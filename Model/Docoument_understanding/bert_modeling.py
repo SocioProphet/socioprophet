@@ -220,10 +220,15 @@ def transformer_model(input_tensor,
 		raise ValueError("The width of the input tensor (%d) != hidden size (%d)" %
             			(input_width, hidden_size))
 
+
+	# We keep the representation as a 2D tensor to avoid re-shaping it back and
+	# forth from a 3D tensor to a 2D tensor. Re-shapes are normally free on
+	# the GPU/CPU but may not be free on the TPU, so we want to minimize them to
+	# help the optimizer.
+
 	prev_output = reshape_to_matrix(input_tensor)
 
 	all_layer_outputs = []
-
 	for layer_idx in range(number_hidden_layers):
 		with tf.variable_scope("layer_%d" % layer_idx):
 			layer_input = prev_output
@@ -255,11 +260,17 @@ def transformer_model(input_tensor,
 				attention_output = tf.concat(attention_heads, axis=-1)
 
 
-	# We keep the representation as a 2D tensor to avoid re-shaping it back and
-	# forth from a 3D tensor to a 2D tensor. Re-shapes are normally free on
-	# the GPU/CPU but may not be free on the TPU, so we want to minimize them to
-	# help the optimizer.
+			# Run a linear projection of `hidden_size` then add a residual
+			# with `layer_input`.
 
+			with tf.variable_scope("output"):
+				attention_output = tf.layers.dense(
+					attention_output,
+					hidden_size,
+					kernel_initializer=create_initializer(initializer_range)
+					)
+				attention_output = dropout(attention_output, hidden_dropout_prob)
+				attention_output = layer_norm(attention_output + layer_input)
   
 
 def get_shape_list(tensor, expected_rank=None, name=None):
@@ -298,6 +309,20 @@ def get_shape_list(tensor, expected_rank=None, name=None):
 	for index in non_static_indexes:
 		shape[index] = dyn_shape[index]
 	return shape
+
+
+def reshape_to_matrix(input_tensor):
+	"""Reshapes a >= rank 2 tensor to a rank 2 tensor (i.e., a matrix)."""
+	ndims = input_tensor.shape.ndims
+	if ndims < 2:
+		raise ValueError("Input tensor must have at least rank 2. Shape = %s" %
+			(input_tensor.shape))
+	if ndims == 2:
+		return input_tensor
+
+	width = input_tensor.shape[-1]
+	output_tensor = tf.reshape(input_tensor, [-1, width])
+	return output_tensor
 
 
 def create_attention_mask_from_input_mask(from_tensor, to_mask):
