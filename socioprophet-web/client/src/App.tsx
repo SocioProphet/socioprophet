@@ -1,5 +1,23 @@
+/**
+ *
+ *  File: App.tsx
+ *  Author: William Jones
+ *  Desciption: Main application wrapper for all view routes
+ *
+ */
+
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
+/**
+ *  view imports (latest version)
+ *
+ */
+import Terms from './views/legal/Terms';
+import Privacy from './views/legal/Privacy';
+import NotFound from './views/not-found/NotFound';
+
+/***************************************************/
 
 // import ComingSoon from './components/coming-soon/ComingSoon';
 import Landing from './components/landing/Landing';
@@ -7,9 +25,6 @@ import EmailSubmission from './components/landing/forms/email-submission/EmailSu
 import Survey from './components/survey/Survey';
 
 import Alpha from './components/dashboard/Alpha';
-import NotFound from './components/not-found/NotFound';
-import Terms from './components/legal/Terms';
-import Privacy from './components/legal/Privacy';
 
 import PrivateRoute from './components/private-route/PrivateRoute';
 import { AuthProvider } from './authentication/contexts/AuthContext';
