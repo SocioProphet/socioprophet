@@ -52,7 +52,7 @@
     "googleapis": "^67.0.0",
     "helmet": "^4.3.1",
     "node-cache": "^5.1.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "node-vault": "^0.9.21",
     "nodemailer": "^6.6.1",
     "request": "^2.88.2"
