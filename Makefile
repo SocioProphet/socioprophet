@@ -19,3 +19,9 @@ run_client:
 # build client
 build_client:
 	cd socioprophet-web/scripts && bash build_client.sh
+
+deploy_client:
+	cd socioprophet-web/scripts && bash deploy_client.sh
+
+deploy_server:
+	cd socioprophet-web/scripts && bash deploy_server.sh
