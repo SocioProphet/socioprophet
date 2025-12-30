@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# HOST-GUARD: run via toolchain/oci/run.sh
+if ! command -v skopeo >/dev/null 2>&1; then
+  echo "skopeo not found. This script must run inside the pinned toolchain container." >&2
+  echo "Run: MODE=local-http-offline REG=host.containers.internal:5000 COSIGN_PASSWORD='' bash toolchain/oci/run.sh" >&2
+  exit 127
+fi
+
 set -euo pipefail
 
 # MODE:
