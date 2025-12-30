@@ -1,0 +1,7 @@
+# Minimal image mirror/sign/attest inputs (extend later)
+images:
+  - name: nginx-unprivileged
+    src: ghcr.io/nginxinc/nginx-unprivileged:1.27
+    dest_repo: nginxinc/nginx-unprivileged
+    tag: "1.27"
+    # digest: ""   # optional pin (filled after first mirror)

@@ -1,0 +1,5 @@
+# supply chain keys + outputs
+cosign.key
+cosign.pub
+sbom.spdx.json
+runlog.*
