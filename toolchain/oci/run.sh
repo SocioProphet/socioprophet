@@ -8,13 +8,13 @@ COSIGN_PASSWORD="${COSIGN_PASSWORD:-}"
 command -v podman >/dev/null 2>&1 || { echo "podman not found on host" >&2; exit 127; }
 
 # Ensure tool image exists (host-side).
-podman image exists supplychain-tools:local || podman build -t supplychain-tools:local -f toolchain/oci/Dockerfile toolchain/oci
+podman image exists supplychain-tools:local >/dev/null 2>&1 || \
+  podman build -t supplychain-tools:local -f toolchain/oci/Dockerfile toolchain/oci
 
 # If we're targeting the local dev registry, ensure it exists (host-side).
 if [[ "$REG" == "host.containers.internal:5000" || "$REG" == "localhost:5000" || "$REG" == "127.0.0.1:5000" ]]; then
   podman ps --format "{{.Names}}" | grep -qx local-registry || podman run -d --name local-registry -p 5000:5000 registry:2
 fi
 
-# IMPORTANT: supplychain-tools:local ENTRYPOINT is already "/bin/bash -lc"
-exec podman run --rm -it -v "$PWD:/work" -w /work supplychain-tools:local \
-  "MODE='$MODE' REG='$REG' COSIGN_PASSWORD='$COSIGN_PASSWORD' bash toolchain/oci/spike.sh"
+exec podman run --rm -i -v "$PWD:/work" -w /work supplychain-tools:local \
+  bash -lc "MODE='$MODE' REG='$REG' COSIGN_PASSWORD='$COSIGN_PASSWORD' bash toolchain/oci/spike.sh"
