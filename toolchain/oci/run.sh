@@ -16,5 +16,5 @@ if [[ "$REG" == "host.containers.internal:5000" || "$REG" == "localhost:5000" ||
   podman ps --format "{{.Names}}" | grep -qx local-registry || podman run -d --name local-registry -p 5000:5000 registry:2
 fi
 
-exec podman run --rm -i -v "$PWD:/work" -w /work supplychain-tools:local \
-  bash -lc "MODE='$MODE' REG='$REG' COSIGN_PASSWORD='$COSIGN_PASSWORD' bash toolchain/oci/spike.sh"
+exec podman run --rm -it -v "$PWD:/work" -w /work supplychain-tools:local \
+  bash -lc "MODE='$MODE' REG='$REG' COSIGN_PASSWORD='$COSIGN_PASSWORD' COSIGN_YES=true bash toolchain/oci/spike.sh"
