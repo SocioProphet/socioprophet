@@ -1,0 +1,12 @@
+node_modules/
+
+nginx/
+
+build/
+
+local_deploy/
+
+.env
+
+.DS_Store
+

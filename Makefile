@@ -1,4 +1,4 @@
-.PHONY: install_web run_server run_client build_client
+.PHONY: install_web run_web
 
 # install dependencies for client and server concurrently
 install_web:
@@ -7,15 +7,3 @@ install_web:
 # run client and server 
 run_web:
 	cd socioprophet-web/scripts/ && bash run_web.sh
-
-# local run server
-run_server:
-	cd socioprophet-web/scripts/ && bash run_server.sh
-
-# local run client
-run_client:
-	cd socioprophet-web/scripts && bash run_client.sh
-
-# build client
-build_client:
-	cd socioprophet-web/scripts && bash build_client.sh

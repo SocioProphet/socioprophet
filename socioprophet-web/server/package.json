@@ -34,33 +34,34 @@
   "license": "UNLICENSED",
   "private": true,
   "main": "server.js",
+  "nodemonConfig": {
+    "ext": "js",
+    "ignore": [
+      "package.json"
+    ]
+  },
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node src/server.ts",
+    "dev": "nodemon src/server.ts"
   },
   "author": "Will Jones",
   "dependencies": {
-    "@supabase/supabase-js": "^1.22.3",
-    "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "cookie-session": "^1.4.0",
     "cors": "^2.8.5",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.3.1",
     "express": "^4.16.4",
-    "firebase-admin": "^9.9.0",
-    "googleapis": "^67.0.0",
     "helmet": "^4.3.1",
+    "jsdom": "^23.0.1",
     "node-cache": "^5.1.2",
-    "node-fetch": "^2.6.1",
-    "node-vault": "^0.9.21",
-    "nodemailer": "^6.6.1",
-    "request": "^2.88.2"
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
-    "google-auth-library": "^6.1.4",
-    "nodemon": "^2.0.6"
-  },
-  "proxy": "http://localhost:5001"
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.7",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
 }

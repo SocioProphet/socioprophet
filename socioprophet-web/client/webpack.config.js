@@ -1,11 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
-const webpack = require('webpack');
+require('dotenv').config();
 
-let APP_DIR = path.resolve(__dirname, './src');
-let BUILD_DIR = path.join(__dirname, '/build');
+const APP_DIR = path.resolve(__dirname, './src');
+const BUILD_DIR = path.join(__dirname, '/build');
 
 const webpackConfig = () => {
   return {
@@ -27,8 +26,8 @@ const webpackConfig = () => {
           },
         },
         {
-          test: /\.(s*)css$/,
-          use: ['style-loader', 'css-loader', 'sass-loader'],
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
         },
         {
           test: /\.(jpg|gif|ico|jpeg|png)$/i,
@@ -50,11 +49,10 @@ const webpackConfig = () => {
 
     devServer: {
       host: '0.0.0.0',
-      port: 8081,
+      port: process.env.REACT_PORT,
       historyApiFallback: true,
-      allowedHosts: ['localhost.socioprophet.com', 'socioprophet.com', 'www.socioprophet.com'],
       proxy: {
-        '/api': 'http://localhost:5001',
+        '/api': `http://localhost:${process.env.NODE_PORT}`,
       },
     },
     plugins: [
@@ -63,7 +61,6 @@ const webpackConfig = () => {
         favicon: './public/favicon.ico',
       }),
       new CleanWebpackPlugin(),
-      new Dotenv(),
     ],
   };
 };

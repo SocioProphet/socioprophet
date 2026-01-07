@@ -1,9 +1,7 @@
 # Client Dockerfile
 
 # pull official base image as build image
-FROM node:15-alpine as build
-
-
+FROM node:18-alpine as build
 
 # set working directory
 WORKDIR /usr/src/app/
@@ -14,7 +12,7 @@ COPY package.json .
 COPY yarn.lock .
 
 RUN apk add --no-cache --virtual .gyp \
-    python \
+    python3 \
     make \
     g++ \
     && yarn \

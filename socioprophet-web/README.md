@@ -1,94 +1,125 @@
-## SocioProphet-Web
+# socioprophet-web
 
-This folder contains the code for the socioprophet website. 
+This directory contains the **entire SocioProphet web application**, split into a frontend SPA and a backend API. Use this README for operational details; component-level documentation lives in subdirectories.
 
-## SocioProphet-Web top-level directory layout
+## Repository structure
 
-This is the directory of the monorepo for the website / user interfact of the prophet-platform. The codebase and repo are both a work in progress.
+| Path | Description |
+| --- | --- |
+| `client/` | React 18 + TypeScript SPA bundled with Webpack. |
+| `server/` | Express server that exposes `/api/feed/rss`. |
+| `scripts/` | Shell helpers used by the root `Makefile`. |
 
+## Quick start (development)
 
 ```bash
-    socioprophet-web            # Directory containing website platform code (back-end and front-end)
-    │   ├── README.md               #
-    │   ├── client                  #
-    	    └── webpack.config.js   #
-    │       └── pubilc              #
-    │        └──**/** 
-    │       └── src                 #
-    │           └──**/** 	             
-    │   ├── routes                  #
-    │   ├── scripts                 #
-    │   ├── server.js               #
-    │   ├── package.json            #             
+# from /workspace/socioprophet
+make install_web
+make run_web
 ```
 
-## Build Setup 
+### What runs where
 
-Some build setup documentation
+| Service | Default runtime | Notes |
+| --- | --- | --- |
+| Client | Webpack dev server | Configured in `client/webpack.config.js`. |
+| Server | Express | Entry point: `server/src/server.ts`. |
 
-## Building with the Makefile and Yarn
+## Environment variables
 
-SocioProphet-Web can be built and run using the Makefile within the project root directory. The commands executed by the Makefile are the same commands one would use to build a project and run the webserver--these commands are documented here:
+Create `.env` files in **both** subprojects.
 
-``` bash
-.PHONY: build_web run_server run_client
+### Client (`client/.env`)
 
-build_web:
-	cd socioprophet-web/scripts/ && bash build_web.sh
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `REACT_PORT` | ✅ | Port for the dev server (`webpack-dev-server`). |
+| `NODE_PORT` | ✅ | Target port for API proxying (`/api`). |
 
-run_server:
-	cd socioprophet-web/scripts && bash start_mongod.sh && bash run_server.sh
+### Server (`server/.env`)
 
-run_client:
-	cd socioprophet-web/scripts && bash run_client.sh
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `PORT` | ✅ | HTTP port for the Express server. |
+
+## API overview
+
+The backend exposes one API namespace:
+
+- `GET /api/feed/rss`
+  - Returns a JSON array of items: `{ title, link }`.
+  - Sourced from `https://hnrss.org/newest` (Hacker News RSS).
+  - Cached for **10 minutes** in-memory using `node-cache`.
+
+The client fetches this endpoint in the ticker banner (`client/src/components/tickerFeed`).
+
+## Development workflows
+
+### Install dependencies
+
+```bash
+cd scripts
+bash install_web.sh
 ```
 
-To build the socioprophet-web repository, run the following commands in the root directory:
+### Run client + server together
 
-``` bash
-# install website dependencies
-make build_web
-
-# to run the development web-server:
-make run_server
-
-# to run the webpack-dev-server for the client build:
-make run_client
+```bash
+cd scripts
+bash run_web.sh
 ```
 
-The 'make build_web' command documented above executes a shell script with the following:
+### Run projects individually
 
-``` bash
-#!/usr/bin/env bash
+```bash
+cd client
+cp .env.example .env
+# set REACT_PORT and NODE_PORT
 
-#build prophet-web
-cd .. && yarn 
-cd client && yarn
+yarn
+
+yarn start
 ```
 
-The 'make run_server' command documented above executes a shell script with the following:
+```bash
+cd server
+cp .env.example .env
+# set PORT
 
-``` bash
-#!/usr/bin/env bash
+yarn
 
-#start-up socioprophet-web
-cd .. && yarn run dev
+yarn run dev
 ```
 
-The 'make run_client' command documented above executes a shell script with the following:
+## Docker builds
 
-``` bash
-#!/usr/bin/env bash
+Both subprojects include Dockerfiles. They are **not** wired together with a `docker-compose.yml`.
 
-#start-up socioprophet-web
-cd .. && cd client && yarn run start
-```
+### Client container
 
-As part of the process, the root Makefile calls 'start_mongod.sh'  which is a shell script with the following:
+- Build stage uses `node:18-alpine`, runs `yarn build`.
+- Runtime stage uses `nginx:stable-alpine`.
+- Copies `/build` output to `/usr/share/nginx/html`.
+- Exposes port **80**.
+- The Dockerfile expects an `nginx/nginx.conf` file under the client directory.
 
-``` bash
-#!/usr/bin/env bash
+### Server container
 
-#start mongod and run in packground
-mongod &
-```
+- Uses `node:18-alpine`.
+- Installs dependencies and runs `yarn start`.
+- Exposes whatever `PORT` is configured at runtime.
+
+## Where to find detailed documentation
+
+Each directory ships with its own README. Start here:
+
+- `client/README.md`
+- `server/README.md`
+- `scripts/README.md`
+- `client/src/**/README.md`
+- `server/src/**/README.md`
+
+## Notes
+
+- `node_modules/` directories are included in this workspace but are not part of documentation updates.
+- The server uses CommonJS `require` syntax inside TypeScript for consistency; follow the existing patterns unless you explicitly refactor.
