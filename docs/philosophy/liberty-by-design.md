@@ -164,6 +164,21 @@ Verification must be easy:
 
 ---
 
+---
+
+## Related Specs (stubs → formal specs)
+
+These are the implementable surfaces that doctrine must map into. They start as stubs and should be formalized into schemas/RPC/policy/audit tooling.
+
+- Rights of Verification Charter v1: spec/constitutional/rights-of-verification-charter-v1.md
+- Attestation Envelope v1: spec/security/attestation-envelope-v1.md
+- Transparency Log v1: spec/security/transparency-log-v1.md
+- Witness Diversity Policy v1: spec/security/witness-diversity-policy-v1.md
+- Audit Bundle + Replay Recipe v1: spec/security/audit-bundle-and-replay-v1.md
+- Governance Lifecycle v1: spec/governance/governance-lifecycle-v1.md
+- Curvature Proxy Metrics v1: spec/metrics/curvature-proxy-metrics-v1.md
+- Privacy Boundaries v1: spec/privacy/privacy-boundaries-v1.md
+
 # Backlog (spec artifacts to implement next)
 1) Rights of Verification Charter v1 (human-readable + machine-enforceable).
 2) Attestation Envelope v1 (code/data/model/policy/decision).
