@@ -39,3 +39,7 @@ make run_web
 ### Env Variables
 
 Create a `.env` in both the client and server folders. Check `./client/.env.example` and `./server/.env.examples` for details.
+## Philosophy
+
+- Liberty by Design: docs/philosophy/liberty-by-design.md
+
