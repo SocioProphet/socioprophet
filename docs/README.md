@@ -16,3 +16,13 @@ Docs are organized so that doctrine (values/constraints) maps cleanly into specs
 
 - Keep doctrine stable and linkable.
 - Every doctrine claim should map to an implementable spec surface.
+## Canonical Spec Roots
+
+- Canonical spec root: `spec/`
+- Doctrine-linked spec domains:
+  - constitutional: `spec/constitutional/`
+  - security: `spec/security/`
+  - governance: `spec/governance/`
+  - metrics: `spec/metrics/`
+  - privacy: `spec/privacy/`
+
