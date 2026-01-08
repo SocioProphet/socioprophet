@@ -43,3 +43,9 @@ Create a `.env` in both the client and server folders. Check `./client/.env.exam
 
 - Liberty by Design: docs/philosophy/liberty-by-design.md
 
+## Documentation
+
+- Docs index: docs/README.md
+- Philosophy: docs/philosophy/README.md
+- Liberty by Design: docs/philosophy/liberty-by-design.md
+
