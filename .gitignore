@@ -23,3 +23,6 @@ firebase-debug.log*
 
 # Runtime-injected public config
 socioprophet-web/client/public/firebase-config.js
+
+# Local validation artifacts
+artifacts/
