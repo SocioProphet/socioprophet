@@ -16,8 +16,9 @@ jobs:
       - name: Install gitleaks
         run: |
           curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz \
-          | tar -xz
-          sudo mv gitleaks /usr/local/bin/
+          |uses: gitleaks/gitleaks-action
+        with:
+          args: detect --source . --no-git --redact
 
       - name: Run gitleaks (working tree only)
         run: |
