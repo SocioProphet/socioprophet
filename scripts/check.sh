@@ -13,5 +13,4 @@ python3 "$ROOT/scripts/validate_registry.py" \
   --strict
 
 python3 "$ROOT/agentplane/scripts/validate_bundle.py" \
-  "$ROOT/agentplane/bundles/example-agent/bundle.json" \
-  --out-dir "$OUTDIR"
+  "$ROOT/agentplane/bundles/example-agent/bundle.json"
