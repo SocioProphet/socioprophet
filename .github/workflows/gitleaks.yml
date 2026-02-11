@@ -7,6 +7,7 @@ on:
 
 jobs:
   scan:
+    name: scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
