@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "apiVersion": {
+      "enum": [
+        "agentplane.socioprophet.org/v0.1"
+      ],
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "Bundle"
+      ],
+      "type": "string"
+    },
+    "metadata": {
+      "properties": {
+        "createdAt": {
+          "type": "string"
+        },
+        "licensePolicy": {
+          "description": "Our internal compliance gate: declare that bundle contents are shippable under our rules.",
+          "properties": {
+            "allowAGPL": {
+              "enum": [
+                false
+              ],
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": {
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}$",
+          "type": "string"
+        },
+        "source": {
+          "properties": {
+            "git": {
+              "properties": {
+                "dirty": {
+                  "type": "boolean"
+                },
+                "rev": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "spec": {
+      "properties": {
+        "artifacts": {
+          "properties": {
+            "outDir": {
+              "description": "Where proof artifacts are written (run/policy/promotion/replay/receipt)",
+              "type": "string"
+            }
+          },
+          "required": [
+            "outDir"
+          ],
+          "type": "object"
+        },
+        "executor": {
+          "properties": {
+            "ref": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "policy": {
+          "description": "TrustFirst Policy Pack pointer(s) and hashes; contents live elsewhere.",
+          "properties": {
+            "failOnTimeout": {
+              "type": "boolean"
+            },
+            "humanGateRequired": {
+              "type": "boolean"
+            },
+            "lane": {
+              "enum": [
+                "staging",
+                "prod"
+              ],
+              "type": "string"
+            },
+            "maxRunSeconds": {
+              "maximum": 3600,
+              "minimum": 5,
+              "type": "integer"
+            },
+            "policyPackHash": {
+              "type": "string"
+            },
+            "policyPackRef": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "secrets": {
+          "description": "Secrets are refs/paths only \u2014 never inline values.",
+          "properties": {
+            "required": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "secretRefRoot": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "smoke": {
+          "properties": {
+            "script": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "script"
+          ],
+          "type": "object"
+        },
+        "vm": {
+          "properties": {
+            "backendIntent": {
+              "enum": [
+                "qemu",
+                "microvm",
+                "lima-process",
+                "fleet"
+              ],
+              "type": "string"
+            },
+            "modulePath": {
+              "description": "Path to NixOS module entry (e.g., vm.nix)",
+              "type": "string"
+            },
+            "mounts": {
+              "items": {
+                "properties": {
+                  "ro": {
+                    "type": "boolean"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "virtiofs",
+                      "9p",
+                      "none"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "source",
+                  "target",
+                  "ro"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "network": {
+              "properties": {
+                "egressAllowlist": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "mode": {
+                  "enum": [
+                    "none",
+                    "nat",
+                    "bridge",
+                    "slirp"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "resources": {
+              "properties": {
+                "diskGiB": {
+                  "type": "integer"
+                },
+                "memMiB": {
+                  "type": "integer"
+                },
+                "vcpu": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "modulePath",
+            "backendIntent"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "vm",
+        "secrets",
+        "policy",
+        "artifacts",
+        "smoke"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "title": "Agentplane Bundle Schema v0.1",
+  "type": "object"
+}

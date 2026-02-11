@@ -1,0 +1,530 @@
+generated_at: '2026-02-11T11:00:48.925809Z'
+tools:
+- id: gastown
+  name: Gastown
+  layer: L3 Orchestration
+  repo: https://github.com/steveyegge/gastown
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: Orchestrator
+  default_context: core
+- id: aiwg
+  name: AIWG
+  layer: L3 Process Spine
+  repo: https://github.com/jmagly/aiwg
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: ProcessSpine
+  default_context: core
+  zip_meta:
+  - id: aiwg
+    name: aiwg
+    source: uploaded_zip
+    zip: aiwg-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 03ba46e0f47d80e4
+    notice_file: null
+    package_json_license: MIT
+    final_license_signal: MIT
+- id: ace-framework
+  name: ACE Framework
+  layer: L3 Process Playbooks
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: Playbooks
+  default_context: support
+  zip_meta:
+  - id: ace-framework
+    name: ACE_Framework
+    source: uploaded_zip
+    zip: ACE_Framework-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 73aec45e0d165cbd
+    notice_file: null
+    package_json_license: null
+    final_license_signal: MIT
+- id: opencode
+  name: OpenCode
+  layer: L2 Executor
+  repo: https://github.com/anomalyco/opencode
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: Executor
+  default_context: core
+- id: aider
+  name: Aider
+  layer: L2 Executor
+  repo: https://github.com/Aider-AI/aider
+  license_spdx: Apache-2.0
+  license_source: web
+  risk: green
+  adapter: Executor
+  default_context: support
+- id: continue
+  name: Continue
+  layer: L2 Executor/(IDE/PR)
+  repo: https://github.com/continuedev/continue
+  license_spdx: Apache-2.0
+  license_source: web
+  risk: green
+  adapter: Executor
+  default_context: support
+- id: goose
+  name: Goose
+  layer: L2 Executor/Tool Runner
+  repo: https://github.com/block/goose
+  license_spdx: Apache-2.0
+  license_source: web
+  risk: green
+  adapter: Executor
+  default_context: support
+- id: tabbyml
+  name: Tabby (TabbyML)
+  layer: L2 Assistant Backend
+  repo: https://github.com/TabbyML/tabby
+  license_spdx: Apache-2.0 (FOSS) + paid tiers
+  license_source: web
+  risk: green/yellow
+  adapter: CompletionService
+  default_context: core
+- id: stagehand
+  name: Stagehand
+  layer: L4 BrowserOps
+  repo: https://github.com/browserbase/stagehand
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: BrowserOps
+  default_context: core
+- id: browser-use
+  name: browser-use
+  layer: L4 BrowserOps
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: BrowserOps
+  default_context: support
+  zip_meta:
+  - id: browser-use
+    name: browser-use
+    source: uploaded_zip
+    zip: browser-use-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 135c57671b0ee957
+    notice_file: null
+    package_json_license: null
+    final_license_signal: MIT
+- id: agent-s
+  name: Agent-S
+  layer: L4 DesktopOps
+  repo: null
+  license_spdx: Apache-2.0
+  license_source: zip
+  risk: green
+  adapter: DesktopOps
+  default_context: restricted
+  zip_meta:
+  - id: agent-s
+    name: Agent-S
+    source: uploaded_zip
+    zip: Agent-S-main.zip
+    license_spdx: Apache-2.0
+    license_signals:
+    - Apache-2.0
+    license_conflict: false
+    license_sha256_16: 43070e2d4e532684
+    notice_file: null
+    package_json_license: null
+    final_license_signal: Apache-2.0
+- id: openclaw
+  name: OpenClaw
+  layer: L4 Personal Assistant/Connectors
+  repo: https://github.com/openclaw/openclaw
+  license_spdx: MIT
+  license_source: web
+  risk: yellow (security surface)
+  adapter: AssistantGateway
+  default_context: restricted
+- id: mem0
+  name: Mem0
+  layer: L5 Memory
+  repo: https://github.com/mem0ai/mem0
+  license_spdx: Apache-2.0
+  license_source: web
+  risk: green
+  adapter: MemoryAPI
+  default_context: core
+- id: ontogpt
+  name: OntoGPT
+  layer: L5 Extractor (text→schema)
+  repo: https://github.com/monarch-initiative/ontogpt
+  license_spdx: BSD-3-Clause
+  license_source: web
+  risk: green
+  adapter: Extractor
+  default_context: support
+- id: vlmrun-hub
+  name: VLM Run Hub
+  layer: L5 Extractor (vision→schema)
+  repo: https://github.com/vlm-run/vlmrun-hub
+  license_spdx: Apache-2.0
+  license_source: web
+  risk: green
+  adapter: Extractor
+  default_context: support
+- id: subconscious-systems
+  name: Subconscious Systems (TIMRUN + SDKs)
+  layer: L8 Long-horizon reasoning
+  repo: https://github.com/subconscious-systems
+  license_spdx: mixed/verify per repo (TIMRUN model MIT)
+  license_source: web
+  risk: yellow
+  adapter: LongHorizonService
+  default_context: optional
+- id: fortemi
+  name: Fortemi
+  layer: L8 KB/semantic search
+  repo: null
+  license_spdx: BUSL-1.1 (change date to AGPL in LICENSE)
+  license_source: zip
+  risk: red/yellow
+  adapter: KBService
+  default_context: quarantine
+  zip_meta:
+  - id: fortemi
+    name: fortemi
+    source: uploaded_zip
+    zip: fortemi-main.zip
+    license_spdx: BUSL-1.1
+    license_signals:
+    - BUSL-1.1
+    - SEE LICENSE IN ../LICENSE
+    license_conflict: true
+    license_sha256_16: 7371d10557ca85ed
+    notice_file: fortemi-main/NOTICE
+    package_json_license: SEE LICENSE IN ../LICENSE
+    final_license_signal: BUSL-1.1
+- id: ad4m
+  name: AD4M
+  layer: L8 Agent social fabric
+  repo: https://github.com/coasys/ad4m
+  license_spdx: CAL-1.0
+  license_source: web
+  risk: red/yellow
+  adapter: SocialFabric
+  default_context: optional
+- id: opensouls
+  name: OpenSouls
+  layer: L2/3 Agent framework
+  repo: https://github.com/opensouls/opensouls
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: AgentFramework
+  default_context: optional
+- id: vercel-ai-sdk
+  name: Vercel AI SDK (vercel/ai)
+  layer: L6 App framework
+  repo: https://github.com/vercel/ai
+  license_spdx: Apache-2.0 (zip shows)
+  license_source: zip
+  risk: green
+  adapter: AppFramework
+  default_context: support
+  zip_meta:
+  - id: ai
+    name: ai
+    source: uploaded_zip
+    zip: ai-main.zip
+    license_spdx: Apache-2.0
+    license_signals:
+    - Apache License
+    - Apache-2.0
+    license_conflict: true
+    license_sha256_16: b4f9adb7c5689048
+    notice_file: null
+    package_json_license: Apache License
+    final_license_signal: Apache-2.0
+  aliases:
+  - 'ai (zip: ai-main.zip)'
+- id: zenstack
+  name: ZenStack
+  layer: L6 Data layer
+  repo: https://github.com/zenstackhq/zenstack
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: DataLayer
+  default_context: support
+- id: medusa
+  name: Medusa
+  layer: L6 Commerce platform
+  repo: https://github.com/medusajs/medusa
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: ProductPlatform
+  default_context: optional
+- id: plate
+  name: Plate (open-source core)
+  layer: L1/6 Editor components
+  repo: https://github.com/udecode/plate
+  license_spdx: MIT (core) + commercial Plate Plus
+  license_source: web
+  risk: green/yellow
+  adapter: EditorComponent
+  default_context: optional
+- id: parlai
+  name: ParlAI
+  layer: L7 Eval harness
+  repo: https://github.com/facebookresearch/ParlAI
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: EvalHarness
+  default_context: optional
+- id: zed
+  name: Zed
+  layer: L1 Editor
+  repo: https://github.com/zed-industries/zed
+  license_spdx: AGPL/GPL components (see repo LICENSE-AGPL/LICENCE-GPL)
+  license_source: web
+  risk: yellow
+  adapter: Editor
+  default_context: dev-only
+- id: warp
+  name: Warp
+  layer: L1 Terminal
+  repo: https://www.warp.dev
+  license_spdx: proprietary
+  license_source: web
+  risk: red (if bundled)
+  adapter: Terminal
+  default_context: dev-only
+- id: soft-serve
+  name: Soft Serve
+  layer: L0 Git hosting
+  repo: https://github.com/charmbracelet/soft-serve
+  license_spdx: MIT
+  license_source: web
+  risk: green
+  adapter: GitService
+  default_context: optional
+- id: rappy-lobster
+  name: rappy-lobster
+  layer: L7 Vertical Rig
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: yellow
+  adapter: Rig
+  default_context: optional
+  zip_meta:
+  - id: rappy-lobster
+    name: rappy-lobster
+    source: uploaded_zip
+    zip: rappy-lobster-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    - UNLICENSED
+    license_conflict: true
+    license_sha256_16: 5b615e0f951e1815
+    notice_file: null
+    package_json_license: UNLICENSED
+    final_license_signal: MIT
+- id: agent-inbox
+  name: agent-inbox
+  layer: L7 Vertical Rig (Inbox agents)
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: Rig
+  default_context: optional
+  zip_meta:
+  - id: agent-inbox
+    name: agent-inbox
+    source: uploaded_zip
+    zip: agent-inbox-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 5a73d9410eb4f288
+    notice_file: null
+    package_json_license: null
+    final_license_signal: MIT
+- id: seomachine
+  name: seomachine
+  layer: L7 Vertical Rig (SEO)
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: Rig
+  default_context: optional
+  zip_meta:
+  - id: seomachine
+    name: seomachine
+    source: uploaded_zip
+    zip: seomachine-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 78f5ddf97cb2712e
+    notice_file: null
+    package_json_license: null
+    final_license_signal: MIT
+- id: skill-seekers-development
+  name: Skill_Seekers-development
+  layer: L5 Ingestion/Prep
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: Ingestion
+  default_context: optional
+  zip_meta:
+  - id: skill-seekers-development
+    name: Skill_Seekers-development
+    source: uploaded_zip
+    zip: Skill_Seekers-development.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: d131d0e96700cd78
+    notice_file: null
+    package_json_license: null
+    final_license_signal: MIT
+  aliases:
+  - Skill Seekers
+- id: full-small-app-workflow
+  name: Full-Small-App-Workflow
+  layer: L7 Template/Workflow
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: Template
+  default_context: optional
+  zip_meta:
+  - id: full-small-app-workflow
+    name: Full-Small-App-Workflow
+    source: uploaded_zip
+    zip: Full-Small-App-Workflow-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 0aa79baf6328b4a1
+    notice_file: null
+    package_json_license: MIT
+    final_license_signal: MIT
+- id: inbox-zero
+  name: inbox-zero
+  layer: L7 Vertical App
+  repo: null
+  license_spdx: GPL-3.0
+  license_source: zip
+  risk: yellow
+  adapter: App
+  default_context: optional
+  zip_meta:
+  - id: inbox-zero
+    name: inbox-zero
+    source: uploaded_zip
+    zip: inbox-zero-main.zip
+    license_spdx: GPL-3.0
+    license_signals:
+    - GPL-3.0
+    license_conflict: false
+    license_sha256_16: f4a1d294633040a4
+    notice_file: null
+    package_json_license: null
+    final_license_signal: GPL-3.0
+- id: bmad-builder
+  name: bmad-builder
+  layer: L3 Process Playbooks
+  repo: null
+  license_spdx: MIT
+  license_source: zip
+  risk: green
+  adapter: Playbooks
+  default_context: optional
+  zip_meta:
+  - id: bmad-builder
+    name: bmad-builder
+    source: uploaded_zip
+    zip: bmad-builder-main.zip
+    license_spdx: MIT
+    license_signals:
+    - MIT
+    license_conflict: false
+    license_sha256_16: 0aa79baf6328b4a1
+    notice_file: null
+    package_json_license: MIT
+    final_license_signal: MIT
+  aliases:
+  - BMAD Builder
+- id: anus
+  name: ANUS
+  layer: L7 Sandbox/Example
+  repo: null
+  license_spdx: Apache-2.0
+  license_source: zip
+  risk: green
+  adapter: Example
+  default_context: optional
+  zip_meta:
+  - id: anus
+    name: ANUS
+    source: uploaded_zip
+    zip: ANUS-main.zip
+    license_spdx: Apache-2.0
+    license_signals:
+    - Apache-2.0
+    license_conflict: false
+    license_sha256_16: 09d2d564b15d1a8b
+    notice_file: ANUS-main/NOTICE
+    package_json_license: Apache-2.0
+    final_license_signal: Apache-2.0
+- id: argos
+  name: argos
+  layer: L7 Reference Patterns
+  repo: null
+  license_spdx: CC0-1.0
+  license_source: zip
+  risk: green
+  adapter: Reference
+  default_context: optional
+  zip_meta:
+  - id: argos
+    name: argos
+    source: uploaded_zip
+    zip: argos-main.zip
+    license_spdx: CC0-1.0
+    license_signals:
+    - CC0-1.0
+    license_conflict: false
+    license_sha256_16: 36ffd9dc085d529a
+    notice_file: null
+    package_json_license: null
+    final_license_signal: CC0-1.0

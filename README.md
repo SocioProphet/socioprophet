@@ -1,58 +1,37 @@
-# SocioProphet — Global Knowledge Commons (Monorepo)
+# Sociosphere Ecosystem (AgentOS + Agentplane)
 
-SocioProphet is building a **global knowledge commons**: an open, human-first system for sharing knowledge, tooling, and operational practice into a substrate that is **auditable**, **local-first**, and **interoperable**.
+This repo is a **single work product** that unifies:
 
-This repo is the monorepo for the web surface and the enforcement primitives that keep the commons safe as it grows (rules-as-code, emulator-backed tests, CI gates, and secret hygiene).
+- **AgentOS**: a *layered* agent stack definition (interfaces, policies, tool registry, Linux integration runbook).
+- **Agentplane**: a *fleet-shaped control plane* for reproducible execution (bundles → validate → place → run → evidence → replay).
 
-## Repo layout
+The intended result is a coherent “agent platform” where:
 
-- socioprophet-web/ — web app + Firebase/Firestore config and policy
-  - client/ — frontend (webpack)
-  - server/ — backend (if present/used)
-  - firestore.rules / firestore.indexes.json — rules-as-code and indexes
-  - firebase.json / .firebaserc — Firebase project configuration
-  - test/ — emulator-backed Firestore rules tests
-  - scripts/run_rules_tests.sh — deterministic runner for rules tests
+- the **AgentOS tool registry** is the compliance + inventory source of truth
+- **agentplane bundles** become the unit of deployment/execution across your executor fleet
+- **AIWG artifacts** (system-of-record) and **agentplane evidence artifacts** (validation/placement/run) reconcile into one auditable trail
 
-- .github/ — GitHub automation (CI workflows, dependabot)
-- docs/ — architecture overview and threat model
+## Layout
 
-## Security posture
+- `agentos/` — AgentOS skeleton (interfaces, policy, integration runbook).
+- `agentplane/` — agentplane repo (Nix flake, bundle schema, runner scripts).
+- `registry/` — canonical tool registry (YAML + CSV).
+- `inventory/` — stack inventory + RACI (spreadsheet).
+- `workspaces/` — workspace controllers (socio-linux + socioprophet) as Nix-first stubs.
+- `scripts/` — cross-cutting validation glue.
 
-We harden against two failure modes that kill projects:
-1) Secrets leaking into git or builds
-2) Datastore rules drifting into permissive mode
+## Quick checks
 
-We enforce:
-- No secrets in git (CI scanning + local hygiene)
-- Firestore rules are deny-by-default
-- Rules changes must be test-backed (emulator tests locally and in CI)
+- Validate the tool registry:
+  - `python3 scripts/validate_registry.py registry/agentos-tool-registry.yaml config/base_image_tools.yaml`
 
-See SECURITY.md for reporting and handling.
+- Validate the example agentplane bundle:
+  - `python3 agentplane/scripts/validate_bundle.py agentplane/bundles/example-agent/bundle.json`
 
-## Getting started (local dev)
+## Why this split exists
 
-Prereqs: Git, Node 20+, Java (Temurin/OpenJDK) for emulator, Yarn (client), npm (rules tests)
+**Gastown/AIWG/OpenCode/etc.** are *agentic* runtime pieces.
 
-Already cloned:
-- cd ~/dev/socioprophet
-- git checkout master
-- git pull --ff-only
-- git status -sb
+**agentplane** is *system-space orchestration* — it answers: “Where does this run, under what constraints, and where is the evidence?”
 
-Build client:
-- cd ~/dev/socioprophet/socioprophet-web/client
-- yarn install
-- yarn build
-
-Runtime Firebase public config (local dev):
-- cd ~/dev/socioprophet/socioprophet-web/client
-- cp -n public/firebase-config.js.example public/firebase-config.js
-- edit public/firebase-config.js
-
-Firestore rules tests:
-- cd ~/dev/socioprophet/socioprophet-web
-- npm ci
-- npm run test:rules
-
-License: MIT (see LICENSE)
+They are complementary, not redundant.

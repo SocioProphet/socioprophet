@@ -1,0 +1,65 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-02-10T00:00:00-05:00",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Bundle contents must remain shippable under permissive-friendly policy."
+    },
+    "name": "example-agent",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/example-agent"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": false,
+      "lane": "staging",
+      "maxRunSeconds": 20,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/dev/default"
+    },
+    "secrets": {
+      "required": [
+        "EXAMPLE_AGENT_TOKEN_FILE"
+      ],
+      "secretRefRoot": "secrets://user"
+    },
+    "smoke": {
+      "script": "bundles/example-agent/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/example-agent/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/example-agent",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns",
+          "https"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 8,
+        "memMiB": 2048,
+        "vcpu": 2
+      }
+    }
+  }
+}
