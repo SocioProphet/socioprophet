@@ -3,7 +3,7 @@ name: gitleaks
 on:
   pull_request:
   push:
-    branches: ["master", "main"]
+    branches: [ master ]
 
 jobs:
   scan:
@@ -11,22 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Install gitleaks
-        run: |
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz \
-          |uses: gitleaks/gitleaks-action
+      - uses: gitleaks/gitleaks-action@v2
         with:
           args: detect --source . --no-git --redact
-
-      - name: Run gitleaks (working tree only)
-        run: |
-          gitleaks detect \
-            --source . \
-            --no-git \
-            --no-banner \
-            --redact \
-            --exit-code 1 \
-            --config .gitleaks.toml
