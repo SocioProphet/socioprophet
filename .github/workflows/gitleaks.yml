@@ -1,5 +1,10 @@
 name: gitleaks
 
+# NOTE: We intentionally install a pinned open-source gitleaks binary.
+# Do NOT switch to license-gated gitleaks actions that require org license keys.
+# This repo is OSS-first and must remain reproducible without proprietary secrets.
+
+
 on:
   pull_request:
   push:
