@@ -29,3 +29,7 @@ artifacts/
 
 # Local caches
 .cache/
+
+# VitePress build outputs
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
