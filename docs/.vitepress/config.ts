@@ -4,11 +4,13 @@ const repo = (process.env.GITHUB_REPOSITORY || "socioprophet").split("/").pop() 
 const base = process.env.DOCS_BASE || "/" + repo + "/";
 
 export default defineConfig({
+  head: [["link", { rel: "icon", href: "/icon.png" }]],
   title: "SocioProphet",
   description: "SocioProphet documentation",
   base,
   cleanUrls: true,
   themeConfig: {
+    logo: { light: "/icon.png", dark: "/icon.png" },
     nav: [
       { text: "Docs", link: "/" },
       { text: "Getting Started", link: "/guide/getting-started" },
