@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Socioprophet</title>
+    <title>SocioProphet</title>
     <link rel="icon" href="/icon.png" />
-    <meta name="description" content="Socioprophet: ideas that propagate, identity that forms, trust that compounds." />
-    <meta property="og:title" content="Socioprophet" />
+    <meta name="description" content="SocioProphet: ideas that propagate, identity that forms, trust that compounds." />
+    <meta property="og:title" content="SocioProphet" />
     <meta property="og:description" content="A platform for idea contagion, identity formation, and trust-mediated economics." />
     <meta property="og:type" content="website" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,8 +22,8 @@
     <header class="border-b">
       <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img src="/icon.png" alt="Socioprophet" class="h-9 w-9" />
-          <div class="font-semibold tracking-tight">Socioprophet</div>
+          <img src="/icon.png" alt="SocioProphet" class="h-9 w-9" />
+          <div class="font-semibold tracking-tight">SocioProphet</div>
         </div>
         <nav class="flex items-center gap-6 text-sm">
           <a class="hover:underline" href="/documentation">Documentation</a>
@@ -42,7 +42,7 @@
               Ideas that propagate. <span class="text-slate-600">Trust that compounds.</span>
             </h1>
             <p class="text-lg text-slate-700 max-w-prose">
-              Socioprophet is building a platform where concept clarity drives adoption,
+              SocioProphet is building a platform where concept clarity drives adoption,
               identity drives retention, and revenue follows trust—not coercion.
             </p>
             <div class="flex flex-wrap gap-3">
@@ -80,17 +80,85 @@
           </div>
         </div>
       </section>
+      <section class="border-t bg-white">
+        <div class="mx-auto max-w-6xl px-6 py-12">
+          <div class="flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <h2 class="text-2xl font-semibold tracking-tight">Products</h2>
+              <p class="mt-2 text-slate-600">Product surfaces are organized by domain suffix.</p>
+            </div>
+            <a class="text-sm text-slate-600 hover:underline" href="/documentation">Documentation →</a>
+          </div>
+
+          <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-xl border bg-white p-5">
+              <div class="text-xs text-slate-500">.ai</div>
+              <div class="mt-1 font-medium">AI Platform</div>
+              <div class="mt-2 text-sm text-slate-600">Agents, orchestration, proofs, and trust gates.</div>
+              <div class="mt-4 flex gap-3 text-sm">
+                <a class="font-medium hover:underline" href="/documentation">Docs</a>
+                <a class="text-slate-600 hover:underline" href="/products/ai">Explore</a>
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-white p-5">
+              <div class="text-xs text-slate-500">.dev</div>
+              <div class="mt-1 font-medium">Developer Platform</div>
+              <div class="mt-2 text-sm text-slate-600">SDKs, CLI, templates, integrations, workflows.</div>
+              <div class="mt-4 flex gap-3 text-sm">
+                <a class="font-medium hover:underline" href="/documentation">Docs</a>
+                <a class="text-slate-600 hover:underline" href="/products/dev">Explore</a>
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-white p-5">
+              <div class="text-xs text-slate-500">.cloud</div>
+              <div class="mt-1 font-medium">Cloud Platform</div>
+              <div class="mt-2 text-sm text-slate-600">Hosting, deployments, registries, ops surfaces.</div>
+              <div class="mt-4 flex gap-3 text-sm">
+                <a class="font-medium hover:underline" href="/documentation">Docs</a>
+                <a class="text-slate-600 hover:underline" href="/products/cloud">Explore</a>
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-white p-5">
+              <div class="text-xs text-slate-500">.io</div>
+              <div class="mt-1 font-medium">I/O Plane (TBD)</div>
+              <div class="mt-2 text-sm text-slate-600">Uploads, streams, capture, ingestion. We will lock scope.</div>
+              <div class="mt-4 flex gap-3 text-sm">
+                <a class="font-medium hover:underline" href="/documentation">Docs</a>
+                <a class="text-slate-600 hover:underline" href="/products/io">Explore</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <footer class="border-t">
       <div class="mx-auto max-w-6xl px-6 py-10 text-sm text-slate-600 flex flex-wrap gap-4 justify-between">
-        <div>© <span id="y"></span> Socioprophet</div>
+        <div>© <span id="y"></span> SocioProphet</div>
         <div class="flex gap-4">
           <a class="hover:underline" href="/documentation">Docs</a>
           <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
         </div>
       </div>
       <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+    
+      <div class="mx-auto max-w-6xl px-6 pb-10 text-sm text-slate-600 flex flex-wrap gap-6 justify-between">
+        <div class="flex gap-4 flex-wrap">
+          <a class="hover:underline" href="/documentation">Docs</a>
+          <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
+          <a class="hover:underline" href="/investor">Investor</a>
+        </div>
+        <div class="flex gap-4 flex-wrap">
+          <a class="hover:underline" href="/privacy">Privacy</a>
+          <a class="hover:underline" href="/terms">Terms</a>
+          <a class="hover:underline" href="/security">Security</a>
+        </div>
+      </div>
     </footer>
+
   </body>
 </html>

@@ -14,7 +14,10 @@ export default defineConfig({
     nav: [
       { text: "Docs", link: "/" },
       { text: "Getting Started", link: "/guide/getting-started" },
-      { text: "Architecture", link: "/guide/architecture" }
+      { text: "Architecture", link: "/guide/architecture" },
+      { text: "Domain Surface", link: "/guide/domain-surface" },
+        { text: "Products", link: "/guide/products/overview" },
+      { text: "Products", link: "/guide/products/overview" }
     ],
     sidebar: {
       "/guide/": [

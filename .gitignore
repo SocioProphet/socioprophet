@@ -33,3 +33,20 @@ artifacts/
 # VitePress build outputs
 /docs/.vitepress/dist/
 /docs/.vitepress/cache/
+
+# Local Firebase state
+.firebase/
+
+# Local Firebase state
+.firebase/
+
+# Local Firebase state
+.firebase/
+
+# Generated docs mounted into marketing (build output)
+marketing/public/documentation/assets/
+marketing/public/documentation/guide/
+marketing/public/documentation/*.html
+marketing/public/documentation/*.css
+marketing/public/documentation/*.json
+marketing/public/documentation/icon.png
