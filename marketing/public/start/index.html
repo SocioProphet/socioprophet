@@ -7,56 +7,128 @@
     <meta name="description" content="Find the right path across Humans, Organizations, and Institutions." />
     <link rel="icon" href="/icon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .choice.selected { border-color: rgb(15 23 42); background: rgb(248 250 252); }
+      .choice { transition: all 120ms ease; cursor: pointer; }
+    </style>
   </head>
   <body class="bg-white text-slate-900 font-sans">
-    <main class="mx-auto max-w-4xl px-6 py-16">
+    <main class="mx-auto max-w-5xl px-6 py-16">
       <div class="space-y-6">
         <div class="text-sm uppercase tracking-[0.18em] text-slate-500">Start</div>
         <h1 class="text-4xl font-semibold tracking-tight">Find the right path.</h1>
         <p class="text-lg text-slate-700">
-          This is the first survey step. We are using it to classify trust boundary, primary goal, and what matters most right now.
+          This is the first intake step. We use it to classify trust boundary, primary goal, and what matters most right now.
         </p>
       </div>
 
       <section class="mt-12 space-y-10">
         <div>
           <h2 class="text-2xl font-semibold tracking-tight">1. Where are we coming from today?</h2>
-          <div class="mt-4 grid gap-4 md:grid-cols-3 text-sm">
-            <a class="rounded-xl border p-5 hover:bg-slate-50" href="/humans/">
+          <div class="mt-4 grid gap-4 md:grid-cols-3 text-sm" data-group="actor">
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="human">
               <div class="font-medium">Human</div>
               <p class="mt-2 text-slate-600">Personal learning, research, agency, and local-first intelligence.</p>
-            </a>
-            <a class="rounded-xl border p-5 hover:bg-slate-50" href="/organizations/">
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="organization">
               <div class="font-medium">Organization</div>
               <p class="mt-2 text-slate-600">Governed AI, shared memory, workforce development, and operational capability.</p>
-            </a>
-            <a class="rounded-xl border p-5 hover:bg-slate-50" href="/institutions/">
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="institution">
               <div class="font-medium">Institution</div>
               <p class="mt-2 text-slate-600">Defense, cyber, supply chain, accountable operations, and public-interest systems.</p>
-            </a>
+            </button>
           </div>
         </div>
 
         <div>
           <h2 class="text-2xl font-semibold tracking-tight">2. What are we trying to do?</h2>
-          <div class="mt-4 grid gap-4 md:grid-cols-2 text-sm">
-            <div class="rounded-xl border p-5"><div class="font-medium">Learn and understand</div><p class="mt-2 text-slate-600">Study, research, and build durable knowledge.</p></div>
-            <div class="rounded-xl border p-5"><div class="font-medium">Build and deploy</div><p class="mt-2 text-slate-600">Create agents, workflows, systems, and technical capability.</p></div>
-            <div class="rounded-xl border p-5"><div class="font-medium">Coordinate and operate</div><p class="mt-2 text-slate-600">Run teams, knowledge, policy, support, or mission workflows.</p></div>
-            <div class="rounded-xl border p-5"><div class="font-medium">Establish trust and visibility</div><p class="mt-2 text-slate-600">Improve digital presence, communities, and trusted interaction surfaces.</p></div>
+          <div class="mt-4 grid gap-4 md:grid-cols-2 text-sm" data-group="goal">
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="learn">
+              <div class="font-medium">Learn and understand</div>
+              <p class="mt-2 text-slate-600">Study, research, and build durable knowledge.</p>
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="build">
+              <div class="font-medium">Build and deploy</div>
+              <p class="mt-2 text-slate-600">Create agents, workflows, systems, and technical capability.</p>
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="operate">
+              <div class="font-medium">Coordinate and operate</div>
+              <p class="mt-2 text-slate-600">Run teams, knowledge, policy, support, or mission workflows.</p>
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="trust">
+              <div class="font-medium">Establish trust and visibility</div>
+              <p class="mt-2 text-slate-600">Improve digital presence, communities, and trusted interaction surfaces.</p>
+            </button>
           </div>
         </div>
 
         <div>
           <h2 class="text-2xl font-semibold tracking-tight">3. What matters most right now?</h2>
-          <div class="mt-4 grid gap-4 md:grid-cols-2 text-sm">
-            <div class="rounded-xl border p-5"><div class="font-medium">Control</div><p class="mt-2 text-slate-600">Local-first, governed, inspectable systems.</p></div>
-            <div class="rounded-xl border p-5"><div class="font-medium">Speed</div><p class="mt-2 text-slate-600">Faster learning, deployment, and execution.</p></div>
-            <div class="rounded-xl border p-5"><div class="font-medium">Trust</div><p class="mt-2 text-slate-600">Auditability, privacy, transparency, and proof.</p></div>
-            <div class="rounded-xl border p-5"><div class="font-medium">Growth</div><p class="mt-2 text-slate-600">Capability development, staffing, and market opportunity.</p></div>
+          <div class="mt-4 grid gap-4 md:grid-cols-2 text-sm" data-group="priority">
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="control">
+              <div class="font-medium">Control</div>
+              <p class="mt-2 text-slate-600">Local-first, governed, inspectable systems.</p>
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="speed">
+              <div class="font-medium">Speed</div>
+              <p class="mt-2 text-slate-600">Faster learning, deployment, and execution.</p>
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="trust">
+              <div class="font-medium">Trust</div>
+              <p class="mt-2 text-slate-600">Auditability, privacy, transparency, and proof.</p>
+            </button>
+            <button type="button" class="choice rounded-xl border p-5 text-left" data-value="growth">
+              <div class="font-medium">Growth</div>
+              <p class="mt-2 text-slate-600">Capability development, staffing, and market opportunity.</p>
+            </button>
           </div>
         </div>
       </section>
+
+      <section class="mt-12 rounded-xl border p-6 bg-slate-50">
+        <div class="font-medium">Current selections</div>
+        <div id="summary" class="mt-3 text-sm text-slate-600">Choose one option from each section to continue.</div>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a id="continueLink" class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white opacity-50 pointer-events-none" href="/contact/">Continue</a>
+          <a class="inline-flex items-center rounded-md border border-slate-300 px-5 py-3 hover:bg-slate-50" href="/documentation">Review docs first</a>
+        </div>
+      </section>
     </main>
+
+    <script>
+      const state = { actor: "", goal: "", priority: "" };
+
+      function updateSummary() {
+        const summary = document.getElementById("summary");
+        const link = document.getElementById("continueLink");
+        const complete = state.actor && state.goal && state.priority;
+        if (!complete) {
+          summary.textContent = "Choose one option from each section to continue.";
+          link.classList.add("opacity-50", "pointer-events-none");
+          link.href = "/contact/";
+          return;
+        }
+        const qs = new URLSearchParams(state).toString();
+        summary.textContent = `Actor: ${state.actor} · Goal: ${state.goal} · Priority: ${state.priority}`;
+        link.classList.remove("opacity-50", "pointer-events-none");
+        link.href = `/contact/?${qs}`;
+      }
+
+      document.querySelectorAll("[data-group]").forEach(group => {
+        const key = group.getAttribute("data-group");
+        const choices = group.querySelectorAll(".choice");
+        choices.forEach(choice => {
+          choice.addEventListener("click", () => {
+            choices.forEach(c => c.classList.remove("selected"));
+            choice.classList.add("selected");
+            state[key] = choice.getAttribute("data-value");
+            updateSummary();
+          });
+        });
+      });
+
+      updateSummary();
+    </script>
   </body>
 </html>

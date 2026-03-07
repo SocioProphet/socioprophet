@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact · SocioProphet</title>
+    <meta name="description" content="Privacy-aware intake for SocioProphet." />
+    <link rel="icon" href="/icon.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-white text-slate-900 font-sans">
+    <main class="mx-auto max-w-4xl px-6 py-16">
+      <div class="space-y-6">
+        <div class="text-sm uppercase tracking-[0.18em] text-slate-500">Contact</div>
+        <h1 class="text-4xl font-semibold tracking-tight">Privacy-aware intake</h1>
+        <p class="text-lg text-slate-700">
+          This is the first contact shell. It summarizes the path selection and lets us collect the minimum information needed for follow-up.
+        </p>
+      </div>
+
+      <section class="mt-10 rounded-xl border p-6 bg-slate-50">
+        <div class="font-medium">Selected path</div>
+        <div id="selectionSummary" class="mt-3 text-sm text-slate-600">Loading…</div>
+      </section>
+
+      <form id="contactForm" class="mt-10 space-y-6">
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="block font-medium mb-2">Name</span>
+            <input id="name" class="w-full rounded-md border px-3 py-2" type="text" />
+          </label>
+          <label class="block text-sm">
+            <span class="block font-medium mb-2">Email</span>
+            <input id="email" class="w-full rounded-md border px-3 py-2" type="email" />
+          </label>
+        </div>
+
+        <label class="block text-sm">
+          <span class="block font-medium mb-2">Organization (optional)</span>
+          <input id="org" class="w-full rounded-md border px-3 py-2" type="text" />
+        </label>
+
+        <label class="block text-sm">
+          <span class="block font-medium mb-2">What should we know?</span>
+          <textarea id="notes" class="w-full rounded-md border px-3 py-2 min-h-[120px]"></textarea>
+        </label>
+
+        <label class="flex items-start gap-3 text-sm">
+          <input id="consent" type="checkbox" class="mt-1" />
+          <span>I consent to a follow-up based on the information I provide here. Keep this intake minimal and use it only for routing, response, and product follow-up.</span>
+        </label>
+
+        <div class="flex flex-wrap gap-3">
+          <button id="emailButton" type="submit" class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white">Send intake</button>
+          <a class="inline-flex items-center rounded-md border border-slate-300 px-5 py-3 hover:bg-slate-50" href="https://vue.socioprophet.com/login">Login instead</a>
+        </div>
+      </form>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const actor = params.get("actor") || "unknown";
+      const goal = params.get("goal") || "unknown";
+      const priority = params.get("priority") || "unknown";
+      document.getElementById("selectionSummary").textContent = `Actor: ${actor} · Goal: ${goal} · Priority: ${priority}`;
+
+      document.getElementById("contactForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const consent = document.getElementById("consent").checked;
+        if (!consent) {
+          alert("Please confirm follow-up consent before sending.");
+          return;
+        }
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const org = document.getElementById("org").value.trim();
+        const notes = document.getElementById("notes").value.trim();
+        const subject = encodeURIComponent("SocioProphet intake");
+        const body = encodeURIComponent(
+`Selections
+Actor: ${actor}
+Goal: ${goal}
+Priority: ${priority}
+
+Name: ${name}
+Email: ${email}
+Organization: ${org}
+
+Notes:
+${notes}`
+        );
+        window.location.href = `mailto:michael@socioprophet.ai?subject=${subject}&body=${body}`;
+      });
+    </script>
+  </body>
+</html>
