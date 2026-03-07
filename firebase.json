@@ -22,6 +22,78 @@
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
+      ],
+      "redirects": [
+        {
+          "source": "/blog",
+          "destination": "https://socioprophet.medium.com",
+          "type": 302
+        },
+        {
+          "source": "/documentation/guide/architecture",
+          "destination": "/documentation/guide/architecture.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/domain-surface",
+          "destination": "/documentation/guide/domain-surface.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/getting-started",
+          "destination": "/documentation/guide/getting-started.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/academy",
+          "destination": "/documentation/guide/products/academy.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/ai",
+          "destination": "/documentation/guide/products/ai.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/blog",
+          "destination": "/documentation/guide/products/blog.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/cloud",
+          "destination": "/documentation/guide/products/cloud.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/dev",
+          "destination": "/documentation/guide/products/dev.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/law",
+          "destination": "/documentation/guide/products/law.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/live",
+          "destination": "/documentation/guide/products/live.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/medical",
+          "destination": "/documentation/guide/products/medical.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/overview",
+          "destination": "/documentation/guide/products/overview.html",
+          "type": 301
+        },
+        {
+          "source": "/documentation/guide/products/wiki",
+          "destination": "/documentation/guide/products/wiki.html",
+          "type": 301
+        }
       ]
     }
   ]

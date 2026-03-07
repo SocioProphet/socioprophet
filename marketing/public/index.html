@@ -15,6 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
           }
@@ -31,23 +32,23 @@
       gtag("config", "G-GL5Y2786Z6");
       function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
     </script>
-    <link rel="stylesheet" href="/tailwind.css">
 </head>
 
   <body class="bg-white text-slate-900 font-sans">
     <header class="border-b">
       <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3" onclick="spTrack(cta_home_click,{href:/});">
+        <a href="/" class="flex items-center gap-3">
           <img src="/icon.png" alt="SocioProphet" class="h-9 w-9" />
           <div class="font-semibold tracking-tight">SocioProphet</div>
         </a>
 
         <nav class="flex items-center gap-6 text-sm">
-          <a class="hover:underline" href="/documentation" onclick="spTrack(cta_docs_click,{href:this.getAttribute(href)});">Documentation</a>
-          <a class="hover:underline" href="https://vue.socioprophet.com" onclick="spTrack(cta_portal_click,{href:this.getAttribute(href)});">Portal</a>
+          <a class="hover:underline" href="/humans/">Humans</a>
+          <a class="hover:underline" href="/organizations/">Organizations</a>
+          <a class="hover:underline" href="/institutions/">Institutions</a>
+          <a class="hover:underline" href="/documentation">Documentation</a>
           <a class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-800"
-             href="https://vue.socioprophet.com/login"
-             onclick="spTrack(cta_login_click,{href:this.getAttribute(href)});">
+             href="https://vue.socioprophet.com/login">
             Login
           </a>
         </nav>
@@ -71,14 +72,12 @@
 
             <div class="flex flex-wrap gap-3">
               <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white hover:bg-slate-800"
-                 href="https://vue.socioprophet.com/login"
-                 onclick="spTrack(cta_get_started_click,{href:this.getAttribute(href)});">
+                 href="/organizations/">
                 Get started
               </a>
 
               <a class="inline-flex items-center rounded-md border border-slate-300 px-5 py-3 hover:bg-slate-50"
-                 href="/documentation"
-                 onclick="spTrack(cta_docs_click,{href:this.getAttribute(href)});">
+                 href="/documentation">
                 Read the docs
               </a>
             </div>
@@ -118,20 +117,20 @@
       <!-- PRODUCTS (single merged section) -->
       <section class="border-t bg-white">
         <div class="mx-auto max-w-6xl px-6 py-12">
-          <h2 class="text-2xl font-semibold tracking-tight">Products</h2>
-          <p class="mt-2 text-slate-600">Each surface has a purpose, privilege boundary, and routing policy.</p>
+          <h2 class="text-2xl font-semibold tracking-tight">Capability Surfaces</h2>
+          <p class="mt-2 text-slate-600">Each surface has a purpose, trust boundary, and routing policy.</p>
 
           <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-sm">
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/ai" onclick="spTrack(cta_product_click,{product:ai,href:this.getAttribute(href)});">
+            <a class="rounded-xl border p-4 hover:bg-slate-50" href="https://socioprophet.ai">
               <div class="text-xs text-slate-500">.ai</div><div class="font-medium mt-1">AI Platform</div>
             </a>
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/dev" onclick="spTrack(cta_product_click,{product:dev,href:this.getAttribute(href)});">
+            <a class="rounded-xl border p-4 hover:bg-slate-50" href="https://socioprophet.dev">
               <div class="text-xs text-slate-500">.dev</div><div class="font-medium mt-1">Developer</div>
             </a>
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/cloud" onclick="spTrack(cta_product_click,{product:cloud,href:this.getAttribute(href)});">
+            <a class="rounded-xl border p-4 hover:bg-slate-50" href="https://socioprophet.cloud">
               <div class="text-xs text-slate-500">.cloud</div><div class="font-medium mt-1">Cloud Suite</div>
             </a>
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/live" onclick="spTrack(cta_product_click,{product:live,href:this.getAttribute(href)});">
+            <a class="rounded-xl border p-4 hover:bg-slate-50" href="https://socioprophet.live">
               <div class="text-xs text-slate-500">.live</div><div class="font-medium mt-1">Live Builds</div>
             </a>
           </div>
@@ -146,19 +145,18 @@
               <h2 class="text-lg font-semibold tracking-tight">More surfaces</h2>
               <p class="mt-1 text-sm text-slate-600">Mission, knowledge, and trust surfaces—without clutter.</p>
             </div>
-            <a class="text-sm text-slate-600 hover:underline" href="/documentation/guide/products/overview"
-               onclick="spTrack(cta_products_overview_click,{href:this.getAttribute(href)});">
+            <a class="text-sm text-slate-600 hover:underline" href="/documentation/guide/products/overview">
               See all →
             </a>
           </div>
 
           <div class="mt-5 flex flex-wrap gap-2 text-sm">
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/academy" onclick="spTrack(cta_surface_click,{surface:academy,href:this.getAttribute(href)});">Academy (.academy)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/medical" onclick="spTrack(cta_surface_click,{surface:medical,href:this.getAttribute(href)});">Medical (.md)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/law" onclick="spTrack(cta_surface_click,{surface:law,href:this.getAttribute(href)});">Law (.law)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/wiki" onclick="spTrack(cta_surface_click,{surface:wiki,href:this.getAttribute(href)});">Wiki (.wiki)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/blog" onclick="spTrack(cta_surface_click,{surface:blog,href:this.getAttribute(href)});">Blog (.blog)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/domain-surface" onclick="spTrack(cta_surface_click,{surface:digital,href:this.getAttribute(href)});">Digital / Trust (.digital)</a>
+            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/academy">Academy (.academy)</a>
+            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/medical">Medical (.md)</a>
+            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/law">Law (.law)</a>
+            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/wiki">Wiki (.wiki)</a>
+            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/blog">Blog (.blog)</a>
+            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/domain-surface">Digital / Privacy (.digital)</a>
           </div>
         </div>
       </section>
@@ -168,9 +166,9 @@
       <div class="mx-auto max-w-6xl px-6 py-10 text-sm text-slate-600 flex flex-wrap gap-4 justify-between">
         <div>© <span id="y"></span> SocioProphet</div>
         <div class="flex gap-4">
-          <a class="hover:underline" href="/documentation" onclick="spTrack(cta_docs_click,{href:this.getAttribute(href)});">Docs</a>
-          <a class="hover:underline" href="https://vue.socioprophet.com" onclick="spTrack(cta_portal_click,{href:this.getAttribute(href)});">Portal</a>
-          <a class="hover:underline" href="/investor" onclick="spTrack(cta_investor_click,{href:this.getAttribute(href)});">Investor</a>
+          <a class="hover:underline" href="/documentation">Docs</a>
+          <a class="hover:underline" href="https://vue.socioprophet.com/login">Login</a>
+          <a class="hover:underline" href="/investor">Investor</a>
         </div>
       </div>
       <script>document.getElementById("y").textContent = new Date().getFullYear();</script>

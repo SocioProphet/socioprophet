@@ -12,16 +12,16 @@ export default defineConfig({
   title: "SocioProphet",
   description: "SocioProphet documentation",
   base,
-  cleanUrls: true,
+  cleanUrls: false,
   themeConfig: {
     logo: { light: "/icon.png", dark: "/icon.png" },
     nav: [
       { text: "Docs", link: "/" },
       { text: "Getting Started", link: "/guide/getting-started" },
       { text: "Architecture", link: "/guide/architecture" },
-      { text: "Domain Surface", link: "/guide/domain-surface" },
-        { text: "Products", link: "/guide/products/overview" },
-      { text: "Products", link: "/guide/products/overview" }
+      { text: "Digital / Trust", link: "/guide/domain-surface" },
+      { text: "Products", link: "/guide/products/overview" },
+      { text: "GitHub", link: "https://github.com/SocioProphet/socioprophet" }
     ],
     sidebar: {
       "/guide/": [
