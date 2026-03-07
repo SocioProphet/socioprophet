@@ -97,7 +97,31 @@
     </main>
 
     <script>
+      const STORAGE_KEY = "socioprophet_intake_v1";
       const state = { actor: "", goal: "", priority: "" };
+
+      function saveState() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          ["actor","goal","priority"].forEach(k => { if (parsed[k]) state[k] = parsed[k]; });
+        } catch (e) {}
+      }
+
+      function paintSelections() {
+        document.querySelectorAll("[data-group]").forEach(group => {
+          const key = group.getAttribute("data-group");
+          const choices = group.querySelectorAll(".choice");
+          choices.forEach(choice => {
+            choice.classList.toggle("selected", choice.getAttribute("data-value") === state[key]);
+          });
+        });
+      }
 
       function updateSummary() {
         const summary = document.getElementById("summary");
@@ -113,7 +137,11 @@
         summary.textContent = `Actor: ${state.actor} · Goal: ${state.goal} · Priority: ${state.priority}`;
         link.classList.remove("opacity-50", "pointer-events-none");
         link.href = `/contact/?${qs}`;
+        saveState();
       }
+
+      loadState();
+      paintSelections();
 
       document.querySelectorAll("[data-group]").forEach(group => {
         const key = group.getAttribute("data-group");

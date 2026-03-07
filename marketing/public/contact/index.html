@@ -62,7 +62,22 @@
       const actor = params.get("actor") || "unknown";
       const goal = params.get("goal") || "unknown";
       const priority = params.get("priority") || "unknown";
-      document.getElementById("selectionSummary").textContent = `Actor: ${actor} · Goal: ${goal} · Priority: ${priority}`;
+      const STORAGE_KEY = "socioprophet_intake_v1";
+      if ((actor === "unknown" || goal === "unknown" || priority === "unknown")) {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (actor === "unknown" && parsed.actor) params.set("actor", parsed.actor);
+            if (goal === "unknown" && parsed.goal) params.set("goal", parsed.goal);
+            if (priority === "unknown" && parsed.priority) params.set("priority", parsed.priority);
+          }
+        } catch (e) {}
+      }
+      const finalActor = params.get("actor") || "unknown";
+      const finalGoal = params.get("goal") || "unknown";
+      const finalPriority = params.get("priority") || "unknown";
+      document.getElementById("selectionSummary").textContent = `Actor: ${finalActor} · Goal: ${finalGoal} · Priority: ${finalPriority}`;
 
       document.getElementById("contactForm").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -78,9 +93,9 @@
         const subject = encodeURIComponent("SocioProphet intake");
         const body = encodeURIComponent(
 `Selections
-Actor: ${actor}
-Goal: ${goal}
-Priority: ${priority}
+Actor: ${finalActor}
+Goal: ${finalGoal}
+Priority: ${finalPriority}
 
 Name: ${name}
 Email: ${email}
