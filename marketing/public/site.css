@@ -1,0 +1,21 @@
+/* Marketing polish overrides (restore lighter feel) */
+
+/* Soften default borders and card outlines */
+.border { border-color: rgba(15, 23, 42, 0.12) !important; } /* slate-900 @ ~12% */
+
+/* Cards: slightly softer, less stark */
+.rounded-xl { border-radius: 16px !important; }
+.rounded-lg { border-radius: 12px !important; }
+.rounded-md { border-radius: 10px !important; }
+
+/* Reduce heavy box outlines by default */
+.border { border-width: 1px !important; }
+
+/* Add subtle shadow to “card” sections that feel too flat */
+.bg-white.border,
+.bg-slate-50.border {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+/* Headline smoothing: a touch less “stenciled” */
+h1, h2, h3 { letter-spacing: -0.02em; }
