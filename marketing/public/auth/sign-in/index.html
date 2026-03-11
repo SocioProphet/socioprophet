@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SocioProphet — Platform Sign In</title>
+    <link rel="stylesheet" href="/tailwind.css" />
+    <link rel="stylesheet" href="/site.css" />
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+    <header class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="/" class="text-sm uppercase tracking-[0.22em] text-slate-500">SocioProphet</a>
+        <nav class="flex items-center gap-5 text-sm text-slate-600">
+          <a href="/auth/">Auth</a>
+          <a href="/auth/sign-in/" class="font-medium text-slate-900">Sign in</a>
+          <a href="/auth/connections/">Connections</a>
+          <a href="/auth/recovery/">Recovery</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-6 py-16">
+      <section class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Step 1 / platform identity</p>
+          <h1 class="mt-4 text-5xl font-semibold leading-tight">Sign into SocioProphet once, before any provider-specific setup.</h1>
+          <p class="mt-6 max-w-2xl text-lg text-slate-600">
+            The user’s first mental model should be platform membership, not provider credentials. SocioProphet owns identity, workspace access, role assignment, and audit history.
+          </p>
+
+          <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <h2 class="text-xl font-semibold">Passkeys</h2>
+              <p class="mt-2 text-sm text-slate-600">Fastest and least hostile path for repeat sign-in across devices.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <h2 class="text-xl font-semibold">Magic link</h2>
+              <p class="mt-2 text-sm text-slate-600">Fallback for users who are not yet ready for passkey-first flows.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <p class="text-sm text-slate-500">Example platform entry screen</p>
+          <h2 class="mt-3 text-3xl font-semibold">Welcome back</h2>
+          <p class="mt-3 text-slate-600">Sign in to manage your workspace, providers, capabilities, and secure automation settings.</p>
+
+          <div class="mt-8 space-y-4">
+            <button class="w-full rounded-xl bg-slate-900 px-4 py-3 font-medium text-white">Continue with passkey</button>
+            <button class="w-full rounded-xl border border-slate-300 px-4 py-3 font-medium text-slate-900">Email me a magic link</button>
+          </div>
+
+          <div class="mt-8 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+            <p class="text-sm text-slate-500">Why we do this first</p>
+            <ul class="mt-3 space-y-2 text-sm text-slate-700">
+              <li>• Workspace membership comes before provider wiring.</li>
+              <li>• Users should understand “my account” before “my connectors”.</li>
+              <li>• We separate identity from secret storage and provider tokens.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
