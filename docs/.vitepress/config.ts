@@ -19,6 +19,7 @@ export default defineConfig({
       { text: "Docs", link: "/" },
       { text: "Getting Started", link: "/guide/getting-started" },
       { text: "Architecture", link: "/guide/architecture" },
+      { text: "Community", link: "/guide/community" },
       { text: "Digital / Trust", link: "/guide/domain-surface" },
       { text: "Products", link: "/guide/products/overview" },
       { text: "GitHub", link: "https://github.com/SocioProphet/socioprophet" }
@@ -26,7 +27,8 @@ export default defineConfig({
     sidebar: {
       "/guide/": [
         { text: "Getting Started", link: "/guide/getting-started" },
-        { text: "Architecture", link: "/guide/architecture" }
+        { text: "Architecture", link: "/guide/architecture" },
+        { text: "Community", link: "/guide/community" }
       ]
     }
   }
