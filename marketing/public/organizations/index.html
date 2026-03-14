@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Organizations — SocioProphet</title>
+    <meta name="description" content="For schools, districts, nonprofits, public sector, and teams — an institutional path that supports the commons." />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Safe even if GA/trackers are blocked.
+      function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
+    </script>
+  </head>
+
+  <body class="bg-white text-slate-900 font-sans">
+    <header class="border-b">
+      <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+          <img src="/icon.png" alt="SocioProphet" class="h-9 w-9" />
+          <div class="font-semibold tracking-tight">SocioProphet</div>
+        </a>
+        <nav class="flex items-center gap-6 text-sm">
+          <a class="hover:underline" href="/academy/">Academy</a>
+          <a class="hover:underline" href="/documentation/">Documentation</a>
+          <a class="hover:underline" href="/organizations/">Organizations</a>
+          <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-6 py-14">
+      <div class="space-y-6">
+        <div class="inline-flex items-center rounded-full border px-3 py-1 text-xs text-slate-600">
+          Organizations • Schools • Districts • NGOs • Public Sector • Teams
+        </div>
+
+        <h1 class="text-4xl font-semibold tracking-tight lg:text-5xl">
+          Institutional deployments that fund the commons.
+          <span class="block text-slate-600">For the people — at scale.</span>
+        </h1>
+
+        <p class="text-lg text-slate-700 max-w-prose">
+          The platform is designed for end users and communities. Organizations can adopt it to serve learners and builders at scale —
+          with governance, privacy, and deployment support — while funding the open commons instead of capturing it.
+        </p>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <div class="rounded-xl border bg-slate-50 p-6">
+            <h2 class="text-xl font-semibold">Schools & Nonprofits</h2>
+            <p class="mt-2 text-sm text-slate-600">
+              Cohorts, curriculum packs, guardianship modes, multilingual/offline pathways, and admin tooling — designed to improve learner outcomes.
+            </p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700">
+              <li>• Rostering + cohort management (planned)</li>
+              <li>• Safety + moderation + policy controls</li>
+              <li>• Deployment options: cloud or self-host</li>
+            </ul>
+          </div>
+
+          <div class="rounded-xl border bg-slate-50 p-6">
+            <h2 class="text-xl font-semibold">Teams & Companies</h2>
+            <p class="mt-2 text-sm text-slate-600">
+              Workforce learning without surveillance. Private cohorts, integrations, audit trails, and an ethical skills→opportunity pipeline.
+            </p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700">
+              <li>• Org controls (SSO/policy) — planned</li>
+              <li>• Compliance posture + auditability</li>
+              <li>• Direction: LinkedIn + Upwork + Coursera + Academy primitives</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rounded-xl border p-6">
+          <h2 class="text-xl font-semibold">Interest survey</h2>
+          <p class="mt-2 text-sm text-slate-600">
+            Dev stub now (local save). Next step: first-party /api/lead for real capture (email + segmentation).
+          </p>
+
+          <form id="orgForm" class="mt-5 grid gap-4 md:grid-cols-2">
+            <input type="hidden" name="surface" value="organizations" />
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium">I’m here as…</label>
+              <select name="audience" class="mt-1 w-full rounded-md border px-3 py-2" required>
+                <option value="">Select…</option>
+                <option value="person">Individual / Family / Learner</option>
+                <option value="educator">Educator / Mentor</option>
+                <option value="org">Organization (School/NGO/Public sector/Company)</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium">Email *</label>
+              <input name="email" required type="email" class="mt-1 w-full rounded-md border px-3 py-2" placeholder="you@domain.com" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Org type</label>
+              <select name="org_type" class="mt-1 w-full rounded-md border px-3 py-2">
+                <option value="">Select…</option>
+                <option>School / District</option>
+                <option>Nonprofit / NGO</option>
+                <option>Public sector</option>
+                <option>Company</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Primary intent</label>
+              <select name="intent" class="mt-1 w-full rounded-md border px-3 py-2">
+                <option value="">Select…</option>
+                <option>Learn / upskill</option>
+                <option>Run cohorts</option>
+                <option>Hire / staffing pipeline</option>
+                <option>Deploy & govern platform</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium">Notes</label>
+              <textarea name="notes" rows="3" class="mt-1 w-full rounded-md border px-3 py-2" placeholder="What are you trying to do?"></textarea>
+            </div>
+
+            <div class="md:col-span-2 flex items-center gap-3">
+              <button class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white hover:bg-slate-800" type="submit">
+                Submit
+              </button>
+              <span id="msg" class="text-sm text-slate-600"></span>
+            </div>
+
+            <div class="md:col-span-2 text-xs text-slate-500">
+              Values contract: institutional use funds the commons (scholarships, open curriculum packs, maintenance) and does not hijack community priorities.
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.getElementById("orgForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const payload = Object.fromEntries(new FormData(e.target).entries());
+        payload.page = location.pathname;
+        payload.referrer = document.referrer || "";
+        payload.ts = Date.now();
+        try { localStorage.setItem("lead_last", JSON.stringify(payload)); } catch(e) {}
+        document.getElementById("msg").textContent = "Saved (dev stub). Next: wire /api/lead.";
+        spTrack("org_interest_submit", { surface: "organizations", audience: payload.audience || "" });
+      });
+    </script>
+  </body>
+</html>

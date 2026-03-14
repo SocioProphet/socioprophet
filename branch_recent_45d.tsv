@@ -1,0 +1,14 @@
+2026-03-14\torigin\t09dc49f\tmarketing: add Organizations lane + fix landing styling in dev (#232)
+2026-03-14\torigin/master\t09dc49f\tmarketing: add Organizations lane + fix landing styling in dev (#232)
+2026-03-14\torigin/feat/organizations-lane\ta60cd07\tfix(dev): restore Tailwind CDN on landing (remove broken tailwind.css link)
+2026-03-14\torigin/feat/reference-screens-pass-1\t9707d89\tfeat: add Organizations lane page and nav link (dev stub survey)
+2026-03-07\torigin/feat/site-shell-and-surface-routing-20260307\t0ade91c\tAdd intake persistence and marketplace surface
+2026-03-01\torigin/dependabot/npm_and_yarn/docs/npm_and_yarn-ce05d3d025\t8fa03c7\tbuild(deps): bump the npm_and_yarn group across 4 directories with 29 updates
+2026-02-17\torigin/chore/marketing-docs-dev\t9f74a26\tchore: compile Tailwind for marketing, add docs GA, add deploy script
+2026-02-12\torigin/chore/docs-hygiene\t56000fc\tdocs: ignore and untrack vitepress dist/cache
+2026-02-11\torigin/docs/readme-proper\teb34252\tdocs: rewrite README to reflect project scope and enforcement posture
+2026-02-11\torigin/docs/architecture-threat-model\t8f0f201\tdocs: add threat model
+2026-02-11\torigin/docs/readme-reset\tf96663b\tdocs: rewrite README and add license/security/contributing docs
+2026-02-11\torigin/dependabot/npm_and_yarn/socioprophet-web/client/npm_and_yarn-ff449ba2ba\t647ae74\tbuild(deps): bump the npm_and_yarn group across 2 directories with 24 updates
+2026-02-11\torigin/chore/secrets-guardrails\t538179f\tci(secrets): gitleaks scan working tree only (no history) + use repo config
+2026-02-10\torigin/codex/review-repo-for-security-compliance\t1bc7591\tRestore CodeQL scanning and harden secret hygiene

@@ -1,0 +1,20 @@
+2026-03-14	origin	09dc49f	marketing: add Organizations lane + fix landing styling in dev (#232)
+2026-03-14	origin/feat/organizations-lane	a60cd07	fix(dev): restore Tailwind CDN on landing (remove broken tailwind.css link)
+2026-03-14	origin/feat/reference-screens-pass-1	9707d89	feat: add Organizations lane page and nav link (dev stub survey)
+2026-03-07	origin/feat/site-shell-and-surface-routing-20260307	0ade91c	Add intake persistence and marketplace surface
+2026-03-01	origin/dependabot/npm_and_yarn/docs/npm_and_yarn-ce05d3d025	8fa03c7	build(deps): bump the npm_and_yarn group across 4 directories with 29 updates
+2026-02-17	origin/chore/marketing-docs-dev	9f74a26	chore: compile Tailwind for marketing, add docs GA, add deploy script
+2026-02-12	origin/chore/docs-hygiene	56000fc	docs: ignore and untrack vitepress dist/cache
+2026-02-11	origin/docs/readme-proper	eb34252	docs: rewrite README to reflect project scope and enforcement posture
+2026-02-11	origin/docs/architecture-threat-model	8f0f201	docs: add threat model
+2026-02-11	origin/docs/readme-reset	f96663b	docs: rewrite README and add license/security/contributing docs
+2026-02-11	origin/dependabot/npm_and_yarn/socioprophet-web/client/npm_and_yarn-ff449ba2ba	647ae74	build(deps): bump the npm_and_yarn group across 2 directories with 24 updates
+2026-02-11	origin/chore/secrets-guardrails	538179f	ci(secrets): gitleaks scan working tree only (no history) + use repo config
+2026-02-10	origin/codex/review-repo-for-security-compliance	1bc7591	Restore CodeQL scanning and harden secret hygiene
+2026-01-09	origin/codex/resolve-security-vulnerabilities-from-dependabot	f0c41c1	Update dependencies and remove node-fetch
+2026-01-08	origin/codex/merge-and-update-security-pull-requests	be770a9	Update server dependencies for security
+2026-01-08	origin/docs/liberty-by-design	5224ebb	ci/docs: enforce doctrine-linked specs and replay guard
+2026-01-07	origin/dependabot/npm_and_yarn/socioprophet-web/server/minimist-1.2.8	1e09e23	Merge branch 'master' into dependabot/npm_and_yarn/socioprophet-web/server/minimist-1.2.8
+2025-12-31	origin/codex/document-repository-for-users	ca0e243	Merge branch 'master' into codex/document-repository-for-users
+2025-12-31	origin/codex/add-comprehensive-documentation-for-repository	a124527	Add pedantic repository documentation
+2025-12-31	origin/codex/document-all-subdirectories-extensively	42e341b	Add detailed README files for project directories
