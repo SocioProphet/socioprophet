@@ -10,11 +10,11 @@ service cloud.firestore {
       allow read, write: if signedIn() && request.auth.uid == uid;
     }
 
-    // ---- NEXT COLLECTIONS (intentionally disabled until predicates are defined) ----
-    // match /jobs/{jobId} {
-    //   allow read: if false;
-    //   allow write: if false;
-    // }
+    // Public intake: minimal safe create-only path
+    match /lead_intake/{leadId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
 
     match /{document=**} {
       allow read, write: if false;
