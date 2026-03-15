@@ -12,7 +12,7 @@ const {
 
 const PROJECT_ID = "socioprophet-web-dev-env";
 
-test("Firestore rules: users self-access only; lead_intake create-only; default deny elsewhere", async (t) => {
+test("Firestore rules: users self-access only; intake collections denied to clients; default deny elsewhere", async (t) => {
   const testEnv = await initializeTestEnvironment({
     projectId: PROJECT_ID,
     firestore: {
@@ -32,31 +32,27 @@ test("Firestore rules: users self-access only; lead_intake create-only; default 
 
   await assertSucceeds(alice.doc("users/alice").set({ hello: "world" }));
   await assertSucceeds(alice.doc("users/alice").get());
+
   await assertFails(alice.doc("users/bob").get());
   await assertFails(bob.doc("users/alice").get());
 
-  const validLead = {
+  // lead_intake is server-only
+  await assertFails(anon.doc("lead_intake/x1").set({
     surface: "academy",
     audience: "learner",
-    email: "dev-test@example.com",
-    intent: "Learn cybernetics systems",
-    reason: "I want a serious systems learning path",
-    notes: "rules smoke test",
-    page: "/academy/apply/",
-    referrer: "",
-    ts: 1710000000000,
-    hp: ""
-  };
-
-  await assertSucceeds(anon.doc("lead_intake/x1").set(validLead));
-  await assertFails(anon.doc("lead_intake/x1").get());
-  await assertFails(anon.doc("lead_intake/x1").update({ notes: "changed" }));
-  await assertFails(anon.doc("lead_intake/x1").delete());
-
-  await assertFails(anon.doc("lead_intake/x2").set({
-    surface: "academy",
-    audience: "learner"
+    email: "dev-test@example.com"
   }));
+  await assertFails(anon.doc("lead_intake/x1").get());
+
+  // notification_outbox is server-only
+  await assertFails(anon.doc("notification_outbox/x1").get());
+  await assertFails(anon.doc("notification_outbox/x1").set({
+    kind: "lead_intake_created"
+  }));
+
+  // default deny
+  await assertFails(alice.doc("posts/x").set({ ownerUid: "alice" }));
+  await assertFails(alice.doc("anything/x").get());
 
   assert.ok(true);
 });
