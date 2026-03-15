@@ -5,6 +5,7 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
 initializeApp();
 const db = getFirestore();
+db.settings({ ignoreUndefinedProperties: true });
 
 exports.leadCapture = onRequest(async (req, res) => {
   res.set("Cache-Control", "no-store");
@@ -64,6 +65,30 @@ exports.leadCapture = onRequest(async (req, res) => {
     };
 
     const ref = await db.collection("lead_intake").add(doc);
+
+    const outbox = {
+      kind: "lead_intake_created",
+      leadId: ref.id,
+      createdAt: FieldValue.serverTimestamp(),
+      status: "pending",
+      destination: {
+        mode: "founder_controlled",
+        channel: "intake"
+      },
+      summary: {
+        surface,
+        audience,
+        email,
+        intent: doc.intent,
+        reason: doc.reason,
+        page: doc.page
+      }
+    };
+    if (doc.platform) outbox.platform = doc.platform;
+    if (doc.experiment) outbox.experiment = doc.experiment;
+    if (doc.policy) outbox.policy = doc.policy;
+
+    await db.collection("notification_outbox").add(outbox);
     logger.info("leadCapture stored", { id: ref.id, surface, audience, email });
 
     return res.status(200).json({ ok: true, id: ref.id });

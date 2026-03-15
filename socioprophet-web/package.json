@@ -14,5 +14,8 @@
     "@firebase/rules-unit-testing": "^5.0.0",
     "firebase-admin": "^13.6.1",
     "firebase-tools": "^15.5.1"
+  },
+  "dependencies": {
+    "firebase": "^12.10.0"
   }
 }

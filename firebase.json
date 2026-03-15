@@ -22,7 +22,16 @@
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/api/lead",
+          "function": "leadCapture"
+        }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "source": "functions"
+  }
 }
