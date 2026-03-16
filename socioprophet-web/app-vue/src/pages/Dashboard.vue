@@ -1,0 +1,1 @@
+<template><div><h3 style='color: var(--accent);'>Dashboard</h3><div class='card small'>Charts & KPIs</div></div></template><script setup lang='ts'></script>

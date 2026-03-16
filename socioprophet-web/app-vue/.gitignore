@@ -1,0 +1,17 @@
+
+# deps
+**/node_modules/
+**/.DS_Store
+**/.env
+**/.env.*
+
+# build output
+**/dist/
+
+# build output
+**/dist/
+
+.DS_Store
+
+/scratch/
+*.bak

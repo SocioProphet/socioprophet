@@ -1,0 +1,2 @@
+/// <reference types='vite/client' />
+interface ImportMetaEnv{ readonly VITE_API_BASE:string; readonly VITE_WS_URL:string; readonly VITE_SPACE:string; readonly VITE_NAMESPACE:string; readonly VITE_ROUTER_BASE:string; readonly VITE_BRIDGE_ORIGINS?:string; readonly VITE_MOCK?:string }

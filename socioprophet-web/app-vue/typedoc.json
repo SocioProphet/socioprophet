@@ -1,0 +1,17 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/services/api.ts",
+    "src/services/auth.ts",
+    "src/services/triRpc.ts",
+    "src/services/emoji.ts"
+  ],
+  "out": "public/docs/latest",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "readme": "none",
+  "plugin": [
+    "typedoc-plugin-markdown"
+  ]
+}

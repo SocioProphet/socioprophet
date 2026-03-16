@@ -1,0 +1,1 @@
+export interface EventEnvelope<T = unknown>{ ts:string; space:string; ns:string; actor:{id:string; pk:string}; kind:string; ref?:Record<string,string>; body:T; meta?:{hashPrev?:string; sig?:string; provenance?:{repo?:string;commit?:string;signer_fpr?:string;model?:string}} }

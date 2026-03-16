@@ -1,0 +1,1 @@
+<template><div><h3 style='color: var(--accent);'>Policies</h3><div class='card small'>Placeholder</div></div></template><script setup lang='ts'></script>

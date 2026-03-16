@@ -1,0 +1,1 @@
+const SHORTCODES:Record<string,string>={trophy:'🏆',tada:'🎉',star:'⭐',rocket:'🚀',check:'✔️'};export function parseShortcodes(t:string){return t.replace(/:([a-z0-9_+-]+):/gi,(m,s)=>SHORTCODES[s]||m)}

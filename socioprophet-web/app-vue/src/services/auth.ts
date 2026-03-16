@@ -1,0 +1,1 @@
+export function getToken(){return localStorage.getItem('agent_bearer_token')} export function setToken(t:string){localStorage.setItem('agent_bearer_token',t)} export function clearToken(){localStorage.removeItem('agent_bearer_token')}
