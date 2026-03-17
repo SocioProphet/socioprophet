@@ -7,6 +7,7 @@ This matrix classifies current SocioProphet surfaces.
 | Academy | Yes | Yes | Strong | First-class public surface | Continue deepening |
 | Auth / Connections | Yes | Yes | Moderate | First-class public surface | Add provider safety integration |
 | Digital | Yes | Partial | Partial | Emerging first-class surface | Deepen docs and trust framing |
+| Entity Analytics | Yes | Yes | Strong | First-class public surface | Continue surface integration across Digital, Auth, Organizations, and Academy |
 | Organizations | Yes | Partial | Partial | Emerging first-class surface | Add governance/safety docs |
 | AI | Docs only | Yes | Weak | Docs-first surface | Decide landing strategy |
 | Developer | Docs only | Yes | Weak | Docs-first surface | Decide landing strategy |

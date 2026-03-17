@@ -1,0 +1,53 @@
+:root {
+  --vp-layout-max-width: 1680px;
+  --vp-sidebar-width: 276px;
+  --vp-c-brand-1: #7aa2f7;
+  --vp-c-brand-2: #60a5fa;
+  --vp-c-brand-3: #3b82f6;
+}
+.dark {
+  --vp-c-bg: #0b1020;
+  --vp-c-bg-alt: #0f172a;
+  --vp-c-bg-soft: #111827;
+  --vp-c-text-1: #e5e7eb;
+  --vp-c-text-2: #cbd5e1;
+  --vp-c-text-3: #94a3b8;
+  --vp-c-divider: rgba(148, 163, 184, 0.16);
+  --vp-c-gutter: rgba(148, 163, 184, 0.12);
+}
+.VPNavBar .title span,
+.VPSidebarItem .text {
+  letter-spacing: -0.01em;
+}
+.VPDoc.has-aside .content-container {
+  max-width: 980px;
+}
+.vp-doc h1 {
+  font-size: 2.5rem;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.vp-doc h2 {
+  margin-top: 2.2rem;
+  letter-spacing: -0.02em;
+}
+.vp-doc p,
+.vp-doc li {
+  font-size: 1.04rem;
+  line-height: 1.75;
+}
+.vp-doc table {
+  display: block;
+  overflow-x: auto;
+}
+.katex-display,
+.math-display {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+.VPSidebar {
+  padding-top: 12px;
+}
+.VPDocAside {
+  padding-top: 18px;
+}

@@ -2,6 +2,12 @@
 
 ## Related guides
 
+- [Entity Analytics Overview](/guide/entity-analytics-overview)
+- [Identity Prime and Event-IR](/guide/identity-prime-and-event-ir)
+- [Entity Graph and Safe Linkage](/guide/entity-graph-and-safe-linkage)
+- [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
+- [Marketer-Safe Outputs and Segment Proofs](/guide/marketer-safe-outputs-and-segment-proofs)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
 - [Platform Human Protection and Safeguarding](/guide/platform-human-protection-and-safeguarding)
 - [Guardian Consent and Minor Access Model](/guide/guardian-consent-and-minor-access-model)
 - [Academy Policy Index](/guide/academy-policy-index)
