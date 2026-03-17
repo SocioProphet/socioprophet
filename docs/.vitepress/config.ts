@@ -48,6 +48,7 @@ export default defineConfig({
         { text: "Provider Safety and Capability Eligibility", link: "/guide/provider-safety-and-capability-eligibility" },
         { text: "Product Surface Standard", link: "/guide/product-surface-standard" },
         { text: "Product Surface Maturity Matrix", link: "/guide/product-surface-maturity-matrix" },
+        { text: "Entity Analytics Reference", link: "/guide/entity-analytics-reference" },
         { text: "Entity Analytics Overview", link: "/guide/entity-analytics-overview" },
         { text: "Identity Prime and Event-IR", link: "/guide/identity-prime-and-event-ir" },
         { text: "Entity Graph and Safe Linkage", link: "/guide/entity-graph-and-safe-linkage" },

@@ -718,7 +718,7 @@
     "status": "live",
     "landing_page": "/entity-analytics/",
     "survey_page": "",
-    "docs_path": "/guide/entity-analytics-overview",
+    "docs_path": "/guide/entity-analytics-reference",
     "homepage_visible": true,
     "graph_group": "core",
     "map_priority": 30,

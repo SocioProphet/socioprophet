@@ -20,7 +20,7 @@
   letter-spacing: -0.01em;
 }
 .VPDoc.has-aside .content-container {
-  max-width: 980px;
+  max-width: 1180px;
 }
 .vp-doc h1 {
   font-size: 2.5rem;
@@ -33,8 +33,8 @@
 }
 .vp-doc p,
 .vp-doc li {
-  font-size: 1.04rem;
-  line-height: 1.75;
+  font-size: 1.08rem;
+  line-height: 1.82;
 }
 .vp-doc table {
   display: block;
@@ -50,4 +50,12 @@
 }
 .VPDocAside {
   padding-top: 18px;
+}
+
+.vp-doc h3 {
+  margin-top: 1.6rem;
+  letter-spacing: -0.01em;
+}
+.vp-doc code {
+  font-size: 0.94em;
 }

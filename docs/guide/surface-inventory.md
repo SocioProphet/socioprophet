@@ -229,7 +229,7 @@
 - **Normalized topics:** architecture, reference, trust, platform, governance
 - **Investor lens:** discovery_compounding
 - **Landing page:** `/entity-analytics/`
-- **Docs path:** `/guide/entity-analytics-overview`
+- **Docs path:** `/guide/entity-analytics-reference`
 - **Description:** Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs.
 - **Next action:** Keep as the source of deeper system detail.
 - **Related surfaces:** academy, organizations, ai, developer, cloud, live, medical, law, wiki, blog, digital-trust
