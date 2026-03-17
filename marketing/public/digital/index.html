@@ -4,69 +4,107 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>.digital · SocioProphet</title>
-    <meta name="description" content="Digital privacy, trust, communities, brands, identities, and measurable digital presence." />
+    <meta name="description" content="Digital privacy, trust, communities, identities, and provider-connected capability routing." />
     <link rel="icon" href="/icon.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/tailwind.css" />
+    <link rel="stylesheet" href="/site.css" />
   </head>
-  <body class="bg-white text-slate-900 font-sans">
-    <header class="border-b">
-      <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+  <body class="min-h-screen bg-neutral-950 text-neutral-100">
+    <header class="border-b border-neutral-800 bg-neutral-950/90 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a href="/" class="flex items-center gap-3">
           <img src="/icon.png" alt="SocioProphet" class="h-9 w-9" />
-          <div class="font-semibold tracking-tight">SocioProphet</div>
+          <div class="font-semibold tracking-tight text-white">SocioProphet</div>
         </a>
-        <nav class="flex items-center gap-6 text-sm">
-          <a class="hover:underline" href="/humans/">Humans</a>
-          <a class="hover:underline" href="/organizations/">Organizations</a>
-          <a class="hover:underline" href="/institutions/">Institutions</a>
-          <a class="hover:underline" href="/documentation">Documentation</a>
-          <a class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-800" href="https://vue.socioprophet.com/login">Login</a>
+        <nav class="flex items-center gap-5 text-sm text-neutral-300">
+          <a class="hover:text-white" href="/organizations/">Organizations</a>
+          <a class="hover:text-white" href="https://socioprophet-web.web.app">Documentation</a>
+          <a class="hover:text-white" href="/auth/">Auth</a>
+          <a class="inline-flex items-center rounded-md bg-white px-4 py-2 font-medium text-neutral-950 hover:bg-neutral-200" href="/auth/sign-in/">Login</a>
         </nav>
       </div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-6 py-16">
+    <main class="mx-auto max-w-7xl px-6 py-16">
       <section class="max-w-4xl space-y-6">
-        <div class="text-sm uppercase tracking-[0.18em] text-slate-500">.digital</div>
-        <h1 class="text-4xl font-semibold tracking-tight lg:text-5xl">Digital privacy and trust for communities, brands, and identities.</h1>
-        <p class="text-lg text-slate-700">
-          SocioProphet .digital is the surface for trusted digital presence. It connects communities, brands,
-          and identities to measurable digital interactions, search and agent optimization, privacy-aware visibility,
-          and feedback loops that improve reputation over time.
+        <div class="text-sm uppercase tracking-[0.18em] text-neutral-400">.digital</div>
+        <h1 class="text-4xl font-semibold tracking-tight lg:text-5xl">Digital trust, identity, and capability routing for communities, brands, and institutions.</h1>
+        <p class="text-lg text-neutral-300">
+          SocioProphet .digital is the surface for trusted digital presence. It connects communities, brands, and identities
+          to measurable digital interactions, privacy-aware visibility, provider-connected capability routing, and feedback loops
+          that improve trust over time.
         </p>
         <div class="flex flex-wrap gap-3">
-          <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white hover:bg-slate-800" href="/organizations/">See organizational fit</a>
-          <a class="inline-flex items-center rounded-md border border-slate-300 px-5 py-3 hover:bg-slate-50" href="/documentation/guide/domain-surface">Read digital docs</a>
+          <a class="inline-flex items-center rounded-md bg-white px-5 py-3 font-medium text-neutral-950 hover:bg-neutral-200" href="/auth/connections/">View provider connections</a>
+          <a class="inline-flex items-center rounded-md border border-neutral-700 px-5 py-3 text-white hover:bg-neutral-900" href="https://socioprophet-web.web.app/guide/domain-surface">Read digital docs</a>
         </div>
       </section>
 
-      <section class="mt-14 grid gap-4 md:grid-cols-3 text-sm">
-        <div class="rounded-xl border p-5"><div class="font-medium">Communities</div><p class="mt-2 text-slate-600">Coordinate social and knowledge surfaces around shared purpose, contribution, and interaction history.</p></div>
-        <div class="rounded-xl border p-5"><div class="font-medium">Brands</div><p class="mt-2 text-slate-600">Create public-facing identity surfaces that improve trust, discoverability, and digital reach.</p></div>
-        <div class="rounded-xl border p-5"><div class="font-medium">Identities</div><p class="mt-2 text-slate-600">Support privacy-aware presence and trust-scoped visibility across the ecosystem.</p></div>
-      
+      <section class="mt-14 grid gap-4 text-sm md:grid-cols-3">
+        <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+          <div class="font-medium">Communities</div>
+          <p class="mt-2 text-neutral-300">Coordinate social and knowledge surfaces around shared purpose, contribution history, and trusted interaction.</p>
+        </div>
+        <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+          <div class="font-medium">Brands</div>
+          <p class="mt-2 text-neutral-300">Create public-facing identity surfaces that improve discoverability, reputation, and digital reach.</p>
+        </div>
+        <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+          <div class="font-medium">Identities</div>
+          <p class="mt-2 text-neutral-300">Support privacy-aware presence and trust-scoped visibility across the ecosystem.</p>
+        </div>
+      </section>
+
+      <section class="mt-14 rounded-[2rem] border border-neutral-800 bg-neutral-900 p-8">
+        <p class="text-sm uppercase tracking-[0.2em] text-neutral-400">Capability routing</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-tight">Provider connections turn digital surfaces into real capabilities.</h2>
+        <p class="mt-4 max-w-3xl text-neutral-300">
+          The digital layer should not stop at brand presence. It should route users into real connected capabilities:
+          platform sign-in, provider connection health, browsing/runtime access, and graceful recovery when auth gets weird.
+        </p>
+
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+          <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+            <div class="font-medium">Single platform identity</div>
+            <p class="mt-2 text-sm text-neutral-300">Users sign into SocioProphet once, then connect providers under that workspace identity.</p>
+          </div>
+          <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+            <div class="font-medium">Provider capabilities</div>
+            <p class="mt-2 text-sm text-neutral-300">Coding, research, browsing, and local runtime become capability states instead of unrelated login rituals.</p>
+          </div>
+          <div class="rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+            <div class="font-medium">Recovery by design</div>
+            <p class="mt-2 text-sm text-neutral-300">Callback failure, expired tokens, and limited scopes are surfaced as recoverable states with explicit actions.</p>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <a class="inline-flex items-center rounded-md bg-white px-5 py-3 font-medium text-neutral-950 hover:bg-neutral-200" href="/auth/connections/">Open provider connections</a>
+        </div>
+      </section>
+
       <section class="mt-14">
         <h2 class="text-2xl font-semibold tracking-tight">Sociosphere on Matrix</h2>
-        <p class="mt-4 max-w-3xl text-slate-700">
+        <p class="mt-4 max-w-3xl text-neutral-300">
           Sociosphere is the live community coordination surface for SocioProphet. Use it for contributor onboarding,
           collaboration, support, and community participation across the trust mesh.
         </p>
-        <div class="mt-6 grid gap-4 md:grid-cols-3 text-sm">
-          <div class="rounded-xl border p-5">
+        <div class="mt-6 grid gap-4 text-sm md:grid-cols-3">
+          <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
             <div class="font-medium">Community coordination</div>
-            <p class="mt-2 text-slate-600">Join the live Matrix space for discussion, support, and aligned participation.</p>
+            <p class="mt-2 text-neutral-300">Join the live Matrix space for discussion, support, and aligned participation.</p>
           </div>
-          <div class="rounded-xl border p-5">
+          <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
             <div class="font-medium">Contributor path</div>
-            <p class="mt-2 text-slate-600">Move from user to collaborator to contributor with clear norms, documentation, and AI-assisted guidance.</p>
+            <p class="mt-2 text-neutral-300">Move from user to collaborator to contributor with clear norms, documentation, and AI-assisted guidance.</p>
           </div>
-          <div class="rounded-xl border p-5">
+          <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
             <div class="font-medium">Support channel</div>
-            <p class="mt-2 text-slate-600">Use the community surface as the first live support and coordination path while broader support tooling comes online.</p>
+            <p class="mt-2 text-neutral-300">Use the community surface as the first live support and coordination path while broader support tooling comes online.</p>
           </div>
         </div>
         <div class="mt-6">
-          <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white hover:bg-slate-800" href="https://matrix.to/#/!KXodmWaRcnATXHvxCn:matrix.org/$U-VdMKyieO3_zdf9AXZmdS0-f_FvcoEiNRWp07utmPc?via=matrix.org">Join Sociosphere on Matrix</a>
+          <a class="inline-flex items-center rounded-md bg-white px-5 py-3 font-medium text-neutral-950 hover:bg-neutral-200" href="https://matrix.to/#/!KXodmWaRcnATXHvxCn:matrix.org/$U-VdMKyieO3_zdf9AXZmdS0-f_FvcoEiNRWp07utmPc?via=matrix.org">Join Sociosphere on Matrix</a>
         </div>
       </section>
     </main>

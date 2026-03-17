@@ -98,8 +98,6 @@
       .map-canvas-wrap { border: 1px solid #e2e8f0; border-radius: 1rem; background: white; padding: 0.75rem; }
       .map-svg { min-height: 340px; }
       @media (min-width: 1400px) { .map-svg { min-height: 400px; } }
-      .map-intro h2 { margin: 0.35rem 0 0; font-size: 1.5rem; line-height: 1.2; }
-      .map-intro p { margin-top: 0.5rem; }
       .map-svg { width: 100%; height: auto; display: block; border: 1px solid #e2e8f0; border-radius: 1rem; background: white; }
       .map-grid { display: grid; gap: 0.75rem; }
       @media (min-width: 640px) { .map-grid { grid-template-columns: 1fr 1fr; } }
@@ -107,6 +105,14 @@
       .map-link-card:hover { background: #f8fafc; }
       .map-link-card .kicker { font-size: 0.75rem; color: #64748b; }
       .map-link-card p { margin-top: 0.35rem; }
+      .auth-story { background: #f8fafc; }
+      .auth-story-shell { display: grid; gap: 1.25rem; }
+      @media (min-width: 980px) { .auth-story-shell { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); align-items: start; } }
+      .auth-story-copy p { max-width: 44rem; }
+      .auth-story-grid { display: grid; gap: 1rem; }
+      @media (min-width: 768px) { .auth-story-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      .auth-story-card { border: 1px solid #e2e8f0; border-radius: 1rem; background: white; padding: 1rem; }
+      .auth-story-card p { margin: 0.45rem 0 0; color: #475569; font-size: 0.98rem; }
 
     </style>
   </head>
@@ -123,8 +129,8 @@
           <nav class="home-nav">
             <a href="/organizations/">Organizations</a>
             <a href="https://socioprophet-web.web.app" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
-            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
-            <a class="btn-dark" href="https://vue.socioprophet.com/login" onclick='spTrack("cta_login_click",{href:this.getAttribute("href")})'>
+            <a href="/auth/" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+            <a class="btn-dark" href="/auth/sign-in/" onclick='spTrack("cta_login_click",{href:this.getAttribute("href")})'>
               Login
             </a>
           </nav>
@@ -218,6 +224,48 @@
         </div>
       </section>
 
+
+      <section class="section auth-story">
+        <div class="home-shell auth-story-shell">
+          <div class="auth-story-copy">
+            <div class="card-kicker">Identity + capability orchestration</div>
+            <h2>One SocioProphet login. Many provider connections.</h2>
+            <p>
+              Most users should not have to stitch together AI agents, provider callbacks, API keys, and recovery flows by hand.
+              SocioProphet signs the user in once, then manages provider connections as capabilities with clear recovery states.
+            </p>
+            <div class="cta-row">
+              <a class="btn-dark" href="/auth/" onclick='spTrack("cta_auth_hub_click",{href:this.getAttribute("href")})'>
+                Explore Auth & Connections
+              </a>
+              <a class="btn-light" href="/auth/connections/" onclick='spTrack("cta_auth_connections_click",{href:this.getAttribute("href")})'>
+                View Provider Connections
+              </a>
+            </div>
+          </div>
+
+          <div class="auth-story-grid">
+            <a class="auth-story-card" href="/auth/sign-in/" onclick='spTrack("cta_auth_signin_click",{href:this.getAttribute("href")})'>
+              <div class="card-kicker">Step 1</div>
+              <strong>Platform sign-in</strong>
+              <p>Passkey-first or magic-link entry into a single SocioProphet workspace identity.</p>
+            </a>
+
+            <a class="auth-story-card" href="/auth/connections/" onclick='spTrack("cta_auth_connectors_click",{href:this.getAttribute("href")})'>
+              <div class="card-kicker">Step 2</div>
+              <strong>Provider connections</strong>
+              <p>OpenAI, Anthropic, browser automation, and local runtime become managed capabilities instead of scattered secrets.</p>
+            </a>
+
+            <a class="auth-story-card" href="/auth/recovery/" onclick='spTrack("cta_auth_recovery_click",{href:this.getAttribute("href")})'>
+              <div class="card-kicker">Step 3</div>
+              <strong>Recovery & degraded states</strong>
+              <p>Callback failures, expired auth, and limited scopes become clear states with recovery actions instead of dead ends.</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section class="section">
         <div class="home-shell">
           <h2>Products</h2>
@@ -268,7 +316,7 @@
           <div>© <span id="y"></span> SocioProphet</div>
           <div class="footer-links">
             <a href="https://socioprophet-web.web.app" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Docs</a>
-            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+            <a href="/auth/" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
             <a href="/map/" onclick='spTrack("cta_map_click",{href:this.getAttribute("href")})'>Map</a>
             <a href="/investor/" onclick='spTrack("cta_investor_click",{href:this.getAttribute("href")})'>Investor</a>
           </div>
