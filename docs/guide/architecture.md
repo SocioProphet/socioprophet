@@ -2,6 +2,9 @@
 
 ## Related guides
 
+- [Auth and Connections](/guide/auth-and-connections)
+- [Provider Capability Routing](/guide/provider-capability-routing)
+- [Auth Recovery and Connection Health](/guide/auth-recovery-and-connection-health)
 - [Governed Cybernetic Stack](/guide/governed-cybernetic-stack)
 - [Semantic Vector Stack](/guide/semantic-vector-stack)
 - [Semantic Representation Ladder](/guide/semantic-representation-ladder)

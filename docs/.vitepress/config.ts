@@ -35,9 +35,12 @@ export default defineConfig({
         { text: "Semantic Model Workstreams", link: "/guide/semantic-model-workstreams" },
         { text: "Hybrid Representation Builder", link: "/guide/hybrid-representation-builder" },
         { text: "Temporal Graph Evolution", link: "/guide/temporal-graph-evolution" },
+        { text: "Auth and Connections", link: "/guide/auth-and-connections" },
+        { text: "Provider Capability Routing", link: "/guide/provider-capability-routing" },
+        { text: "Auth Recovery and Connection Health", link: "/guide/auth-recovery-and-connection-health" },
         { text: "Domain Surface", link: "/guide/domain-surface" },
-        { text: "Products", link: "/guide/products/overview" }
-      ]
-    }
-  }
+        { text: "Products", link: "/guide/products/overview" },
+      ],
+    },
+  },
 });
