@@ -17,6 +17,7 @@
 | Blog | No | No | Yes | stub | Content-first surface. |
 | Digital / Trust | No | No | Yes | stub | Clarify product definition and trust narrative. |
 | Investor | Yes | No | No | stub | Expand when investor materials are ready. |
+| Entity Analytics | Yes | No | Yes | live | Keep as the source of deeper system detail. |
 
 ## Details
 
@@ -217,3 +218,19 @@
 - **Next action:** Expand when investor materials are ready.
 - **Related surfaces:** documentation, organizations, digital-trust
 - **Related sites:** /investor/, /map/, https://socioprophet-web.web.app/guide/surface-inventory
+
+### Entity Analytics
+
+- **Category:** docs
+- **Status:** live
+- **Homepage visible:** Yes
+- **Audiences:** builders, operators, researchers, partners
+- **Topics:** architecture, products, trust, guides, reference
+- **Normalized topics:** architecture, reference, trust, platform, governance
+- **Investor lens:** discovery_compounding
+- **Landing page:** `/entity-analytics/`
+- **Docs path:** `/guide/entity-analytics-overview`
+- **Description:** Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs.
+- **Next action:** Keep as the source of deeper system detail.
+- **Related surfaces:** academy, organizations, ai, developer, cloud, live, medical, law, wiki, blog, digital-trust
+- **Related sites:** https://socioprophet-web.web.app/, https://socioprophet-web.web.app/guide/canonical-platform-direction

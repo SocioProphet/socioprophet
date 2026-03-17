@@ -710,5 +710,69 @@
         "trust_quality"
       ]
     }
+  },
+  {
+    "id": "entity-analytics",
+    "label": "Entity Analytics",
+    "category": "docs",
+    "status": "live",
+    "landing_page": "/entity-analytics/",
+    "survey_page": "",
+    "docs_path": "/guide/entity-analytics-overview",
+    "homepage_visible": true,
+    "graph_group": "core",
+    "map_priority": 30,
+    "audiences": [
+      "builders",
+      "operators",
+      "researchers",
+      "partners"
+    ],
+    "topic_constituents": [
+      "architecture",
+      "products",
+      "trust",
+      "guides",
+      "reference"
+    ],
+    "related_surfaces": [
+      "academy",
+      "organizations",
+      "ai",
+      "developer",
+      "cloud",
+      "live",
+      "medical",
+      "law",
+      "wiki",
+      "blog",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet-web.web.app/",
+      "https://socioprophet-web.web.app/guide/canonical-platform-direction"
+    ],
+    "description": "Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs.",
+    "next_action": "Keep as the source of deeper system detail.",
+    "normalized_topics": [
+      "architecture",
+      "reference",
+      "trust",
+      "platform",
+      "governance"
+    ],
+    "investor_overlay": {
+      "lens": "discovery_compounding",
+      "value_drivers": [
+        "qualified_discovery",
+        "builder_activation",
+        "trust_signal"
+      ],
+      "economic_profit_proxy": [
+        "qualified_traffic",
+        "activation",
+        "reference_depth"
+      ]
+    }
   }
 ]

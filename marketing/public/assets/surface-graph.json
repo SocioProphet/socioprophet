@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-16T20:19:44.114388+00:00",
+  "generated_at": "2026-03-17T01:20:19.262876+00:00",
   "ui": {
     "modes": [
       "topology",
@@ -196,6 +196,70 @@
         "https://socioprophet-web.web.app/guide/canonical-platform-direction"
       ],
       "description": "Architecture, products, trust model, and canonical direction."
+    },
+    {
+      "id": "entity-analytics",
+      "type": "surface",
+      "label": "Entity Analytics",
+      "category": "docs",
+      "status": "live",
+      "homepage_visible": true,
+      "graph_group": "core",
+      "map_priority": 30,
+      "landing_page": "/entity-analytics/",
+      "survey_page": "",
+      "docs_path": "/guide/entity-analytics-overview",
+      "audiences": [
+        "builders",
+        "operators",
+        "researchers",
+        "partners"
+      ],
+      "topic_constituents": [
+        "architecture",
+        "products",
+        "trust",
+        "guides",
+        "reference"
+      ],
+      "normalized_topics": [
+        "architecture",
+        "reference",
+        "trust",
+        "platform",
+        "governance"
+      ],
+      "related_surfaces": [
+        "academy",
+        "organizations",
+        "ai",
+        "developer",
+        "cloud",
+        "live",
+        "medical",
+        "law",
+        "wiki",
+        "blog",
+        "digital-trust"
+      ],
+      "investor_overlay": {
+        "lens": "discovery_compounding",
+        "value_drivers": [
+          "qualified_discovery",
+          "builder_activation",
+          "trust_signal"
+        ],
+        "economic_profit_proxy": [
+          "qualified_traffic",
+          "activation",
+          "reference_depth"
+        ]
+      },
+      "related_sites": [
+        "https://socioprophet-web.web.app/",
+        "https://socioprophet-web.web.app/guide/canonical-platform-direction"
+      ],
+      "description": "Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs."
     },
     {
       "id": "ai",
@@ -1776,6 +1840,61 @@
         "source": "digital-trust",
         "target": "investor",
         "type": "curated"
+      },
+      {
+        "source": "academy",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "organizations",
+        "type": "curated"
+      },
+      {
+        "source": "ai",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "developer",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "cloud",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "live",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "medical",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "law",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "wiki",
+        "type": "curated"
+      },
+      {
+        "source": "blog",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "digital-trust",
+        "target": "entity-analytics",
+        "type": "curated"
       }
     ],
     "constituent": [
@@ -2048,6 +2167,31 @@
         "source": "investor",
         "target": "topic:platform-direction",
         "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:architecture",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:products",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:trust",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:guides",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:reference",
+        "type": "constituent"
       }
     ],
     "vector": [
@@ -2082,6 +2226,12 @@
         "score": 0.17
       },
       {
+        "source": "organizations",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.125
+      },
+      {
         "source": "documentation",
         "target": "ai",
         "type": "vector_similarity",
@@ -2112,6 +2262,12 @@
         "score": 0.2
       },
       {
+        "source": "documentation",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 1.0
+      },
+      {
         "source": "ai",
         "target": "developer",
         "type": "vector_similarity",
@@ -2130,6 +2286,12 @@
         "score": 0.195
       },
       {
+        "source": "ai",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.137
+      },
+      {
         "source": "developer",
         "target": "cloud",
         "type": "vector_similarity",
@@ -2146,6 +2308,18 @@
         "target": "live",
         "type": "vector_similarity",
         "score": 0.256
+      },
+      {
+        "source": "cloud",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.137
+      },
+      {
+        "source": "live",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.135
       },
       {
         "source": "medical",
@@ -2172,10 +2346,22 @@
         "score": 0.158
       },
       {
+        "source": "wiki",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.12
+      },
+      {
         "source": "digital-trust",
         "target": "investor",
         "type": "vector_similarity",
         "score": 0.14
+      },
+      {
+        "source": "digital-trust",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.2
       }
     ]
   }
