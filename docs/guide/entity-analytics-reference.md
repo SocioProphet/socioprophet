@@ -2,248 +2,157 @@
 
 Entity Analytics is a first-class SocioProphet surface for identity-aware, policy-constrained, proof-producing analytics.
 
-This document is the technical reference page for the surface. It is intentionally written as a manual rather than a marketing summary.
+This document is a technical reference manual, not a product summary.
 
-## Problem statement
+## 1. System thesis
 
-Conventional entity resolution systems optimize for linkage yield. They merge aggressively, suppress ambiguity, and often treat the person as a single ambient object.
+We are building a personal identity, privacy, and security stack that treats a human's digital life as something to be accounted for, constrained, audited, and proven.
 
-SocioProphet does not accept that model as safe by default.
+The core move is:
 
-The system must support:
-- typed event ingestion
-- scoped identity composition
-- governed candidate linkage
-- policy-constrained merge and unmerge
-- proof-producing export
-- child-, guardian-, and institution-safe defaults
+> **Identity is prime.**
+> A person is not one blob. Identity is a structured composition of irreducible prime topics (roles / contexts) that must not be merged or leaked across scopes without explicit, provable authorization.
 
-## Formal objects
+Classical enterprise ER optimizes for stable linkage under organizational control.
+This system optimizes for **safe linkage with provable non-leak guarantees** under citizen-first, fog-first control.
 
-### Event-IR
+## 2. Prime topics and identity composition
 
-We model each event as a typed record:
+Fix a finite prime-topic basis
 
 $$
-e_t = (a_t, s_t, \alpha_t, \phi_t, \tau_t, \pi_t, \epsilon_t)
+\mathcal{P} = \{p_1, \dots, p_k\}.
 $$
 
-where:
+Each \(p_i\) is an irreducible identity-relevant context such as patient, parent, citizen, creator, or founder.
 
-- $a_t$ is the actor reference
-- $s_t$ is the scope or domain context
-- $\alpha_t$ is the action type
-- $\phi_t$ is the feature-atom bundle
-- $\tau_t$ is time
-- $\pi_t$ is policy-relevant metadata
-- $\epsilon_t$ is evidence / provenance
-
-### Feature map
-
-A feature extraction function maps the event into a typed vector:
+We model topic composition as a free commutative monoid over \(\mathbb{N}^k\):
 
 $$
-x_t = f(e_t) \in \mathbb{R}^d
+e = (e_1, \dots, e_k), \qquad
+e \oplus e' := e + e'.
 $$
 
-The important point is not just vectorization. It is that the vector remains attached to scope, provenance, and policy context.
-
-### Entity state
-
-A candidate entity state can be represented as an aggregate over scoped events:
+A scalar prime encoding can also be used:
 
 $$
-E_i = \sum_{t \in T_i} w_t x_t
+\mathrm{enc}(e) := \prod_{i=1}^k \ell(p_i)^{e_i}
 $$
 
-where $T_i$ is the event set associated with entity candidate $i$ and $w_t$ is a weighting function over recency, confidence, and scope relevance.
+for an injective labeling \(\ell : \mathcal{P} \to \mathbb{P}\), where \(\mathbb{P}\) is the set of prime numbers.
 
-## Graph model
+## 3. Scope, capabilities, and Event-IR
 
-We prefer a governed graph over a monolithic profile.
-
-Let:
+A scope is first-class:
 
 $$
-G = (V_E, V_C, V_P, E)
+s := (\text{device}, \text{process}, \text{container}, \text{app}, \text{jurisdiction}, \text{network-class}, \dots)
+$$
+
+with a partial order \(s \preceq s'\) meaning \(s'\) is wider / less trusted.
+
+The typed Event-IR is:
+
+$$
+e = (\mathrm{ts}, \mathrm{actor}, \mathrm{scope}, \mathrm{action}, \mathrm{primes}, \mathrm{features}, \mathrm{evidence})
 $$
 
 where:
+- \(\mathrm{ts}\) is time
+- \(\mathrm{actor}\) is the subject
+- \(\mathrm{scope}\) is the scope
+- \(\mathrm{action}\) is an event kind
+- \(\mathrm{primes} \in \mathbb{N}^k\) is the prime-topic exponent vector
+- \(\mathrm{features}\) is a typed feature map
+- \(\mathrm{evidence}\) contains counters, nonces, handles, hashes, provenance
 
-- $V_E$ are entity candidates
-- $V_C$ are contexts or scopes
-- $V_P$ are policy and proof nodes
-- $E$ are typed edges such as asserted, candidate, blocked, inherited, guardian-linked, institution-linked, or revoked
+## 4. Entity resolution as constrained inference
 
-A useful link is not automatically an allowed merge.
-
-## Candidate generation
-
-For an entity candidate $i$, a candidate set can be defined as:
-
-$$
-\mathcal{C}(i) = \operatorname{topK}\big(g(E_i, E_j, R_{ij}, C_{ij})\big)
-$$
-
-where:
-
-- $R_{ij}$ is relationship evidence
-- $C_{ij}$ is context compatibility
-- $g$ is the candidate scoring function
-
-## Policy-constrained merge rule
-
-A merge score alone is insufficient.
-
-Let:
+Let \(R\) be the record set.
+For a pair \((r,r')\), define comparator evidence:
 
 $$
-\sigma_{ij} = g(E_i, E_j, R_{ij}, C_{ij})
+\phi(r,r') \in \mathbb{R}^d
 $$
 
-and let the policy gate be:
+and an additive score:
 
 $$
-\Gamma_{ij} \in \{\mathrm{allow},\ \mathrm{review},\ \mathrm{block}\}
+S(r,r') := \sum_{t=1}^{T}\alpha_t h_t(\phi(r,r')).
 $$
 
-Then merge is legal only if:
+This is not “ML magic.” It is an additive evidence ledger.
+
+### 4.1 Policy-constrained merging
+
+A merge is admissible iff:
+
+1. ER evidence is sufficient
+2. the merge does not violate the identity-prime policy polytope
+3. the merge preserves non-escape invariants when secrets or protected contexts are involved
+
+Formally, if \(\sigma_{ij}\) is the merge score and \(\Gamma_{ij}\in\{\mathrm{allow}, \mathrm{review}, \mathrm{block}\}\) is the policy gate, then
 
 $$
-M_{ij} = 1 \iff \sigma_{ij} \ge \theta \land \Gamma_{ij} = \mathrm{allow}
+M_{ij} = 1 \iff \sigma_{ij} \ge \theta \land \Gamma_{ij} = \mathrm{allow}.
 $$
 
-This is the central rule.
+Evidence proposes; policy disposes.
 
-High-confidence evidence can still be vetoed when the merge would create unacceptable cross-context leakage.
+## 5. Policy polytopes
 
-## Unmerge rule
-
-Unmerge is a first-class operation.
-
-If a merge is later found to be harmful, incorrect, or policy-incompatible, the system must support:
-
-- rollback of the entity contraction
-- preservation of the evidence trail
-- explanation of why the merge was reversed
-- regeneration of downstream proofs
-
-In other words, the entity graph must remain **replayable**, not merely mutable.
-
-## Cross-context leakage invariant
-
-If two scopes are policy-incompatible, the system must not allow a merge or export path that collapses them into a shared downstream identity surface.
-
-A simple invariant is:
+For policy checks we often binarize the active topic mixture into
 
 $$
-B(c_i, c_j) = 1 \Rightarrow M_{ij} = 0
+v \in \{0,1\}^k.
 $$
 
-where $B$ is the policy block matrix over context classes.
-
-## Worked example: Michael cross-context
-
-Michael is simultaneously:
-
-- a patient
-- a parent
-- a learner
-- a citizen
-- a digital participant
-
-Let the scope set be:
+A convex relaxation of the allowed state region is
 
 $$
-\mathcal{S} = \{\mathrm{medical},\ \mathrm{parent},\ \mathrm{academy},\ \mathrm{citizen},\ \mathrm{adtech}\}
+K := \{x \in \mathbb{R}^k \mid A x \le b,\; 0 \le x \le 1\}.
 $$
 
-Suppose evidence suggests that several records refer to the same human being. A conventional ER system might collapse all of them into one master profile.
-
-SocioProphet does not do that automatically.
-
-### Allowed reasoning
-
-The system may conclude:
-- the parent and academy records are plausibly related under supervised family / education context
-- the citizen and digital participant records may share public-facing continuity
-- the patient context has strong evidence overlap with the same human actor
-
-### Forbidden propagation
-
-The system must still block operations such as:
-- exporting medical context into ad-tech segmentation
-- collapsing child/guardian supervision records into unrestricted self-service provider connection
-- treating all scopes as equally routable to every capability backend
-
-### Technical interpretation
-
-Evidence can acknowledge shared human reference without permitting unsafe cross-context operational collapse.
-
-That is the difference between:
-- **identity awareness**
-and
-- **identity exploitation**
-
-## Marketer-safe export
-
-Exports are not raw identity dumps.
-
-A marketer-safe export function can be represented as:
+A discrete topic mixture is allowed iff
 
 $$
-y = h(G, \Pi_{\mathrm{export}})
+v \in K \cap \{0,1\}^k.
 $$
 
-where $\Pi_{\mathrm{export}}$ is the export policy.
+### 5.1 Counting / risk
 
-The output may include:
-- coarse cohorts
-- bounded topic summaries
-- time-windowed signals
-- proof artifacts about excluded contexts
+For a rational polytope \(K\), the Ehrhart function is
 
-The output must *not* silently include blocked contexts just because the system could infer them.
+$$
+L_K(t) := |tK \cap \mathbb{Z}^k|, \qquad t \in \mathbb{N}.
+$$
 
-## Child and guardian constraints
+We use this as intuition and approximation for:
+- search complexity
+- identity optionality
+- over-determination / profiling risk
 
-Minor and guardian-linked actors are not treated as ordinary unrestricted accounts.
+## 6. Congruence domains and non-escape
 
-The entity layer must respect:
-- guardian-linked supervision
-- institution-governed participation
-- capability restrictions by participant class
-- stricter merge and export constraints for protected actors
+Attackers love modular space: nonces, counters, namespaces, handles.
 
-In effect, policy is not downstream of analytics. Policy is part of analytics.
+A congruence abstract value is
 
-## Merge and unmerge state machine
+$$
+x \in a\mathbb{Z} + b \pmod m.
+$$
 
-A practical lifecycle is:
+If a handle \(h\) is created in HSM scope and typed as \(\mathrm{NoEscape}(h,\mathrm{HSM})\), then no value congruent with its reserved namespace may appear in any wider scope unless an explicit audited witness authorizes the move.
 
-1. observed
-2. candidate
-3. review-required
-4. allowed
-5. merged
-6. blocked
-7. revoked
-8. unmerged
+## 7. Proof artifacts
 
-This state machine should be externally legible to operators and internally reproducible from evidence + policy.
+A proof artifact \(\Pi\) contains:
+- the claim
+- input hashes and versions
+- domains used
+- precision deltas
+- witnesses
+- counterexample trace if violated
+- signatures / replay hooks
 
-## Operational consequences for product surfaces
-
-Entity Analytics is not isolated.
-
-It directly supports:
-- **Digital** through trust, visibility, and reputation continuity
-- **Auth / Connections** through capability attachment and scope-aware identity routing
-- **Organizations** through institution-governed roles and participant classes
-- **Academy** through safeguarding, guardian rights, and protected minor participation
-
-## Non-goals
-
-Entity Analytics does not exist to maximize linkage for its own sake.
-
-It exists to maximize **safe, governed, reviewable usefulness**.
+The artifact must be replayable, audit-friendly, and composable.
