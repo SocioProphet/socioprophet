@@ -1,6 +1,6 @@
 # Hybrid Representation Builder
 
-The platform does not stop at one semantic method. It should build a governed representation ensemble.
+The platform does not stop at one semantic method. It must build a governed representation ensemble.
 
 ## Input
 

@@ -166,6 +166,17 @@
               <div class="mini-note">
                 Start with a real surface: Academy for learning, Organizations for deployment, and Documentation for deeper system detail.
               </div>
+
+              <div class="panel" style="margin-top:1.25rem;padding:1rem 1.1rem;">
+                <div class="card-kicker">Auth & connections</div>
+                <h3 style="margin:0.35rem 0 0.5rem;font-size:1.05rem;line-height:1.2;">Sign in once. Connect capabilities deliberately.</h3>
+                <p style="margin:0;color:#475569;">Keep identity, provider routing, and recovery flows nearby without turning the homepage into a second auth page.</p>
+                <div class="surface-row" style="margin-top:0.85rem;">
+                  <a class="surface-pill" href="/auth/" onclick='spTrack("cta_auth_hub_click",{href:this.getAttribute("href")})'>Auth hub</a>
+                  <a class="surface-pill" href="/auth/connections/" onclick='spTrack("cta_auth_connections_click",{href:this.getAttribute("href")})'>Provider connections</a>
+                  <a class="surface-pill" href="/auth/recovery/" onclick='spTrack("cta_auth_recovery_click",{href:this.getAttribute("href")})'>Recovery states</a>
+                </div>
+              </div>
             </div>
 
             <div class="panel platform-map">
@@ -222,48 +233,6 @@
         </div>
       </section>
 
-
-      <section class="section auth-story">
-        <div class="home-shell auth-story-shell">
-          <div class="auth-story-copy">
-            <div class="card-kicker">Identity + capability orchestration</div>
-            <h2>One SocioProphet login. Many provider connections.</h2>
-            <p>
-              Most users should not have to stitch together AI agents, provider callbacks, API keys, and recovery flows by hand.
-              SocioProphet signs the user in once, then manages provider connections as capabilities with clear recovery states.
-            </p>
-            <div class="cta-row">
-              <a class="btn-dark" href="/auth/" onclick='spTrack("cta_auth_hub_click",{href:this.getAttribute("href")})'>
-                Explore Auth & Connections
-              </a>
-              <a class="btn-light" href="/auth/connections/" onclick='spTrack("cta_auth_connections_click",{href:this.getAttribute("href")})'>
-                View Provider Connections
-              </a>
-            </div>
-          </div>
-
-          <div class="auth-story-grid">
-            <a class="auth-story-card" href="/auth/sign-in/" onclick='spTrack("cta_auth_signin_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">Step 1</div>
-              <strong>Platform sign-in</strong>
-              <p>Passkey-first or magic-link entry into a single SocioProphet workspace identity.</p>
-            </a>
-
-            <a class="auth-story-card" href="/auth/connections/" onclick='spTrack("cta_auth_connectors_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">Step 2</div>
-              <strong>Provider connections</strong>
-              <p>OpenAI, Anthropic, browser automation, and local runtime become managed capabilities instead of scattered secrets.</p>
-            </a>
-
-            <a class="auth-story-card" href="/auth/recovery/" onclick='spTrack("cta_auth_recovery_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">Step 3</div>
-              <strong>Recovery & degraded states</strong>
-              <p>Callback failures, expired auth, and limited scopes become clear states with recovery actions instead of dead ends.</p>
-            </a>
-          </div>
-        </div>
-      </section>
-
       <section class="section">
         <div class="home-shell">
           <h2>Products</h2>
@@ -291,25 +260,17 @@
         <div class="home-shell">
           <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:end;">
             <div>
-              <h2>Identity and Entity Analytics</h2>
-              <p>Build a governed entity graph from typed events, policy-constrained merges, proof artifacts, and marketer-safe outputs.</p>
+              <h2>Institutional deployment</h2>
+              <p>Deploy SocioProphet for institutions with governed operations, bounded AI, Entity Analytics, and defense-oriented validation under human oversight.</p>
             </div>
-            <a href="/entity-analytics/" onclick='spTrack("cta_entity_analytics_click",{href:this.getAttribute("href")})'>Open surface →</a>
+            <a href="/organizations/" onclick='spTrack("cta_entity_analytics_click",{href:this.getAttribute("href")})'>Explore organizations →</a>
           </div>
 
           <div class="product-grid">
-            <a class="product-link" href="/entity-analytics/" onclick='spTrack("cta_entity_analytics_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">identity / graph</div><div><strong>Entity Analytics</strong></div>
-            </a>
-            <a class="product-link" href="https://socioprophet.com/documentation/entity-analytics-reference/#2-core-objects" onclick='spTrack("cta_entity_docs_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">docs</div><div><strong>Entity Analytics Overview</strong></div>
-            </a>
-            <a class="product-link" href="https://socioprophet.com/documentation/entity-analytics-reference/#54-policy-gating" onclick='spTrack("cta_entity_policy_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">policy</div><div><strong>Safe linkage and merge rules</strong></div>
-            </a>
-            <a class="product-link" href="https://socioprophet.com/documentation/entity-analytics-reference/#9-marketer-safe-outputs" onclick='spTrack("cta_entity_marketer_click",{href:this.getAttribute("href")})'>
-              <div class="card-kicker">outputs</div><div><strong>Marketer-safe proofs and exports</strong></div>
-            </a>
+            <a class="product-link" href="/organizations/"><div class="card-kicker">institutional</div><div><strong>Organizations</strong></div></a>
+            <a class="product-link" href="https://socioprophet.com/documentation/governed-ai-and-cybernetics/"><div class="card-kicker">governance</div><div><strong>Governed AI &amp; Cybernetics</strong></div></a>
+            <a class="product-link" href="https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/"><div class="card-kicker">defense</div><div><strong>Authorized cyberdefense</strong></div></a>
+            <a class="product-link" href="/organizations/apply/"><div class="card-kicker">intake</div><div><strong>Open deployment intake</strong></div></a>
           </div>
         </div>
       </section>

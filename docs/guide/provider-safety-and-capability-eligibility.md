@@ -16,7 +16,7 @@ Providers can occupy explicit states such as:
 
 ## Eligibility rule
 
-Not every actor and not every surface should be allowed to attach every capability.
+Not every actor and not every surface must be allowed to attach every capability.
 
 ## Safety examples
 
@@ -36,4 +36,4 @@ Medical, legal, and other elevated domains require stricter role, trust, and exp
 
 ## Product consequence
 
-The public site and product docs should describe not only what providers exist, but which capability classes are appropriate for which users and surfaces.
+The public site and product docs must describe not only what providers exist, but which capability classes are appropriate for which users and surfaces.

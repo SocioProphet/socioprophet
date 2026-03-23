@@ -93,25 +93,37 @@
         "employers"
       ],
       "topic_constituents": [
+        "organizations",
+        "governed-ai",
+        "cybernetics",
+        "agent-plane",
+        "entity-analytics",
+        "cyberdefense",
         "deployment",
-        "institutions",
-        "governance",
-        "public-interest",
-        "secure-training"
+        "oversight",
+        "safeguards",
+        "authorized-simulation"
       ],
       "normalized_topics": [
-        "deployment",
-        "institutions",
+        "organizations",
+        "institutional-ai",
+        "cybernetics",
+        "agent-operations",
+        "entity-analytics",
+        "cyberdefense",
         "governance",
-        "trust",
-        "capability"
+        "safety",
+        "deployment"
       ],
       "related_surfaces": [
-        "academy",
-        "documentation",
+        "entity-analytics",
+        "auth",
         "digital-trust",
-        "medical",
-        "law"
+        "academy",
+        "cloud",
+        "developer",
+        "law",
+        "medical"
       ],
       "investor_overlay": {
         "lens": "deployment_compounding",
@@ -128,10 +140,12 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet.com/documentation/surface-inventory/",
-        "https://socioprophet.com/documentation/domain-surface/"
+        "https://socioprophet.com/documentation/governed-ai-and-cybernetics/",
+        "https://socioprophet.com/documentation/agent-plane-and-operator-workflows/",
+        "https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/",
+        "https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/"
       ],
-      "description": "Institutional deployment for schools, nonprofits, public-interest, and mission-aligned organizations."
+      "description": "Institutional deployment surface for governed AI, agent-plane operations, Entity Analytics, and authorized cyberdefense under human oversight."
     },
     {
       "id": "documentation",

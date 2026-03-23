@@ -29,7 +29,7 @@ Institutional deployment does not remove safety constraints. It formalizes them.
 
 ## Required controls
 
-Organizations should be able to express:
+Organizations must be able to express:
 
 - approval chains
 - participant class restrictions
@@ -40,7 +40,7 @@ Organizations should be able to express:
 
 ## Public website implication
 
-Organizations should eventually have:
+Organizations must eventually have:
 - a first-class landing surface
 - dedicated docs
 - explicit governance and safety framing

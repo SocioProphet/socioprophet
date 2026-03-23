@@ -9,4 +9,4 @@ The canonical treatment now lives in the Entity Analytics Reference:
 - [Scopes](./entity-analytics-reference#23-scopes)
 - [Type system](./entity-analytics-reference#3-type-system)
 
-This companion page should remain short. Its purpose is to direct readers into the canonical manual sections that define typed events, prime mixtures, and scoped identity composition.
+This companion page must remain short. Its purpose is to direct readers into the canonical manual sections that define typed events, prime mixtures, and scoped identity composition.

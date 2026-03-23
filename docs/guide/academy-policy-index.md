@@ -20,7 +20,7 @@ Academy also inherits the wider platform trust model:
 
 ## Why this index exists
 
-Academy should not depend on scattered policy fragments.
+Academy must not depend on scattered policy fragments.
 
 A first-class learning surface needs:
 - clear participation rules

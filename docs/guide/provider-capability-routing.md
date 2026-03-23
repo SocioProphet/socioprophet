@@ -35,7 +35,7 @@ Each provider has a visible state:
 When a capability cannot execute through one provider, the system can route to fallback paths or present the correct recovery action.
 
 ### Human-legible explanation
-Routing should never feel like unexplained black-box switching. The user should understand what is connected, what is usable, and what requires action.
+Routing must never feel like unexplained black-box switching. The user must understand what is connected, what is usable, and what requires action.
 
 ## Digital surface connection
 

@@ -59,3 +59,101 @@
 .vp-doc code {
   font-size: 0.94em;
 }
+
+/* docs-shell polish v1 */
+:root {
+  --vp-layout-max-width: 1660px;
+  --vp-sidebar-width: 296px;
+}
+
+.VPDoc.has-aside .content-container,
+.VPDoc .content-container {
+  max-width: 920px;
+}
+
+.VPDoc .content {
+  padding-bottom: 96px;
+}
+
+.VPDoc h1 {
+  font-size: 2.45rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.VPDoc h2 {
+  margin-top: 2.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.VPDoc h3 {
+  margin-top: 1.6rem;
+}
+
+.VPDoc p,
+.VPDoc li {
+  line-height: 1.75;
+}
+
+.VPDoc ul,
+.VPDoc ol {
+  padding-left: 1.2rem;
+}
+
+.VPDoc .vp-doc div[class*='language-'] {
+  border-radius: 16px;
+}
+
+.VPDoc .vp-doc table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.VPSidebar {
+  padding-top: 12px;
+}
+
+.VPSidebarItem.level-0 {
+  margin-bottom: 10px;
+}
+
+.VPSidebarItem.level-0 > .item > .link > p {
+  font-weight: 700;
+}
+
+.VPSidebarItem .item .link {
+  border-radius: 10px;
+}
+
+.VPSidebarItem .item.is-active > .link {
+  background: rgba(29, 78, 216, 0.08);
+}
+
+@media (min-width: 1280px) {
+  .VPDoc.has-aside .content-container,
+  .VPDoc .content-container {
+    max-width: 980px;
+  }
+}
+\n\n/* docs-brand polish v1 */
+.VPNavBarTitle a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+
+.VPNavBarTitle .VPImage.logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.VPNavBarTitle .title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: 1.02rem;
+}

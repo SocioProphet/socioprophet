@@ -297,7 +297,7 @@ In edge-language form:
 
 ## 9. Proof artifact sketch
 
-The blocked export decision should produce an artifact $\Pi_{23}$ containing at least:
+The blocked export decision must produce an artifact $\Pi_{23}$ containing at least:
 
 - claim: “Patient-bearing local event may be merged/exported into ad-tech scope”
 - result: rejected
@@ -312,7 +312,7 @@ The blocked export decision should produce an artifact $\Pi_{23}$ containing at 
 
 ## 10. Safe alternative
 
-The system should not stop at “no.” It should provide the safe path.
+The system must not stop at “no.” It must provide the safe path.
 
 Instead of allowing $(E_2,E_3)$ to become an exportable merge, the system permits a separate bounded job represented by $E_6$ that exports only:
 
@@ -327,7 +327,7 @@ This is how usefulness is preserved without turning the platform into ambient id
 
 ## 11. Why this example matters
 
-A traditional ER platform sees strong evidence and asks whether two records should be collapsed.
+A traditional ER platform sees strong evidence and asks whether two records must be collapsed.
 
 Entity Analytics asks a stricter sequence:
 

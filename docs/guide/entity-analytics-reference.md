@@ -185,7 +185,7 @@ Evidence is partitioned into classes:
 - witness evidence
 - contradiction evidence
 
-This matters because contradiction evidence should not be averaged away by raw confidence. A single protected-context contradiction can veto an otherwise high-scoring merge.
+This matters because contradiction evidence must not be averaged away by raw confidence. A single protected-context contradiction can veto an otherwise high-scoring merge.
 
 ### 3.3 Link states
 
@@ -303,7 +303,7 @@ This provides a compact representation of allowed prime mixtures and forbidden c
 
 ### 6.2 Harm and review zones
 
-Not all non-allowed states are equally bad. Policy should distinguish:
+Not all non-allowed states are equally bad. Policy must distinguish:
 - automatically allowed
 - automatically blocked
 - review-required
@@ -412,4 +412,4 @@ This manual is the canonical reference. Companion pages provide narrower entry p
 - Marketer-Safe Outputs and Segment Proofs
 - Worked Example: Michael Cross-Context
 
-Those pages should deep-link into this manual’s sections rather than duplicate its full substance.
+Those pages must deep-link into this manual’s sections rather than duplicate its full substance.

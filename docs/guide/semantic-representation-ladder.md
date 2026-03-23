@@ -75,4 +75,4 @@ The platform can move in both directions:
 
 ## Graph consequence
 
-The temporal graph should ultimately visualize this ladder indirectly. Expanded topology, rollout ordering, and graph navigation is informed by changes in document structure, latent topics, vector channels, and semantic clusters rather than only static curated links.
+The temporal graph must ultimately visualize this ladder indirectly. Expanded topology, rollout ordering, and graph navigation is informed by changes in document structure, latent topics, vector channels, and semantic clusters rather than only static curated links.

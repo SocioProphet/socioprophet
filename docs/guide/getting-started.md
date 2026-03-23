@@ -6,7 +6,7 @@ SocioProphet is not yet open for self-serve subscriptions.
 
 To get started, fill out the intake form here:
 
-- [Request access on Socioprophet.com](https://socioprophet.com/organizations/)
+- [Request access on Socioprophet.com](https://socioprophet.com/organizations/apply/)
 
 We are currently onboarding manually so we can route each organization, operator, or builder into the right capability surface and documentation path.
 
@@ -17,7 +17,7 @@ After the form is submitted, we review:
 1. use case and operator fit
 2. safeguarding and trust requirements
 3. which product surfaces and docs lanes are relevant
-4. whether access should begin with guided onboarding instead of ambient self-serve
+4. whether access must begin with guided onboarding instead of ambient self-serve
 
 ## Public documentation entry
 

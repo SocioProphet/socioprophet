@@ -40,6 +40,19 @@
           SocioProphet is built for people and communities first. Organizations can adopt it to serve learners, operators, and builders at scale — with governance, privacy, deployment support, and safety controls — while funding the commons rather than capturing it.
         </p>
 
+        <!-- organizations-hero-cta -->
+        <div class="flex flex-wrap gap-3">
+          <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white shadow-sm hover:bg-slate-800" href="/organizations/apply/">
+            Open intake
+          </a>
+          <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 hover:bg-slate-50" href="https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/">
+            Review governance docs
+          </a>
+          <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 hover:bg-slate-50" href="#governed-stack">
+            Explore the governed stack
+          </a>
+        </div>
+
         <section class="grid gap-6 md:grid-cols-2">
           <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 class="text-xl font-semibold tracking-tight text-slate-950">Schools & Learning Communities</h2>
@@ -80,200 +93,67 @@
           </div>
         </section>
 
-        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 class="text-xl font-semibold tracking-tight text-slate-950">Tell us what you’re trying to build</h2>
+        
+        <!-- governed-stack-surface -->
+        <section id="governed-stack" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="text-xl font-semibold tracking-tight text-slate-950">Governed operations stack</h2>
           <p class="mt-2 text-sm text-slate-600">
-            Short segmented intake for organizations, educators, and the opportunity side. This first-party intake is live and is used to route follow-up appropriately.
+            Organizations adopt SocioProphet through a governed stack: institutional oversight, bounded agent execution, governed identity analytics, and authorized cyberdefense with evidence-producing review loops.
           </p>
 
-          <form id="orgForm" class="mt-5 grid gap-4 md:grid-cols-2">
-            <input type="hidden" name="assignment_id" value="">
-            <input type="hidden" name="experiment_id" value="">
-            <input type="hidden" name="variant_id" value="control">
-            <input type="hidden" name="cta_id" value="">
-            <input type="hidden" name="landing_path" value="">
-            <input type="hidden" name="privacy_policy_version" value="privacy-v2">
-            <input type="hidden" name="terms_version" value="terms-v2">
-            <input type="hidden" name="surface" value="organizations" />
+          <div class="mt-5 grid gap-4 md:grid-cols-2">
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="https://socioprophet.com/documentation/governed-ai-and-cybernetics/">
+              <div class="text-xs font-medium uppercase tracking-wide text-slate-500">operations</div>
+              <div class="mt-2 font-semibold text-slate-950">Governed AI &amp; Cybernetics</div>
+              <p class="mt-2 text-sm text-slate-600">Policy-bounded execution, human oversight, control loops, and evidence-bearing system behavior.</p>
+            </a>
 
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium">I’m here as…</label>
-              <select name="audience" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500" required>
-                <option value="">Select…</option>
-                <option value="person">Learner / Family</option>
-                <option value="educator">Educator / Mentor</option>
-                <option value="org">Organization</option>
-                <option value="opportunity">Hiring / Opportunity side</option>
-              </select>
-            </div>
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="https://socioprophet.com/documentation/agent-plane-and-operator-workflows/">
+              <div class="text-xs font-medium uppercase tracking-wide text-slate-500">agent plane</div>
+              <div class="mt-2 font-semibold text-slate-950">Operator workflows and control</div>
+              <p class="mt-2 text-sm text-slate-600">Role-bounded execution, reviewable workflows, capability routing, and audit-friendly operator state.</p>
+            </a>
 
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium">Email *</label>
-              <input name="email" required type="email" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500" placeholder="you@domain.com" />
-            </div>
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/entity-analytics/">
+              <div class="text-xs font-medium uppercase tracking-wide text-slate-500">governed analytics</div>
+              <div class="mt-2 font-semibold text-slate-950">Entity Analytics</div>
+              <p class="mt-2 text-sm text-slate-600">Typed Event-IR, governed identity graphs, policy-constrained merges, and proof artifacts.</p>
+            </a>
 
-            <div>
-              <label class="block text-sm font-medium">Organization type</label>
-              <select name="org_type" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500">
-                <option value="">Select…</option>
-                <option>School / District</option>
-                <option>Nonprofit / NGO</option>
-                <option>Public sector / Government</option>
-                <option>Sovereign / Mission-critical</option>
-                <option>Company / Employer</option>
-              </select>
-            </div>
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/">
+              <div class="text-xs font-medium uppercase tracking-wide text-slate-500">defense</div>
+              <div class="mt-2 font-semibold text-slate-950">Authorized cyberdefense and simulation</div>
+              <p class="mt-2 text-sm text-slate-600">Defense-first validation, purple-team learning loops, blue-team hardening, and governed simulation under authorization.</p>
+            </a>
+          </div>
 
-            <div>
-              <label class="block text-sm font-medium">Primary intent</label>
-              <select name="intent" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500">
-                <option value="">Select…</option>
-                <option>Learn / upskill</option>
-                <option>Run cohorts or programs</option>
-                <option>Deploy the platform</option>
-                <option>Build an opportunity pipeline</option>
-                <option>Evaluate institutional use</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium">Mission area</label>
-              <select name="mission_area" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500">
-                <option value="">Select…</option>
-                <option>Learning and education</option>
-                <option>Workforce training</option>
-                <option>Public service delivery</option>
-                <option>Civil preparedness / resilience</option>
-                <option>Secure training / mission readiness</option>
-                <option>Research / knowledge systems</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium">Oversight model</label>
-              <select name="oversight_model" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500">
-                <option value="">Select…</option>
-                <option>Internal ethics board</option>
-                <option>Public accountability body</option>
-                <option>Legal / compliance office</option>
-                <option>Other / described in notes</option>
-              </select>
-            </div>
-
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium">Human impact statement</label>
-              <textarea name="impact" rows="3" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500" placeholder="How does this deployment protect or benefit people?"></textarea>
-            </div>
-
-            <div class="md:col-span-2">
-              <label class="inline-flex items-start gap-3 text-sm text-slate-700">
-                <input type="checkbox" name="restricted_use_ack" class="mt-1" />
-                <span>This request does not involve surveillance abuse, coercive profiling, offensive cyber activity, or anti-human targeting.</span>
-              </label>
-            </div>
-
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium">Notes</label>
-              <textarea name="notes" rows="3" class="mt-1 w-full rounded-md border border-slate-300 bg-slate-50/40 px-3 py-2 outline-none focus:border-slate-500" placeholder="What are you trying to do, and who is it for?"></textarea>
-            </div>
-
-            <div style="display:none;"><label>Leave blank<input name="hp" type="text" autocomplete="off"></label></div>
-
-            <div class="md:col-span-2">
-              <label class="inline-flex items-start gap-3 text-sm text-slate-700">
-                <input type="checkbox" name="consent_ack" class="mt-1" required>
-                <span>I agree to the <a class="underline underline-offset-4" href="/privacy/" target="_blank" rel="noopener">privacy policy</a> and <a class="underline underline-offset-4" href="/terms/" target="_blank" rel="noopener">terms</a>.</span>
-              </label>
-            </div>
-
-            <div class="md:col-span-2 flex items-center gap-3">
-              <button class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white shadow-sm hover:bg-slate-800" type="submit">
-                Submit interest
-              </button>
-              <span id="msg" class="text-sm text-slate-600"></span>
-            </div>
-
-            <div class="md:col-span-2 text-xs text-slate-500">
-              By submitting, you agree that we may contact you about Academy, organizational deployment, and related opportunities. Privacy, terms, and safeguarding documentation are now live and continue to be hardened ahead of production rollout.
-            </div>
-          </form>
+          <p class="mt-5 text-xs text-slate-500">
+            Sensitive operator internals, adversary-emulation mechanics, and high-risk security tradecraft are intentionally withheld from the public docs. Public docs describe governance, boundaries, evidence, and deployment posture only.
+          </p>
         </section>
 
-        <!-- docs-precision-organizations -->
+
+
+        <!-- organizations-operating-principles -->
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 class="text-xl font-semibold tracking-tight text-slate-950">Related docs</h2>
+          <h2 class="text-xl font-semibold tracking-tight text-slate-950">Operating principles</h2>
           <p class="mt-2 text-sm text-slate-600">
-            Read the governance, safeguarding, and merge-control documents before deployment planning.
+            Public docs cover governance, bounded execution, deterministic safety claims, and the institutional operating model. Sensitive tactical internals stay outside the public layer.
           </p>
           <div class="mt-4 flex flex-wrap gap-3 text-sm">
             <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/">Institutional governance</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/">Boundary model</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="https://socioprophet.com/documentation/public-vs-restricted-security-boundary/">Public vs restricted</a>
             <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="https://socioprophet.com/documentation/platform-human-protection-and-safeguarding/">Participant safety</a>
             <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="https://socioprophet.com/documentation/policy-constrained-merging-and-unmerge/">Merge policy</a>
           </div>
         </section>
 
+
       </div>
     </main>
 
-    <script>
-      const params = new URLSearchParams(location.search);
-      const form = document.getElementById("orgForm");
-
-      let assignmentId = localStorage.getItem("sp_assignment_id");
-      if (!assignmentId) {
-        assignmentId = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("assign-" + Date.now() + "-" + Math.random().toString(16).slice(2));
-        localStorage.setItem("sp_assignment_id", assignmentId);
-      }
-
-      if (form.elements["audience"] && params.get("audience")) {
-        form.elements["audience"].value = params.get("audience");
-      }
-      form.elements["assignment_id"].value = assignmentId;
-      form.elements["experiment_id"].value = params.get("exp") || "";
-      form.elements["variant_id"].value = params.get("variant") || "control";
-      form.elements["cta_id"].value = params.get("cta") || "organizations_submit";
-      form.elements["landing_path"].value = params.get("from") || document.referrer || "";
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const payload = Object.fromEntries(new FormData(form).entries());
-        payload.page = location.pathname;
-        payload.referrer = document.referrer || "";
-        payload.ts = Date.now();
-
-        try {
-          const res = await fetch("/api/lead", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          const data = await res.json();
-          if (data.ok) {
-            document.getElementById("msg").textContent = `Captured — reference ID: ${data.id}`;
-            form.reset();
-            form.elements["assignment_id"].value = assignmentId;
-            form.elements["experiment_id"].value = params.get("exp") || "";
-            form.elements["variant_id"].value = params.get("variant") || "control";
-            form.elements["cta_id"].value = params.get("cta") || "organizations_submit";
-            form.elements["landing_path"].value = params.get("from") || document.referrer || "";
-            form.elements["privacy_policy_version"].value = "privacy-v2";
-            form.elements["terms_version"].value = "terms-v2";
-            console.log("lead_intake id", data.id, "release", data.releaseId, "slot", data.releaseSlot);
-            spTrack("org_interest_submit", {
-              surface: payload.surface || "",
-              audience: payload.audience || "",
-              reason: payload.reason || "",
-              releaseId: data.releaseId || "",
-              releaseSlot: data.releaseSlot || ""
-            });
-          } else {
-            document.getElementById("msg").textContent = "There was a problem saving your submission.";
-          }
-        } catch (err) {
-          console.error(err);
-          document.getElementById("msg").textContent = "There was a problem saving your submission.";
-        }
-      });
-    </script>
+    
   </body>
 </html>
