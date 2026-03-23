@@ -69,8 +69,8 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/academy",
-        "https://socioprophet-web.web.app/guide/academy-safeguarding-and-minor-protection"
+        "https://socioprophet.com/documentation/products/academy/",
+        "https://socioprophet.com/documentation/academy-safeguarding-and-minor-protection/"
       ],
       "description": "Learning, family, mentorship, and cybernetics education."
     },
@@ -128,8 +128,8 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/surface-inventory",
-        "https://socioprophet-web.web.app/guide/domain-surface"
+        "https://socioprophet.com/documentation/surface-inventory/",
+        "https://socioprophet.com/documentation/domain-surface/"
       ],
       "description": "Institutional deployment for schools, nonprofits, public-interest, and mission-aligned organizations."
     },
@@ -192,8 +192,8 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/",
-        "https://socioprophet-web.web.app/guide/canonical-platform-direction"
+        "https://socioprophet.com/documentation/",
+        "https://socioprophet.com/documentation/canonical-platform-direction/"
       ],
       "description": "Architecture, products, trust model, and canonical direction."
     },
@@ -216,31 +216,51 @@
         "partners"
       ],
       "topic_constituents": [
-        "architecture",
-        "products",
-        "trust",
-        "guides",
-        "reference"
+        "identity",
+        "entity-graph",
+        "event-ir",
+        "feature-atoms",
+        "type-system",
+        "scopes",
+        "prime-topics",
+        "safe-linkage",
+        "policy-gating",
+        "merge",
+        "unmerge",
+        "proof-artifacts",
+        "marketer-safe-outputs",
+        "congruence",
+        "non-escape",
+        "protected-participation",
+        "capability-routing",
+        "governed-deployment",
+        "reputation",
+        "privacy"
       ],
       "normalized_topics": [
-        "architecture",
-        "reference",
+        "identity",
+        "entity-resolution",
+        "graph",
+        "policy",
+        "proofs",
+        "privacy",
+        "safety",
+        "governance",
         "trust",
-        "platform",
-        "governance"
+        "analytics",
+        "export-control",
+        "reputation",
+        "capability-routing"
       ],
       "related_surfaces": [
-        "academy",
+        "auth",
+        "digital-trust",
         "organizations",
-        "ai",
-        "developer",
-        "cloud",
-        "live",
+        "academy",
         "medical",
         "law",
-        "wiki",
-        "blog",
-        "digital-trust"
+        "developer",
+        "cloud"
       ],
       "investor_overlay": {
         "lens": "discovery_compounding",
@@ -256,10 +276,12 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/",
-        "https://socioprophet-web.web.app/guide/canonical-platform-direction"
+        "https://socioprophet.com/documentation/entity-analytics-reference/#2-core-objects",
+        "https://socioprophet.com/documentation/entity-analytics-reference/#54-policy-gating",
+        "https://socioprophet.com/documentation/entity-analytics-reference/#9-marketer-safe-outputs",
+        "https://socioprophet.com/documentation/worked-example-michael-cross-context/#9-proof-artifact-sketch"
       ],
-      "description": "Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs."
+      "description": "Identity-aware entity analytics built from typed Event-IR, governed entity graphs, policy-constrained merges, reversibility, proof artifacts, non-escape controls, and marketer-safe outputs."
     },
     {
       "id": "ai",
@@ -310,7 +332,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/ai"
+        "https://socioprophet.com/documentation/products/ai/"
       ],
       "description": "Model, agent, orchestration, and trust-layer capabilities."
     },
@@ -363,7 +385,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/dev"
+        "https://socioprophet.com/documentation/products/dev/"
       ],
       "description": "SDKs, APIs, integration patterns, and developer workflows."
     },
@@ -416,7 +438,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/cloud"
+        "https://socioprophet.com/documentation/products/cloud/"
       ],
       "description": "Hosted and managed operational capabilities."
     },
@@ -470,7 +492,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/live"
+        "https://socioprophet.com/documentation/products/live/"
       ],
       "description": "Demonstrations, environments, and active build states."
     },
@@ -524,7 +546,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/medical"
+        "https://socioprophet.com/documentation/products/medical/"
       ],
       "description": "Health, education, and support pathways requiring higher assurance."
     },
@@ -578,7 +600,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/law"
+        "https://socioprophet.com/documentation/products/law/"
       ],
       "description": "Legal, governance, and jurisprudential workflows."
     },
@@ -629,7 +651,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/wiki"
+        "https://socioprophet.com/documentation/products/wiki/"
       ],
       "description": "Structured knowledge and reference surface."
     },
@@ -680,7 +702,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/blog"
+        "https://socioprophet.com/documentation/products/blog/"
       ],
       "description": "Long-form writing, updates, and commentary."
     },
@@ -735,7 +757,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/domain-surface"
+        "https://socioprophet.com/documentation/domain-surface/"
       ],
       "description": "Trust-first positioning, digital identity, and public-facing trust surfaces."
     },
@@ -789,7 +811,7 @@
       "related_sites": [
         "/investor/",
         "/map/",
-        "https://socioprophet-web.web.app/guide/surface-inventory"
+        "https://socioprophet.com/documentation/surface-inventory/"
       ],
       "description": "Investor and governance-facing public materials."
     },
@@ -2364,5 +2386,55 @@
         "score": 0.2
       }
     ]
-  }
+  },
+  "edges": [
+    {
+      "source": "entity-analytics",
+      "target": "auth",
+      "relation": "depends_on",
+      "weight": 0.93
+    },
+    {
+      "source": "entity-analytics",
+      "target": "digital-trust",
+      "relation": "governed_by",
+      "weight": 0.96
+    },
+    {
+      "source": "entity-analytics",
+      "target": "organizations",
+      "relation": "operationalizes",
+      "weight": 0.84
+    },
+    {
+      "source": "entity-analytics",
+      "target": "academy",
+      "relation": "teaches",
+      "weight": 0.68
+    },
+    {
+      "source": "entity-analytics",
+      "target": "medical",
+      "relation": "protects_context",
+      "weight": 0.92
+    },
+    {
+      "source": "entity-analytics",
+      "target": "law",
+      "relation": "constrained_by",
+      "weight": 0.88
+    },
+    {
+      "source": "entity-analytics",
+      "target": "developer",
+      "relation": "implemented_by",
+      "weight": 0.77
+    },
+    {
+      "source": "entity-analytics",
+      "target": "cloud",
+      "relation": "deploys_to",
+      "weight": 0.72
+    }
+  ]
 }

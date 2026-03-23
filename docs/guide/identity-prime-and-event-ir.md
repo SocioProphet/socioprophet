@@ -1,28 +1,12 @@
 # Identity Prime and Event-IR
 
-Entity Analytics begins with typed events, not generic rows.
+Identity Prime and Event-IR are the entry point to Entity Analytics' typed event model.
 
-## Event-IR
+The canonical treatment now lives in the Entity Analytics Reference:
+- [Core objects](./entity-analytics-reference#2-core-objects)
+- [Events](./entity-analytics-reference#21-events)
+- [Identity-prime basis](./entity-analytics-reference#22-identity-prime-basis)
+- [Scopes](./entity-analytics-reference#23-scopes)
+- [Type system](./entity-analytics-reference#3-type-system)
 
-A typed event should carry enough structure to explain:
-- actor
-- scope
-- action
-- time
-- feature atoms
-- evidence
-- policy-relevant context
-
-## Identity as scoped composition
-
-A person is not represented as one undifferentiated blob.
-
-Distinct scopes, relationships, and contexts can remain separate while still being analyzable under governed linkage rules.
-
-## Why this matters
-
-Typed events let us:
-- preserve evidence
-- prevent category mistakes
-- support explainable merge decisions
-- export coarsened outputs without exposing all source contexts
+This companion page should remain short. Its purpose is to direct readers into the canonical manual sections that define typed events, prime mixtures, and scoped identity composition.

@@ -1,26 +1,11 @@
 # Policy-Constrained Merging and Unmerge
 
-Confidence is not enough.
+Confidence is not enough. Entity Analytics separates evidential strength from admissibility.
 
-Entity Analytics can reject a high-confidence merge if that merge would violate trust, safeguarding, or cross-context protection rules.
+The canonical treatment now lives in the Entity Analytics Reference:
+- [Policy gating](./entity-analytics-reference#54-policy-gating)
+- [Policy model](./entity-analytics-reference#6-policy-model)
+- [Merge, split, and unmerge semantics](./entity-analytics-reference#7-merge-split-and-unmerge-semantics)
+- [Operator checklist](./entity-analytics-reference#11-operator-checklist)
 
-## Merge rule
-
-Merge requires:
-- evidence
-- policy compatibility
-- acceptable harm profile
-- reviewability
-
-## Unmerge rule
-
-Unmerge is a first-class operation, not a failure state.
-
-The system supports:
-- rollback of harmful merges
-- preservation of evidence trails
-- explanation of why a merge was blocked or reversed
-
-## Why this matters
-
-This is how we prevent contexts such as patient, child, parent, learner, citizen, or ad-target from collapsing into unsafe ambient identity leakage.
+Use this page as a narrow entry point for readers focused on merge controls and reversibility.

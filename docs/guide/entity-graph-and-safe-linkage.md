@@ -1,29 +1,11 @@
 # Entity Graph and Safe Linkage
 
-Entity Analytics prefers a governed graph over a naive monolithic profile.
+Entity Analytics uses a governed graph instead of a naive monolithic profile.
 
-## Safe linkage
+The canonical treatment now lives in the Entity Analytics Reference:
+- [Entity graph](./entity-analytics-reference#24-entity-graph)
+- [Invariants](./entity-analytics-reference#4-invariants)
+- [Resolution and decision pipeline](./entity-analytics-reference#5-resolution-and-decision-pipeline)
+- [Merge, split, and unmerge semantics](./entity-analytics-reference#7-merge-split-and-unmerge-semantics)
 
-Linkage decisions consider:
-- evidence quality
-- scope compatibility
-- policy restrictions
-- downstream harm if contexts are merged incorrectly
-
-## Graph rule
-
-A link can be useful without becoming an irreversible merge.
-
-The system can preserve:
-- candidate links
-- asserted links
-- policy-blocked links
-- revoked or unmerged links
-
-## Product implication
-
-The surface should make clear when:
-- two contexts are related
-- two contexts are candidates
-- a link is forbidden
-- an earlier merge has been reversed
+Use this page as a narrow entry point for readers who want the graph model first.
