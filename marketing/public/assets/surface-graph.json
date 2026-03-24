@@ -69,8 +69,8 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/academy/",
-        "/documentation/a/cademy-safeguarding-and-minor-protection/"
+        "/documentation/products/academy/",
+        "/documentation/academy-safeguarding-and-minor-protection/"
       ],
       "description": "Learning, family, mentorship, and cybernetics education."
     },
@@ -140,10 +140,10 @@
         ]
       },
       "related_sites": [
-        "/documentation/g/overned-ai-and-cybernetics/",
-        "/documentation/a/gent-plane-and-operator-workflows/",
-        "/documentation/a/uthorized-cyberdefense-and-simulation/",
-        "/documentation/o/rganizations-governance-and-institutional-safety/"
+        "/documentation/governed-ai-and-cybernetics/",
+        "/documentation/agent-plane-and-operator-workflows/",
+        "/documentation/authorized-cyberdefense-and-simulation/",
+        "/documentation/organizations-governance-and-institutional-safety/"
       ],
       "description": "Institutional deployment surface for governed AI, agent-plane operations, Entity Analytics, and authorized cyberdefense under human oversight."
     },
@@ -207,7 +207,7 @@
       },
       "related_sites": [
         "https://socioprophet.com/documentation/",
-        "/documentation/c/anonical-platform-direction/"
+        "/documentation/canonical-platform-direction/"
       ],
       "description": "Architecture, products, trust model, and canonical direction."
     },
@@ -290,10 +290,10 @@
         ]
       },
       "related_sites": [
-        "/documentation/e/ntity-analytics-reference/#2-core-objects",
-        "/documentation/e/ntity-analytics-reference/#54-policy-gating",
-        "/documentation/e/ntity-analytics-reference/#9-marketer-safe-outputs",
-        "/documentation/w/orked-example-michael-cross-context/#9-proof-artifact-sketch"
+        "/documentation/entity-analytics-reference/#2-core-objects",
+        "/documentation/entity-analytics-reference/#54-policy-gating",
+        "/documentation/entity-analytics-reference/#9-marketer-safe-outputs",
+        "/documentation/worked-example-michael-cross-context/#9-proof-artifact-sketch"
       ],
       "description": "Identity-aware entity analytics built from typed Event-IR, governed entity graphs, policy-constrained merges, reversibility, proof artifacts, non-escape controls, and marketer-safe outputs."
     },
@@ -346,7 +346,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/ai/"
+        "/documentation/products/ai/"
       ],
       "description": "Model, agent, orchestration, and trust-layer capabilities."
     },
@@ -399,7 +399,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/dev/"
+        "/documentation/products/dev/"
       ],
       "description": "SDKs, APIs, integration patterns, and developer workflows."
     },
@@ -452,7 +452,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/cloud/"
+        "/documentation/products/cloud/"
       ],
       "description": "Hosted and managed operational capabilities."
     },
@@ -506,7 +506,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/live/"
+        "/documentation/products/live/"
       ],
       "description": "Demonstrations, environments, and active build states."
     },
@@ -560,7 +560,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/medical/"
+        "/documentation/products/medical/"
       ],
       "description": "Health, education, and support pathways requiring higher assurance."
     },
@@ -614,7 +614,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/law/"
+        "/documentation/products/law/"
       ],
       "description": "Legal, governance, and jurisprudential workflows."
     },
@@ -665,7 +665,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/wiki/"
+        "/documentation/products/wiki/"
       ],
       "description": "Structured knowledge and reference surface."
     },
@@ -716,7 +716,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/p/roducts/blog/"
+        "/documentation/products/blog/"
       ],
       "description": "Long-form writing, updates, and commentary."
     },
@@ -771,7 +771,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/d/omain-surface/"
+        "/documentation/domain-surface/"
       ],
       "description": "Trust-first positioning, digital identity, and public-facing trust surfaces."
     },
@@ -825,7 +825,7 @@
       "related_sites": [
         "/investor/",
         "/map/",
-        "/documentation/s/urface-inventory/"
+        "/documentation/surface-inventory/"
       ],
       "description": "Investor and governance-facing public materials."
     },

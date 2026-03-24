@@ -513,16 +513,16 @@
     "source_kind": "docs-guide",
     "source_path": "docs/guide/marketer-safe-outputs-and-segment-proofs.md",
     "url": "https://socioprophet.com/documentation/marketer-safe-outputs-and-segment-proofs/",
-    "ok": true,
-    "status": 200,
-    "final_url": "https://socioprophet.com/documentation/marketer-safe-outputs-and-segment-proofs/",
-    "title": "Marketer-Safe Outputs and Segment Proofs | SocioProphet",
-    "link_count": 56,
+    "ok": false,
+    "status": "",
+    "final_url": "",
+    "title": "",
+    "link_count": 0,
     "webapp_link_count": 0,
     "firebase_link_count": 0,
     "contains_webapp_text": false,
     "contains_firebase_text": false,
-    "notes": ""
+    "notes": "error=TimeoutError:The read operation timed out"
   },
   {
     "source_kind": "docs-guide",
