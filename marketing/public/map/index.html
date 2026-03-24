@@ -462,7 +462,7 @@
     });
     queryEl.addEventListener("input", () => { state.query = queryEl.value; render(); });
 
-    fetch("/assets/surface-graph.20260323.json")
+    fetch("/assets/surface-graph.json")
       .then(r => r.json())
       .then(graph => {
         state.graph = graph;

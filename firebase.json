@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "docs",
-      "public": "docs/.vitepress/dist",
+      "public": "docs/.vitepress/publish",
       "ignore": [
         "firebase.json",
         "**/.*",
