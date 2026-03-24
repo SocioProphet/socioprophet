@@ -23,7 +23,7 @@ export default {
           const parts = href.split('#');
           const base = parts[0].replace(/^\/guide\//, '').replace(/\/$/, '');
           const hash = parts[1] ? '#' + parts[1] : '';
-          link.href = `https://sociophet.com/documentation/${base}/${hash}`;
+          link.href = `https://socioprophet.com/documentation/${base}/${hash}`;
           continue;
         }
 
@@ -31,7 +31,7 @@ export default {
           const parts = href.split('#');
           const base = parts[0].replace('https://socioprophet-web.web.app/guide/', '').replace(/\/$/, '');
           const hash = parts[1] ? '#' + parts[1] : '';
-          link.href = `https://sociophet.com/documentation/${base}/${hash}`;
+          link.href = `https://socioprophet.com/documentation/${base}/${hash}`;
           continue;
         }
       }
