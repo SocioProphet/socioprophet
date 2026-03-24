@@ -1,75 +1,174 @@
 # Governed AI and Cybernetics
 
-Governed AI and Cybernetics is the public description of how SocioProphet organizes human oversight, policy-bounded execution, evidence production, and controlled operational feedback loops.
+This page explains the public SocioProphet control model for governed AI and cybernetic operations.
 
-This page is intentionally public-safe. It describes governance, control, and deployment boundaries. It does not publish sensitive operator internals, exploit tradecraft, or security-sensitive runbooks.
+SocioProphet is not an ambient-autonomy system. It is a governed operational intelligence stack where capability, authority, evidence, and review remain explicit.
 
 ## 1. Purpose
 
-This surface exists for organizations that need more than chat interfaces or disconnected tools. It describes how SocioProphet coordinates:
+Governed AI and Cybernetics is the public explanation of how SocioProphet organizes:
 
-- human operators
-- bounded agent execution
-- policy-aware capability routing
-- evidence-producing workflows
-- reversible and reviewable system behavior
+- bounded execution
+- human supervision
+- policy-bounded capability routing
+- proof-bearing workflows
+- reversible operational transitions
+- institutional safety and governance
 
-The goal is not ambient autonomy. The goal is governed execution under human supervision.
+This layer is central to the public thesis of the platform.
 
-## 2. What is governed
+## 2. Core claim
 
-The governed layer covers:
+The core claim is simple:
 
-- operator roles and approval paths
-- policy checks before execution
-- capability grants and revocation
-- audit trails and replay hooks
-- proof-producing outputs
-- cross-context protection for sensitive data
+AI becomes operationally trustworthy when it is governed.
 
-This is where cybernetics matters: not as mystique, but as disciplined control loops with visible state, bounded action, and corrective feedback.
+That means:
 
-## 3. Human control model
+- actions occur inside explicit capability envelopes
+- operators can inspect workflow state
+- important transitions are reviewable
+- promotions require evidence
+- reversibility exists as a first-class design property
+- public architecture remains legible without exposing restricted tactical detail
 
-The public model is:
+This is the difference between governed execution and black-box automation.
 
-1. humans define mission and authorization boundaries
-2. agents execute only within capability and policy envelopes
-3. sensitive operations are reviewed, gated, or refused
-4. every consequential action must be attributable and reconstructible
+## 3. Deterministic and bounded posture
 
-This keeps the system aligned with institutional governance rather than letting execution drift into opaque automation.
+SocioProphet describes this layer as deterministic because the system is built around bounded transitions, measurable safety, and attributable state changes.
 
-## 4. Relationship to other surfaces
+In public terms, that means:
 
-Governed AI and Cybernetics sits above and alongside:
+- no ambient authority
+- no uncontrolled capability escalation
+- no invisible promotion path
+- no content-free confidence claims
+- no safety posture that relies on intuition alone
 
-- [Organizations governance and institutional safety](./organizations-governance-and-institutional-safety)
-- [Auth and connections](./auth-and-connections)
-- [Provider capability routing](./provider-capability-routing)
-- [Entity Analytics Reference](./entity-analytics-reference)
+Deterministic AI in this system means bounded operation under declared constraints.
 
-It is also closely related to the operator and execution model described in [Agent Plane and Operator Workflows](./agent-plane-and-operator-workflows).
+Read:
+- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
+- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
 
-## 5. Public-safe boundary
+## 4. Cybernetic control loops
 
-The public docs cover:
+The public-safe cybernetic loop is:
 
-- governance model
-- control loops
+1. observe
+2. evaluate
+3. route capability
+4. execute within policy
+5. emit evidence
+6. review, promote, or reverse
+
+This is not mystical language. It is the operational loop by which the platform keeps execution governable.
+
+The important point is that the loop is:
+
+- stateful
+- reviewable
+- attributable
+- bounded
+- evidence-producing
+
+## 5. Relationship to the Agent Plane
+
+The Agent Plane is the operator-facing workflow layer inside the broader governed model.
+
+The Agent Plane explains:
+
 - operator roles
-- deployment boundaries
-- evidence and proof model
-- safeguards and reversibility
+- workflow state
+- review paths
+- capability routing
+- execution boundaries
 
-The public docs do **not** cover:
+Read:
+- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
+- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
+- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
 
-- offensive automation internals
-- sensitive adversary simulation tooling
-- private runbooks
-- tradecraft specifics
-- exploit or persistence workflows
+## 6. Relationship to Entity Analytics
 
-## 6. Institutional outcome
+Entity Analytics provides the governed identity, event, graph, merge, and proof substrate that keeps cross-context reasoning disciplined.
 
-For organizations, this surface explains how to adopt a governed AI layer without collapsing into either black-box automation or uncontrolled operator sprawl. The emphasis is disciplined control, human supervision, and evidence-bearing execution.
+This matters because governed execution needs:
+
+- typed events
+- identity and scope discipline
+- merge controls
+- evidence trails
+- public-safe proof artifacts
+
+Read:
+- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
+- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+
+## 7. Relationship to Authorized Cyberdefense
+
+Authorized Cyberdefense and Simulation is the defense-first validation layer for governed operations.
+
+This layer exists so institutions can:
+
+- validate defensive posture
+- run bounded simulation under authorization
+- improve hardening and response
+- keep evidence of what was tested, blocked, and remediated
+
+Read:
+- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+
+## 8. Public-safe boundary
+
+This page is public-safe by design.
+
+It explains:
+
+- control model
+- governance model
+- bounded execution
+- evidence and promotion logic
+- relationships among the major layers
+
+It does not publish:
+
+- sensitive operator kits
+- exact tactical playbooks
+- exploit or persistence logic
+- restricted thresholds
+- misuse-enabling tradecraft
+
+That restriction is part of the safety architecture, not a missing section.
+
+## 9. Why this matters
+
+Most AI systems in the market still present as one of these:
+
+- a chat interface
+- a copilot wrapper
+- an opaque automation plane
+- a stack of disconnected tools
+
+SocioProphet presents something else:
+
+- governed operational intelligence
+- bounded execution
+- deterministic safety posture
+- evidence-bearing workflows
+- institutional adoption model
+- explicit public and restricted boundary management
+
+That is a different category.
+
+## 10. Use this page
+
+Use this page when the question is:
+
+- What makes this AI system governed rather than ambient?
+- How does execution remain bounded?
+- Where do evidence, review, and reversibility fit?
+- How do agent workflows, analytics, and cyberdefense connect into one operational model?
