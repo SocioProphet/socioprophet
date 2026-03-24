@@ -1,47 +1,146 @@
 # Organizations Governance and Institutional Safety
 
-Organizations is not only a lead form or deployment lane. It is a governed institutional surface.
+This page is the public manual entry point for institutional deployment.
 
-## Role model
+SocioProphet is designed for organizations that need a governed operational intelligence system rather than an unbounded automation layer. The platform is structured for institutions that care about safeguards, attribution, reversibility, bounded execution, and explicit control of sensitive capability.
 
-Organizations typically involve multiple role classes:
+## 1. What this surface is for
 
-- organization admin
-- program lead
-- mentor / operator / moderator
-- guardian or sponsor
-- participant / learner
-- compliance or safety reviewer
+This surface is for:
 
-## Institutional obligations
+- schools and learning communities
+- nonprofits and public-interest organizations
+- public-sector and sovereign contexts
+- employers building ethical learning and capability pathways
+- mission-aligned institutions adopting governed AI and cybernetic operations
 
-A first-class organizations surface must document:
+It is not just an intake page. It is the institutional explanation layer.
 
-- who approves access
-- who can connect capabilities
-- who handles incidents
-- who reviews policy exceptions
-- who is responsible for minors and sensitive participants
+## 2. Institutional thesis
 
-## Institutional safety rule
+The institutional thesis is simple:
 
-Institutional deployment does not remove safety constraints. It formalizes them.
+- people remain responsible for legitimacy and authority
+- bounded agents assist within explicit governance envelopes
+- important transitions are reviewable
+- consequential actions produce evidence
+- harmful or invalid transitions remain reversible
+- defensive and validation functions remain authorized, bounded, and documented
 
-## Required controls
+This is why SocioProphet is positioned as governed and deterministic rather than ambient and improvisational.
 
-Organizations must be able to express:
+## 3. Institutional stack
 
-- approval chains
-- participant class restrictions
-- guardian-linked requirements
-- moderation and escalation routes
-- provider eligibility and capability limits
-- audit and evidence retention expectations
+Organizations adopt SocioProphet through a governed stack.
 
-## Public website implication
+### Governed AI and Cybernetics
 
-Organizations must eventually have:
-- a first-class landing surface
-- dedicated docs
-- explicit governance and safety framing
-- direct linkage to relevant policy documents
+This is the bounded execution and control-loop layer.
+
+Read:
+- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
+- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
+
+### Agent Plane and operator workflows
+
+This is the role, workflow, capability-routing, and operator-state layer.
+
+Read:
+- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
+- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
+- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
+
+### Entity Analytics
+
+This is the governed identity, event, merge, graph, and proof subsystem.
+
+Read:
+- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
+- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+
+### Authorized Cyberdefense and Simulation
+
+This is the public-safe defensive validation surface.
+
+Read:
+- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+
+## 4. Governance model
+
+Institutional deployment depends on explicit governance.
+
+The public governance model includes:
+
+- human oversight of consequential transitions
+- bounded capabilities rather than ambient authority
+- evidence-bearing promotion and release logic
+- provenance and auditability
+- public versus restricted separation for security-sensitive detail
+- safeguarding and participant protection
+
+Read:
+- [Provenance, Promotion, and Reversibility](https://socioprophet.com/documentation/provenance-promotion-and-reversibility/)
+- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+- [Platform Human Protection and Safeguarding](https://socioprophet.com/documentation/platform-human-protection-and-safeguarding/)
+
+## 5. Human safeguards and deployment boundary
+
+SocioProphet supports institutions only within an explicit human-protection and authorization boundary.
+
+Publicly, that means:
+
+- anti-human use is refused
+- sensitive capabilities are governed
+- public docs explain the boundary honestly
+- restricted operational internals stay outside the public layer
+- organizations adopt the system through reviewable deployment and intake pathways
+
+## 6. What organizations get publicly
+
+Organizations can understand, from the public layer:
+
+- the product architecture
+- the governance model
+- the bounded AI claim
+- the evidence model
+- the defensive validation posture
+- the public/private security boundary
+- the intake and deployment path
+
+## 7. What remains restricted
+
+Restricted material includes:
+
+- sensitive operator kits
+- exact tactical playbooks
+- high-fidelity adversary-emulation internals
+- restricted thresholds
+- exploit or persistence mechanics
+- other details that materially increase misuse value
+
+This is a deliberate safety boundary, not a documentation gap.
+
+## 8. Deployment path
+
+The institutional path is:
+
+1. understand the public architecture
+2. review governance and safety materials
+3. review the deterministic and bounded AI claim
+4. review the governed stack relevant to the use case
+5. use the intake page to begin the deployment conversation
+
+Entry points:
+- [Organizations landing page](https://socioprophet.com/organizations/)
+- [Organizations intake](https://socioprophet.com/organizations/apply/)
+
+## 9. Use this page
+
+Use this page as the institutional manual entry point.
+
+Use it when the question is:
+- Can this system be adopted by an institution responsibly?
+- What is the governance model?
+- Where is the line between public architecture and restricted operational detail?
+- How do the major governed subsystems fit together?
