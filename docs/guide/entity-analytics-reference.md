@@ -1,30 +1,48 @@
 # Entity Analytics Reference
 
-Entity Analytics is SocioProphet’s identity-aware, policy-constrained, proof-producing analytics system for building governed entity graphs without collapsing a person into one unsafe ambient profile.
+Entity Analytics is the governed identity, event, graph, merge, and proof subsystem of SocioProphet.
 
-This document is the operator manual and technical reference for the system. It defines the model, invariants, execution order, proof artifacts, and failure semantics for safe linkage, merge, unmerge, suppression, and bounded export.
+This page is the canonical public technical manual for the system. It explains how typed events, identity-prime structure, scopes, graph state, policy gates, and proof artifacts fit together.
+
+Entity Analytics is not a generic CRM profile layer and not a conventional enterprise entity-resolution engine. It is a governed analytics system built to preserve identity boundaries, bound cross-context reasoning, and emit evidence-bearing results.
 
 ## 1. System purpose
 
-Classical entity resolution tries to maximize correct linkage under organizational control. Entity Analytics instead optimizes for safe linkage under citizen-first control, where a linkage can be useful, reviewable, reversible, and still forbidden from becoming a merge or an export.
+Classical entity resolution tries to maximize correct linkage under organizational control.
 
-The governing thesis is:
+Entity Analytics optimizes for a different objective:
 
-> Identity is prime.
+- preserve identity boundaries
+- permit governed linkage where justified
+- block unsafe merge or export paths
+- attach policy and proof to consequential transitions
+- keep reversal and auditability first-class
 
-A person is not modeled as one blob. A person is represented as a structured composition of irreducible identity-relevant contexts, each of which may participate differently across devices, institutions, jurisdictions, relationships, and applications.
+The system exists because institutional analytics, identity, policy, and safety cannot be treated as unrelated layers.
 
-The system therefore answers five different questions, not one:
+## 2. Core thesis
 
-1. Are these records evidentially related?
-2. May they be linked?
-3. May they be merged?
-4. May that merge be exported into another scope?
-5. Can we prove afterward what was allowed, blocked, suppressed, or reversed?
+The core thesis is:
 
-## 2. Core objects
+**Identity is prime.**
 
-The system operates over five first-class object families:
+A person is not modeled as one undifferentiated ambient profile. A person is represented as a structured composition of irreducible identity-relevant contexts that may relate, remain separate, merge under policy, or remain blocked.
+
+That leads to a stricter sequence than conventional ER systems use.
+
+The system asks:
+
+1. are these records evidentially related
+2. may they be linked
+3. may they be merged
+4. may the merge be exported across scope
+5. can the decision be replayed and explained later
+
+Evidence proposes. Policy disposes. Proof preserves the result.
+
+## 3. Core objects
+
+Entity Analytics operates over five first-class object families:
 
 - events
 - scopes
@@ -32,7 +50,7 @@ The system operates over five first-class object families:
 - links
 - proof artifacts
 
-### 2.1 Events
+### 3.1 Events
 
 Every observation enters as a typed event rather than a generic row.
 
@@ -52,9 +70,74 @@ where:
 - $\mathrm{features}$ is a typed feature map
 - $\mathrm{evidence}$ is the provenance and witness bundle
 
-Event-IR exists so that the system can preserve not just that something happened, but where it happened, under what trust regime, with what identifiers, and with what auditability.
+Event-IR preserves not only that something happened, but where it happened, under what trust regime, with which identity-relevant context, and with what evidence.
 
-### 2.2 Identity-prime basis
+### 3.2 Scopes
+
+A scope is first-class:
+
+$$
+s := (\text{device}, \text{process}, \text{container}, \text{app}, \text{institution}, \text{jurisdiction}, \text{network-class}, \dots)
+$$
+
+with partial order:
+
+$$
+s \preceq s'
+$$
+
+meaning that $s'$ is wider, less trusted, or less local than $s$.
+
+Scope transitions are semantic transitions. They determine what kind of linkage, merge, export, and promotion is even admissible.
+
+### 3.3 Entities and links
+
+The system prefers a governed graph over a monolithic profile.
+
+Nodes include:
+
+- tentative entities
+- asserted entities
+- scoped personas
+- devices
+- identifiers
+- institutions
+- proof artifacts
+
+Edges include:
+
+- candidate-link
+- asserted-link
+- merged-with
+- blocked-by-policy
+- exported-to
+- revoked-link
+- unmerged-from
+- witnessed-by
+
+A relation can be useful without becoming a merge. A merge can be admissible without becoming exportable. A graph edge can be evidentially strong and still remain policy-blocked.
+
+### 3.4 Proof artifacts
+
+Every high-consequence operation produces or updates a proof artifact $\Pi$.
+
+A proof artifact carries:
+
+- claim
+- input hashes
+- policy and model versions
+- domains used
+- evidence atoms
+- witnesses
+- precision deltas
+- decision result
+- counterexample trace on failure
+- replay hooks
+- signatures
+
+The artifact is how the system moves from “we think this happened” to “we can replay what happened and explain why.”
+
+## 4. Identity-prime basis
 
 Fix a finite prime-topic basis
 
@@ -62,7 +145,7 @@ $$
 \mathcal{P} = \{p_1, \dots, p_k\}.
 $$
 
-Each $p_i$ is an irreducible identity-relevant context such as patient, parent, citizen, founder, learner, creator, or worker. These are not marketing labels; they are policy-bearing semantic dimensions.
+Each $p_i$ is an irreducible identity-relevant context such as patient, parent, citizen, founder, learner, creator, or worker.
 
 A topic mixture is represented as:
 
@@ -70,13 +153,13 @@ $$
 u = (u_1,\dots,u_k)\in\mathbb{N}^k
 $$
 
-with additive composition
+with additive composition:
 
 $$
 u \oplus v := u + v.
 $$
 
-For policy checks we often use a binarized activation vector
+For policy checks we frequently use a binarized activation vector:
 
 $$
 b(u)\in\{0,1\}^k
@@ -92,70 +175,16 @@ $$
 
 for injective prime labeling $\ell:\mathcal{P}\to\mathbb{P}$.
 
-This gives us a compositional representation that supports factor reasoning, topic activation, and irreversible-audit-friendly decomposition.
+This gives the system a compositional identity model that remains factorizable, typed, and auditable.
 
-### 2.3 Scopes
+## 5. Type system and evidence classes
 
-A scope is first-class:
+Entity Analytics uses a typed discipline because untyped evidence collapses too easily into ambient leakage.
 
-$$
-s := (\text{device}, \text{process}, \text{container}, \text{app}, \text{institution}, \text{jurisdiction}, \text{network-class}, \dots)
-$$
+### 5.1 Feature atoms
 
-with a partial order $s \preceq s'$ meaning that $s'$ is wider, less trusted, or less local than $s$.
+Features are typed atoms such as:
 
-Scopes are not cosmetic metadata. Scope changes are semantic events because they determine what linkage, merge, export, or replay action is even admissible.
-
-### 2.4 Entity graph
-
-The system prefers a governed graph over a monolithic profile.
-
-Nodes include:
-- tentative entities
-- asserted entities
-- scoped personas
-- devices
-- identifiers
-- institutions
-- proof artifacts
-
-Edges include:
-- candidate-link
-- asserted-link
-- merged-with
-- blocked-by-policy
-- exported-to
-- revoked-link
-- unmerged-from
-- witnessed-by
-
-A link can be useful without being mergeable. A merge can be valid without being exportable. A relationship can be evidentially strong and still policy-forbidden.
-
-### 2.5 Proof artifacts
-
-Every high-consequence operation produces or updates a proof artifact $\Pi$ containing:
-
-- claim
-- input hashes
-- model and policy versions
-- domains used
-- evidence atoms
-- witnesses
-- precision deltas
-- decision result
-- counterexample trace on failure
-- replay hooks
-- signatures
-
-The proof artifact is how the system moves from “we think” to “we can replay and show why.”
-
-## 3. Type system
-
-Entity Analytics uses a typed discipline because untyped evidence becomes ambient leakage.
-
-### 3.1 Feature atoms
-
-Features are not one flat dictionary. They are typed atoms such as:
 - stable identifier
 - soft identifier
 - temporal signal
@@ -166,15 +195,16 @@ Features are not one flat dictionary. They are typed atoms such as:
 - secret-bearing token
 - derived cohort label
 
-Each feature atom has:
+Each feature atom carries:
+
 - origin scope
 - extraction method
-- confidence or quality
+- quality or confidence
 - allowed uses
 - forbidden downstream scopes
 - retention policy
 
-### 3.2 Evidence classes
+### 5.2 Evidence classes
 
 Evidence is partitioned into classes:
 
@@ -185,11 +215,11 @@ Evidence is partitioned into classes:
 - witness evidence
 - contradiction evidence
 
-This matters because contradiction evidence must not be averaged away by raw confidence. A single protected-context contradiction can veto an otherwise high-scoring merge.
+Contradiction evidence does not get averaged away by raw confidence. A protected-context contradiction can veto an otherwise high-scoring merge.
 
-### 3.3 Link states
+### 5.3 Link states
 
-A proposed relation between records or entities can be in one of the following states:
+A proposed relation can occupy states such as:
 
 - proposed
 - linked
@@ -199,53 +229,59 @@ A proposed relation between records or entities can be in one of the following s
 - revoked
 - unmerged
 
-The system must preserve state transitions, not just final outcomes.
+The system preserves transitions, not only final states.
 
-## 4. Invariants
+## 6. Invariants
 
 The following invariants govern the system.
 
-### 4.1 Identity-prime non-collapse
+### 6.1 Identity-prime non-collapse
 
-No operation may silently collapse incompatible prime-bearing contexts into one ambient profile merely because evidential similarity is high.
+No operation may silently collapse incompatible prime-bearing contexts into one ambient identity merely because evidential similarity is high.
 
-### 4.2 Scope monotonicity for protected data
+### 6.2 Scope monotonicity for protected data
 
-Protected evidence may not move to a wider scope unless an explicit admissibility rule and witness authorize that move.
+Protected evidence may not move to a wider scope unless an admissibility rule and witness authorize that move.
 
-### 4.3 Proof-producing decisions
+### 6.3 Proof-producing decisions
 
 Every merge, block, unmerge, export, suppression, and review escalation must be reconstructible from artifact state.
 
-### 4.4 Reversibility
+### 6.4 Reversibility
 
-Unsafe merges are not terminal. Unmerge is a first-class operation with retained evidence lineage.
+Unsafe merges are not terminal. Unmerge is first-class.
 
-### 4.5 Evidence provenance preservation
+### 6.5 Evidence provenance preservation
 
 No downstream aggregate may erase the provenance chain required to explain how the result was formed.
 
-## 5. Resolution and decision pipeline
+## 7. Resolution and decision pipeline
 
-The pipeline is ordered. Evidence does not go directly to merge.
+Evidence does not go directly to merge. The pipeline is ordered.
 
-### 5.1 Ingest
+### 7.1 Ingest
 
 Typed events are normalized into Event-IR with scope, primes, feature atoms, and evidence provenance.
 
-### 5.2 Candidate generation
+### 7.2 Candidate generation
 
-Candidate links are generated using stable identifiers, relational evidence, durable device links, institutionally asserted joins, or bounded heuristics.
+Candidate links are generated using:
 
-### 5.3 Evidence scoring
+- stable identifiers
+- relational evidence
+- durable device links
+- institutionally asserted joins
+- bounded heuristics
 
-For a pair $(r,r')$, comparator evidence is
+### 7.3 Evidence scoring
+
+For a pair $(r,r')$, comparator evidence is:
 
 $$
 \phi(r,r')\in\mathbb{R}^{d}
 $$
 
-with additive score
+with additive score:
 
 $$
 S(r,r')=\sum_{t=1}^{T}\alpha_t h_t(\phi(r,r')).
@@ -253,7 +289,7 @@ $$
 
 This score is an evidence ledger, not permission to merge.
 
-### 5.4 Policy gating
+### 7.4 Policy gating
 
 Let $\sigma_{ij}$ be the evidential score and let
 
@@ -261,25 +297,27 @@ $$
 \Gamma_{ij}\in\{\mathrm{allow},\mathrm{review},\mathrm{block}\}
 $$
 
-be the policy gate. Then
+be the policy gate.
+
+Then:
 
 $$
 M_{ij}=1 \iff \sigma_{ij}\ge\theta \land \Gamma_{ij}=\mathrm{allow}.
 $$
 
-Evidence proposes; policy disposes.
+A high score with a blocked gate still yields no merge.
 
-### 5.5 Merge materialization
+### 7.5 Merge materialization
 
-A merge creates a governed graph state transition and updates artifact lineage. It does not retroactively erase prior scoped separation.
+A merge creates a governed graph transition and updates proof lineage. It does not erase the prior scoped distinction.
 
-### 5.6 Export and suppression
+### 7.6 Export and suppression
 
-Even after a valid merge, exports remain separately governed. A merged graph state may still produce only bounded, coarsened, or suppressed outputs.
+Even after a valid merge, exports remain separately governed. A merged graph state may still yield only bounded, coarsened, or suppressed outputs.
 
-## 6. Policy model
+## 8. Policy model
 
-### 6.1 Policy polytope
+### 8.1 Policy polytope
 
 For binary prime activation vector
 
@@ -287,7 +325,7 @@ $$
 v\in\{0,1\}^{k}
 $$
 
-define allowed region
+define allowed region:
 
 $$
 K=\{x\in\mathbb{R}^{k}\mid Ax\le b,\;0\le x\le 1\}.
@@ -299,19 +337,22 @@ $$
 v\in K\cap\{0,1\}^{k}.
 $$
 
-This provides a compact representation of allowed prime mixtures and forbidden co-activations.
+This gives a compact representation of allowed mixtures and forbidden co-activations.
 
-### 6.2 Harm and review zones
+### 8.2 Harm and review zones
 
-Not all non-allowed states are equally bad. Policy must distinguish:
+Policy distinguishes:
+
 - automatically allowed
 - automatically blocked
 - review-required
-- allowed only with witness
-- allowed only for local or citizen-cloud scopes
-- allowed only as coarsened export
+- witness-required
+- local-only or citizen-cloud-only
+- coarsened-export-only
 
-### 6.3 Counting and risk
+Not all non-allowed states are equally severe. The public model still needs review zones, not only binary allow/deny.
+
+### 8.3 Counting and risk
 
 The Ehrhart-style count
 
@@ -319,39 +360,41 @@ $$
 L_{K}(t)=|tK\cap\mathbb{Z}^{k}|
 $$
 
-is useful as an intuition for combinatorial optionality, profiling surface, and search complexity. Operationally, it helps reason about how many safe identity configurations remain after policy tightening and where over-determination risk increases.
+is useful as an intuition for combinatorial optionality, profiling surface, and search complexity.
 
-## 7. Merge, split, and unmerge semantics
+## 9. Merge, split, and unmerge semantics
 
-### 7.1 Merge
+### 9.1 Merge
 
-A merge is the creation of a stronger graph relation under admissible evidence and policy.
+A merge is the creation of a stronger governed relation under admissible evidence and policy.
 
-### 7.2 Split
+### 9.2 Split
 
 A split partitions an entity view into narrower scoped subviews without necessarily asserting prior harm.
 
-### 7.3 Unmerge
+### 9.3 Unmerge
 
-An unmerge is a first-class reversal event triggered by:
+An unmerge is a reversal event triggered by:
+
 - new contradiction evidence
 - policy discovery
 - witness revocation
 - harmful ambient leakage
 - operator review outcome
 
-Unmerge must preserve:
+Unmerge preserves:
+
 - original evidence atoms
 - prior decision artifact
 - reversal reason
 - affected outputs
-- required downstream remediations
+- downstream remediation context
 
-## 8. Congruence domains and non-escape
+## 10. Congruence domains and non-escape
 
 Handles, nonces, counters, and namespace-reserved identifiers often live in modular domains.
 
-A congruence abstract value is represented as
+A congruence abstract value is represented as:
 
 $$
 x \in a\mathbb{Z}+b \pmod m.
@@ -359,28 +402,31 @@ $$
 
 If a token or handle is typed as $\mathrm{NoEscape}(h,\mathrm{HSM})$, then no congruent representative of its reserved namespace may appear in a wider scope unless an explicit audited witness authorizes the transition.
 
-This is how the system treats replay and namespace leakage as semantic violations, not merely logging anomalies.
+This lets the system treat replay and namespace leakage as semantic violations rather than mere logging anomalies.
 
-## 9. Marketer-safe outputs
+## 11. Marketer-safe outputs
 
-The system may emit useful outputs without exporting the whole person.
+Entity Analytics can emit useful outputs without exporting the whole person.
 
 Allowed outputs may include:
+
 - bounded cohorts
 - coarse topic mixtures
 - time-windowed aggregates
 - suppression-aware segments
 - proof-carrying summaries
 
-Each output must carry enough metadata to show:
+Each output carries enough metadata to show:
+
 - what classes of inputs contributed
 - what contexts were excluded
 - what coarsening was applied
 - why the export remained policy-safe
 
-## 10. Failure modes
+## 12. Failure modes
 
 Major failure modes include:
+
 - high-confidence but policy-forbidden merges
 - protected-context leakage through export
 - irreversible ambient profile construction
@@ -389,9 +435,20 @@ Major failure modes include:
 - non-replayable decisions
 - namespace escape of secret-bearing handles
 
-The system is designed so that these surface as artifacts, blocked edges, or counterexample traces rather than as invisible harm.
+The system is designed so these surface as artifacts, blocked edges, or counterexample traces rather than invisible harm.
 
-## 11. Operator checklist
+## 13. Relation to the broader platform
+
+Entity Analytics is not isolated.
+
+It connects directly to:
+
+- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
+- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
+- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+
+## 14. Operator checklist
 
 Before approving a merge or export, confirm:
 
@@ -403,13 +460,17 @@ Before approving a merge or export, confirm:
 6. replayable proof artifact generation
 7. reversibility path if later contradicted
 
-## 12. Companion documents
+## 15. Companion pages
 
-This manual is the canonical reference. Companion pages provide narrower entry points:
-- Identity Prime and Event-IR
-- Entity Graph and Safe Linkage
-- Policy-Constrained Merging and Unmerge
-- Marketer-Safe Outputs and Segment Proofs
-- Worked Example: Michael Cross-Context
+This page is the canonical technical reference.
 
-Those pages must deep-link into this manual’s sections rather than duplicate its full substance.
+Companion pages provide narrower entry points:
+
+- [Entity Analytics Overview](https://socioprophet.com/documentation/entity-analytics-overview/)
+- [Identity Prime and Event-IR](https://socioprophet.com/documentation/identity-prime-and-event-ir/)
+- [Entity Graph and Safe Linkage](https://socioprophet.com/documentation/entity-graph-and-safe-linkage/)
+- [Policy-Constrained Merging and Unmerge](https://socioprophet.com/documentation/policy-constrained-merging-and-unmerge/)
+- [Marketer-Safe Outputs and Segment Proofs](https://socioprophet.com/documentation/marketer-safe-outputs-and-segment-proofs/)
+- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+
+Use the companion pages for focused reading. Use this page for the full public technical model.
