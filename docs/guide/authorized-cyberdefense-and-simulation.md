@@ -1,8 +1,8 @@
 # Authorized Cyberdefense and Simulation
 
-Authorized Cyberdefense and Simulation is the public description of SocioProphet's defense-oriented security validation surface.
+This page is the public manual entry point for SocioProphet's defense-first validation surface.
 
-This page is intentionally public-safe. It describes authorization boundaries, defensive goals, simulation principles, and evidence expectations. It does not publish sensitive offensive tooling or high-fidelity tradecraft.
+Authorized Cyberdefense and Simulation explains how institutions can validate defensive posture, run bounded simulation under authorization, and produce evidence-bearing remediation outputs without turning the public documentation layer into a disclosure surface for restricted tactical internals.
 
 ## 1. Purpose
 
@@ -10,78 +10,121 @@ This surface exists for institutions that need:
 
 - defensive validation
 - resilience testing
-- security learning loops
-- purple-team collaboration
-- governed adversary emulation under authorization
+- policy hardening
+- reviewable simulation under authorization
+- evidence of what was tested, blocked, detected, or remediated
 
-The public emphasis is defensive readiness, not offensive novelty.
+The emphasis is defensive readiness, not offensive novelty.
 
-## 2. Authorization boundary
+## 2. Public thesis
 
-Any security testing or adversary simulation must remain inside an explicit authorization boundary.
+The public thesis is:
 
-The public rule is simple:
+- validation must be authorized
+- simulation must be bounded
+- evidence must survive the exercise
+- hardening must be reviewable
+- dangerous tactical detail does not belong in the public layer
+
+This keeps the platform legible and serious without making the docs a misuse amplifier.
+
+## 3. What this layer includes
+
+Publicly, this layer explains:
+
+- the authorization boundary
+- the defensive mission
+- the relationship between simulation and governance
+- the evidence model
+- the way findings feed back into institutional hardening
+- the relationship between defense, operator workflows, and governed analytics
+
+## 4. Authorization boundary
+
+Any security testing or simulation remains inside an explicit authorization boundary.
+
+Publicly, that means:
 
 - authorized systems may be validated and hardened
 - unauthorized systems are not targets
 - anti-human use is refused
-- high-risk functions remain under human review and governance controls
+- sensitive functions remain under human review and governance controls
+- public material explains boundaries, not tactical mechanics
 
-## 3. Teaming model
+This page is about lawful, bounded, defense-first validation.
 
-The public-facing teaming model supports:
+## 5. Relationship to the broader platform
 
-- blue-team hardening and detection improvement
-- purple-team learning loops and validation
-- governed red-team style simulation where explicitly authorized
-- evidence capture and replay for remediation
+Authorized Cyberdefense and Simulation is not isolated.
 
-The public docs describe the governance and evidence model, not the private mechanics.
+It connects directly to:
 
-## 4. Evidence and proof
+- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
+- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
+- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
 
-This surface must produce:
+## 6. Defense-first operating model
 
-- scope-bounded findings
+The defense-first operating model is:
+
+1. define the authorization boundary
+2. instrument the environment
+3. validate defensive posture
+4. record findings and evidence
+5. harden policy and controls
+6. re-run bounded validation
+7. preserve proof of what changed
+
+The point is not theater. The point is institutional hardening backed by evidence.
+
+## 7. Public-safe artifacts
+
+Publicly, this layer can document outputs such as:
+
 - validation artifacts
-- proof of what was tested
-- evidence of what was blocked, detected, or remediated
-- replayable records for learning and governance
+- assurance reports
+- remediation summaries
+- governance notes
+- public-safe threat-model framing
+- proof that defensive work was performed inside an authorization boundary
 
-It must align with the proof-oriented model documented in:
+This gives institutions something more durable than ad hoc security claims.
 
-- [Entity Analytics Reference](./entity-analytics-reference)
-- [Marketer-safe outputs and segment proofs](./marketer-safe-outputs-and-segment-proofs) for the proof pattern
-- [Platform Human Protection and Safeguarding](./platform-human-protection-and-safeguarding)
+## 8. What remains restricted
 
-## 5. Public-safe boundary
+Restricted material includes:
 
-The public docs cover:
-
-- mission and purpose
-- authorization and governance
-- team roles
-- evidence and remediation model
-- relationship to institutional deployment
-
-The public docs do **not** cover:
-
-- exploit chains
 - sensitive operator kits
-- persistence methods
-- detection evasion details
-- private adversary playbooks
+- exploit or persistence workflows
+- high-fidelity adversary-emulation mechanics
+- evasion-sensitive logic
+- exact thresholds and tactical playbooks
+- other details that materially increase misuse value
 
-## 6. Institutional placement
+That restriction is deliberate. It is part of the platform's safety model.
 
-Authorized Cyberdefense and Simulation belongs under the Organizations umbrella because its correct context is institutional governance, bounded authorization, and human-supervised defensive operations.
+## 9. Why this matters
 
-It is related to:
+Many security products describe posture in vague or purely reactive terms.
 
-- [Organizations governance and institutional safety](./organizations-governance-and-institutional-safety)
-- [Governed AI and Cybernetics](./governed-ai-and-cybernetics)
-- [Agent Plane and Operator Workflows](./agent-plane-and-operator-workflows)
+SocioProphet frames defense differently:
 
-## 7. Why this is public
+- validation is governed
+- simulation is bounded
+- findings are attributable
+- remediation is reviewable
+- evidence survives the cycle
+- institutions can understand what is public and what remains restricted
 
-Institutions need to understand what they are adopting and how the boundary is governed. They do not need the public docs to expose dangerous internals. This page is therefore architectural and policy-facing by design.
+This makes the surface useful to operators, institutions, and governance stakeholders at the same time.
+
+## 10. Use this page
+
+Use this page when the question is:
+
+- How does SocioProphet describe cyberdefense publicly without disclosing restricted tactical detail?
+- What is the authorization boundary for validation and simulation?
+- How do defensive validation, operator workflows, analytics, and governance fit together?
+- What can an institution learn from the public layer before entering a deployment conversation?
