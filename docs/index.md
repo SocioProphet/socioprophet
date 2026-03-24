@@ -39,21 +39,21 @@ features:
 ## Reading paths
 
 ### Institutional and governance
-- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
-- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
-- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
+- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
+- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
 
 ### Operations and control
-- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
-- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
-- [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
+- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
+- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
+- [Provenance, Promotion, and Reversibility](https://socioprophet.com/documentation/provenance-promotion-and-reversibility/)
 
 ### Analytics and boundary evidence
-- [Entity Analytics Reference](/guide/entity-analytics-reference)
-- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
-- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
+- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
+- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
 
 ### Learning and theory
-- [Operating Modes: Learning and Defense](/guide/operating-modes-learning-and-defense)
-- [23-Topic Canon](/guide/twenty-three-topic-canon)
-- [Architecture](/guide/architecture)
+- [Operating Modes: Learning and Defense](https://socioprophet.com/documentation/operating-modes-learning-and-defense/)
+- [23-Topic Canon](https://socioprophet.com/documentation/twenty-three-topic-canon/)
+- [Architecture](https://socioprophet.com/documentation/architecture/)

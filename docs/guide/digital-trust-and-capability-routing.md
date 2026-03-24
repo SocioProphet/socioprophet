@@ -34,6 +34,6 @@ SocioProphet treats digital trust as the connection between:
 
 ## Related docs
 
-- [Auth and Connections](/guide/auth-and-connections)
-- [Provider Capability Routing](/guide/provider-capability-routing)
-- [Auth Recovery and Connection Health](/guide/auth-recovery-and-connection-health)
+- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
+- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
+- [Auth Recovery and Connection Health](https://socioprophet.com/documentation/auth-recovery-and-connection-health/)
