@@ -79,8 +79,8 @@ If the public layer published every sensitive tactical internal, the platform wo
 
 Relevant references:
 
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
 
 ## 6. Relationship to organizations
 
@@ -96,7 +96,7 @@ This matters because institutional adoption depends on:
 
 Relevant reference:
 
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
 
 ## 7. Relationship to defense and validation
 
@@ -119,7 +119,7 @@ The public layer does not need to publish:
 
 Relevant reference:
 
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
 
 ## 8. Relationship to the boundary-first model
 
@@ -139,7 +139,7 @@ without publishing every restricted data source, tactic, or internal operator me
 
 Relevant reference:
 
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 
 ## 9. Why this matters
 

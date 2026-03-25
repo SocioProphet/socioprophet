@@ -38,33 +38,33 @@ Organizations adopt SocioProphet through a governed stack.
 This is the bounded execution and control-loop layer.
 
 Read:
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
 
 ### Agent Plane and operator workflows
 
 This is the role, workflow, capability-routing, and operator-state layer.
 
 Read:
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
-- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Auth and Connections](/guide/auth-and-connections)
+- [Provider Capability Routing](/guide/provider-capability-routing)
 
 ### Entity Analytics
 
 This is the governed identity, event, merge, graph, and proof subsystem.
 
 Read:
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
 
 ### Authorized Cyberdefense and Simulation
 
 This is the public-safe defensive validation surface.
 
 Read:
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 
 ## 4. Governance model
 
@@ -80,9 +80,9 @@ The public governance model includes:
 - safeguarding and participant protection
 
 Read:
-- [Provenance, Promotion, and Reversibility](https://socioprophet.com/documentation/provenance-promotion-and-reversibility/)
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
-- [Platform Human Protection and Safeguarding](https://socioprophet.com/documentation/platform-human-protection-and-safeguarding/)
+- [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
+- [Platform Human Protection and Safeguarding](/guide/platform-human-protection-and-safeguarding)
 
 ## 5. Human safeguards and deployment boundary
 

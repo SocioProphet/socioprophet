@@ -443,10 +443,10 @@ Entity Analytics is not isolated.
 
 It connects directly to:
 
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 
 ## 14. Operator checklist
 
@@ -466,11 +466,11 @@ This page is the canonical technical reference.
 
 Companion pages provide narrower entry points:
 
-- [Entity Analytics Overview](https://socioprophet.com/documentation/entity-analytics-overview/)
-- [Identity Prime and Event-IR](https://socioprophet.com/documentation/identity-prime-and-event-ir/)
-- [Entity Graph and Safe Linkage](https://socioprophet.com/documentation/entity-graph-and-safe-linkage/)
-- [Policy-Constrained Merging and Unmerge](https://socioprophet.com/documentation/policy-constrained-merging-and-unmerge/)
-- [Marketer-Safe Outputs and Segment Proofs](https://socioprophet.com/documentation/marketer-safe-outputs-and-segment-proofs/)
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+- [Entity Analytics Overview](/guide/entity-analytics-overview)
+- [Identity Prime and Event-IR](/guide/identity-prime-and-event-ir)
+- [Entity Graph and Safe Linkage](/guide/entity-graph-and-safe-linkage)
+- [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
+- [Marketer-Safe Outputs and Segment Proofs](/guide/marketer-safe-outputs-and-segment-proofs)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
 
 Use the companion pages for focused reading. Use this page for the full public technical model.

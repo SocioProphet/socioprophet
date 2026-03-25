@@ -71,10 +71,10 @@ Capability routing is bounded by:
 
 Relevant references:
 
-- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
-- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
-- [Provider Safety and Capability Eligibility](https://socioprophet.com/documentation/provider-safety-and-capability-eligibility/)
-- [Auth Recovery and Connection Health](https://socioprophet.com/documentation/auth-recovery-and-connection-health/)
+- [Auth and Connections](/guide/auth-and-connections)
+- [Provider Capability Routing](/guide/provider-capability-routing)
+- [Provider Safety and Capability Eligibility](/guide/provider-safety-and-capability-eligibility)
+- [Auth Recovery and Connection Health](/guide/auth-recovery-and-connection-health)
 
 ## 6. Relationship to governed AI and cybernetics
 
@@ -90,9 +90,9 @@ That means it inherits:
 
 Relevant references:
 
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Provenance, Promotion, and Reversibility](https://socioprophet.com/documentation/provenance-promotion-and-reversibility/)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
 
 ## 7. Relationship to Entity Analytics
 
@@ -109,9 +109,9 @@ It relies on Entity Analytics for:
 
 Relevant references:
 
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Identity Prime and Event-IR](https://socioprophet.com/documentation/identity-prime-and-event-ir/)
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Identity Prime and Event-IR](/guide/identity-prime-and-event-ir)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
 
 ## 8. Relationship to organizations
 
@@ -121,8 +121,8 @@ The Agent Plane is one governed subsystem inside that umbrella.
 
 Relevant references:
 
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
 
 ## 9. Public-safe boundary
 

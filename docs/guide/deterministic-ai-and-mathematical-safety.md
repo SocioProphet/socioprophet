@@ -125,12 +125,12 @@ That is not inconsistency. It is part of the safety architecture.
 
 This page connects directly to the major public layers of the system:
 
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
 
 ## 8. Why this matters institutionally
 

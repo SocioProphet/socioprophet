@@ -24,78 +24,78 @@ This is not a chat-first architecture. It is a controlled systems architecture.
 Organizations is the institutional umbrella surface. It is where public-sector, nonprofit, educational, sovereign, and mission-aligned deployments are framed.
 
 Key references:
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-- [Platform Human Protection and Safeguarding](https://socioprophet.com/documentation/platform-human-protection-and-safeguarding/)
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [Platform Human Protection and Safeguarding](/guide/platform-human-protection-and-safeguarding)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
 
 ### Governed AI and cybernetics
 
 This layer explains how bounded execution, human oversight, and proof-bearing control loops are organized.
 
 Key references:
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Provenance, Promotion, and Reversibility](https://socioprophet.com/documentation/provenance-promotion-and-reversibility/)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
 
 ### Agent plane and operator workflows
 
 This layer describes operator roles, workflow states, capability routing, review, and bounded execution.
 
 Key references:
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
-- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
-- [Provider Safety and Capability Eligibility](https://socioprophet.com/documentation/provider-safety-and-capability-eligibility/)
-- [Auth Recovery and Connection Health](https://socioprophet.com/documentation/auth-recovery-and-connection-health/)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Auth and Connections](/guide/auth-and-connections)
+- [Provider Capability Routing](/guide/provider-capability-routing)
+- [Provider Safety and Capability Eligibility](/guide/provider-safety-and-capability-eligibility)
+- [Auth Recovery and Connection Health](/guide/auth-recovery-and-connection-health)
 
 ### Entity Analytics
 
 Entity Analytics is the governed identity, event, graph, merge, and proof subsystem.
 
 Key references:
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
-- [Entity Analytics Overview](https://socioprophet.com/documentation/entity-analytics-overview/)
-- [Identity Prime and Event-IR](https://socioprophet.com/documentation/identity-prime-and-event-ir/)
-- [Entity Graph and Safe Linkage](https://socioprophet.com/documentation/entity-graph-and-safe-linkage/)
-- [Policy-Constrained Merging and Unmerge](https://socioprophet.com/documentation/policy-constrained-merging-and-unmerge/)
-- [Marketer-Safe Outputs and Segment Proofs](https://socioprophet.com/documentation/marketer-safe-outputs-and-segment-proofs/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
+- [Entity Analytics Overview](/guide/entity-analytics-overview)
+- [Identity Prime and Event-IR](/guide/identity-prime-and-event-ir)
+- [Entity Graph and Safe Linkage](/guide/entity-graph-and-safe-linkage)
+- [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
+- [Marketer-Safe Outputs and Segment Proofs](/guide/marketer-safe-outputs-and-segment-proofs)
 
 ### Authorized cyberdefense and simulation
 
 This layer is public-safe and defense-first. It covers defensive validation, simulation boundaries, evidence, and institutional review posture.
 
 Key references:
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
 
 ## 3. Learning and theory layer
 
 SocioProphet also includes a learning, theory, and semantic-model layer. This is where the system’s representational logic, topic organization, and curriculum-facing structure are documented.
 
 Key references:
-- [Operating Modes: Learning and Defense](https://socioprophet.com/documentation/operating-modes-learning-and-defense/)
-- [23-Topic Canon](https://socioprophet.com/documentation/twenty-three-topic-canon/)
-- [Governed Cybernetic Stack](https://socioprophet.com/documentation/governed-cybernetic-stack/)
-- [Semantic Vector Stack](https://socioprophet.com/documentation/semantic-vector-stack/)
-- [Semantic Representation Ladder](https://socioprophet.com/documentation/semantic-representation-ladder/)
-- [LSA / LSI / LDA Geometry](https://socioprophet.com/documentation/lsa-lsi-lda-geometry/)
-- [Semantic Model Workstreams](https://socioprophet.com/documentation/semantic-model-workstreams/)
-- [Hybrid Representation Builder](https://socioprophet.com/documentation/hybrid-representation-builder/)
-- [Temporal Graph Evolution](https://socioprophet.com/documentation/temporal-graph-evolution/)
+- [Operating Modes: Learning and Defense](/guide/operating-modes-learning-and-defense)
+- [23-Topic Canon](/guide/twenty-three-topic-canon)
+- [Governed Cybernetic Stack](/guide/governed-cybernetic-stack)
+- [Semantic Vector Stack](/guide/semantic-vector-stack)
+- [Semantic Representation Ladder](/guide/semantic-representation-ladder)
+- [LSA / LSI / LDA Geometry](/guide/lsa-lsi-lda-geometry)
+- [Semantic Model Workstreams](/guide/semantic-model-workstreams)
+- [Hybrid Representation Builder](/guide/hybrid-representation-builder)
+- [Temporal Graph Evolution](/guide/temporal-graph-evolution)
 
 ## 4. Product and surface layer
 
 The public site exposes multiple surfaces, but they are not all equivalent. Some are institutional, some are learning-oriented, and some are domain or product extensions.
 
 Key references:
-- [Products Overview](https://socioprophet.com/documentation/products/overview/)
-- [Product Surface Standard](https://socioprophet.com/documentation/product-surface-standard/)
-- [Product Surface Maturity Matrix](https://socioprophet.com/documentation/product-surface-maturity-matrix/)
-- [Domain Surface](https://socioprophet.com/documentation/domain-surface/)
-- [Digital Trust and Capability Routing](https://socioprophet.com/documentation/digital-trust-and-capability-routing/)
-- [Academy Policy Index](https://socioprophet.com/documentation/academy-policy-index/)
+- [Products Overview](/guide/products/overview)
+- [Product Surface Standard](/guide/product-surface-standard)
+- [Product Surface Maturity Matrix](/guide/product-surface-maturity-matrix)
+- [Domain Surface](/guide/domain-surface)
+- [Digital Trust and Capability Routing](/guide/digital-trust-and-capability-routing)
+- [Academy Policy Index](/guide/academy-policy-index)
 
 ## 5. Boundary-first model
 
@@ -115,16 +115,16 @@ The system models crossings through explicit structures such as:
 This keeps the architecture explainable at the point where action, policy, and observation meet.
 
 Primary reference:
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 
 ## 6. Deterministic and bounded posture
 
 SocioProphet presents itself publicly as deterministic AI because it is built around bounded execution, measurable safety, and proof-bearing transitions rather than ambient improvisation.
 
 Primary references:
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Provenance, Promotion, and Reversibility](https://socioprophet.com/documentation/provenance-promotion-and-reversibility/)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
 
 ## 7. Public-safe versus restricted material
 
@@ -140,27 +140,27 @@ The public docs do not contain restricted tactical internals such as:
 - misuse-enabling tradecraft
 
 Primary reference:
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
 
 ## 8. Reading paths
 
 ### Executive and institutional path
-- [Getting Started](https://socioprophet.com/documentation/getting-started/)
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Getting Started](/guide/getting-started)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
 
 ### Operator and security path
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
 
 ### Builder and researcher path
-- [Semantic Vector Stack](https://socioprophet.com/documentation/semantic-vector-stack/)
-- [Hybrid Representation Builder](https://socioprophet.com/documentation/hybrid-representation-builder/)
-- [Operating Modes: Learning and Defense](https://socioprophet.com/documentation/operating-modes-learning-and-defense/)
-- [23-Topic Canon](https://socioprophet.com/documentation/twenty-three-topic-canon/)
+- [Semantic Vector Stack](/guide/semantic-vector-stack)
+- [Hybrid Representation Builder](/guide/hybrid-representation-builder)
+- [Operating Modes: Learning and Defense](/guide/operating-modes-learning-and-defense)
+- [23-Topic Canon](/guide/twenty-three-topic-canon)
 
 ## 9. Use this page
 

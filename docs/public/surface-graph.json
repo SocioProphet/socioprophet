@@ -28,7 +28,7 @@
       "map_priority": 10,
       "landing_page": "/academy/",
       "survey_page": "/academy/apply/",
-      "docs_path": "/documentation/products/academy/",
+      "docs_path": "/documentation/guide/products/academy/",
       "audiences": [
         "learners",
         "families",
@@ -69,8 +69,8 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/academy/",
-        "/documentation/academy-safeguarding-and-minor-protection/"
+        "/documentation/guide/products/academy/",
+        "/documentation/guide/academy-safeguarding-and-minor-protection/"
       ],
       "description": "Learning, family, mentorship, and cybernetics education."
     },
@@ -140,10 +140,10 @@
         ]
       },
       "related_sites": [
-        "/documentation/governed-ai-and-cybernetics/",
-        "/documentation/agent-plane-and-operator-workflows/",
-        "/documentation/authorized-cyberdefense-and-simulation/",
-        "/documentation/organizations-governance-and-institutional-safety/"
+        "/documentation/guide/governed-ai-and-cybernetics/",
+        "/documentation/guide/agent-plane-and-operator-workflows/",
+        "/documentation/guide/authorized-cyberdefense-and-simulation/",
+        "/documentation/guide/organizations-governance-and-institutional-safety/"
       ],
       "description": "Institutional deployment surface for governed AI, agent-plane operations, Entity Analytics, and authorized cyberdefense under human oversight."
     },
@@ -207,7 +207,7 @@
       },
       "related_sites": [
         "https://socioprophet.com/documentation/",
-        "/documentation/canonical-platform-direction/"
+        "/documentation/guide/canonical-platform-direction/"
       ],
       "description": "Architecture, products, trust model, and canonical direction."
     },
@@ -222,7 +222,7 @@
       "map_priority": 30,
       "landing_page": "/entity-analytics/",
       "survey_page": "",
-      "docs_path": "/documentation/entity-analytics-reference/",
+      "docs_path": "/documentation/guide/entity-analytics-reference/",
       "audiences": [
         "builders",
         "operators",
@@ -290,10 +290,10 @@
         ]
       },
       "related_sites": [
-        "/documentation/entity-analytics-reference/#2-core-objects",
-        "/documentation/entity-analytics-reference/#54-policy-gating",
-        "/documentation/entity-analytics-reference/#9-marketer-safe-outputs",
-        "/documentation/worked-example-michael-cross-context/#9-proof-artifact-sketch"
+        "/documentation/guide/entity-analytics-reference/#2-core-objects",
+        "/documentation/guide/entity-analytics-reference/#54-policy-gating",
+        "/documentation/guide/entity-analytics-reference/#9-marketer-safe-outputs",
+        "/documentation/guide/worked-example-michael-cross-context/#9-proof-artifact-sketch"
       ],
       "description": "Identity-aware entity analytics built from typed Event-IR, governed entity graphs, policy-constrained merges, reversibility, proof artifacts, non-escape controls, and marketer-safe outputs."
     },
@@ -308,7 +308,7 @@
       "map_priority": 40,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/ai/",
+      "docs_path": "/documentation/guide/products/ai/",
       "audiences": [
         "builders",
         "operators"
@@ -346,7 +346,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/ai/"
+        "/documentation/guide/products/ai/"
       ],
       "description": "Model, agent, orchestration, and trust-layer capabilities."
     },
@@ -361,7 +361,7 @@
       "map_priority": 50,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/dev/",
+      "docs_path": "/documentation/guide/products/dev/",
       "audiences": [
         "builders",
         "integrators"
@@ -399,7 +399,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/dev/"
+        "/documentation/guide/products/dev/"
       ],
       "description": "SDKs, APIs, integration patterns, and developer workflows."
     },
@@ -414,7 +414,7 @@
       "map_priority": 60,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/cloud/",
+      "docs_path": "/documentation/guide/products/cloud/",
       "audiences": [
         "operators",
         "partners"
@@ -452,7 +452,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/cloud/"
+        "/documentation/guide/products/cloud/"
       ],
       "description": "Hosted and managed operational capabilities."
     },
@@ -467,7 +467,7 @@
       "map_priority": 70,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/live/",
+      "docs_path": "/documentation/guide/products/live/",
       "audiences": [
         "builders",
         "operators",
@@ -506,7 +506,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/live/"
+        "/documentation/guide/products/live/"
       ],
       "description": "Demonstrations, environments, and active build states."
     },
@@ -521,7 +521,7 @@
       "map_priority": 80,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/medical/",
+      "docs_path": "/documentation/guide/products/medical/",
       "audiences": [
         "providers",
         "institutions",
@@ -560,7 +560,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/medical/"
+        "/documentation/guide/products/medical/"
       ],
       "description": "Health, education, and support pathways requiring higher assurance."
     },
@@ -575,7 +575,7 @@
       "map_priority": 90,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/law/",
+      "docs_path": "/documentation/guide/products/law/",
       "audiences": [
         "legal",
         "policy",
@@ -614,7 +614,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/law/"
+        "/documentation/guide/products/law/"
       ],
       "description": "Legal, governance, and jurisprudential workflows."
     },
@@ -629,7 +629,7 @@
       "map_priority": 100,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/wiki/",
+      "docs_path": "/documentation/guide/products/wiki/",
       "audiences": [
         "readers",
         "researchers"
@@ -665,7 +665,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/wiki/"
+        "/documentation/guide/products/wiki/"
       ],
       "description": "Structured knowledge and reference surface."
     },
@@ -680,7 +680,7 @@
       "map_priority": 110,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/products/blog/",
+      "docs_path": "/documentation/guide/products/blog/",
       "audiences": [
         "readers",
         "followers"
@@ -716,7 +716,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/products/blog/"
+        "/documentation/guide/products/blog/"
       ],
       "description": "Long-form writing, updates, and commentary."
     },
@@ -731,7 +731,7 @@
       "map_priority": 120,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/documentation/domain-surface/",
+      "docs_path": "/documentation/guide/domain-surface/",
       "audiences": [
         "operators",
         "partners",
@@ -771,7 +771,7 @@
         ]
       },
       "related_sites": [
-        "/documentation/domain-surface/"
+        "/documentation/guide/domain-surface/"
       ],
       "description": "Trust-first positioning, digital identity, and public-facing trust surfaces."
     },
@@ -825,7 +825,7 @@
       "related_sites": [
         "/investor/",
         "/map/",
-        "/documentation/surface-inventory/"
+        "/documentation/guide/surface-inventory/"
       ],
       "description": "Investor and governance-facing public materials."
     },

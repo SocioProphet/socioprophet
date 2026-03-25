@@ -49,8 +49,8 @@ In public terms, that means:
 Deterministic AI in this system means bounded operation under declared constraints.
 
 Read:
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
 
 ## 4. Cybernetic control loops
 
@@ -86,9 +86,9 @@ The Agent Plane explains:
 - execution boundaries
 
 Read:
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Auth and Connections](https://socioprophet.com/documentation/auth-and-connections/)
-- [Provider Capability Routing](https://socioprophet.com/documentation/provider-capability-routing/)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Auth and Connections](/guide/auth-and-connections)
+- [Provider Capability Routing](/guide/provider-capability-routing)
 
 ## 6. Relationship to Entity Analytics
 
@@ -103,9 +103,9 @@ This matters because governed execution needs:
 - public-safe proof artifacts
 
 Read:
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 
 ## 7. Relationship to Authorized Cyberdefense
 
@@ -119,8 +119,8 @@ This layer exists so institutions can:
 - keep evidence of what was tested, blocked, and remediated
 
 Read:
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
 
 ## 8. Public-safe boundary
 

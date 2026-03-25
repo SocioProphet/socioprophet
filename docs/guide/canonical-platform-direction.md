@@ -111,7 +111,7 @@ Cybernetics systems foundations, methods, architecture logic, advanced details, 
 
 Target path model:
 - /documentation/ -> product/operator docs
-- /documentation/manual/ -> textbook/manual layer
+- /guide/architecture -> textbook/manual layer
 
 ## Survey schema
 Surveys are segmentation infrastructure, not just email capture.

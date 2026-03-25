@@ -13,18 +13,18 @@ Pick the path that matches what you are actually trying to do.
 Use this path when the goal is to understand the architecture, the learning model, and the public-safe theory.
 
 Read:
-- [Architecture](https://socioprophet.com/documentation/architecture/)
-- [Operating Modes: Learning and Defense](https://socioprophet.com/documentation/operating-modes-learning-and-defense/)
-- [23-Topic Canon](https://socioprophet.com/documentation/twenty-three-topic-canon/)
+- [Architecture](/guide/architecture)
+- [Operating Modes: Learning and Defense](/guide/operating-modes-learning-and-defense)
+- [23-Topic Canon](/guide/twenty-three-topic-canon)
 
 ### Institutional deployment
 
 Use this path when evaluating SocioProphet for an organization, program, mission-aligned institution, or governed operational environment.
 
 Read:
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-- [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-- [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+- [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
 
 Then go to:
 - [Organizations landing page](https://socioprophet.com/organizations/)
@@ -35,18 +35,18 @@ Then go to:
 Use this path when the main interest is governed identity, merge controls, event modeling, proof artifacts, and boundary evidence.
 
 Read:
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 
 ### Governed operations and defense
 
 Use this path when the interest is bounded execution, operator workflows, defensive validation, and governance of sensitive capability.
 
 Read:
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
 
 ## 2. What the public docs include
 
@@ -76,12 +76,12 @@ That line is deliberate and part of the system design.
 
 For most readers, this order works:
 
-1. [Architecture](https://socioprophet.com/documentation/architecture/)
-2. [Deterministic AI and Mathematical Safety](https://socioprophet.com/documentation/deterministic-ai-and-mathematical-safety/)
-3. [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-4. [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-5. [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-6. [Public vs Restricted Security Boundary](https://socioprophet.com/documentation/public-vs-restricted-security-boundary/)
+1. [Architecture](/guide/architecture)
+2. [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
+3. [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+4. [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+5. [Entity Analytics Reference](/guide/entity-analytics-reference)
+6. [Public vs Restricted Security Boundary](/guide/public-vs-restricted-security-boundary)
 
 ## 5. Use this page
 

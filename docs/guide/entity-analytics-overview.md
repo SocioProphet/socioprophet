@@ -2,7 +2,7 @@
 
 Entity Analytics is the governed identity, event, graph, merge, and proof layer inside SocioProphet.
 
-This page is the readable overview of the subsystem. The canonical technical manual remains the [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/).
+This page is the readable overview of the subsystem. The canonical technical manual remains the [Entity Analytics Reference](/guide/entity-analytics-reference).
 
 ## 1. What Entity Analytics is
 
@@ -161,27 +161,27 @@ Entity Analytics is one of the core governed subsystems inside SocioProphet.
 
 It connects directly to:
 
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Boundary-Centric Cyber Hypergraph](https://socioprophet.com/documentation/boundary-centric-cyber-hypergraph/)
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
 
 That is why the subsystem matters beyond analytics alone.
 
 ## 7. Reading paths
 
 ### Read the full technical manual
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
 
 ### Read the worked example
-- [Worked Example: Michael Cross-Context](https://socioprophet.com/documentation/worked-example-michael-cross-context/)
+- [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
 
 ### Read the narrower companion pages
-- [Identity Prime and Event-IR](https://socioprophet.com/documentation/identity-prime-and-event-ir/)
-- [Entity Graph and Safe Linkage](https://socioprophet.com/documentation/entity-graph-and-safe-linkage/)
-- [Policy-Constrained Merging and Unmerge](https://socioprophet.com/documentation/policy-constrained-merging-and-unmerge/)
-- [Marketer-Safe Outputs and Segment Proofs](https://socioprophet.com/documentation/marketer-safe-outputs-and-segment-proofs/)
+- [Identity Prime and Event-IR](/guide/identity-prime-and-event-ir)
+- [Entity Graph and Safe Linkage](/guide/entity-graph-and-safe-linkage)
+- [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
+- [Marketer-Safe Outputs and Segment Proofs](/guide/marketer-safe-outputs-and-segment-proofs)
 
 ## 8. Use this page
 

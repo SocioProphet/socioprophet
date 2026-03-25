@@ -187,11 +187,11 @@ The Boundary-Centric Cyber Hypergraph is not isolated.
 
 It connects directly to:
 
-- [Entity Analytics Reference](https://socioprophet.com/documentation/entity-analytics-reference/)
-- [Governed AI and Cybernetics](https://socioprophet.com/documentation/governed-ai-and-cybernetics/)
-- [Agent Plane and Operator Workflows](https://socioprophet.com/documentation/agent-plane-and-operator-workflows/)
-- [Authorized Cyberdefense and Simulation](https://socioprophet.com/documentation/authorized-cyberdefense-and-simulation/)
-- [Organizations Governance and Institutional Safety](https://socioprophet.com/documentation/organizations-governance-and-institutional-safety/)
+- [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
+- [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
+- [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
+- [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
 
 ## 9. Public-safe boundary
 
