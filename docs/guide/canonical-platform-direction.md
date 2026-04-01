@@ -21,7 +21,7 @@ Current implementation may temporarily omit routes that are not yet built. Publi
 ## Canonical routes
 Primary:
 - /academy/
-- /documentation/
+- /
 - /organizations/
 
 Secondary surfaces (after alignment and review):
@@ -110,7 +110,7 @@ Deployment, routing, auth, integrations, admin/operator guidance
 Cybernetics systems foundations, methods, architecture logic, advanced details, diagrams, worked examples, course content
 
 Target path model:
-- /documentation/ -> product/operator docs
+- / -> product/operator docs
 - /guide/architecture -> textbook/manual layer
 
 ## Survey schema

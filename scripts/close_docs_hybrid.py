@@ -25,7 +25,7 @@ def to_docs_path(path: str, anchor: str = "") -> str:
     if p.startswith("guide/"):
         p = p[len("guide/"):]
     p = p.rstrip("/")
-    return f"/documentation/{p}/" + (anchor or "")
+    return f"/documentation/guide/{p}/" + (anchor or "")
 
 # 1) Publish real docs into the marketing site under /documentation/*
 marketing_docs = repo / "marketing/public/documentation"

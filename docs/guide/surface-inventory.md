@@ -32,11 +32,11 @@
 - **Investor lens:** capability_compounding
 - **Landing page:** `/academy/`
 - **Survey / intake:** `/academy/apply/`
-- **Docs path:** `/guide/products/academy`
+- **Docs path:** `/documentation/guide/products/academy/`
 - **Description:** Learning, family, mentorship, and cybernetics education.
 - **Next action:** Polish and continue documentation.
 - **Related surfaces:** documentation, organizations, digital-trust
-- **Related sites:** /guide/products/academy, /guide/academy-safeguarding-and-minor-protection
+- **Related sites:** https://socioprophet.com/documentation/guide/products/academy/, https://socioprophet.com/documentation/guide/academy-safeguarding-and-minor-protection/
 
 ### Organizations
 
@@ -52,7 +52,7 @@
 - **Description:** Institutional deployment for schools, nonprofits, public-interest, and mission-aligned organizations.
 - **Next action:** Upgrade to Academy-level first-class quality.
 - **Related surfaces:** academy, documentation, digital-trust, medical, law
-- **Related sites:** /guide/surface-inventory, /guide/domain-surface
+- **Related sites:** https://socioprophet.com/documentation/guide/surface-inventory/, https://socioprophet.com/documentation/guide/domain-surface/
 
 ### Documentation
 
@@ -67,7 +67,7 @@
 - **Description:** Architecture, products, trust model, and canonical direction.
 - **Next action:** Keep as the source of deeper system detail.
 - **Related surfaces:** academy, organizations, ai, developer, cloud, live, medical, law, wiki, blog, digital-trust
-- **Related sites:** /, /guide/canonical-platform-direction
+- **Related sites:** https://socioprophet.com/documentation/, https://socioprophet.com/documentation/guide/canonical-platform-direction/
 
 ### AI Platform
 
@@ -78,11 +78,11 @@
 - **Topics:** agents, models, automation, tooling
 - **Normalized topics:** intelligence, platform, automation, builders, trust
 - **Investor lens:** technical_optionality
-- **Docs path:** `/guide/products/ai`
+- **Docs path:** `/documentation/guide/products/ai/`
 - **Description:** Model, agent, orchestration, and trust-layer capabilities.
 - **Next action:** Decide whether this needs a first-class landing page.
 - **Related surfaces:** developer, cloud, live, documentation
-- **Related sites:** /guide/products/ai
+- **Related sites:** https://socioprophet.com/documentation/guide/products/ai/
 
 ### Developer
 
@@ -93,11 +93,11 @@
 - **Topics:** apis, sdk, tooling, integration
 - **Normalized topics:** platform, builders, integration, capability, apis
 - **Investor lens:** developer_compounding
-- **Docs path:** `/guide/products/dev`
+- **Docs path:** `/documentation/guide/products/dev/`
 - **Description:** SDKs, APIs, integration patterns, and developer workflows.
 - **Next action:** Promote to docs-backed landing page first.
 - **Related surfaces:** ai, cloud, live, documentation
-- **Related sites:** /guide/products/dev
+- **Related sites:** https://socioprophet.com/documentation/guide/products/dev/
 
 ### Cloud Suite
 
@@ -108,11 +108,11 @@
 - **Topics:** hosting, managed-services, deployment, operations
 - **Normalized topics:** platform, operations, deployment, trust, hosting
 - **Investor lens:** managed_service_compounding
-- **Docs path:** `/guide/products/cloud`
+- **Docs path:** `/documentation/guide/products/cloud/`
 - **Description:** Hosted and managed operational capabilities.
 - **Next action:** Clarify managed-platform scope.
 - **Related surfaces:** ai, developer, live, documentation
-- **Related sites:** /guide/products/cloud
+- **Related sites:** https://socioprophet.com/documentation/guide/products/cloud/
 
 ### Live Builds
 
@@ -123,11 +123,11 @@
 - **Topics:** demos, environments, rollouts, examples
 - **Normalized topics:** platform, operations, deployment, signal, demonstration
 - **Investor lens:** signal_and_validation
-- **Docs path:** `/guide/products/live`
+- **Docs path:** `/documentation/guide/products/live/`
 - **Description:** Demonstrations, environments, and active build states.
 - **Next action:** Decide how much live operational visibility to expose.
 - **Related surfaces:** ai, developer, cloud, documentation
-- **Related sites:** /guide/products/live
+- **Related sites:** https://socioprophet.com/documentation/guide/products/live/
 
 ### Medical
 
@@ -138,11 +138,11 @@
 - **Topics:** health, care, higher-assurance, safeguarding
 - **Normalized topics:** trust, higher-assurance, care, safeguarding, institutions
 - **Investor lens:** higher_trust_optionality
-- **Docs path:** `/guide/products/medical`
+- **Docs path:** `/documentation/guide/products/medical/`
 - **Description:** Health, education, and support pathways requiring higher assurance.
 - **Next action:** Likely gated inquiry later, not open survey first.
 - **Related surfaces:** law, organizations, documentation, digital-trust
-- **Related sites:** /guide/products/medical
+- **Related sites:** https://socioprophet.com/documentation/guide/products/medical/
 
 ### Law
 
@@ -153,11 +153,11 @@
 - **Topics:** law, policy, governance, higher-assurance
 - **Normalized topics:** trust, higher-assurance, governance, policy, institutions
 - **Investor lens:** governance_optionality
-- **Docs path:** `/guide/products/law`
+- **Docs path:** `/documentation/guide/products/law/`
 - **Description:** Legal, governance, and jurisprudential workflows.
 - **Next action:** Likely gated inquiry later, not open survey first.
 - **Related surfaces:** medical, organizations, documentation, digital-trust
-- **Related sites:** /guide/products/law
+- **Related sites:** https://socioprophet.com/documentation/guide/products/law/
 
 ### Wiki
 
@@ -168,11 +168,11 @@
 - **Topics:** knowledge, reference, taxonomy, glossary
 - **Normalized topics:** knowledge, reference, platform, taxonomy, trust
 - **Investor lens:** knowledge_compounding
-- **Docs path:** `/guide/products/wiki`
+- **Docs path:** `/documentation/guide/products/wiki/`
 - **Description:** Structured knowledge and reference surface.
 - **Next action:** Content-first, not survey-first.
 - **Related surfaces:** blog, documentation
-- **Related sites:** /guide/products/wiki
+- **Related sites:** https://socioprophet.com/documentation/guide/products/wiki/
 
 ### Blog
 
@@ -183,11 +183,11 @@
 - **Topics:** essays, updates, analysis, narrative
 - **Normalized topics:** knowledge, narrative, signal, trust, public-positioning
 - **Investor lens:** narrative_compounding
-- **Docs path:** `/guide/products/blog`
+- **Docs path:** `/documentation/guide/products/blog/`
 - **Description:** Long-form writing, updates, and commentary.
 - **Next action:** Content-first surface.
 - **Related surfaces:** wiki, documentation
-- **Related sites:** /guide/products/blog
+- **Related sites:** https://socioprophet.com/documentation/guide/products/blog/
 
 ### Digital / Trust
 
@@ -198,11 +198,11 @@
 - **Topics:** identity, trust, governance, public-positioning
 - **Normalized topics:** trust, governance, identity, platform, public-positioning
 - **Investor lens:** trust_compounding
-- **Docs path:** `/guide/domain-surface`
+- **Docs path:** `/documentation/guide/domain-surface/`
 - **Description:** Trust-first positioning, digital identity, and public-facing trust surfaces.
 - **Next action:** Clarify product definition and trust narrative.
 - **Related surfaces:** documentation, organizations, academy, law, medical
-- **Related sites:** /guide/domain-surface
+- **Related sites:** https://socioprophet.com/documentation/guide/domain-surface/
 
 ### Investor
 
@@ -217,7 +217,7 @@
 - **Description:** Investor and governance-facing public materials.
 - **Next action:** Expand when investor materials are ready.
 - **Related surfaces:** documentation, organizations, digital-trust
-- **Related sites:** /investor/, /map/, /guide/surface-inventory
+- **Related sites:** /investor/, /map/, https://socioprophet.com/documentation/guide/surface-inventory/
 
 ### Entity Analytics
 
@@ -229,8 +229,8 @@
 - **Normalized topics:** architecture, reference, trust, platform, governance
 - **Investor lens:** discovery_compounding
 - **Landing page:** `/entity-analytics/`
-- **Docs path:** `/guide/entity-analytics-reference`
+- **Docs path:** `/documentation/guide/entity-analytics-reference/`
 - **Description:** Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs.
 - **Next action:** Keep as the source of deeper system detail.
 - **Related surfaces:** academy, organizations, ai, developer, cloud, live, medical, law, wiki, blog, digital-trust
-- **Related sites:** /, /guide/canonical-platform-direction
+- **Related sites:** https://socioprophet.com/documentation/, https://socioprophet.com/documentation/guide/canonical-platform-direction/

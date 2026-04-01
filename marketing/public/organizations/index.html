@@ -7,6 +7,7 @@
     <meta name="description" content="For schools, nonprofits, public sector, sovereign systems, and employers — institutional deployment that stays aligned with the commons." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script>
       function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
     </script>
@@ -19,7 +20,7 @@
           <div class="font-semibold tracking-tight">SocioProphet</div>
         </a>
         <nav class="flex items-center gap-6 text-sm">
-          <a class="hover:underline" href="https://socioprophet.com/documentation/">Documentation</a>
+          <a class="hover:underline" href="/documentation/">Documentation</a>
           <a class="hover:underline" href="/organizations/">Organizations</a>
           <a class="hover:underline" href="/organizations/apply/">Apply</a>
           <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
@@ -47,7 +48,7 @@
               <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white shadow-sm hover:bg-slate-800" href="/organizations/apply/">
                 Open Intake
               </a>
-              <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 hover:bg-slate-50" href="/documentation/organizations-governance-and-institutional-safety/">
+              <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 hover:bg-slate-50" href="/documentation/guide/organizations-governance-and-institutional-safety/">
                 Review Governance Docs
               </a>
               <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 hover:bg-slate-50" href="#governed-stack">
@@ -61,52 +62,26 @@
           </div>
 
           <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 class="text-xl font-semibold tracking-tight text-slate-950">Institutional Focus Map</h2>
-            <p class="mt-2 text-sm text-slate-600">
-              Organizations is the umbrella Surface linking Governance, Deterministic AI, the Agent Plane, Entity Analytics, and Authorized Cyberdefense into one institutional path.
-            </p>
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-xl font-semibold tracking-tight text-slate-950">Institutional Surface Graph</h2>
+                <p class="mt-2 text-sm text-slate-600">
+                  Organizations is the umbrella Surface linking Governance, Deterministic AI, the Agent Plane, Entity Analytics, and Authorized Cyberdefense into one institutional path.
+                </p>
+              </div>
+              <a class="text-sm font-medium text-slate-700 hover:text-slate-950" href="/map/?mode=hybrid" target="_blank" rel="noopener">
+                Open Map ↗
+              </a>
+            </div>
 
             <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <svg viewBox="0 0 760 360" class="w-full h-auto" role="img" aria-label="Institutional Focus Map">
-                <g stroke="#cbd5e1" stroke-width="2" fill="none">
-                  <line x1="380" y1="180" x2="380" y2="72"></line>
-                  <line x1="380" y1="180" x2="182" y2="120"></line>
-                  <line x1="380" y1="180" x2="578" y2="120"></line>
-                  <line x1="380" y1="180" x2="212" y2="290"></line>
-                  <line x1="380" y1="180" x2="548" y2="290"></line>
-                </g>
-
-                <g font-family="Inter, sans-serif" text-anchor="middle">
-                  <rect x="268" y="146" width="224" height="72" rx="20" fill="#0f172a"></rect>
-                  <text x="380" y="175" fill="#ffffff" font-size="20" font-weight="700">Organizations</text>
-                  <text x="380" y="198" fill="#cbd5e1" font-size="12">Institutional Surface</text>
-
-                  <rect x="278" y="28" width="204" height="54" rx="18" fill="#ffffff" stroke="#cbd5e1"></rect>
-                  <text x="380" y="50" fill="#0f172a" font-size="15" font-weight="700">Deterministic AI</text>
-                  <text x="380" y="67" fill="#475569" font-size="11">bounded execution</text>
-
-                  <rect x="54" y="92" width="214" height="54" rx="18" fill="#ffffff" stroke="#cbd5e1"></rect>
-                  <text x="161" y="114" fill="#0f172a" font-size="15" font-weight="700">Governed AI</text>
-                  <text x="161" y="131" fill="#475569" font-size="11">control loops and proofs</text>
-
-                  <rect x="492" y="92" width="214" height="54" rx="18" fill="#ffffff" stroke="#cbd5e1"></rect>
-                  <text x="599" y="114" fill="#0f172a" font-size="15" font-weight="700">Agent Plane</text>
-                  <text x="599" y="131" fill="#475569" font-size="11">role-bounded workflows</text>
-
-                  <rect x="76" y="262" width="250" height="54" rx="18" fill="#ffffff" stroke="#cbd5e1"></rect>
-                  <text x="201" y="284" fill="#0f172a" font-size="15" font-weight="700">Entity Analytics</text>
-                  <text x="201" y="301" fill="#475569" font-size="11">Event-IR and proof artifacts</text>
-
-                  <rect x="434" y="262" width="250" height="54" rx="18" fill="#ffffff" stroke="#cbd5e1"></rect>
-                  <text x="559" y="284" fill="#0f172a" font-size="15" font-weight="700">Authorized Cyberdefense</text>
-                  <text x="559" y="301" fill="#475569" font-size="11">validation under governance</text>
-                </g>
-              </svg>
+              <svg id="orgGraph" viewBox="0 0 760 420" class="h-auto w-full" role="img" aria-label="Institutional Surface Graph"></svg>
             </div>
 
             <div class="mt-4 flex flex-wrap gap-2 text-sm">
-              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/organizations-governance-and-institutional-safety/">Institutional Governance</a>
-              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/organizations-governance-and-institutional-safety/">Institutional Governance</a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/agent-plane-and-operator-workflows/">Agent Plane</a>
               <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/organizations/apply/">Open Intake</a>
             </div>
           </aside>
@@ -119,13 +94,13 @@
           </p>
 
           <div class="mt-5 grid gap-4 md:grid-cols-2">
-            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/documentation/governed-ai-and-cybernetics/">
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/documentation/guide/governed-ai-and-cybernetics/">
               <div class="text-xs font-medium uppercase tracking-wide text-slate-500">operations</div>
               <div class="mt-2 font-semibold text-slate-950">Governed AI &amp; Cybernetics</div>
               <p class="mt-2 text-sm text-slate-600">Policy-bounded execution, human oversight, control loops, and evidence-bearing system behavior.</p>
             </a>
 
-            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/documentation/agent-plane-and-operator-workflows/">
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/documentation/guide/agent-plane-and-operator-workflows/">
               <div class="text-xs font-medium uppercase tracking-wide text-slate-500">agent plane</div>
               <div class="mt-2 font-semibold text-slate-950">Agent Plane and Operator Workflows</div>
               <p class="mt-2 text-sm text-slate-600">Role-bounded execution, reviewable workflows, capability routing, and audit-friendly operator state.</p>
@@ -137,7 +112,7 @@
               <p class="mt-2 text-sm text-slate-600">Typed Event-IR, governed identity graphs, policy-constrained merges, and proof artifacts.</p>
             </a>
 
-            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/documentation/authorized-cyberdefense-and-simulation/">
+            <a class="rounded-xl border border-slate-200 bg-slate-50 p-5 transition hover:bg-white" href="/documentation/guide/authorized-cyberdefense-and-simulation/">
               <div class="text-xs font-medium uppercase tracking-wide text-slate-500">defense</div>
               <div class="mt-2 font-semibold text-slate-950">Authorized Cyberdefense and Simulation</div>
               <p class="mt-2 text-sm text-slate-600">Defense-first validation, purple-team learning loops, blue-team hardening, and governed simulation under authorization.</p>
@@ -152,10 +127,10 @@
             proof-bearing workflows, explicit reversibility, and a clear public-versus-restricted security boundary.
           </p>
           <div class="mt-4 flex flex-wrap gap-3 text-sm">
-            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
-            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/boundary-centric-cyber-hypergraph/">Boundary Model</a>
-            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/public-vs-restricted-security-boundary/">Public vs restricted</a>
-            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/provenance-promotion-and-reversibility/">Provenance and reversibility</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/boundary-centric-cyber-hypergraph/">Boundary Model</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/public-vs-restricted-security-boundary/">Public vs restricted</a>
+            <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/provenance-promotion-and-reversibility/">Provenance and reversibility</a>
           </div>
         </section>
 
@@ -187,17 +162,17 @@
             <div>
               <div class="text-sm font-semibold text-slate-800">Institutional governance</div>
               <div class="mt-3 flex flex-wrap gap-2 text-sm">
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/organizations-governance-and-institutional-safety/">Governance</a>
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/platform-human-protection-and-safeguarding/">Safeguarding</a>
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/public-vs-restricted-security-boundary/">Public vs restricted</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/organizations-governance-and-institutional-safety/">Governance</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/platform-human-protection-and-safeguarding/">Safeguarding</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/public-vs-restricted-security-boundary/">Public vs restricted</a>
               </div>
             </div>
 
             <div>
               <div class="text-sm font-semibold text-slate-800">Operations and analytics</div>
               <div class="mt-3 flex flex-wrap gap-2 text-sm">
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/governed-ai-and-cybernetics/">Governed AI</a>
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/agent-plane-and-operator-workflows/">Agent Plane</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/governed-ai-and-cybernetics/">Governed AI</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/agent-plane-and-operator-workflows/">Agent Plane</a>
                 <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/entity-analytics/">Entity Analytics</a>
               </div>
             </div>
@@ -205,9 +180,9 @@
             <div>
               <div class="text-sm font-semibold text-slate-800">Validation and boundary logic</div>
               <div class="mt-3 flex flex-wrap gap-2 text-sm">
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/authorized-cyberdefense-and-simulation/">Authorized cyberdefense</a>
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/boundary-centric-cyber-hypergraph/">Boundary Model</a>
-                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/authorized-cyberdefense-and-simulation/">Authorized cyberdefense</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/boundary-centric-cyber-hypergraph/">Boundary Model</a>
+                <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/deterministic-ai-and-mathematical-safety/">Deterministic AI</a>
               </div>
             </div>
           </div>
@@ -232,5 +207,165 @@
     </main>
 
     
-  </body>
+  
+  <!-- organizations-institutional-graph -->
+  <script>
+    (function () {
+      const el = document.getElementById("orgGraph");
+      if (!el || typeof d3 === "undefined") return;
+
+      const width = 760;
+      const height = 420;
+      const svg = d3.select(el);
+      svg.selectAll("*").remove();
+
+      const nodes = [
+        { id: "organizations", label: "Organizations", note: "Institutional Surface", href: "/organizations/", category: "deployment", x0: 380, y0: 188, featured: true },
+        { id: "deterministic-ai", label: "Deterministic AI", note: "bounded execution", href: "/documentation/guide/deterministic-ai-and-mathematical-safety/", category: "governance", x0: 380, y0: 56 },
+        { id: "governed-ai", label: "Governed AI", note: "control loops and proofs", href: "/documentation/guide/governed-ai-and-cybernetics/", category: "governance", x0: 164, y0: 120 },
+        { id: "agent-plane", label: "Agent Plane", note: "role-bounded workflows", href: "/documentation/guide/agent-plane-and-operator-workflows/", category: "technical", x0: 596, y0: 120 },
+        { id: "entity-analytics", label: "Entity Analytics", note: "Event-IR and proof artifacts", href: "/entity-analytics/", category: "technical", x0: 206, y0: 308 },
+        { id: "authorized-cyberdefense", label: "Cyberdefense", note: "validation under Governance", href: "/documentation/guide/authorized-cyberdefense-and-simulation/", category: "trust", x0: 554, y0: 308 },
+        { id: "institutional-governance", label: "Governance", note: "institutional safety", href: "/documentation/guide/organizations-governance-and-institutional-safety/", category: "trust", x0: 118, y0: 216 },
+        { id: "intake", label: "Open Intake", note: "deployment path", href: "/organizations/apply/", category: "deployment", x0: 642, y0: 216 }
+      ];
+
+      const links = [
+        { source: "organizations", target: "deterministic-ai", primary: true },
+        { source: "organizations", target: "governed-ai", primary: true },
+        { source: "organizations", target: "agent-plane", primary: true },
+        { source: "organizations", target: "entity-analytics", primary: true },
+        { source: "organizations", target: "authorized-cyberdefense", primary: true },
+        { source: "organizations", target: "institutional-governance", primary: true },
+        { source: "organizations", target: "intake", primary: true },
+        { source: "deterministic-ai", target: "governed-ai", primary: false },
+        { source: "deterministic-ai", target: "agent-plane", primary: false },
+        { source: "institutional-governance", target: "authorized-cyberdefense", primary: false },
+        { source: "entity-analytics", target: "authorized-cyberdefense", primary: false }
+      ];
+
+      const colorFor = (d) => {
+        switch (d.category) {
+          case "deployment": return "#bfdbfe";
+          case "technical": return "#ddd6fe";
+          case "trust":
+          case "governance": return "#99f6e4";
+          default: return "#e2e8f0";
+        }
+      };
+
+      nodes.forEach((d) => {
+        d.r = d.featured ? 30 : 21;
+        d.x = d.x0;
+        d.y = d.y0;
+      });
+
+      const defs = svg.append("defs");
+      const glow = defs.append("filter").attr("id", "orgNodeGlow");
+      glow.append("feGaussianBlur").attr("stdDeviation", 6).attr("result", "coloredBlur");
+      const merge = glow.append("feMerge");
+      merge.append("feMergeNode").attr("in", "coloredBlur");
+      merge.append("feMergeNode").attr("in", "SourceGraphic");
+
+      const root = svg.append("g");
+
+      const link = root.append("g")
+        .attr("fill", "none")
+        .attr("stroke", "#cbd5e1")
+        .attr("stroke-opacity", 0.95)
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("stroke-width", (d) => d.primary ? 2.5 : 1.4);
+
+      const node = root.append("g")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .attr("cursor", "pointer")
+        .on("click", (_, d) => { window.location.href = d.href; });
+
+      node.append("circle")
+        .attr("r", (d) => d.r)
+        .attr("fill", (d) => colorFor(d))
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", (d) => d.featured ? 4 : 3)
+        .attr("filter", "url(#orgNodeGlow)");
+
+      node.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", (d) => d.featured ? 5 : 4)
+        .attr("font-family", "Inter, sans-serif")
+        .attr("font-size", (d) => d.featured ? 16 : 13)
+        .attr("font-weight", 700)
+        .attr("fill", "#0f172a")
+        .attr("paint-order", "stroke")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 4)
+        .attr("stroke-linejoin", "round")
+        .text((d) => d.label);
+
+      const note = root.append("g")
+        .selectAll("text.note")
+        .data(nodes)
+        .join("text")
+        .attr("class", "note")
+        .attr("text-anchor", "middle")
+        .attr("font-family", "Inter, sans-serif")
+        .attr("font-size", 11)
+        .attr("font-weight", 600)
+        .attr("fill", "#334155")
+        .text((d) => d.note);
+
+      const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id((d) => d.id).distance((d) => d.primary ? 130 : 94).strength((d) => d.primary ? 1 : 0.55))
+        .force("charge", d3.forceManyBody().strength((d) => d.featured ? -1550 : -900))
+        .force("x", d3.forceX((d) => d.x0).strength(0.24))
+        .force("y", d3.forceY((d) => d.y0).strength(0.24))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius((d) => d.r + 24));
+
+      function ticked() {
+        link
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
+
+        node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+        note
+          .attr("x", (d) => d.x)
+          .attr("y", (d) => d.y + d.r + 18);
+      }
+
+      function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.18).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+
+      node.call(
+        d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended)
+      );
+
+      simulation.on("tick", ticked);
+      ticked();
+    })();
+  </script>
+</body>
 </html>
