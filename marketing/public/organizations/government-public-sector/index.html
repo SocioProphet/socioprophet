@@ -7,6 +7,7 @@
     <meta name="description" content="Governed AI for readiness, continuity, secure learning, institutional memory, and bounded public-sector operations." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script>
       function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
     </script>
@@ -20,7 +21,7 @@
         </a>
         <nav class="flex items-center gap-6 text-sm flex-wrap">
           <a class="hover:underline" href="/organizations/">Organizations</a>
-          <a class="hover:underline" href="https://socioprophet-web.web.app/">Documentation</a>
+          <a class="hover:underline" href="/documentation/">Documentation</a>
           <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
         </nav>
       </div>
@@ -32,7 +33,7 @@
           Organizations • Government and Public Sector
         </div>
 
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-start">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] lg:items-start">
           <div class="space-y-6">
             <h1 class="text-4xl font-semibold tracking-tight lg:text-5xl">
               Governed AI for readiness, continuity, and public-service operations.
@@ -44,22 +45,39 @@
 
             <div class="flex flex-wrap gap-3">
               <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white shadow-sm hover:bg-slate-800" href="/organizations/#orgForm" onclick='spTrack("gov_cta_intake",{href:this.getAttribute("href")})'>Request government and public-sector intake</a>
-              <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 shadow-sm hover:bg-slate-50" href="https://socioprophet-web.web.app/guide/public-vs-restricted-security-boundary" onclick='spTrack("gov_cta_boundary_docs",{href:this.getAttribute("href")})'>Review boundary model</a>
-              <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 shadow-sm hover:bg-slate-50" href="https://socioprophet-web.web.app/guide/architecture" onclick='spTrack("gov_cta_architecture_docs",{href:this.getAttribute("href")})'>Review architecture</a>
+              <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 shadow-sm hover:bg-slate-50" href="/documentation/guide/public-vs-restricted-security-boundary/" onclick='spTrack("gov_cta_boundary_docs",{href:this.getAttribute("href")})'>Review boundary model</a>
+              <a class="inline-flex items-center rounded-md border border-slate-300 bg-white px-5 py-3 text-slate-900 shadow-sm hover:bg-slate-50" href="/documentation/guide/architecture/" onclick='spTrack("gov_cta_architecture_docs",{href:this.getAttribute("href")})'>Review architecture</a>
             </div>
+
+            <p class="max-w-3xl text-sm text-slate-600">
+              Public documentation explains architecture, governance, bounded execution, and evidence-bearing review loops. Sensitive operator mechanics, tactical thresholds, and restricted procedures remain outside the public layer.
+            </p>
           </div>
 
-          <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-            <div>
-              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Evaluation frame</div>
-              <h2 class="mt-2 text-xl font-semibold tracking-tight">Procurement-safe, governance-native, mission-relevant</h2>
+          <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Evaluation frame</div>
+                <h2 class="mt-2 text-xl font-semibold tracking-tight text-slate-950">Government and Public Sector Graph</h2>
+                <p class="mt-2 text-sm text-slate-600">
+                  A mission-specific projection of the institutional surface: readiness, secure learning, continuity, institutional memory, governance, and explicit public-safe boundary control.
+                </p>
+              </div>
+              <a class="text-sm font-medium text-slate-700 hover:text-slate-950" href="/map/?mode=hybrid" target="_blank" rel="noopener">
+                Open Map ↗
+              </a>
             </div>
-            <ul class="space-y-3 text-sm text-slate-700">
-              <li>Readiness and continuity rather than ambient autonomy.</li>
-              <li>Human review, reversibility, and evidence-bearing workflows.</li>
-              <li>Public-safe versus restricted boundary remains explicit.</li>
-              <li>Learning, doctrine transfer, and institutional memory are first-class.</li>
-            </ul>
+
+            <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <svg id="govGraph" viewBox="0 0 760 420" class="h-auto w-full" role="img" aria-label="Government and Public Sector Graph"></svg>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2 text-sm">
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/organizations-governance-and-institutional-safety/">Institutional Governance</a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/public-vs-restricted-security-boundary/">Public-Safe Boundary</a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/documentation/guide/agent-plane-and-operator-workflows/">Agent Plane</a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-2 hover:bg-slate-50" href="/organizations/#orgForm">Open Intake</a>
+            </div>
           </aside>
         </div>
       </section>
@@ -114,9 +132,9 @@
           Public documentation explains the platform architecture, governance model, safety boundaries, bounded execution model, and evidence-bearing workflow design. Sensitive operator procedures, tactical thresholds, restricted workflows, and misuse-enabling detail remain outside the public layer. This lets evaluators assess the system without collapsing the boundary model.
         </p>
         <div class="flex flex-wrap gap-3 pt-2">
-          <a class="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100" href="https://socioprophet-web.web.app/guide/public-vs-restricted-security-boundary">Public vs restricted boundary</a>
-          <a class="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100" href="https://socioprophet-web.web.app/guide/organizations-governance-and-institutional-safety">Governance and institutional safety</a>
-          <a class="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100" href="https://socioprophet-web.web.app/guide/provider-safety-and-capability-eligibility">Provider safety and capability eligibility</a>
+          <a class="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100" href="/documentation/guide/public-vs-restricted-security-boundary/">Public vs restricted boundary</a>
+          <a class="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100" href="/documentation/guide/organizations-governance-and-institutional-safety/">Governance and institutional safety</a>
+          <a class="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100" href="/documentation/guide/provider-safety-and-capability-eligibility/">Provider safety and capability eligibility</a>
         </div>
       </section>
 
@@ -131,5 +149,162 @@
         </div>
       </section>
     </main>
+
+  <!-- government-public-sector-graph -->
+  <script>
+    (function () {
+      const el = document.getElementById("govGraph");
+      if (!el || typeof d3 === "undefined") return;
+
+      const width = 760;
+      const height = 420;
+      const svg = d3.select(el);
+      svg.selectAll("*").remove();
+
+      const nodes = [
+        { id: "government-public-sector", label: "Gov / Public", note: "mission surface", href: "/organizations/government-public-sector/", category: "deployment", x0: 380, y0: 188, featured: true },
+        { id: "readiness", label: "Readiness", note: "preparedness", href: "/documentation/guide/organizations-governance-and-institutional-safety/", category: "governance", x0: 380, y0: 58 },
+        { id: "secure-learning", label: "Secure Learning", note: "training continuity", href: "/documentation/guide/agent-plane-and-operator-workflows/", category: "technical", x0: 170, y0: 118 },
+        { id: "institutional-memory", label: "Memory", note: "durable context", href: "/documentation/guide/provenance-promotion-and-reversibility/", category: "technical", x0: 590, y0: 118 },
+        { id: "continuity", label: "Continuity", note: "mission resilience", href: "/documentation/guide/architecture/", category: "governance", x0: 170, y0: 304 },
+        { id: "public-safe-boundary", label: "Boundary", note: "public-safe vs restricted", href: "/documentation/guide/public-vs-restricted-security-boundary/", category: "trust", x0: 590, y0: 304 },
+        { id: "governance", label: "Governance", note: "institutional safety", href: "/documentation/guide/organizations-governance-and-institutional-safety/", category: "trust", x0: 120, y0: 216 },
+        { id: "intake", label: "Open Intake", note: "evaluation path", href: "/organizations/#orgForm", category: "deployment", x0: 640, y0: 216 },
+        { id: "agent-plane", label: "Agent Plane", note: "bounded workflows", href: "/documentation/guide/agent-plane-and-operator-workflows/", category: "technical", x0: 380, y0: 352 }
+      ];
+
+      const links = [
+        { source: "government-public-sector", target: "readiness", primary: true },
+        { source: "government-public-sector", target: "secure-learning", primary: true },
+        { source: "government-public-sector", target: "institutional-memory", primary: true },
+        { source: "government-public-sector", target: "continuity", primary: true },
+        { source: "government-public-sector", target: "public-safe-boundary", primary: true },
+        { source: "government-public-sector", target: "governance", primary: true },
+        { source: "government-public-sector", target: "intake", primary: true },
+        { source: "government-public-sector", target: "agent-plane", primary: true },
+        { source: "readiness", target: "governance", primary: false },
+        { source: "secure-learning", target: "agent-plane", primary: false },
+        { source: "institutional-memory", target: "continuity", primary: false },
+        { source: "public-safe-boundary", target: "governance", primary: false }
+      ];
+
+      const colorFor = (d) => {
+        switch (d.category) {
+          case "deployment": return "#1d4ed8";
+          case "technical": return "#7c3aed";
+          case "trust":
+          case "governance": return "#0f766e";
+          default: return "#475569";
+        }
+      };
+
+      nodes.forEach((d) => {
+        d.r = d.featured ? 30 : 21;
+        d.x = d.x0;
+        d.y = d.y0;
+      });
+
+      const defs = svg.append("defs");
+      const glow = defs.append("filter").attr("id", "govNodeGlow");
+      glow.append("feGaussianBlur").attr("stdDeviation", 6).attr("result", "coloredBlur");
+      const merge = glow.append("feMerge");
+      merge.append("feMergeNode").attr("in", "coloredBlur");
+      merge.append("feMergeNode").attr("in", "SourceGraphic");
+
+      const root = svg.append("g");
+
+      const link = root.append("g")
+        .attr("fill", "none")
+        .attr("stroke", "#cbd5e1")
+        .attr("stroke-opacity", 0.95)
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("stroke-width", (d) => d.primary ? 2.5 : 1.4);
+
+      const node = root.append("g")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .attr("cursor", "pointer")
+        .on("click", (_, d) => { window.location.href = d.href; });
+
+      node.append("circle")
+        .attr("r", (d) => d.r)
+        .attr("fill", (d) => colorFor(d))
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", (d) => d.featured ? 4 : 3)
+        .attr("filter", "url(#govNodeGlow)");
+
+      node.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", (d) => d.featured ? 5 : 4)
+        .attr("font-family", "Inter, sans-serif")
+        .attr("font-size", (d) => d.featured ? 15 : 12)
+        .attr("font-weight", 700)
+        .attr("fill", "#ffffff")
+        .text((d) => d.label);
+
+      const note = root.append("g")
+        .selectAll("text.note")
+        .data(nodes)
+        .join("text")
+        .attr("class", "note")
+        .attr("text-anchor", "middle")
+        .attr("font-family", "Inter, sans-serif")
+        .attr("font-size", 11)
+        .attr("fill", "#475569")
+        .text((d) => d.note);
+
+      const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id((d) => d.id).distance((d) => d.primary ? 128 : 92).strength((d) => d.primary ? 1 : 0.55))
+        .force("charge", d3.forceManyBody().strength((d) => d.featured ? -1550 : -900))
+        .force("x", d3.forceX((d) => d.x0).strength(0.24))
+        .force("y", d3.forceY((d) => d.y0).strength(0.24))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius((d) => d.r + 24));
+
+      function ticked() {
+        link
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
+
+        node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+        note
+          .attr("x", (d) => d.x)
+          .attr("y", (d) => d.y + d.r + 18);
+      }
+
+      function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.18).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+
+      node.call(
+        d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended)
+      );
+
+      simulation.on("tick", ticked);
+      ticked();
+    })();
+  </script>
   </body>
 </html>
