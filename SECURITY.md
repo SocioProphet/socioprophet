@@ -33,4 +33,4 @@ We will coordinate disclosure timing with the reporter whenever possible and cre
 This repository is configured to reduce accidental secrets exposure and improve detection:
 - Environment files are ignored by default while keeping `.env.example` tracked.
 - Dependabot is enabled for dependency update monitoring.
-- CodeQL analysis runs in GitHub Actions for JavaScript code scanning.
+- CodeQL analysis runs in GitHub Actions for JavaScript/TypeScript code scanning.
