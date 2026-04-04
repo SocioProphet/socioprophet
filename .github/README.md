@@ -10,3 +10,4 @@ This directory houses repository automation and metadata that GitHub consumes. I
 ## Notes
 - Changes here impact automation behavior rather than runtime behavior.
 - Avoid placing app-specific documentation or source files in this directory.
+- `workflows/codeql-analysis.yml` targets self-hosted Fedora/CoreOS runner labels: `self-hosted`, `linux`, `x64`, `fedora`, `coreos`.

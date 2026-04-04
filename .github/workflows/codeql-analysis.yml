@@ -20,7 +20,12 @@ permissions:
 jobs:
   analyze-javascript:
     name: Analyze (javascript-typescript)
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - fedora
+      - coreos
 
     steps:
       - name: Checkout repository
