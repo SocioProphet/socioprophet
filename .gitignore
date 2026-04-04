@@ -9,6 +9,10 @@ local_deploy/
 .env
 
 .DS_Store
+
+# Yarn berry cache/state
+**/.yarn/
+**/.yarnrc.yml
 # Secrets / local env
 .env.*
 *.pem
