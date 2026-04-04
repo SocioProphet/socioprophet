@@ -1,0 +1,13 @@
+title = "SocioProphet baseline"
+
+[allowlist]
+description = "Allow common lockfile integrity hashes and other non-secret artifacts"
+regexes = [
+  '''integrity sha(256|512)-''',
+]
+paths = [
+  '''socioprophet-web/client/yarn\.lock''',
+  '''yarn\.lock''',
+  '''package-lock\.json''',
+  '''pnpm-lock\.yaml''',
+]

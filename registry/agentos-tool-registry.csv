@@ -1,0 +1,37 @@
+id,name,layer,license,license_source,risk,adapter,default_context,repo,aliases,zip
+soft-serve,Soft Serve,L0 Git hosting,MIT,web,green,GitService,optional,https://github.com/charmbracelet/soft-serve,,
+zed,Zed,L1 Editor,AGPL/GPL components (see repo LICENSE-AGPL/LICENCE-GPL),web,yellow,Editor,dev-only,https://github.com/zed-industries/zed,,
+warp,Warp,L1 Terminal,proprietary,web,red (if bundled),Terminal,dev-only,https://www.warp.dev,,
+plate,Plate (open-source core),L1/6 Editor components,MIT (core) + commercial Plate Plus,web,green/yellow,EditorComponent,optional,https://github.com/udecode/plate,,
+tabbyml,Tabby (TabbyML),L2 Assistant Backend,Apache-2.0 (FOSS) + paid tiers,web,green/yellow,CompletionService,core,https://github.com/TabbyML/tabby,,
+aider,Aider,L2 Executor,Apache-2.0,web,green,Executor,support,https://github.com/Aider-AI/aider,,
+opencode,OpenCode,L2 Executor,MIT,web,green,Executor,core,https://github.com/anomalyco/opencode,,
+continue,Continue,L2 Executor/(IDE/PR),Apache-2.0,web,green,Executor,support,https://github.com/continuedev/continue,,
+goose,Goose,L2 Executor/Tool Runner,Apache-2.0,web,green,Executor,support,https://github.com/block/goose,,
+opensouls,OpenSouls,L2/3 Agent framework,MIT,web,green,AgentFramework,optional,https://github.com/opensouls/opensouls,,
+gastown,Gastown,L3 Orchestration,MIT,web,green,Orchestrator,core,https://github.com/steveyegge/gastown,,
+ace-framework,ACE Framework,L3 Process Playbooks,MIT,zip,green,Playbooks,support,,,ACE_Framework-main.zip
+bmad-builder,bmad-builder,L3 Process Playbooks,MIT,zip,green,Playbooks,optional,,BMAD Builder,bmad-builder-main.zip
+aiwg,AIWG,L3 Process Spine,MIT,zip,green,ProcessSpine,core,https://github.com/jmagly/aiwg,,aiwg-main.zip
+stagehand,Stagehand,L4 BrowserOps,MIT,web,green,BrowserOps,core,https://github.com/browserbase/stagehand,,
+browser-use,browser-use,L4 BrowserOps,MIT,zip,green,BrowserOps,support,,,browser-use-main.zip
+agent-s,Agent-S,L4 DesktopOps,Apache-2.0,zip,green,DesktopOps,restricted,,,Agent-S-main.zip
+openclaw,OpenClaw,L4 Personal Assistant/Connectors,MIT,web,yellow (security surface),AssistantGateway,restricted,https://github.com/openclaw/openclaw,,
+ontogpt,OntoGPT,L5 Extractor (text→schema),BSD-3-Clause,web,green,Extractor,support,https://github.com/monarch-initiative/ontogpt,,
+vlmrun-hub,VLM Run Hub,L5 Extractor (vision→schema),Apache-2.0,web,green,Extractor,support,https://github.com/vlm-run/vlmrun-hub,,
+skill-seekers-development,Skill_Seekers-development,L5 Ingestion/Prep,MIT,zip,green,Ingestion,optional,,Skill Seekers,Skill_Seekers-development.zip
+mem0,Mem0,L5 Memory,Apache-2.0,web,green,MemoryAPI,core,https://github.com/mem0ai/mem0,,
+vercel-ai-sdk,Vercel AI SDK (vercel/ai),L6 App framework,Apache-2.0 (zip shows),zip,green,AppFramework,support,https://github.com/vercel/ai,ai (zip: ai-main.zip),ai-main.zip
+medusa,Medusa,L6 Commerce platform,MIT,web,green,ProductPlatform,optional,https://github.com/medusajs/medusa,,
+zenstack,ZenStack,L6 Data layer,MIT,web,green,DataLayer,support,https://github.com/zenstackhq/zenstack,,
+parlai,ParlAI,L7 Eval harness,MIT,web,green,EvalHarness,optional,https://github.com/facebookresearch/ParlAI,,
+argos,argos,L7 Reference Patterns,CC0-1.0,zip,green,Reference,optional,,,argos-main.zip
+anus,ANUS,L7 Sandbox/Example,Apache-2.0,zip,green,Example,optional,,,ANUS-main.zip
+full-small-app-workflow,Full-Small-App-Workflow,L7 Template/Workflow,MIT,zip,green,Template,optional,,,Full-Small-App-Workflow-main.zip
+inbox-zero,inbox-zero,L7 Vertical App,GPL-3.0,zip,yellow,App,optional,,,inbox-zero-main.zip
+rappy-lobster,rappy-lobster,L7 Vertical Rig,MIT,zip,yellow,Rig,optional,,,rappy-lobster-main.zip
+agent-inbox,agent-inbox,L7 Vertical Rig (Inbox agents),MIT,zip,green,Rig,optional,,,agent-inbox-main.zip
+seomachine,seomachine,L7 Vertical Rig (SEO),MIT,zip,green,Rig,optional,,,seomachine-main.zip
+ad4m,AD4M,L8 Agent social fabric,CAL-1.0,web,red/yellow,SocialFabric,optional,https://github.com/coasys/ad4m,,
+fortemi,Fortemi,L8 KB/semantic search,BUSL-1.1 (change date to AGPL in LICENSE),zip,red/yellow,KBService,quarantine,,,fortemi-main.zip
+subconscious-systems,Subconscious Systems (TIMRUN + SDKs),L8 Long-horizon reasoning,mixed/verify per repo (TIMRUN model MIT),web,yellow,LongHorizonService,optional,https://github.com/subconscious-systems,,

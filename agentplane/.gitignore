@@ -1,0 +1,13 @@
+# Runtime outputs (evidence artifacts live here locally)
+artifacts/
+
+# Runtime state (pointers are machine-local)
+state/pointers/*
+!state/pointers/.keep
+
+# OS/editor noise
+.DS_Store
+
+# Python caches
+__pycache__/
+*.pyc

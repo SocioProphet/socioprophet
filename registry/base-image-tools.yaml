@@ -1,0 +1,12 @@
+# Base-image allowlist for SocioProphet/socioprophet
+# Tool IDs must match registry/agentos-tool-registry.yaml
+base_image_tools:
+  - aiwg
+  - ace-framework
+  - opencode
+  - stagehand
+  - browser-use
+  - agent-s
+  - mem0
+  - ontogpt
+  - vlmrun-hub

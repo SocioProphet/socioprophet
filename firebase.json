@@ -1,0 +1,33 @@
+{
+  "hosting": [
+    {
+      "target": "docs",
+      "public": "docs/.vitepress/publish",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "cleanUrls": true,
+      "trailingSlash": false
+    },
+    {
+      "target": "marketing",
+      "public": "marketing/public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/api/lead",
+          "function": "leadCapture"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "source": "functions"
+  }
+}

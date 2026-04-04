@@ -1,0 +1,66 @@
+:root {
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --muted: #475569;
+  --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+main.shell {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.25rem;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 1rem 0 0;
+  color: var(--muted);
+}
+
+.version {
+  margin-top: 1rem;
+}
+
+section.content {
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  main.shell {
+    padding: 2.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 1.875rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+}
