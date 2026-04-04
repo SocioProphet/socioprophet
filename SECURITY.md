@@ -13,16 +13,17 @@ SocioProphet is maintained as a rolling mainline project. Security fixes are app
 
 Please do **not** open public GitHub issues for suspected vulnerabilities.
 
-Instead, report privately by emailing: **security@socioprophet.com** with:
-- A clear description of the issue and affected component(s).
-- Reproduction steps or proof-of-concept details.
-- Impact assessment (confidentiality, integrity, availability).
-- Any suggested mitigation.
+Use GitHub's private vulnerability reporting flow instead:
+1. Open the repository **Security** tab.
+2. Select **Advisories**.
+3. Click **Report a vulnerability** and include reproduction details, impact, and any suggested mitigation.
+
+If GitHub private reporting is unavailable for your account context, open a minimal issue asking maintainers for a secure reporting channel without disclosing exploit details.
 
 ## Response Expectations
 
-- Initial acknowledgement: **within 3 business days**.
-- Triage decision: **within 7 business days** when reproducible details are provided.
+- Initial acknowledgement target: **within 3 business days**.
+- Triage decision target: **within 7 business days** when reproducible details are provided.
 - Remediation timeline: based on severity and exploitability.
 
 We will coordinate disclosure timing with the reporter whenever possible and credit responsible disclosure unless anonymity is requested.
@@ -32,4 +33,4 @@ We will coordinate disclosure timing with the reporter whenever possible and cre
 This repository is configured to reduce accidental secrets exposure and improve detection:
 - Environment files are ignored by default while keeping `.env.example` tracked.
 - Dependabot is enabled for dependency update monitoring.
-- CodeQL analysis runs in GitHub Actions for JavaScript/TypeScript code scanning.
+- CodeQL analysis runs in GitHub Actions for JavaScript code scanning.
