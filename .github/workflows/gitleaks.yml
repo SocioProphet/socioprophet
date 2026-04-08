@@ -19,9 +19,17 @@ permissions:
 
 
 on:
-  pull_request:
   push:
-    branches: [ master ]
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
 
 jobs:
   scan:
@@ -42,19 +50,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install gitleaks (pinned)
-        run: |
-          set -euo pipefail
-          VER="8.18.2"
-          URL="https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
-          curl -fsSL "$URL" -o /tmp/gitleaks.tgz
-          tar -xzf /tmp/gitleaks.tgz -C /tmp
-          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
-          gitleaks version
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Run gitleaks
-        run: |
-          set -euo pipefail
-          gitleaks detect --source . --redact --no-banner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
