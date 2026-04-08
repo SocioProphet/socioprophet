@@ -1,0 +1,755 @@
+[
+  {
+    "id": "academy",
+    "label": "Academy",
+    "category": "learning",
+    "status": "live",
+    "landing_page": "/academy/",
+    "survey_page": "/academy/apply/",
+    "docs_path": "/documentation/guide/products/academy/",
+    "homepage_visible": true,
+    "graph_group": "core",
+    "map_priority": 10,
+    "audiences": [
+      "learners",
+      "families",
+      "mentors",
+      "educators"
+    ],
+    "topic_constituents": [
+      "learning",
+      "family",
+      "mentorship",
+      "cybernetics",
+      "safeguarding"
+    ],
+    "related_surfaces": [
+      "documentation",
+      "organizations",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/academy/",
+      "https://socioprophet.com/documentation/guide/academy-safeguarding-and-minor-protection/"
+    ],
+    "description": "Learning, family, mentorship, and cybernetics education.",
+    "next_action": "Polish and continue documentation.",
+    "normalized_topics": [
+      "learning",
+      "education",
+      "capability",
+      "trust",
+      "safeguarding"
+    ],
+    "investor_overlay": {
+      "lens": "capability_compounding",
+      "value_drivers": [
+        "learner_retention",
+        "mentor_supply",
+        "cohort_completion",
+        "trust"
+      ],
+      "economic_profit_proxy": [
+        "retention_quality",
+        "conversion_readiness",
+        "trust_signal"
+      ]
+    }
+  },
+  {
+    "id": "organizations",
+    "label": "Organizations",
+    "category": "deployment",
+    "status": "live",
+    "landing_page": "/organizations/",
+    "survey_page": "/organizations/",
+    "homepage_visible": true,
+    "graph_group": "core",
+    "map_priority": 20,
+    "audiences": [
+      "schools",
+      "nonprofits",
+      "public-sector",
+      "employers"
+    ],
+    "topic_constituents": [
+      "deployment",
+      "institutions",
+      "governance",
+      "public-interest",
+      "secure-training"
+    ],
+    "related_surfaces": [
+      "academy",
+      "documentation",
+      "digital-trust",
+      "medical",
+      "law"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/surface-inventory/",
+      "https://socioprophet.com/documentation/guide/domain-surface/"
+    ],
+    "description": "Institutional deployment for schools, nonprofits, public-interest, and mission-aligned organizations.",
+    "next_action": "Upgrade to Academy-level first-class quality.",
+    "normalized_topics": [
+      "deployment",
+      "institutions",
+      "governance",
+      "trust",
+      "capability"
+    ],
+    "investor_overlay": {
+      "lens": "deployment_compounding",
+      "value_drivers": [
+        "institutional_conversion",
+        "deployment_retention",
+        "pipeline_value",
+        "trust"
+      ],
+      "economic_profit_proxy": [
+        "deployment_readiness",
+        "account_quality",
+        "trust_signal"
+      ]
+    }
+  },
+  {
+    "id": "documentation",
+    "label": "Documentation",
+    "category": "docs",
+    "status": "live",
+    "docs_path": "/",
+    "homepage_visible": true,
+    "graph_group": "core",
+    "map_priority": 30,
+    "audiences": [
+      "builders",
+      "operators",
+      "researchers",
+      "partners"
+    ],
+    "topic_constituents": [
+      "architecture",
+      "products",
+      "trust",
+      "guides",
+      "reference"
+    ],
+    "related_surfaces": [
+      "academy",
+      "organizations",
+      "ai",
+      "developer",
+      "cloud",
+      "live",
+      "medical",
+      "law",
+      "wiki",
+      "blog",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/",
+      "https://socioprophet.com/documentation/guide/canonical-platform-direction/"
+    ],
+    "description": "Architecture, products, trust model, and canonical direction.",
+    "next_action": "Keep as the source of deeper system detail.",
+    "normalized_topics": [
+      "architecture",
+      "reference",
+      "trust",
+      "platform",
+      "governance"
+    ],
+    "investor_overlay": {
+      "lens": "discovery_compounding",
+      "value_drivers": [
+        "qualified_discovery",
+        "builder_activation",
+        "trust_signal"
+      ],
+      "economic_profit_proxy": [
+        "qualified_traffic",
+        "activation",
+        "reference_depth"
+      ]
+    }
+  },
+  {
+    "id": "ai",
+    "label": "AI Platform",
+    "category": "technical",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/ai/",
+    "homepage_visible": true,
+    "graph_group": "expanding",
+    "map_priority": 40,
+    "audiences": [
+      "builders",
+      "operators"
+    ],
+    "topic_constituents": [
+      "agents",
+      "models",
+      "automation",
+      "tooling"
+    ],
+    "related_surfaces": [
+      "developer",
+      "cloud",
+      "live",
+      "documentation"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/ai/"
+    ],
+    "description": "Model, agent, orchestration, and trust-layer capabilities.",
+    "next_action": "Decide whether this needs a first-class landing page.",
+    "normalized_topics": [
+      "intelligence",
+      "platform",
+      "automation",
+      "builders",
+      "trust"
+    ],
+    "investor_overlay": {
+      "lens": "technical_optionality",
+      "value_drivers": [
+        "agent_capability",
+        "integration_relevance",
+        "trustability"
+      ],
+      "economic_profit_proxy": [
+        "technical_reuse",
+        "surface_pull",
+        "platform_option_value"
+      ]
+    }
+  },
+  {
+    "id": "developer",
+    "label": "Developer",
+    "category": "technical",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/dev/",
+    "homepage_visible": true,
+    "graph_group": "expanding",
+    "map_priority": 50,
+    "audiences": [
+      "builders",
+      "integrators"
+    ],
+    "topic_constituents": [
+      "apis",
+      "sdk",
+      "tooling",
+      "integration"
+    ],
+    "related_surfaces": [
+      "ai",
+      "cloud",
+      "live",
+      "documentation"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/dev/"
+    ],
+    "description": "SDKs, APIs, integration patterns, and developer workflows.",
+    "next_action": "Promote to docs-backed landing page first.",
+    "normalized_topics": [
+      "platform",
+      "builders",
+      "integration",
+      "capability",
+      "apis"
+    ],
+    "investor_overlay": {
+      "lens": "developer_compounding",
+      "value_drivers": [
+        "integration_depth",
+        "sdk_adoption",
+        "builder_retention"
+      ],
+      "economic_profit_proxy": [
+        "adoption_quality",
+        "integration_count",
+        "reuse"
+      ]
+    }
+  },
+  {
+    "id": "cloud",
+    "label": "Cloud Suite",
+    "category": "technical",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/cloud/",
+    "homepage_visible": true,
+    "graph_group": "expanding",
+    "map_priority": 60,
+    "audiences": [
+      "operators",
+      "partners"
+    ],
+    "topic_constituents": [
+      "hosting",
+      "managed-services",
+      "deployment",
+      "operations"
+    ],
+    "related_surfaces": [
+      "ai",
+      "developer",
+      "live",
+      "documentation"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/cloud/"
+    ],
+    "description": "Hosted and managed operational capabilities.",
+    "next_action": "Clarify managed-platform scope.",
+    "normalized_topics": [
+      "platform",
+      "operations",
+      "deployment",
+      "trust",
+      "hosting"
+    ],
+    "investor_overlay": {
+      "lens": "managed_service_compounding",
+      "value_drivers": [
+        "operational_reuse",
+        "deployment_scale",
+        "service_trust"
+      ],
+      "economic_profit_proxy": [
+        "utilization",
+        "retention",
+        "deployment_efficiency"
+      ]
+    }
+  },
+  {
+    "id": "live",
+    "label": "Live Builds",
+    "category": "technical",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/live/",
+    "homepage_visible": true,
+    "graph_group": "expanding",
+    "map_priority": 70,
+    "audiences": [
+      "builders",
+      "operators",
+      "partners"
+    ],
+    "topic_constituents": [
+      "demos",
+      "environments",
+      "rollouts",
+      "examples"
+    ],
+    "related_surfaces": [
+      "ai",
+      "developer",
+      "cloud",
+      "documentation"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/live/"
+    ],
+    "description": "Demonstrations, environments, and active build states.",
+    "next_action": "Decide how much live operational visibility to expose.",
+    "normalized_topics": [
+      "platform",
+      "operations",
+      "deployment",
+      "signal",
+      "demonstration"
+    ],
+    "investor_overlay": {
+      "lens": "signal_and_validation",
+      "value_drivers": [
+        "proof_signal",
+        "demo_conversion",
+        "release_visibility"
+      ],
+      "economic_profit_proxy": [
+        "validation_rate",
+        "engagement_quality",
+        "signal_strength"
+      ]
+    }
+  },
+  {
+    "id": "medical",
+    "label": "Medical",
+    "category": "domain",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/medical/",
+    "homepage_visible": true,
+    "graph_group": "high-trust",
+    "map_priority": 80,
+    "audiences": [
+      "providers",
+      "institutions",
+      "families"
+    ],
+    "topic_constituents": [
+      "health",
+      "care",
+      "higher-assurance",
+      "safeguarding"
+    ],
+    "related_surfaces": [
+      "law",
+      "organizations",
+      "documentation",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/medical/"
+    ],
+    "description": "Health, education, and support pathways requiring higher assurance.",
+    "next_action": "Likely gated inquiry later, not open survey first.",
+    "normalized_topics": [
+      "trust",
+      "higher-assurance",
+      "care",
+      "safeguarding",
+      "institutions"
+    ],
+    "investor_overlay": {
+      "lens": "higher_trust_optionality",
+      "value_drivers": [
+        "assurance",
+        "care_relevance",
+        "safeguard_depth"
+      ],
+      "economic_profit_proxy": [
+        "trust_depth",
+        "risk_reduction",
+        "institutional_fit"
+      ]
+    }
+  },
+  {
+    "id": "law",
+    "label": "Law",
+    "category": "domain",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/law/",
+    "homepage_visible": true,
+    "graph_group": "high-trust",
+    "map_priority": 90,
+    "audiences": [
+      "legal",
+      "policy",
+      "governance"
+    ],
+    "topic_constituents": [
+      "law",
+      "policy",
+      "governance",
+      "higher-assurance"
+    ],
+    "related_surfaces": [
+      "medical",
+      "organizations",
+      "documentation",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/law/"
+    ],
+    "description": "Legal, governance, and jurisprudential workflows.",
+    "next_action": "Likely gated inquiry later, not open survey first.",
+    "normalized_topics": [
+      "trust",
+      "higher-assurance",
+      "governance",
+      "policy",
+      "institutions"
+    ],
+    "investor_overlay": {
+      "lens": "governance_optionality",
+      "value_drivers": [
+        "governance_relevance",
+        "policy_fit",
+        "trust_depth"
+      ],
+      "economic_profit_proxy": [
+        "institutional_fit",
+        "high_trust_signal",
+        "governance_pull"
+      ]
+    }
+  },
+  {
+    "id": "wiki",
+    "label": "Wiki",
+    "category": "content",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/wiki/",
+    "homepage_visible": true,
+    "graph_group": "content",
+    "map_priority": 100,
+    "audiences": [
+      "readers",
+      "researchers"
+    ],
+    "topic_constituents": [
+      "knowledge",
+      "reference",
+      "taxonomy",
+      "glossary"
+    ],
+    "related_surfaces": [
+      "blog",
+      "documentation"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/wiki/"
+    ],
+    "description": "Structured knowledge and reference surface.",
+    "next_action": "Content-first, not survey-first.",
+    "normalized_topics": [
+      "knowledge",
+      "reference",
+      "platform",
+      "taxonomy",
+      "trust"
+    ],
+    "investor_overlay": {
+      "lens": "knowledge_compounding",
+      "value_drivers": [
+        "knowledge_density",
+        "reference_value",
+        "reuse"
+      ],
+      "economic_profit_proxy": [
+        "content_depth",
+        "internal_link_density",
+        "reusability"
+      ]
+    }
+  },
+  {
+    "id": "blog",
+    "label": "Blog",
+    "category": "content",
+    "status": "stub",
+    "docs_path": "/documentation/guide/products/blog/",
+    "homepage_visible": true,
+    "graph_group": "content",
+    "map_priority": 110,
+    "audiences": [
+      "readers",
+      "followers"
+    ],
+    "topic_constituents": [
+      "essays",
+      "updates",
+      "analysis",
+      "narrative"
+    ],
+    "related_surfaces": [
+      "wiki",
+      "documentation"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/products/blog/"
+    ],
+    "description": "Long-form writing, updates, and commentary.",
+    "next_action": "Content-first surface.",
+    "normalized_topics": [
+      "knowledge",
+      "narrative",
+      "signal",
+      "trust",
+      "public-positioning"
+    ],
+    "investor_overlay": {
+      "lens": "narrative_compounding",
+      "value_drivers": [
+        "narrative_clarity",
+        "trust_signal",
+        "audience_growth"
+      ],
+      "economic_profit_proxy": [
+        "qualified_attention",
+        "trust_lift",
+        "public_signal"
+      ]
+    }
+  },
+  {
+    "id": "digital-trust",
+    "label": "Digital / Trust",
+    "category": "trust",
+    "status": "stub",
+    "docs_path": "/documentation/guide/domain-surface/",
+    "homepage_visible": true,
+    "graph_group": "trust",
+    "map_priority": 120,
+    "audiences": [
+      "operators",
+      "partners",
+      "public"
+    ],
+    "topic_constituents": [
+      "identity",
+      "trust",
+      "governance",
+      "public-positioning"
+    ],
+    "related_surfaces": [
+      "documentation",
+      "organizations",
+      "academy",
+      "law",
+      "medical"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/guide/domain-surface/"
+    ],
+    "description": "Trust-first positioning, digital identity, and public-facing trust surfaces.",
+    "next_action": "Clarify product definition and trust narrative.",
+    "normalized_topics": [
+      "trust",
+      "governance",
+      "identity",
+      "platform",
+      "public-positioning"
+    ],
+    "investor_overlay": {
+      "lens": "trust_compounding",
+      "value_drivers": [
+        "identity_clarity",
+        "governance_signal",
+        "trustability"
+      ],
+      "economic_profit_proxy": [
+        "trust_signal",
+        "identity_coherence",
+        "partner_readiness"
+      ]
+    }
+  },
+  {
+    "id": "investor",
+    "label": "Investor",
+    "category": "governance",
+    "status": "stub",
+    "landing_page": "/investor/",
+    "homepage_visible": false,
+    "graph_group": "support",
+    "map_priority": 130,
+    "audiences": [
+      "investors",
+      "governance"
+    ],
+    "topic_constituents": [
+      "governance",
+      "capital",
+      "platform-direction"
+    ],
+    "related_surfaces": [
+      "documentation",
+      "organizations",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "/investor/",
+      "/map/",
+      "https://socioprophet.com/documentation/guide/surface-inventory/"
+    ],
+    "description": "Investor and governance-facing public materials.",
+    "next_action": "Expand when investor materials are ready.",
+    "normalized_topics": [
+      "capital",
+      "governance",
+      "value-creation",
+      "platform",
+      "trust"
+    ],
+    "investor_overlay": {
+      "lens": "economic_profit",
+      "value_drivers": [
+        "nopat",
+        "invested_capital",
+        "capital_charge",
+        "surface_contribution"
+      ],
+      "economic_profit_proxy": [
+        "value_creation_signal",
+        "platform_compounding",
+        "trust_quality"
+      ]
+    }
+  },
+  {
+    "id": "entity-analytics",
+    "label": "Entity Analytics",
+    "category": "docs",
+    "status": "live",
+    "landing_page": "/entity-analytics/",
+    "survey_page": "",
+    "docs_path": "/documentation/guide/entity-analytics-reference/",
+    "homepage_visible": true,
+    "graph_group": "core",
+    "map_priority": 30,
+    "audiences": [
+      "builders",
+      "operators",
+      "researchers",
+      "partners"
+    ],
+    "topic_constituents": [
+      "architecture",
+      "products",
+      "trust",
+      "guides",
+      "reference"
+    ],
+    "related_surfaces": [
+      "academy",
+      "organizations",
+      "ai",
+      "developer",
+      "cloud",
+      "live",
+      "medical",
+      "law",
+      "wiki",
+      "blog",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/",
+      "https://socioprophet.com/documentation/guide/canonical-platform-direction/"
+    ],
+    "description": "Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs.",
+    "next_action": "Keep as the source of deeper system detail.",
+    "normalized_topics": [
+      "architecture",
+      "reference",
+      "trust",
+      "platform",
+      "governance"
+    ],
+    "investor_overlay": {
+      "lens": "discovery_compounding",
+      "value_drivers": [
+        "qualified_discovery",
+        "builder_activation",
+        "trust_signal"
+      ],
+      "economic_profit_proxy": [
+        "qualified_traffic",
+        "activation",
+        "reference_depth"
+      ]
+    }
+  }
+]

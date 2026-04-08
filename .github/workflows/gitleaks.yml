@@ -1,30 +1,60 @@
 name: gitleaks
 
 on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+# NOTE: We intentionally install a pinned open-source gitleaks binary.
+# Do NOT switch to license-gated gitleaks actions that require org license keys.
+# This repo is OSS-first and must remain reproducible without proprietary secrets.
+
+
+on:
   pull_request:
   push:
-    branches: ["master", "main"]
+    branches: [ master ]
 
 jobs:
   scan:
+    name: scan
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - fedora
+      - coreos
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Install gitleaks
+      - name: Install gitleaks (pinned)
         run: |
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz \
-          | tar -xz
-          sudo mv gitleaks /usr/local/bin/
+          set -euo pipefail
+          VER="8.18.2"
+          URL="https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
+          curl -fsSL "$URL" -o /tmp/gitleaks.tgz
+          tar -xzf /tmp/gitleaks.tgz -C /tmp
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
 
-      - name: Run gitleaks (working tree only)
+      - name: Run gitleaks
         run: |
-          gitleaks detect \
-            --source . \
-            --no-git \
-            --no-banner \
-            --redact \
-            --exit-code 1 \
-            --config .gitleaks.toml
+          set -euo pipefail
+          gitleaks detect --source . --redact --no-banner

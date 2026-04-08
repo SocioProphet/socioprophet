@@ -1,0 +1,29 @@
+{
+  "projects": {
+    "dev": "socioprophet-web-dev-env",
+    "prod": "socioprophet-web"
+  },
+  "targets": {
+    "socioprophet-web-dev-env": {
+      "hosting": {
+        "marketing": [
+          "socioprophet-marketing-dev"
+        ],
+        "docs": [
+          "socioprophet-web-dev-env"
+        ]
+      }
+    },
+    "socioprophet-web": {
+      "hosting": {
+        "marketing": [
+          "socioprophet-marketing"
+        ],
+        "docs": [
+          "socioprophet-web"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
