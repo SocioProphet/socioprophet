@@ -1,0 +1,18 @@
+# Docs and navigation
+/docs/** @mdheller
+/docs/.vitepress/** @mdheller
+
+# Delivery governance and workflows
+/.github/workflows/** @mdheller
+/.github/repo-standards.yml @mdheller
+/.github/pull_request_template.md @mdheller
+/.github/CODEOWNERS @mdheller
+
+# Entity Fabric
+/entity-fabric/** @mdheller
+
+# Validation scripts
+/scripts/verify_docs_nav.py @mdheller
+/scripts/verify_workflow_branches.py @mdheller
+/scripts/validate_udm_release_schema.py @mdheller
+/scripts/validate_entity_fabric.py @mdheller
