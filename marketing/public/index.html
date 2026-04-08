@@ -35,7 +35,7 @@
       .home-shell { max-width: 96rem; margin: 0 auto; padding: 0 1.5rem; }
       @media (min-width: 1440px) { .home-shell { max-width: 104rem; } }
       .home-header { border-bottom: 1px solid #e2e8f0; background: #fff; }
-      .home-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; flex-wrap: wrap; }
+      .home-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; flex-wrap: wrap; }
       .home-brand { display: flex; align-items: center; gap: 0.75rem; color: #0f172a; text-decoration: none; }
       .home-brand img { width: 2.25rem; height: 2.25rem; }
       .home-brand-name { font-weight: 600; letter-spacing: -0.02em; }
@@ -47,9 +47,9 @@
       .btn-dark, .btn-dark:visited, .home-nav a.btn-dark, .home-nav a.btn-dark:visited { color: #ffffff !important; -webkit-text-fill-color: #ffffff; opacity: 1; }
       .btn-light { display: inline-flex; align-items: center; border-radius: 0.5rem; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 0.75rem 1.25rem; text-decoration: none; }
       .btn-light:hover { background: #f8fafc; }
-      .hero { padding: 3.5rem 0 4.75rem; }
+      .hero { padding: 2.1rem 0 4.1rem; }
       .hero-grid { display: grid; gap: 3rem; align-items: start; }
-      .hero-copy { max-width: 43rem; padding-top: 0.7rem; }
+      .hero-copy { max-width: 43rem; padding-top: 0.15rem; }
       @media (min-width: 1400px) { .hero-grid { gap: 4rem; } }
       @media (min-width: 1024px) { .hero-grid { grid-template-columns: minmax(0, 0.98fr) minmax(620px, 1.18fr); } }
       .hero h1 { font-size: 3rem; line-height: 1.05; margin: 0; }
@@ -78,8 +78,7 @@
       .footer a { color: #475569; text-decoration: none; }
       .footer a:hover { text-decoration: underline; }
     
-      .platform-map { display: flex; flex-direction: column; gap: 1rem; }
-      .platform-map { padding-top: 0.8rem; }
+      .platform-map { display: flex; flex-direction: column; gap: 1rem; padding-top: 0.8rem; }
       .map-intro { display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
       .map-intro h2 { margin: 0; font-size: 1.65rem; line-height: 1.15; }
       .map-intro p { margin: 0; max-width: 42rem; }
@@ -96,20 +95,26 @@
       .map-rail-link { display: inline-block; margin-top: 0.85rem; font-size: 0.92rem; font-weight: 600; color: #0f172a; text-decoration: none; }
       .map-rail-link:hover { text-decoration: underline; }
       .map-canvas-wrap { border: 1px solid #e2e8f0; border-radius: 1rem; background: white; padding: 0.75rem; }
-      .map-svg { min-height: 340px; }
+      .map-svg { width: 100%; height: auto; display: block; min-height: 340px; border: 1px solid #e2e8f0; border-radius: 1rem; background: white; }
       @media (min-width: 1400px) { .map-svg { min-height: 400px; } }
-      .map-intro h2 { margin: 0.35rem 0 0; font-size: 1.5rem; line-height: 1.2; }
-      .map-intro p { margin-top: 0.5rem; }
-      .map-svg { width: 100%; height: auto; display: block; border: 1px solid #e2e8f0; border-radius: 1rem; background: white; }
       .map-grid { display: grid; gap: 0.75rem; }
       @media (min-width: 640px) { .map-grid { grid-template-columns: 1fr 1fr; } }
       .map-link-card { border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1rem; background: white; text-decoration: none; color: #0f172a; display: block; }
       .map-link-card:hover { background: #f8fafc; }
       .map-link-card .kicker { font-size: 0.75rem; color: #64748b; }
       .map-link-card p { margin-top: 0.35rem; }
+      .auth-story { background: #f8fafc; }
+      .auth-story-shell { display: grid; gap: 1.25rem; }
+      @media (min-width: 980px) { .auth-story-shell { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); align-items: start; } }
+      .auth-story-copy p { max-width: 44rem; }
+      .auth-story-grid { display: grid; gap: 1rem; }
+      @media (min-width: 768px) { .auth-story-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      .auth-story-card { border: 1px solid #e2e8f0; border-radius: 1rem; background: white; padding: 1rem; }
+      .auth-story-card p { margin: 0.45rem 0 0; color: #475569; font-size: 0.98rem; }
 
     </style>
-  </head>
+      <script src="/assets/surface-graph-shared.js"></script>
+</head>
 
   <body>
     <header class="home-header">
@@ -121,12 +126,10 @@
           </a>
 
           <nav class="home-nav">
+            <a href="/academy/">Commons</a>
             <a href="/organizations/">Organizations</a>
-            <a href="https://socioprophet-web.web.app" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
             <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
-            <a class="btn-dark" href="https://vue.socioprophet.com/login" onclick='spTrack("cta_login_click",{href:this.getAttribute("href")})'>
-              Login
-            </a>
           </nav>
         </div>
       </div>
@@ -137,22 +140,26 @@
         <div class="home-shell">
           <div class="hero-grid">
             <div class="hero-copy">
+              <div class="card-kicker">DETERMINISTIC AI • GOVERNED OPERATIONS • BOUNDARY-FIRST CYBERNETICS</div>
               <h1>
-                Ideas that propagate.<br>
-                <span class="subtle">Intelligence that compounds.</span>
+                Deterministic AI for governed operations.<br>
+                <span class="subtle">Built for Institutions, Operators, and Learning Systems.</span>
               </h1>
 
               <p>
-                SocioProphet is building human-first learning, trust, and deployment surfaces for learners, families, mentors, organizations, and mission-aligned operators. Start with Academy, explore the documentation, or bring the platform into an organization.
+                SocioProphet is a governed operational intelligence platform for Learning, Trust, and Deployment Surfaces. Start with Academy, open Documentation, or move into Organizations for institutional adoption, Entity Analytics, and Authorized Cyberdefense.
               </p>
 
               <div class="cta-row">
-                <a class="btn-dark" href="/academy/" onclick='spTrack("cta_academy_click",{href:this.getAttribute("href")})'>
-                  Explore Academy
+                <a class="btn-dark" href="/academy/" onclick='spTrack("cta_commons_click",{href:this.getAttribute("href")})'>
+                  Enter Commons
                 </a>
 
                 <a class="btn-light" href="/organizations/" onclick='spTrack("cta_organizations_click",{href:this.getAttribute("href")})'>
                   For Organizations
+                </a>
+                <a class="btn-light" href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>
+                  Open Documentation
                 </a>
                 <a class="btn-light" href="/map/" onclick='spTrack("cta_map_click",{href:this.getAttribute("href")})'>
                   Explore the Map
@@ -160,7 +167,7 @@
               </div>
 
               <div class="mini-note">
-                Start with a real surface: Academy for learning, Organizations for deployment, and Documentation for deeper system detail.
+                Start with Commons for public learning and participation, Organizations for deployment, and Documentation for proof and technical depth.
               </div>
             </div>
 
@@ -190,24 +197,24 @@
 
               <div class="map-grid">
                 <a class="map-link-card" href="/academy/">
-                  <div class="kicker">Academy</div>
-                  <strong>Learning, family, mentorship, and cybernetics education</strong>
-                  <p>Start here if you are a learner, family, mentor, or educator.</p>
+                  <div class="kicker">Commons</div>
+                  <strong>Open learning, governed participation, and shared knowledge infrastructure</strong>
+                  <p>Academy is the flagship live surface inside Commons for learners, families, mentors, and educators.</p>
                 </a>
 
                 <a class="map-link-card" href="/organizations/">
                   <div class="kicker">Organizations</div>
-                  <strong>Deploy the platform in schools, nonprofits, public-interest, and mission-aligned institutions</strong>
-                  <p>Start here if you are evaluating institutional or deployment use.</p>
+                  <strong>Deployment for enterprise, government and public sector, schools, and nonprofits</strong>
+                  <p>Start here for institutional evaluation, procurement review, deployment pathways, and governed adoption.</p>
                 </a>
 
-                <a class="map-link-card" href="https://socioprophet-web.web.app">
+                <a class="map-link-card" href="/documentation/">
                   <div class="kicker">Documentation</div>
-                  <strong>Architecture, product surfaces, trust model, and canonical direction</strong>
-                  <p>Start here if you want the underlying system model and deeper product context.</p>
+                  <strong>Architecture, governance, trust boundaries, and product proof</strong>
+                  <p>Start here for technical validation, system model review, and canonical platform direction.</p>
                 </a>
 
-                <a class="map-link-card" href="https://socioprophet-web.web.app/guide/surface-inventory">
+                <a class="map-link-card" href="/documentation/guide/canonical-platform-direction/">
                   <div class="kicker">Surface inventory</div>
                   <strong>See which surfaces already have landing pages, intake, and documentation</strong>
                   <p>Use this to understand what is fully live now and what is still maturing.</p>
@@ -224,18 +231,38 @@
           <p>Each surface serves a distinct audience, trust boundary, and operational purpose.</p>
 
           <div class="product-grid">
-            <a class="product-link" href="https://socioprophet-web.web.app/guide/products/ai" onclick='spTrack("cta_product_click",{product:"ai",href:this.getAttribute("href")})'>
+            <a class="product-link" href="/documentation/guide/products/ai/" onclick='spTrack("cta_product_click",{product:"ai",href:this.getAttribute("href")})'>
               <div class="card-kicker">.ai</div><div><strong>AI Platform</strong></div>
             </a>
-            <a class="product-link" href="https://socioprophet-web.web.app/guide/products/dev" onclick='spTrack("cta_product_click",{product:"dev",href:this.getAttribute("href")})'>
+            <a class="product-link" href="/documentation/guide/products/dev/" onclick='spTrack("cta_product_click",{product:"dev",href:this.getAttribute("href")})'>
               <div class="card-kicker">.dev</div><div><strong>Developer</strong></div>
             </a>
-            <a class="product-link" href="https://socioprophet-web.web.app/guide/products/cloud" onclick='spTrack("cta_product_click",{product:"cloud",href:this.getAttribute("href")})'>
+            <a class="product-link" href="/documentation/guide/products/cloud/" onclick='spTrack("cta_product_click",{product:"cloud",href:this.getAttribute("href")})'>
               <div class="card-kicker">.cloud</div><div><strong>Cloud Suite</strong></div>
             </a>
-            <a class="product-link" href="https://socioprophet-web.web.app/guide/products/live" onclick='spTrack("cta_product_click",{product:"live",href:this.getAttribute("href")})'>
+            <a class="product-link" href="/documentation/guide/products/live/" onclick='spTrack("cta_product_click",{product:"live",href:this.getAttribute("href")})'>
               <div class="card-kicker">.live</div><div><strong>Live Builds</strong></div>
             </a>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="section">
+        <div class="home-shell">
+          <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:end;">
+            <div>
+              <h2>Institutional path</h2>
+              <p>Organizations is the institutional landing for Governed AI, the Agent Plane, Entity Analytics, and Authorized Cyberdefense under Human Oversight.</p>
+            </div>
+            <a href="/organizations/" onclick='spTrack("cta_organizations_surface_click",{href:this.getAttribute("href")})'>Open organizations →</a>
+          </div>
+
+          <div class="surface-row">
+            <a class="surface-pill" href="/organizations/" onclick='spTrack("cta_org_surface_click",{href:this.getAttribute("href")})'>Organizations</a>
+            <a class="surface-pill" href="/documentation/guide/organizations-governance-and-institutional-safety/" onclick='spTrack("cta_org_governance_click",{href:this.getAttribute("href")})'>Governance docs</a>
+            <a class="surface-pill" href="/documentation/guide/governed-ai-and-cybernetics/" onclick='spTrack("cta_org_governed_click",{href:this.getAttribute("href")})'>Governed AI</a>
+            <a class="surface-pill" href="/organizations/apply/" onclick='spTrack("cta_org_apply_click",{href:this.getAttribute("href")})'>Open deployment intake</a>
           </div>
         </div>
       </section>
@@ -247,16 +274,16 @@
               <h2>More surfaces</h2>
               <p>Mission, knowledge, and trust surfaces—without clutter.</p>
             </div>
-            <a href="https://socioprophet-web.web.app/guide/products/overview" onclick='spTrack("cta_products_overview_click",{href:this.getAttribute("href")})'>See all →</a>
+            <a href="/documentation/guide/products/overview/" onclick='spTrack("cta_products_overview_click",{href:this.getAttribute("href")})'>See all →</a>
           </div>
 
           <div class="surface-row">
-            <a class="surface-pill" href="https://socioprophet-web.web.app/guide/products/academy" onclick='spTrack("cta_surface_click",{surface:"academy",href:this.getAttribute("href")})'>Academy (.academy)</a>
-            <a class="surface-pill" href="https://socioprophet-web.web.app/guide/products/medical" onclick='spTrack("cta_surface_click",{surface:"medical",href:this.getAttribute("href")})'>Medical (.md)</a>
-            <a class="surface-pill" href="https://socioprophet-web.web.app/guide/products/law" onclick='spTrack("cta_surface_click",{surface:"law",href:this.getAttribute("href")})'>Law (.law)</a>
-            <a class="surface-pill" href="https://socioprophet-web.web.app/guide/products/wiki" onclick='spTrack("cta_surface_click",{surface:"wiki",href:this.getAttribute("href")})'>Wiki (.wiki)</a>
-            <a class="surface-pill" href="https://socioprophet-web.web.app/guide/products/blog" onclick='spTrack("cta_surface_click",{surface:"blog",href:this.getAttribute("href")})'>Blog (.blog)</a>
-            <a class="surface-pill" href="https://socioprophet-web.web.app/guide/domain-surface" onclick='spTrack("cta_surface_click",{surface:"digital",href:this.getAttribute("href")})'>Digital / Trust (.digital)</a>
+            <a class="surface-pill" href="/documentation/guide/products/academy/" onclick='spTrack("cta_surface_click",{surface:"academy",href:this.getAttribute("href")})'>Academy (.academy)</a>
+            <a class="surface-pill" href="/documentation/guide/products/medical/" onclick='spTrack("cta_surface_click",{surface:"medical",href:this.getAttribute("href")})'>Medical (.md)</a>
+            <a class="surface-pill" href="/documentation/guide/products/law/" onclick='spTrack("cta_surface_click",{surface:"law",href:this.getAttribute("href")})'>Law (.law)</a>
+            <a class="surface-pill" href="/documentation/guide/products/wiki/" onclick='spTrack("cta_surface_click",{surface:"wiki",href:this.getAttribute("href")})'>Wiki (.wiki)</a>
+            <a class="surface-pill" href="/documentation/guide/products/blog/" onclick='spTrack("cta_surface_click",{surface:"blog",href:this.getAttribute("href")})'>Blog (.blog)</a>
+            <a class="surface-pill" href="/documentation/guide/digital-trust-and-capability-routing/" onclick='spTrack("cta_surface_click",{surface:"digital",href:this.getAttribute("href")})'>Digital / Trust (.digital)</a>
           </div>
         </div>
       </section>
@@ -267,8 +294,8 @@
         <div class="footer-row">
           <div>© <span id="y"></span> SocioProphet</div>
           <div class="footer-links">
-            <a href="https://socioprophet-web.web.app" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Docs</a>
-            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Docs</a>
+            <a href="/auth/" onclick='spTrack("cta_auth_click",{href:this.getAttribute("href")})'>Auth</a>
             <a href="/map/" onclick='spTrack("cta_map_click",{href:this.getAttribute("href")})'>Map</a>
             <a href="/investor/" onclick='spTrack("cta_investor_click",{href:this.getAttribute("href")})'>Investor</a>
           </div>

@@ -42,6 +42,23 @@
   </style>
 </head>
 <body>
+<header class="home-header">
+      <div class="home-shell">
+        <div class="home-header-row">
+          <a href="/" class="home-brand" onclick='spTrack("cta_home_click",{href:"/"})'>
+            <img src="/icon.png" alt="SocioProphet" />
+            <div class="home-brand-name">SocioProphet</div>
+          </a>
+
+          <nav class="home-nav">
+            <a href="/academy/">Commons</a>
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
+            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+          </nav>
+        </div>
+      </div>
+    </header>
   <main class="map-shell">
     <h1 class="map-title">Prophet Platform Explorer</h1>
     <p class="map-sub">
@@ -234,17 +251,29 @@
       });
 
       const vectorLinks = buildVectorLinks(surfaces);
-      const curatedLinks = graph.links.curated.filter(l => {
-        const ids = new Set(surfaces.map(s => s.id));
-        return ids.has(l.source) && ids.has(l.target);
-      });
+      const ids = new Set(surfaces.map(s => s.id));
+      const curatedSource = Array.isArray(graph?.links?.curated)
+        ? graph.links.curated
+        : Array.isArray(graph?.edges)
+          ? graph.edges
+          : [];
+      const curatedLinks = curatedSource
+        .filter(l => {
+          const sid = l.source?.id || l.source;
+          const tid = l.target?.id || l.target;
+          return ids.has(sid) && ids.has(tid);
+        })
+        .map(l => ({ type: l.type || "curated", ...l }));
 
       let constituentLinks = [];
       let topics = [];
       if (state.showTopics || state.expandedSurfaceId) {
+        const constituentSource = Array.isArray(graph?.links?.constituent) ? graph.links.constituent : [];
         const relevant = state.expandedSurfaceId ? new Set([state.expandedSurfaceId]) : new Set(surfaces.map(s => s.id));
-        constituentLinks = graph.links.constituent.filter(l => relevant.has(l.source));
-        const topicIds = new Set(constituentLinks.map(l => l.target));
+        constituentLinks = constituentSource
+          .filter(l => relevant.has(l.source?.id || l.source))
+          .map(l => ({ type: l.type || "constituent", ...l }));
+        const topicIds = new Set(constituentLinks.map(l => l.target?.id || l.target));
         topics = graph.nodes.filter(n => n.type === "topic" && topicIds.has(n.id));
       }
 
@@ -256,6 +285,8 @@
       if (state.selectedId && state.searchMode !== "global") {
         const depth = state.searchMode === "local" ? 1 : 2;
         const keep = neighborIds(links, state.selectedId, depth);
+        keep.add(state.selectedId);
+        if (state.expandedSurfaceId) keep.add(state.expandedSurfaceId);
         surfaces = surfaces.filter(n => keep.has(n.id));
         topics = topics.filter(n => keep.has(n.id));
         links = links.filter(l => keep.has(l.source.id || l.source) && keep.has(l.target.id || l.target));
@@ -274,7 +305,9 @@
       if (node.landing_page) linkRows.push(`<a href="${node.landing_page}">Landing page</a>`);
       if (node.survey_page) linkRows.push(`<a href="${node.survey_page}">Survey / intake</a>`);
       if (node.docs_path) {
-        const href = node.docs_path.startsWith("http") ? node.docs_path : `https://socioprophet-web.web.app${node.docs_path}`;
+        const docsHome = (node.related_sites || []).find(site => { const s = String(site); return s.startsWith("/documentation/") || s.startsWith("https://socioprophet.com/documentation/"); });
+        const rawDocsPath = String(node.docs_path || "");
+        const href = rawDocsPath.startsWith("http") ? rawDocsPath : rawDocsPath.startsWith("/documentation/") ? rawDocsPath : rawDocsPath.startsWith("/guide/") ? `/documentation${rawDocsPath.replace(/\/?$/, "/")}` : `/documentation/guide/${rawDocsPath.replace(/^\/+/, "").replace(/\/?$/, "/")}`;
         linkRows.push(`<a href="${href}" target="_blank" rel="noopener">Documentation</a>`);
       }
       if (state.showExternal && node.related_sites && node.related_sites.length) {
@@ -415,8 +448,17 @@
 
       label.attr("opacity", d => d.type === "surface" || state.showTopics || state.expandedSurfaceId ? 1 : 0);
 
-      if (state.selectedId && !nodeMap.has(state.selectedId)) {
-        state.selectedId = null;
+      if (state.selectedId) {
+        const selectedNode = nodes.find(n => n.id === state.selectedId)
+          || (state.graph && state.graph.nodes.find(n => n.id === state.selectedId))
+          || null;
+        if (selectedNode) {
+          renderDetail(selectedNode);
+        } else {
+          state.selectedId = null;
+          renderDetail(null);
+        }
+      } else {
         renderDetail(null);
       }
     }
@@ -450,5 +492,17 @@
         detailEl.innerHTML = `<h2>Details</h2><div class="detail-empty">Failed to load graph data: ${String(err)}</div>`;
       });
   </script>
+<footer class="footer">
+      <div class="home-shell">
+        <div class="footer-row">
+          <div>© SocioProphet</div>
+          <div class="footer-links">
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/">Documentation</a>
+            <a href="https://vue.socioprophet.com">Portal</a>
+          </div>
+        </div>
+      </div>
+    </footer>
 </body>
 </html>

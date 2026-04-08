@@ -15,10 +15,10 @@ This is acceptable as a temporary substrate, but it is not the intended final se
 
 ## Target state
 
-The next semantic pass should explicitly support all of the following:
+The next semantic pass must explicitly support all of the following:
 
 ### 1. Doc2Vec surface vectors
-Each surface, doctrine page, and canonical long-form artifact should have a document vector suitable for cross-surface semantic comparison and graph weighting.
+Each surface, doctrine page, and canonical long-form artifact must have a document vector suitable for cross-surface semantic comparison and graph weighting.
 
 ### 2. Word2Vec base vectors and subvectors
 We does not stop at a single token space. We supports word2vec-derived subvectors for:
@@ -29,11 +29,11 @@ We does not stop at a single token space. We supports word2vec-derived subvector
 - ontology label/alias clusters
 
 ### 3. LSA basis vectors
-The semantic pipeline should expose an LSA basis representation rather than only a flat similarity score.
+The semantic pipeline must expose an LSA basis representation rather than only a flat similarity score.
 
 ### 4. Aligned 23rd-channel variants over the latent LSA 22 basis
 
-The 23rd channel should not be modeled as only one LDA output. It should be modeled as aligned variants over the same latent family so we can compare how the 23rd channel behaves across closed, bridging, and open topic regimes:
+The 23rd channel must not be modeled as only one LDA output. It must be modeled as aligned variants over the same latent family so we can compare how the 23rd channel behaves across closed, bridging, and open topic regimes:
 
 - **LSA23** — a closed summary channel over the fixed latent LSA 22 basis
 - **LSI23** — a bridge channel that maps from local closed topic sets into broader shifting neighborhoods
@@ -44,7 +44,7 @@ The 22 basis vectors remain the contributing latent basis. The comparison happen
 
 ## Ensemble design direction
 
-The graph should eventually support a fused similarity model built from multiple channels:
+The graph must eventually support a fused similarity model built from multiple channels:
 
 - curated semantic topology
 - doc2vec document embeddings
@@ -54,11 +54,11 @@ The graph should eventually support a fused similarity model built from multiple
 - LDA topic channel
 - ontology constraints and governance weighting
 
-The result should not be one opaque score. It should be a composable semantic evidence stack.
+The result must not be one opaque score. It must be a composable semantic evidence stack.
 
 ## Output expectations
 
-The next vector pipeline emit more than one similarity artifact. At minimum it should emit:
+The next vector pipeline emit more than one similarity artifact. At minimum it must emit:
 
 - per-surface vector artifacts
 - channel-specific similarities
@@ -71,7 +71,7 @@ The next vector pipeline emit more than one similarity artifact. At minimum it s
 
 ## Build discipline
 
-This work is documented and reproducible. The docs should say what the vectors mean, what each channel captures, and how rollout order, graph layout, and explorer modes consume those artifacts.
+This work is documented and reproducible. The docs must say what the vectors mean, what each channel captures, and how rollout order, graph layout, and explorer modes consume those artifacts.
 
 ## Closed / bridge / open interpretation
 
