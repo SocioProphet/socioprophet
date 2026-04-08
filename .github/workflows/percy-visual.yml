@@ -1,0 +1,118 @@
+name: percy-visual
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "socioprophet-web/**"
+      - "docs/guide/intake-udm-schema.md"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/percy-visual.yml"
+      - "scripts/validate_udm_release_schema.py"
+  push:
+    branches: [ master ]
+    paths:
+      - "docs/**"
+      - "socioprophet-web/**"
+      - "docs/guide/intake-udm-schema.md"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/percy-visual.yml"
+      - "scripts/validate_udm_release_schema.py"
+
+permissions:
+  contents: read
+
+jobs:
+  percy-docs:
+    if: ${{ secrets.PERCY_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Enable Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn --version
+
+      - name: Install docs deps
+        run: yarn --cwd docs install --frozen-lockfile || yarn --cwd docs install
+
+      - name: Install python deps
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
+
+      - name: Validate UDM release schema
+        run: python scripts/validate_udm_release_schema.py
+
+      - name: Build docs
+        env:
+          DOCS_BASE: /documentation/
+        run: yarn --cwd docs build
+
+      - name: Install Percy CLI
+        run: npm install -g @percy/cli
+
+      - name: Emit UDM-aligned build context
+        run: |
+          mkdir -p artifacts
+          cat > artifacts/percy-udm-context.json <<'JSON'
+          {
+            "context": {
+              "repository": "${{ github.repository }}",
+              "workflow": "${{ github.workflow }}",
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}"
+            },
+            "platform": {
+              "releaseId": "${{ github.run_id }}",
+              "releaseSlot": "github-actions",
+              "deploymentStrategy": "percy-visual-preview",
+              "releaseManifestRef": "artifacts/percy-udm-context.json",
+              "formSchemaVersion": "udm-doc-driven",
+              "firestoreRuleset": null,
+              "firebaseAppId": null
+            },
+            "experiment": {
+              "experimentId": null,
+              "variantId": null,
+              "assignmentId": null,
+              "ctaId": null,
+              "landingPath": "/documentation/"
+            },
+            "policy": {
+              "source": "docs/guide/intake-udm-schema.md",
+              "mode": "visual-regression"
+            },
+            "udm": {
+              "metadata": {
+                "channel": "percy"
+              },
+              "principal": {},
+              "target": {
+                "surface": "docs"
+              },
+              "observer": {
+                "system": "github-actions"
+              },
+              "network": {
+                "http": {}
+              },
+              "additional": {
+                "artifact": "artifacts/percy-udm-context.json"
+              }
+            }
+          }
+          JSON
+
+      - name: Percy snapshot docs build
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+        run: percy snapshot docs/.vitepress/dist
