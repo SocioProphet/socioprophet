@@ -1,0 +1,159 @@
+:root {
+  --vp-layout-max-width: 1680px;
+  --vp-sidebar-width: 276px;
+  --vp-c-brand-1: #7aa2f7;
+  --vp-c-brand-2: #60a5fa;
+  --vp-c-brand-3: #3b82f6;
+}
+.dark {
+  --vp-c-bg: #0b1020;
+  --vp-c-bg-alt: #0f172a;
+  --vp-c-bg-soft: #111827;
+  --vp-c-text-1: #e5e7eb;
+  --vp-c-text-2: #cbd5e1;
+  --vp-c-text-3: #94a3b8;
+  --vp-c-divider: rgba(148, 163, 184, 0.16);
+  --vp-c-gutter: rgba(148, 163, 184, 0.12);
+}
+.VPNavBar .title span,
+.VPSidebarItem .text {
+  letter-spacing: -0.01em;
+}
+.VPDoc.has-aside .content-container {
+  max-width: 1180px;
+}
+.vp-doc h1 {
+  font-size: 2.5rem;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.vp-doc h2 {
+  margin-top: 2.2rem;
+  letter-spacing: -0.02em;
+}
+.vp-doc p,
+.vp-doc li {
+  font-size: 1.08rem;
+  line-height: 1.82;
+}
+.vp-doc table {
+  display: block;
+  overflow-x: auto;
+}
+.katex-display,
+.math-display {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+.VPSidebar {
+  padding-top: 12px;
+}
+.VPDocAside {
+  padding-top: 18px;
+}
+
+.vp-doc h3 {
+  margin-top: 1.6rem;
+  letter-spacing: -0.01em;
+}
+.vp-doc code {
+  font-size: 0.94em;
+}
+
+/* docs-shell polish v1 */
+:root {
+  --vp-layout-max-width: 1660px;
+  --vp-sidebar-width: 296px;
+}
+
+.VPDoc.has-aside .content-container,
+.VPDoc .content-container {
+  max-width: 920px;
+}
+
+.VPDoc .content {
+  padding-bottom: 96px;
+}
+
+.VPDoc h1 {
+  font-size: 2.45rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.VPDoc h2 {
+  margin-top: 2.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.VPDoc h3 {
+  margin-top: 1.6rem;
+}
+
+.VPDoc p,
+.VPDoc li {
+  line-height: 1.75;
+}
+
+.VPDoc ul,
+.VPDoc ol {
+  padding-left: 1.2rem;
+}
+
+.VPDoc .vp-doc div[class*='language-'] {
+  border-radius: 16px;
+}
+
+.VPDoc .vp-doc table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.VPSidebar {
+  padding-top: 12px;
+}
+
+.VPSidebarItem.level-0 {
+  margin-bottom: 10px;
+}
+
+.VPSidebarItem.level-0 > .item > .link > p {
+  font-weight: 700;
+}
+
+.VPSidebarItem .item .link {
+  border-radius: 10px;
+}
+
+.VPSidebarItem .item.is-active > .link {
+  background: rgba(29, 78, 216, 0.08);
+}
+
+@media (min-width: 1280px) {
+  .VPDoc.has-aside .content-container,
+  .VPDoc .content-container {
+    max-width: 980px;
+  }
+}
+\n\n/* docs-brand polish v1 */
+.VPNavBarTitle a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+
+.VPNavBarTitle .VPImage.logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.VPNavBarTitle .title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: 1.02rem;
+}

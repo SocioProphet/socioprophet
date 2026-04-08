@@ -1,0 +1,58 @@
+ docs/.vitepress/config.ts                    |  12 +-
+ docs/guide/community.md                      |  54 ++
+ firebase.json                                |  72 ++
+ marketing/public/ai/index.html               |  44 ++
+ marketing/public/auth/connections/index.html |  95 +++
+ marketing/public/auth/index.html             |  78 +++
+ marketing/public/auth/recovery/index.html    |  77 +++
+ marketing/public/auth/sign-in/index.html     |  66 ++
+ marketing/public/cloud/index.html            |  44 ++
+ marketing/public/contact/index.html          | 111 +++
+ marketing/public/dev/index.html              |  44 ++
+ marketing/public/digital/index.html          |  74 ++
+ marketing/public/humans/index.html           |  82 +++
+ marketing/public/index.html                  |  90 ++-
+ marketing/public/institutions/index.html     |  82 +++
+ marketing/public/live/index.html             |  44 ++
+ marketing/public/marketplace/index.html      |  49 ++
+ marketing/public/organizations/index.html    |  83 +++
+ marketing/public/site.css                    |  21 +
+ marketing/public/start/index.html            | 162 +++++
+ marketing/public/tailwind.css                | 980 ++++++++++++++++++++++++++-
+ marketing/tailwind.input.css                 |   4 +-
+ package.json                                 |   2 +
+ postcss.config.cjs                           |   6 +
+ scripts/deploy-dev.sh                        |  12 +
+ tailwind.config.cjs                          |   4 +
+ tailwind.config.js                           |   7 +
+ yarn.lock                                    | 328 ++++++++-
+ 28 files changed, 2685 insertions(+), 42 deletions(-)
+----
+M	docs/.vitepress/config.ts
+A	docs/guide/community.md
+M	firebase.json
+A	marketing/public/ai/index.html
+A	marketing/public/auth/connections/index.html
+A	marketing/public/auth/index.html
+A	marketing/public/auth/recovery/index.html
+A	marketing/public/auth/sign-in/index.html
+A	marketing/public/cloud/index.html
+A	marketing/public/contact/index.html
+A	marketing/public/dev/index.html
+A	marketing/public/digital/index.html
+A	marketing/public/humans/index.html
+M	marketing/public/index.html
+A	marketing/public/institutions/index.html
+A	marketing/public/live/index.html
+A	marketing/public/marketplace/index.html
+A	marketing/public/organizations/index.html
+A	marketing/public/site.css
+A	marketing/public/start/index.html
+M	marketing/public/tailwind.css
+M	marketing/tailwind.input.css
+M	package.json
+A	postcss.config.cjs
+A	scripts/deploy-dev.sh
+A	tailwind.config.cjs
+A	tailwind.config.js
+M	yarn.lock

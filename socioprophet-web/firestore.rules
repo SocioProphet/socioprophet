@@ -10,11 +10,14 @@ service cloud.firestore {
       allow read, write: if signedIn() && request.auth.uid == uid;
     }
 
-    // ---- NEXT COLLECTIONS (intentionally disabled until predicates are defined) ----
-    // match /jobs/{jobId} {
-    //   allow read: if false;
-    //   allow write: if false;
-    // }
+    // Intake is server-written only; client access denied.
+    match /lead_intake/{leadId} {
+      allow read, write: if false;
+    }
+
+    match /notification_outbox/{docId} {
+      allow read, write: if false;
+    }
 
     match /{document=**} {
       allow read, write: if false;
