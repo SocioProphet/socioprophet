@@ -1,6 +1,6 @@
 # Temporal Graph Evolution
 
-This guide records how the homepage graph and the full explorer should evolve.
+This guide records how the homepage graph and the full explorer must evolve.
 
 ## Current state
 
@@ -35,7 +35,7 @@ The target is closer to a temporal force-directed graph than a frozen solved lay
 
 ## Observable-style control surface
 
-The graph experience should keep evolving toward a richer control rail:
+The graph experience must keep evolving toward a richer control rail:
 - mode switching
 - focus shortcuts
 - topology / hybrid / temporal permutations
@@ -54,7 +54,7 @@ The temporal graph is not just a UI flourish. It is part of the platform’s vis
 
 ## Vector-channel impact on temporal order
 
-Temporal graph order should not remain a simple display hack.
+Temporal graph order must not remain a simple display hack.
 
 As the semantic stack matures, temporal evolution is informed by:
 
@@ -64,4 +64,4 @@ As the semantic stack matures, temporal evolution is informed by:
 - aligned 23rd-channel changes across LSA23 / LSI23 / LDA23
 - graph edge changes from fused representation channels
 
-In other words, expanded topology should eventually react not only to release order, but also to changes in the semantic basis itself.
+In other words, expanded topology must eventually react not only to release order, but also to changes in the semantic basis itself.

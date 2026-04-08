@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SocioProphet — Provider Connections</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/site.css" />
+  </head>
+  <body class="min-h-screen bg-neutral-950 text-neutral-100">
+    <header class="border-b border-neutral-800 bg-neutral-950/90 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <a href="/" class="flex items-center gap-3"><img src="/icon.png" alt="SocioProphet" class="h-9 w-9" /><div class="font-semibold tracking-tight text-white">SocioProphet</div></a>
+        <nav class="flex items-center gap-5 text-sm text-neutral-300">
+          <a href="/auth/">Auth</a>
+          <a href="/auth/sign-in/">Sign in</a>
+          <a href="/auth/connections/" class="font-medium text-white">Connections</a>
+          <a href="/auth/recovery/">Recovery</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-16">
+      <section class="mb-12">
+        <p class="text-sm uppercase tracking-[0.2em] text-neutral-400">Step 2 / connector center</p>
+        <h1 class="mt-4 text-5xl font-semibold leading-tight">Connect providers as capabilities, not as a pile of unrelated secrets.</h1>
+        <p class="mt-6 max-w-3xl text-lg text-neutral-300">
+          The user should never need to reason about which runtime owns which key. They connect a provider once, we surface the status, and the capability layer routes work appropriately.
+        </p>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-[2rem] border border-neutral-800 bg-neutral-900 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-neutral-400">Coding capability</p>
+              <h2 class="text-2xl font-semibold">OpenAI / Codex</h2>
+            </div>
+            <span class="rounded-full bg-emerald-500/15 px-3 py-1 text-sm text-emerald-300">Connected</span>
+          </div>
+          <p class="mt-4 text-neutral-300">Primary provider for coding, refactoring, shell assistance, and code-aware generation.</p>
+          <div class="mt-6 flex gap-3">
+            <button class="rounded-xl bg-white px-4 py-2 font-medium text-neutral-950">Reconnect</button>
+            <button class="rounded-xl border border-neutral-700 px-4 py-2">Manage scopes</button>
+          </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-neutral-800 bg-neutral-900 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-neutral-400">Research capability</p>
+              <h2 class="text-2xl font-semibold">Anthropic</h2>
+            </div>
+            <span class="rounded-full bg-amber-500/15 px-3 py-1 text-sm text-amber-300">Needs connection</span>
+          </div>
+          <p class="mt-4 text-neutral-300">Used for long-context synthesis, policy reasoning, and deeper review workflows.</p>
+          <div class="mt-6 flex gap-3">
+            <button class="rounded-xl bg-white px-4 py-2 font-medium text-neutral-950">Connect provider</button>
+            <button class="rounded-xl border border-neutral-700 px-4 py-2">Use API key instead</button>
+          </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-neutral-800 bg-neutral-900 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-neutral-400">Browsing capability</p>
+              <h2 class="text-2xl font-semibold">Browser automation</h2>
+            </div>
+            <span class="rounded-full bg-sky-500/15 px-3 py-1 text-sm text-sky-300">Configured</span>
+          </div>
+          <p class="mt-4 text-neutral-300">Handles login-required sites through an explicit human-in-the-loop browser profile and recovery prompts.</p>
+          <div class="mt-6 flex gap-3">
+            <button class="rounded-xl bg-white px-4 py-2 font-medium text-neutral-950">Open browser profile</button>
+            <button class="rounded-xl border border-neutral-700 px-4 py-2">Review safety rules</button>
+          </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-neutral-800 bg-neutral-900 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-neutral-400">Offline capability</p>
+              <h2 class="text-2xl font-semibold">Local runtime</h2>
+            </div>
+            <span class="rounded-full bg-neutral-700 px-3 py-1 text-sm text-neutral-200">Not installed</span>
+          </div>
+          <p class="mt-4 text-neutral-300">For private workloads, local-only models, and fallback execution when cloud access is unavailable.</p>
+          <div class="mt-6 flex gap-3">
+            <button class="rounded-xl bg-white px-4 py-2 font-medium text-neutral-950">Install local runtime</button>
+            <button class="rounded-xl border border-neutral-700 px-4 py-2">Read requirements</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- docs-precision-auth-connections -->
+      <section class="mt-14 rounded-[2rem] border border-neutral-800 bg-neutral-900 p-8">
+        <p class="text-sm uppercase tracking-[0.2em] text-neutral-400">Related docs</p>
+        <div class="mt-4 flex flex-wrap gap-3 text-sm">
+          <a class="inline-flex items-center rounded-full border border-neutral-700 px-4 py-2 hover:bg-neutral-950" href="/documentation/guide/auth-and-connections/">Auth and connections</a>
+          <a class="inline-flex items-center rounded-full border border-neutral-700 px-4 py-2 hover:bg-neutral-950" href="/documentation/guide/provider-capability-routing/">Capability routing</a>
+          <a class="inline-flex items-center rounded-full border border-neutral-700 px-4 py-2 hover:bg-neutral-950" href="/documentation/guide/provider-safety-and-capability-eligibility/">Provider eligibility</a>
+          <a class="inline-flex items-center rounded-full border border-neutral-700 px-4 py-2 hover:bg-neutral-950" href="/documentation/guide/entity-analytics-reference/#42-scope-monotonicity-for-protected-data">Cross-context protection</a>
+        </div>
+      </section>
+
+    </main>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+name: CodeQL
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  schedule:
+    - cron: '28 3 * * 1'
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  analyze-javascript:
+    name: Analyze (javascript-typescript)
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - fedora
+      - coreos
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL (javascript-typescript)
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis (javascript-typescript)
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:javascript-typescript
+
+  analyze-python-dynamic:
+    name: Analyze (python) (dynamic)
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - fedora
+      - coreos
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect Python files
+        id: detect_python
+        run: |
+          if find . -type f -name "*.py" -not -path "./.git/*" | grep -q .; then
+            echo "has_python=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_python=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Initialize CodeQL (python)
+        if: steps.detect_python.outputs.has_python == 'true'
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          build-mode: none
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis (python)
+        if: steps.detect_python.outputs.has_python == 'true'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:python
+
+      - name: Skip python analysis when no python source exists
+        if: steps.detect_python.outputs.has_python != 'true'
+        run: echo "No Python source files detected; skipping Python CodeQL analysis."
