@@ -1,6 +1,24 @@
 name: gitleaks
 
 on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+# NOTE: We intentionally install a pinned open-source gitleaks binary.
+# Do NOT switch to license-gated gitleaks actions that require org license keys.
+# This repo is OSS-first and must remain reproducible without proprietary secrets.
+
+
+on:
   push:
     branches:
       - main
@@ -22,6 +40,15 @@ jobs:
       - x64
       - fedora
       - coreos
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
