@@ -56,7 +56,7 @@ Controls:
 ### 4) Privilege escalation via mutable fields
 Risk:
 - Changing ownership fields to hijack records.
-- Mutating fields that should be immutable.
+- Mutating fields that must be immutable.
 
 Controls:
 - Immutable-field constraints in Firestore rules when collections are introduced.

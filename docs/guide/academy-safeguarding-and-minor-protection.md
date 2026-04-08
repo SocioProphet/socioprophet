@@ -50,7 +50,7 @@ Academy maintains a documented pathway for:
 - harmful or coercive conduct
 - situations requiring review, intervention, or escalation
 
-Sensitive reports may require restricted handling rather than immediate broad visibility. The platform should distinguish between ordinary review and sensitive safeguarding workflows.
+Sensitive reports may require restricted handling rather than immediate broad visibility. The platform must distinguish between ordinary review and sensitive safeguarding workflows.
 
 ## Platform enforcement stance
 

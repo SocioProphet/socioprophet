@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-16T20:19:44.114388+00:00",
+  "generated_at": "2026-03-26T14:37:22.140185+00:00",
   "ui": {
     "modes": [
       "topology",
@@ -28,7 +28,7 @@
       "map_priority": 10,
       "landing_page": "/academy/",
       "survey_page": "/academy/apply/",
-      "docs_path": "/guide/products/academy",
+      "docs_path": "/documentation/guide/products/academy/",
       "audiences": [
         "learners",
         "families",
@@ -69,8 +69,8 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/academy",
-        "https://socioprophet-web.web.app/guide/academy-safeguarding-and-minor-protection"
+        "https://socioprophet.com/documentation/guide/products/academy/",
+        "https://socioprophet.com/documentation/guide/academy-safeguarding-and-minor-protection/"
       ],
       "description": "Learning, family, mentorship, and cybernetics education."
     },
@@ -128,8 +128,8 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/surface-inventory",
-        "https://socioprophet-web.web.app/guide/domain-surface"
+        "https://socioprophet.com/documentation/guide/surface-inventory/",
+        "https://socioprophet.com/documentation/guide/domain-surface/"
       ],
       "description": "Institutional deployment for schools, nonprofits, public-interest, and mission-aligned organizations."
     },
@@ -192,10 +192,74 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/",
-        "https://socioprophet-web.web.app/guide/canonical-platform-direction"
+        "https://socioprophet.com/documentation/",
+        "https://socioprophet.com/documentation/guide/canonical-platform-direction/"
       ],
       "description": "Architecture, products, trust model, and canonical direction."
+    },
+    {
+      "id": "entity-analytics",
+      "type": "surface",
+      "label": "Entity Analytics",
+      "category": "docs",
+      "status": "live",
+      "homepage_visible": true,
+      "graph_group": "core",
+      "map_priority": 30,
+      "landing_page": "/entity-analytics/",
+      "survey_page": "",
+      "docs_path": "/documentation/guide/entity-analytics-reference/",
+      "audiences": [
+        "builders",
+        "operators",
+        "researchers",
+        "partners"
+      ],
+      "topic_constituents": [
+        "architecture",
+        "products",
+        "trust",
+        "guides",
+        "reference"
+      ],
+      "normalized_topics": [
+        "architecture",
+        "reference",
+        "trust",
+        "platform",
+        "governance"
+      ],
+      "related_surfaces": [
+        "academy",
+        "organizations",
+        "ai",
+        "developer",
+        "cloud",
+        "live",
+        "medical",
+        "law",
+        "wiki",
+        "blog",
+        "digital-trust"
+      ],
+      "investor_overlay": {
+        "lens": "discovery_compounding",
+        "value_drivers": [
+          "qualified_discovery",
+          "builder_activation",
+          "trust_signal"
+        ],
+        "economic_profit_proxy": [
+          "qualified_traffic",
+          "activation",
+          "reference_depth"
+        ]
+      },
+      "related_sites": [
+        "https://socioprophet.com/documentation/",
+        "https://socioprophet.com/documentation/guide/canonical-platform-direction/"
+      ],
+      "description": "Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs."
     },
     {
       "id": "ai",
@@ -208,7 +272,7 @@
       "map_priority": 40,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/ai",
+      "docs_path": "/documentation/guide/products/ai/",
       "audiences": [
         "builders",
         "operators"
@@ -246,7 +310,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/ai"
+        "https://socioprophet.com/documentation/guide/products/ai/"
       ],
       "description": "Model, agent, orchestration, and trust-layer capabilities."
     },
@@ -261,7 +325,7 @@
       "map_priority": 50,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/dev",
+      "docs_path": "/documentation/guide/products/dev/",
       "audiences": [
         "builders",
         "integrators"
@@ -299,7 +363,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/dev"
+        "https://socioprophet.com/documentation/guide/products/dev/"
       ],
       "description": "SDKs, APIs, integration patterns, and developer workflows."
     },
@@ -314,7 +378,7 @@
       "map_priority": 60,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/cloud",
+      "docs_path": "/documentation/guide/products/cloud/",
       "audiences": [
         "operators",
         "partners"
@@ -352,7 +416,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/cloud"
+        "https://socioprophet.com/documentation/guide/products/cloud/"
       ],
       "description": "Hosted and managed operational capabilities."
     },
@@ -367,7 +431,7 @@
       "map_priority": 70,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/live",
+      "docs_path": "/documentation/guide/products/live/",
       "audiences": [
         "builders",
         "operators",
@@ -406,7 +470,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/live"
+        "https://socioprophet.com/documentation/guide/products/live/"
       ],
       "description": "Demonstrations, environments, and active build states."
     },
@@ -421,7 +485,7 @@
       "map_priority": 80,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/medical",
+      "docs_path": "/documentation/guide/products/medical/",
       "audiences": [
         "providers",
         "institutions",
@@ -460,7 +524,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/medical"
+        "https://socioprophet.com/documentation/guide/products/medical/"
       ],
       "description": "Health, education, and support pathways requiring higher assurance."
     },
@@ -475,7 +539,7 @@
       "map_priority": 90,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/law",
+      "docs_path": "/documentation/guide/products/law/",
       "audiences": [
         "legal",
         "policy",
@@ -514,7 +578,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/law"
+        "https://socioprophet.com/documentation/guide/products/law/"
       ],
       "description": "Legal, governance, and jurisprudential workflows."
     },
@@ -529,7 +593,7 @@
       "map_priority": 100,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/wiki",
+      "docs_path": "/documentation/guide/products/wiki/",
       "audiences": [
         "readers",
         "researchers"
@@ -565,7 +629,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/wiki"
+        "https://socioprophet.com/documentation/guide/products/wiki/"
       ],
       "description": "Structured knowledge and reference surface."
     },
@@ -580,7 +644,7 @@
       "map_priority": 110,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/products/blog",
+      "docs_path": "/documentation/guide/products/blog/",
       "audiences": [
         "readers",
         "followers"
@@ -616,7 +680,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/products/blog"
+        "https://socioprophet.com/documentation/guide/products/blog/"
       ],
       "description": "Long-form writing, updates, and commentary."
     },
@@ -631,7 +695,7 @@
       "map_priority": 120,
       "landing_page": null,
       "survey_page": null,
-      "docs_path": "/guide/domain-surface",
+      "docs_path": "/documentation/guide/domain-surface/",
       "audiences": [
         "operators",
         "partners",
@@ -671,7 +735,7 @@
         ]
       },
       "related_sites": [
-        "https://socioprophet-web.web.app/guide/domain-surface"
+        "https://socioprophet.com/documentation/guide/domain-surface/"
       ],
       "description": "Trust-first positioning, digital identity, and public-facing trust surfaces."
     },
@@ -725,7 +789,7 @@
       "related_sites": [
         "/investor/",
         "/map/",
-        "https://socioprophet-web.web.app/guide/surface-inventory"
+        "https://socioprophet.com/documentation/guide/surface-inventory/"
       ],
       "description": "Investor and governance-facing public materials."
     },
@@ -1776,6 +1840,61 @@
         "source": "digital-trust",
         "target": "investor",
         "type": "curated"
+      },
+      {
+        "source": "academy",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "organizations",
+        "type": "curated"
+      },
+      {
+        "source": "ai",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "developer",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "cloud",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "live",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "medical",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "law",
+        "type": "curated"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "wiki",
+        "type": "curated"
+      },
+      {
+        "source": "blog",
+        "target": "entity-analytics",
+        "type": "curated"
+      },
+      {
+        "source": "digital-trust",
+        "target": "entity-analytics",
+        "type": "curated"
       }
     ],
     "constituent": [
@@ -2048,6 +2167,31 @@
         "source": "investor",
         "target": "topic:platform-direction",
         "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:architecture",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:products",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:trust",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:guides",
+        "type": "constituent"
+      },
+      {
+        "source": "entity-analytics",
+        "target": "topic:reference",
+        "type": "constituent"
       }
     ],
     "vector": [
@@ -2082,6 +2226,12 @@
         "score": 0.17
       },
       {
+        "source": "organizations",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.125
+      },
+      {
         "source": "documentation",
         "target": "ai",
         "type": "vector_similarity",
@@ -2112,6 +2262,12 @@
         "score": 0.2
       },
       {
+        "source": "documentation",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 1.0
+      },
+      {
         "source": "ai",
         "target": "developer",
         "type": "vector_similarity",
@@ -2130,6 +2286,12 @@
         "score": 0.195
       },
       {
+        "source": "ai",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.137
+      },
+      {
         "source": "developer",
         "target": "cloud",
         "type": "vector_similarity",
@@ -2146,6 +2308,18 @@
         "target": "live",
         "type": "vector_similarity",
         "score": 0.256
+      },
+      {
+        "source": "cloud",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.137
+      },
+      {
+        "source": "live",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.135
       },
       {
         "source": "medical",
@@ -2172,10 +2346,22 @@
         "score": 0.158
       },
       {
+        "source": "wiki",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.12
+      },
+      {
         "source": "digital-trust",
         "target": "investor",
         "type": "vector_similarity",
         "score": 0.14
+      },
+      {
+        "source": "digital-trust",
+        "target": "entity-analytics",
+        "type": "vector_similarity",
+        "score": 0.2
       }
     ]
   }

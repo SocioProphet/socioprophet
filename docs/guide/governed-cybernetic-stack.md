@@ -23,7 +23,7 @@ The central problem of the machine age is not lack of information. It is the was
 
 SocioProphet exists to solve that problem.
 
-We build a governed cybernetic system that helps people and institutions educate better, care better, remember better, and coordinate better. Our premise is simple: trained human attention is civilization’s most precious productive force. Machines should not replace it. Machines should protect it, focus it, extend it, and leave behind evidence that compounds future human learning.
+We build a governed cybernetic system that helps people and institutions educate better, care better, remember better, and coordinate better. Our premise is simple: trained human attention is civilization’s most precious productive force. Machines must not replace it. Machines must protect it, focus it, extend it, and leave behind evidence that compounds future human learning.
 
 ## Human-machine symbiosis
 
@@ -33,7 +33,7 @@ Humans choose ends.
 Machines assist with means.  
 Evidence governs the loop.
 
-Humans define legitimacy, priorities, approvals, red lines, and moral boundaries. Machines help retrieve, compare, synthesize, simulate, coordinate, and execute bounded operations under visible policy. Every consequential action should be inspectable. Every important state change should be attributable. Every durable action should leave evidence. Every irreversible action remains under stronger human control.
+Humans define legitimacy, priorities, approvals, red lines, and moral boundaries. Machines help retrieve, compare, synthesize, simulate, coordinate, and execute bounded operations under visible policy. Every consequential action must be inspectable. Every important state change must be attributable. Every durable action must leave evidence. Every irreversible action remains under stronger human control.
 
 ## Multi-layer stack
 
@@ -65,7 +65,7 @@ Opt-in build, catalog, training, and update workflows extend the system into the
 
 Most AI products optimize for content generation, attention capture, and increasing machine autonomy.
 
-SocioProphet should optimize for **increasing human capability per unit of machine assistance**.
+SocioProphet must optimize for **increasing human capability per unit of machine assistance**.
 
 Where others extract attention, we cultivate it.  
 Where others generate more content, we build better understanding.  

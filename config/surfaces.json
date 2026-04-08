@@ -6,7 +6,7 @@
     "status": "live",
     "landing_page": "/academy/",
     "survey_page": "/academy/apply/",
-    "docs_path": "/guide/products/academy",
+    "docs_path": "/documentation/guide/products/academy/",
     "homepage_visible": true,
     "graph_group": "core",
     "map_priority": 10,
@@ -29,8 +29,8 @@
       "digital-trust"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/academy",
-      "https://socioprophet-web.web.app/guide/academy-safeguarding-and-minor-protection"
+      "https://socioprophet.com/documentation/guide/products/academy/",
+      "https://socioprophet.com/documentation/guide/academy-safeguarding-and-minor-protection/"
     ],
     "description": "Learning, family, mentorship, and cybernetics education.",
     "next_action": "Polish and continue documentation.",
@@ -63,7 +63,6 @@
     "status": "live",
     "landing_page": "/organizations/",
     "survey_page": "/organizations/",
-    "docs_path": null,
     "homepage_visible": true,
     "graph_group": "core",
     "map_priority": 20,
@@ -88,8 +87,8 @@
       "law"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/surface-inventory",
-      "https://socioprophet-web.web.app/guide/domain-surface"
+      "https://socioprophet.com/documentation/guide/surface-inventory/",
+      "https://socioprophet.com/documentation/guide/domain-surface/"
     ],
     "description": "Institutional deployment for schools, nonprofits, public-interest, and mission-aligned organizations.",
     "next_action": "Upgrade to Academy-level first-class quality.",
@@ -120,8 +119,6 @@
     "label": "Documentation",
     "category": "docs",
     "status": "live",
-    "landing_page": null,
-    "survey_page": null,
     "docs_path": "/",
     "homepage_visible": true,
     "graph_group": "core",
@@ -153,8 +150,8 @@
       "digital-trust"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/",
-      "https://socioprophet-web.web.app/guide/canonical-platform-direction"
+      "https://socioprophet.com/documentation/",
+      "https://socioprophet.com/documentation/guide/canonical-platform-direction/"
     ],
     "description": "Architecture, products, trust model, and canonical direction.",
     "next_action": "Keep as the source of deeper system detail.",
@@ -184,9 +181,7 @@
     "label": "AI Platform",
     "category": "technical",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/ai",
+    "docs_path": "/documentation/guide/products/ai/",
     "homepage_visible": true,
     "graph_group": "expanding",
     "map_priority": 40,
@@ -207,7 +202,7 @@
       "documentation"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/ai"
+      "https://socioprophet.com/documentation/guide/products/ai/"
     ],
     "description": "Model, agent, orchestration, and trust-layer capabilities.",
     "next_action": "Decide whether this needs a first-class landing page.",
@@ -237,9 +232,7 @@
     "label": "Developer",
     "category": "technical",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/dev",
+    "docs_path": "/documentation/guide/products/dev/",
     "homepage_visible": true,
     "graph_group": "expanding",
     "map_priority": 50,
@@ -260,7 +253,7 @@
       "documentation"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/dev"
+      "https://socioprophet.com/documentation/guide/products/dev/"
     ],
     "description": "SDKs, APIs, integration patterns, and developer workflows.",
     "next_action": "Promote to docs-backed landing page first.",
@@ -290,9 +283,7 @@
     "label": "Cloud Suite",
     "category": "technical",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/cloud",
+    "docs_path": "/documentation/guide/products/cloud/",
     "homepage_visible": true,
     "graph_group": "expanding",
     "map_priority": 60,
@@ -313,7 +304,7 @@
       "documentation"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/cloud"
+      "https://socioprophet.com/documentation/guide/products/cloud/"
     ],
     "description": "Hosted and managed operational capabilities.",
     "next_action": "Clarify managed-platform scope.",
@@ -343,9 +334,7 @@
     "label": "Live Builds",
     "category": "technical",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/live",
+    "docs_path": "/documentation/guide/products/live/",
     "homepage_visible": true,
     "graph_group": "expanding",
     "map_priority": 70,
@@ -367,7 +356,7 @@
       "documentation"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/live"
+      "https://socioprophet.com/documentation/guide/products/live/"
     ],
     "description": "Demonstrations, environments, and active build states.",
     "next_action": "Decide how much live operational visibility to expose.",
@@ -397,9 +386,7 @@
     "label": "Medical",
     "category": "domain",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/medical",
+    "docs_path": "/documentation/guide/products/medical/",
     "homepage_visible": true,
     "graph_group": "high-trust",
     "map_priority": 80,
@@ -421,7 +408,7 @@
       "digital-trust"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/medical"
+      "https://socioprophet.com/documentation/guide/products/medical/"
     ],
     "description": "Health, education, and support pathways requiring higher assurance.",
     "next_action": "Likely gated inquiry later, not open survey first.",
@@ -451,9 +438,7 @@
     "label": "Law",
     "category": "domain",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/law",
+    "docs_path": "/documentation/guide/products/law/",
     "homepage_visible": true,
     "graph_group": "high-trust",
     "map_priority": 90,
@@ -475,7 +460,7 @@
       "digital-trust"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/law"
+      "https://socioprophet.com/documentation/guide/products/law/"
     ],
     "description": "Legal, governance, and jurisprudential workflows.",
     "next_action": "Likely gated inquiry later, not open survey first.",
@@ -505,9 +490,7 @@
     "label": "Wiki",
     "category": "content",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/wiki",
+    "docs_path": "/documentation/guide/products/wiki/",
     "homepage_visible": true,
     "graph_group": "content",
     "map_priority": 100,
@@ -526,7 +509,7 @@
       "documentation"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/wiki"
+      "https://socioprophet.com/documentation/guide/products/wiki/"
     ],
     "description": "Structured knowledge and reference surface.",
     "next_action": "Content-first, not survey-first.",
@@ -556,9 +539,7 @@
     "label": "Blog",
     "category": "content",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/products/blog",
+    "docs_path": "/documentation/guide/products/blog/",
     "homepage_visible": true,
     "graph_group": "content",
     "map_priority": 110,
@@ -577,7 +558,7 @@
       "documentation"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/products/blog"
+      "https://socioprophet.com/documentation/guide/products/blog/"
     ],
     "description": "Long-form writing, updates, and commentary.",
     "next_action": "Content-first surface.",
@@ -607,9 +588,7 @@
     "label": "Digital / Trust",
     "category": "trust",
     "status": "stub",
-    "landing_page": null,
-    "survey_page": null,
-    "docs_path": "/guide/domain-surface",
+    "docs_path": "/documentation/guide/domain-surface/",
     "homepage_visible": true,
     "graph_group": "trust",
     "map_priority": 120,
@@ -632,7 +611,7 @@
       "medical"
     ],
     "related_sites": [
-      "https://socioprophet-web.web.app/guide/domain-surface"
+      "https://socioprophet.com/documentation/guide/domain-surface/"
     ],
     "description": "Trust-first positioning, digital identity, and public-facing trust surfaces.",
     "next_action": "Clarify product definition and trust narrative.",
@@ -663,8 +642,6 @@
     "category": "governance",
     "status": "stub",
     "landing_page": "/investor/",
-    "survey_page": null,
-    "docs_path": null,
     "homepage_visible": false,
     "graph_group": "support",
     "map_priority": 130,
@@ -685,7 +662,7 @@
     "related_sites": [
       "/investor/",
       "/map/",
-      "https://socioprophet-web.web.app/guide/surface-inventory"
+      "https://socioprophet.com/documentation/guide/surface-inventory/"
     ],
     "description": "Investor and governance-facing public materials.",
     "next_action": "Expand when investor materials are ready.",
@@ -708,6 +685,70 @@
         "value_creation_signal",
         "platform_compounding",
         "trust_quality"
+      ]
+    }
+  },
+  {
+    "id": "entity-analytics",
+    "label": "Entity Analytics",
+    "category": "docs",
+    "status": "live",
+    "landing_page": "/entity-analytics/",
+    "survey_page": "",
+    "docs_path": "/documentation/guide/entity-analytics-reference/",
+    "homepage_visible": true,
+    "graph_group": "core",
+    "map_priority": 30,
+    "audiences": [
+      "builders",
+      "operators",
+      "researchers",
+      "partners"
+    ],
+    "topic_constituents": [
+      "architecture",
+      "products",
+      "trust",
+      "guides",
+      "reference"
+    ],
+    "related_surfaces": [
+      "academy",
+      "organizations",
+      "ai",
+      "developer",
+      "cloud",
+      "live",
+      "medical",
+      "law",
+      "wiki",
+      "blog",
+      "digital-trust"
+    ],
+    "related_sites": [
+      "https://socioprophet.com/documentation/",
+      "https://socioprophet.com/documentation/guide/canonical-platform-direction/"
+    ],
+    "description": "Identity-aware entity analytics with governed linkage, policy-constrained merging, proof artifacts, and marketer-safe outputs.",
+    "next_action": "Keep as the source of deeper system detail.",
+    "normalized_topics": [
+      "architecture",
+      "reference",
+      "trust",
+      "platform",
+      "governance"
+    ],
+    "investor_overlay": {
+      "lens": "discovery_compounding",
+      "value_drivers": [
+        "qualified_discovery",
+        "builder_activation",
+        "trust_signal"
+      ],
+      "economic_profit_proxy": [
+        "qualified_traffic",
+        "activation",
+        "reference_depth"
       ]
     }
   }
