@@ -13,6 +13,15 @@ on:
 
 permissions:
   contents: read
+# NOTE: We intentionally install a pinned open-source gitleaks binary.
+# Do NOT switch to license-gated gitleaks actions that require org license keys.
+# This repo is OSS-first and must remain reproducible without proprietary secrets.
+
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
 
 jobs:
   scan:
@@ -31,3 +40,21 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gitleaks (pinned)
+        run: |
+          set -euo pipefail
+          VER="8.18.2"
+          URL="https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
+          curl -fsSL "$URL" -o /tmp/gitleaks.tgz
+          tar -xzf /tmp/gitleaks.tgz -C /tmp
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Run gitleaks
+        run: |
+          set -euo pipefail
+          gitleaks detect --source . --redact --no-banner

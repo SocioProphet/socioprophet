@@ -1,0 +1,15 @@
+{
+  "executors": [
+    {
+      "name": "lima-nixbuilder",
+      "sshRef": "lima-nixbuilder",
+      "caps": {
+        "os": "linux",
+        "arch": "aarch64",
+        "kvm": false,
+        "notes": "Local-first Lima executor; TCG-only for nested QEMU; prefer lima-process backend."
+      }
+    }
+  ],
+  "defaultExecutor": "lima-nixbuilder"
+}

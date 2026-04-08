@@ -1,105 +1,37 @@
-# SocioProphet Web (monorepo wrapper)
+# Sociosphere Ecosystem (AgentOS + Agentplane)
 
-This repository contains the **full SocioProphet web stack**. The actual application lives under the `socioprophet-web/` folder and is split into a React frontend and an Express backend. The root folder only provides shared workflow helpers (Makefile, scripts) and high-level documentation.
+This repo is a **single work product** that unifies:
 
-> **Repository goal:** provide a working local development environment for the SocioProphet marketing site and its supporting RSS feed API.
+- **AgentOS**: a *layered* agent stack definition (interfaces, policies, tool registry, Linux integration runbook).
+- **Agentplane**: a *fleet-shaped control plane* for reproducible execution (bundles → validate → place → run → evidence → replay).
 
-## Repository layout (top level)
+The intended result is a coherent “agent platform” where:
 
-| Path | Description |
-| --- | --- |
-| `README.md` | This file. Overview and workspace instructions. |
-| `CONTRIBUTING.md` | Contribution guidelines (style, workflow expectations). |
-| `Makefile` | Convenience commands that delegate to scripts in `socioprophet-web/scripts/`. |
-| `socioprophet-web/` | **Primary application code** (client, server, scripts). See that directory’s README for full details. |
+- the **AgentOS tool registry** is the compliance + inventory source of truth
+- **agentplane bundles** become the unit of deployment/execution across your executor fleet
+- **AIWG artifacts** (system-of-record) and **agentplane evidence artifacts** (validation/placement/run) reconcile into one auditable trail
 
-## Prerequisites
+## Layout
 
-- **Node.js 18+** (the codebase uses Node 18 tooling and APIs).
-- **Yarn** package manager.
-- **GNU Make** (for running top-level `make` targets).
-- **Bash** (scripts are bash). 
+- `agentos/` — AgentOS skeleton (interfaces, policy, integration runbook).
+- `agentplane/` — agentplane repo (Nix flake, bundle schema, runner scripts).
+- `registry/` — canonical tool registry (YAML + CSV).
+- `inventory/` — stack inventory + RACI (spreadsheet).
+- `workspaces/` — workspace controllers (socio-linux + socioprophet) as Nix-first stubs.
+- `scripts/` — cross-cutting validation glue.
 
-## Quick start (recommended)
+## Quick checks
 
-```bash
-# from /workspace/socioprophet
-make install_web
-make run_web
-```
+- Validate the tool registry:
+  - `python3 scripts/validate_registry.py registry/agentos-tool-registry.yaml config/base_image_tools.yaml`
 
-What this does:
-1. Installs dependencies in `socioprophet-web/client` and `socioprophet-web/server`.
-2. Starts the backend with `yarn run dev` and the frontend with `yarn start`.
+- Validate the example agentplane bundle:
+  - `python3 agentplane/scripts/validate_bundle.py agentplane/bundles/example-agent/bundle.json`
 
-## Manual start (no Makefile)
+## Why this split exists
 
-```bash
-cd socioprophet-web/client
-cp .env.example .env
-# set REACT_PORT and NODE_PORT inside .env
+**Gastown/AIWG/OpenCode/etc.** are *agentic* runtime pieces.
 
-yarn
+**agentplane** is *system-space orchestration* — it answers: “Where does this run, under what constraints, and where is the evidence?”
 
-yarn start
-```
-
-```bash
-cd socioprophet-web/server
-cp .env.example .env
-# set PORT inside .env
-
-yarn
-
-yarn run dev
-```
-
-## Environment variables
-
-Create `.env` files in the **client** and **server** folders.
-
-### Client (`socioprophet-web/client/.env`)
-
-| Variable | Required | Description |
-| --- | --- | --- |
-| `REACT_PORT` | ✅ | Port for the Webpack dev server (e.g., `3000`). |
-| `NODE_PORT` | ✅ | Port where the server is running (used for `/api` proxy). |
-
-### Server (`socioprophet-web/server/.env`)
-
-| Variable | Required | Description |
-| --- | --- | --- |
-| `PORT` | ✅ | Port that the Express server listens on (e.g., `3001`). |
-
-## How the system fits together
-
-- The **client** is a React SPA (single-page app) served by Webpack in development.
-- The **server** is a lightweight Express API that fetches the Hacker News RSS feed and returns JSON.
-- The client makes requests to `/api/feed/rss`, which is proxied to the server when running locally.
-
-## Common tasks
-
-| Task | Command | Where |
-| --- | --- | --- |
-| Install dependencies | `make install_web` | repo root |
-| Run both apps | `make run_web` | repo root |
-| Run client only | `yarn start` | `socioprophet-web/client` |
-| Run server only | `yarn run dev` | `socioprophet-web/server` |
-
-## Where to find more documentation
-
-The project is intentionally verbose about documentation. Each major folder has its own README:
-
-- `socioprophet-web/README.md` – app-level documentation
-- `socioprophet-web/client/README.md` – frontend guide
-- `socioprophet-web/server/README.md` – backend guide
-- `socioprophet-web/scripts/README.md` – helper scripts
-- `socioprophet-web/client/src/**/README.md` – component-level notes
-- `socioprophet-web/server/src/**/README.md` – server source notes
-
-## Notes and gotchas
-
-- The root `Makefile` assumes a Unix-like shell environment (Bash).
-- Both apps are expected to run **concurrently** in development. Ensure ports do not conflict.
-- The client uses a Webpack dev server; it is not preconfigured for production SSR.
-- Dockerfiles exist in the client/server directories for container builds (see their READMEs for details).
+They are complementary, not redundant.

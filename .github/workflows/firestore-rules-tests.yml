@@ -1,0 +1,43 @@
+name: Firestore rules tests
+
+on:
+  pull_request:
+    paths:
+      - "socioprophet-web/firestore.rules"
+      - "socioprophet-web/firestore.indexes.json"
+      - "socioprophet-web/firebase.json"
+      - "socioprophet-web/.firebaserc"
+      - "socioprophet-web/test/**"
+      - "socioprophet-web/package.json"
+      - "socioprophet-web/package-lock.json"
+  push:
+    branches: ["master", "main"]
+    paths:
+      - "socioprophet-web/firestore.rules"
+      - "socioprophet-web/firestore.indexes.json"
+      - "socioprophet-web/firebase.json"
+      - "socioprophet-web/.firebaserc"
+      - "socioprophet-web/test/**"
+      - "socioprophet-web/package.json"
+      - "socioprophet-web/package-lock.json"
+
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: socioprophet-web/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+      - name: Install deps
+        working-directory: socioprophet-web
+        run: npm ci
+      - name: Run rules tests
+        working-directory: socioprophet-web
+        run: npm run test:rules

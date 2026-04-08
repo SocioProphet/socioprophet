@@ -1,21 +1,24 @@
 # Security Policy
 
-## Supported Versions
+Security is foundational to the SocioProphet knowledge commons.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## Reporting a vulnerability
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Do not open public issues for security bugs.
 
-## Reporting a Vulnerability
+Use:
+- GitHub Security Advisories (preferred)
+- security@socioprophet.ai
 
-Use this section to tell people how to report a vulnerability.
+Include:
+- Affected file/component
+- Reproduction steps
+- Impact description
+- Environment details
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+## Security invariants
+
+1. No secrets in git.
+2. Firestore rules are deny-by-default.
+3. Rule changes require emulator-backed tests.
+4. Least privilege is enforced everywhere.

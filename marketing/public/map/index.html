@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prophet Platform Explorer — SocioProphet</title>
+  <meta name="description" content="Explore the Prophet Platform graph with topology, vector similarity, and expandable topic constituents." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <style>
+    .map-shell { max-width: 96rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    .map-title { margin: 0; font-size: 2.25rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; }
+    .map-sub { margin-top: 0.75rem; color: #475569; max-width: 64rem; }
+    .map-layout { display: grid; gap: 1rem; margin-top: 1.5rem; }
+    @media (min-width: 1180px) { .map-layout { grid-template-columns: 290px minmax(0,1fr) 340px; } }
+    .panel { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; }
+    .panel h2 { margin: 0 0 0.75rem; font-size: 1.05rem; }
+    .control { margin-bottom: 0.9rem; }
+    .control label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
+    .control input[type="search"], .control select { width: 100%; border: 1px solid #cbd5e1; border-radius: 0.6rem; padding: 0.6rem 0.75rem; font: inherit; }
+    .control .inline { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; margin-top: 0.35rem; }
+    .helper { color: #64748b; font-size: 0.9rem; }
+    .map-canvas { min-height: 760px; overflow: hidden; }
+    .map-canvas svg { display: block; width: 100%; height: 760px; background: white; border-radius: 1rem; }
+    .legend { display: grid; gap: 0.45rem; margin-top: 0.75rem; font-size: 0.9rem; color: #475569; }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+    .dot { width: 0.85rem; height: 0.85rem; border-radius: 9999px; display: inline-block; }
+    .detail-empty { color: #64748b; }
+    .detail-links { display: grid; gap: 0.35rem; margin-top: 0.75rem; }
+    .detail-links a { color: #0f172a; text-decoration: none; }
+    .detail-links a:hover { text-decoration: underline; }
+    .detail-list { margin: 0.75rem 0 0; padding-left: 1.1rem; color: #475569; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .badge { display: inline-flex; align-items: center; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.8rem; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .btn { border: 1px solid #cbd5e1; background: white; border-radius: 0.65rem; padding: 0.45rem 0.7rem; font: inherit; cursor: pointer; }
+    .btn:hover { background: #f8fafc; }
+    .small { font-size: 0.85rem; color: #64748b; }
+  </style>
+</head>
+<body>
+<header class="home-header">
+      <div class="home-shell">
+        <div class="home-header-row">
+          <a href="/" class="home-brand" onclick='spTrack("cta_home_click",{href:"/"})'>
+            <img src="/icon.png" alt="SocioProphet" />
+            <div class="home-brand-name">SocioProphet</div>
+          </a>
+
+          <nav class="home-nav">
+            <a href="/academy/">Commons</a>
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
+            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+  <main class="map-shell">
+    <h1 class="map-title">Prophet Platform Explorer</h1>
+    <p class="map-sub">
+      Explore the Prophet Platform surface ontology with topology, vector similarity, and hybrid graph views. This explorer is generated from structured surface data, not hand-maintained page prose.
+    </p>
+
+    <div class="map-layout">
+      <aside class="panel">
+        <h2>Controls</h2>
+
+        <div class="control">
+          <label for="viewMode">Graph mode</label>
+          <select id="viewMode">
+            <option value="topology">Topology</option>
+            <option value="vector">Vector similarity</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+          <div class="helper">Topology uses curated links. Vector computes similarity from the ontology. Hybrid combines both.</div>
+        </div>
+
+        <div class="control">
+          <label for="searchMode">Explore mode</label>
+          <select id="searchMode">
+            <option value="global">Global</option>
+            <option value="local">Local</option>
+            <option value="drift">DRIFT-like</option>
+          </select>
+          <div class="helper">Borrowed from graph exploration patterns: global for full topology, local for immediate neighbors, drift-like for a slightly wider neighborhood.</div>
+        </div>
+
+        <div class="control">
+          <label for="threshold">Similarity threshold <span id="thresholdValue">0.12</span></label>
+          <input id="threshold" type="range" min="0.00" max="0.60" step="0.01" value="0.12">
+        </div>
+
+        <div class="control">
+          <label class="inline"><input id="showTopics" type="checkbox"> Show topic constituents</label>
+          <label class="inline"><input id="showExternal" type="checkbox" checked> Show external sites when present</label>
+        </div>
+
+        <div class="control">
+          <label for="query">Filter</label>
+          <input id="query" type="search" placeholder="academy, trust, governance, secure…">
+        </div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="dot" style="background:#0f172a"></span> Docs / core</div>
+          <div class="legend-item"><span class="dot" style="background:#1d4ed8"></span> Learning / deployment</div>
+          <div class="legend-item"><span class="dot" style="background:#7c3aed"></span> Technical</div>
+          <div class="legend-item"><span class="dot" style="background:#0f766e"></span> Trust / governance</div>
+          <div class="legend-item"><span class="dot" style="background:#b45309"></span> Domain / higher-trust</div>
+          <div class="legend-item"><span class="dot" style="background:#64748b"></span> Content / topic</div>
+        </div>
+      </aside>
+
+      <section class="panel map-canvas">
+        <svg id="graph" viewBox="0 0 1100 760" role="img" aria-label="SocioProphet platform graph explorer"></svg>
+      </section>
+
+      <aside class="panel" id="detail">
+        <h2>Details</h2>
+        <div class="detail-empty">Select a node to inspect its description, routes, related surfaces, and topic constituents.</div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const state = {
+      graph: null,
+      viewMode: "topology",
+      searchMode: "global",
+      threshold: 0.12,
+      showTopics: false,
+      showExternal: true,
+      query: "",
+      selectedId: null,
+      expandedSurfaceId: null
+    };
+
+    const viewModeEl = document.getElementById("viewMode");
+    const searchModeEl = document.getElementById("searchMode");
+    const thresholdEl = document.getElementById("threshold");
+    const thresholdValueEl = document.getElementById("thresholdValue");
+    const showTopicsEl = document.getElementById("showTopics");
+    const showExternalEl = document.getElementById("showExternal");
+    const queryEl = document.getElementById("query");
+    const detailEl = document.getElementById("detail");
+    const svg = d3.select("#graph");
+    const width = 1100;
+    const height = 760;
+    const params = new URLSearchParams(window.location.search);
+    const requestedFocus = params.get("focus");
+    const requestedMode = params.get("mode");
+    if (requestedMode && ["topology", "vector", "hybrid"].includes(requestedMode)) state.viewMode = requestedMode;
+    viewModeEl.value = state.viewMode;
+
+    function slug(text) {
+      return String(text || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+
+    function colorFor(node) {
+      if (node.type === "topic") return "#64748b";
+      switch (node.category) {
+        case "learning":
+        case "deployment": return "#1d4ed8";
+        case "technical": return "#7c3aed";
+        case "trust":
+        case "governance": return "#0f766e";
+        case "domain": return "#b45309";
+        case "docs": return "#0f172a";
+        case "content": return "#64748b";
+        default: return "#64748b";
+      }
+    }
+
+    function featureSet(node) {
+      const values = [];
+      values.push(`category:${slug(node.category || "")}`);
+      values.push(`group:${slug(node.graph_group || "")}`);
+      for (const t of (node.topic_constituents || [])) values.push(`topic:${slug(t)}`);
+      for (const t of (node.normalized_topics || [])) values.push(`norm:${slug(t)}`);
+      for (const a of (node.audiences || [])) values.push(`aud:${slug(a)}`);
+      for (const r of (node.related_surfaces || [])) values.push(`rel:${slug(r)}`);
+      const overlay = node.investor_overlay || {};
+      if (overlay.lens) values.push(`lens:${slug(overlay.lens)}`);
+      for (const d of (overlay.value_drivers || [])) values.push(`driver:${slug(d)}`);
+      for (const p of (overlay.economic_profit_proxy || [])) values.push(`proxy:${slug(p)}`);
+      return new Set(values.filter(Boolean));
+    }
+
+    function jaccard(a, b) {
+      const A = new Set(a);
+      const B = new Set(b);
+      const inter = [...A].filter(x => B.has(x)).length;
+      const uni = new Set([...A, ...B]).size;
+      return uni ? inter / uni : 0;
+    }
+
+    function buildVectorLinks(surfaceNodes) {
+      const out = [];
+      for (let i = 0; i < surfaceNodes.length; i++) {
+        for (let j = i + 1; j < surfaceNodes.length; j++) {
+          const a = surfaceNodes[i], b = surfaceNodes[j];
+          const score = jaccard(featureSet(a), featureSet(b));
+          if (score >= state.threshold) {
+            out.push({ source: a.id, target: b.id, type: "vector", score });
+          }
+        }
+      }
+      return out;
+    }
+
+    function neighborIds(links, rootId, depth) {
+      let frontier = new Set([rootId]);
+      const seen = new Set([rootId]);
+      for (let d = 0; d < depth; d++) {
+        const next = new Set();
+        for (const l of links) {
+          const s = l.source.id || l.source;
+          const t = l.target.id || l.target;
+          if (frontier.has(s) && !seen.has(t)) next.add(t);
+          if (frontier.has(t) && !seen.has(s)) next.add(s);
+        }
+        for (const x of next) seen.add(x);
+        frontier = next;
+      }
+      return seen;
+    }
+
+    function applyRequestedFocus() {
+      if (!requestedFocus || !state.graph || state.selectedId) return;
+      const wanted = slug(requestedFocus);
+      const candidate = (state.graph.nodes || []).find(n => n.type === "surface" && (slug(n.id) === wanted || slug(n.label) === wanted));
+      if (candidate) {
+        state.selectedId = candidate.id;
+        state.searchMode = "local";
+        searchModeEl.value = state.searchMode;
+        renderDetail(candidate);
+      }
+    }
+
+    function activeGraph() {
+      const graph = state.graph;
+      const query = state.query.trim().toLowerCase();
+
+      let surfaces = graph.nodes.filter(n => n.type === "surface").filter(n => {
+        if (!query) return true;
+        const hay = [n.label, n.description, ...(n.topic_constituents || []), ...(n.audiences || [])].join(" ").toLowerCase();
+        return hay.includes(query);
+      });
+
+      const vectorLinks = buildVectorLinks(surfaces);
+      const ids = new Set(surfaces.map(s => s.id));
+      const curatedSource = Array.isArray(graph?.links?.curated)
+        ? graph.links.curated
+        : Array.isArray(graph?.edges)
+          ? graph.edges
+          : [];
+      const curatedLinks = curatedSource
+        .filter(l => {
+          const sid = l.source?.id || l.source;
+          const tid = l.target?.id || l.target;
+          return ids.has(sid) && ids.has(tid);
+        })
+        .map(l => ({ type: l.type || "curated", ...l }));
+
+      let constituentLinks = [];
+      let topics = [];
+      if (state.showTopics || state.expandedSurfaceId) {
+        const constituentSource = Array.isArray(graph?.links?.constituent) ? graph.links.constituent : [];
+        const relevant = state.expandedSurfaceId ? new Set([state.expandedSurfaceId]) : new Set(surfaces.map(s => s.id));
+        constituentLinks = constituentSource
+          .filter(l => relevant.has(l.source?.id || l.source))
+          .map(l => ({ type: l.type || "constituent", ...l }));
+        const topicIds = new Set(constituentLinks.map(l => l.target?.id || l.target));
+        topics = graph.nodes.filter(n => n.type === "topic" && topicIds.has(n.id));
+      }
+
+      let links = [];
+      if (state.viewMode === "topology") links = [...curatedLinks, ...constituentLinks];
+      if (state.viewMode === "vector") links = [...vectorLinks, ...constituentLinks];
+      if (state.viewMode === "hybrid") links = [...curatedLinks, ...vectorLinks, ...constituentLinks];
+
+      if (state.selectedId && state.searchMode !== "global") {
+        const depth = state.searchMode === "local" ? 1 : 2;
+        const keep = neighborIds(links, state.selectedId, depth);
+        keep.add(state.selectedId);
+        if (state.expandedSurfaceId) keep.add(state.expandedSurfaceId);
+        surfaces = surfaces.filter(n => keep.has(n.id));
+        topics = topics.filter(n => keep.has(n.id));
+        links = links.filter(l => keep.has(l.source.id || l.source) && keep.has(l.target.id || l.target));
+      }
+
+      return { nodes: [...surfaces, ...topics], links };
+    }
+
+    function renderDetail(node) {
+      if (!node) {
+        detailEl.innerHTML = '<h2>Details</h2><div class="detail-empty">Select a node to inspect its description, routes, related surfaces, and topic constituents.</div>';
+        return;
+      }
+
+      const linkRows = [];
+      if (node.landing_page) linkRows.push(`<a href="${node.landing_page}">Landing page</a>`);
+      if (node.survey_page) linkRows.push(`<a href="${node.survey_page}">Survey / intake</a>`);
+      if (node.docs_path) {
+        const docsHome = (node.related_sites || []).find(site => { const s = String(site); return s.startsWith("/documentation/") || s.startsWith("https://socioprophet.com/documentation/"); });
+        const rawDocsPath = String(node.docs_path || "");
+        const href = rawDocsPath.startsWith("http") ? rawDocsPath : rawDocsPath.startsWith("/documentation/") ? rawDocsPath : rawDocsPath.startsWith("/guide/") ? `/documentation${rawDocsPath.replace(/\/?$/, "/")}` : `/documentation/guide/${rawDocsPath.replace(/^\/+/, "").replace(/\/?$/, "/")}`;
+        linkRows.push(`<a href="${href}" target="_blank" rel="noopener">Documentation</a>`);
+      }
+      if (state.showExternal && node.related_sites && node.related_sites.length) {
+        for (const site of node.related_sites) linkRows.push(`<a href="${site}" target="_blank" rel="noopener">${site}</a>`);
+      }
+
+      const badges = (items) => (items || []).map(x => `<span class="badge">${x}</span>`).join("");
+      const related = (node.related_surfaces || []).map(r => `<li>${r}</li>`).join("");
+
+      const expandButton = node.type === "surface" ? `
+        <div class="toolbar">
+          <button class="btn" id="expandBtn">${state.expandedSurfaceId === node.id ? "Collapse constituents" : "Expand constituents"}</button>
+        </div>` : "";
+
+      detailEl.innerHTML = `
+        <h2>${node.label}</h2>
+        <div class="small">${node.type}${node.category ? " • " + node.category : ""}${node.status ? " • " + node.status : ""}</div>
+        <p>${node.description || "No description available."}</p>
+        ${expandButton}
+        ${(node.audiences || []).length ? `<h2>Audiences</h2><div class="badge-row">${badges(node.audiences)}</div>` : ""}
+        ${(node.topic_constituents || []).length ? `<h2>Topic constituents</h2><div class="badge-row">${badges(node.topic_constituents)}</div>` : ""}
+        ${(node.related_surfaces || []).length ? `<h2>Related surfaces</h2><ul class="detail-list">${related}</ul>` : ""}
+        ${linkRows.length ? `<h2>Links</h2><div class="detail-links">${linkRows.join("")}</div>` : ""}
+      `;
+
+      const expandBtn = document.getElementById("expandBtn");
+      if (expandBtn) {
+        expandBtn.addEventListener("click", () => {
+          state.expandedSurfaceId = state.expandedSurfaceId === node.id ? null : node.id;
+          render();
+        });
+      }
+    }
+
+    function render() {
+      const { nodes, links } = activeGraph();
+      const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
+      svg.selectAll("*").remove();
+
+      const linkLayer = svg.append("g");
+      const nodeLayer = svg.append("g");
+      const labelLayer = svg.append("g");
+
+      const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(l => {
+          if (l.type === "constituent") return 75;
+          if (l.type === "vector") return 155;
+          return 120;
+        }).strength(l => l.type === "vector" ? 0.2 : 0.45))
+        .force("charge", d3.forceManyBody().strength(d => d.type === "topic" ? -110 : -360))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d => d.type === "topic" ? 18 : 36));
+
+      const link = linkLayer.selectAll("line")
+        .data(links)
+        .enter()
+        .append("line")
+        .attr("stroke", d => d.type === "vector" ? "#94a3b8" : d.type === "constituent" ? "#cbd5e1" : "#64748b")
+        .attr("stroke-width", d => d.type === "vector" ? 1.5 : d.type === "constituent" ? 1.3 : 2)
+        .attr("stroke-dasharray", d => d.type === "vector" ? "5,4" : null)
+        .attr("opacity", d => d.type === "constituent" ? 0.75 : 0.9);
+
+      const node = nodeLayer.selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("r", d => d.type === "topic" ? 10 : 24)
+        .attr("fill", d => colorFor(d))
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 2)
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+          state.selectedId = d.id;
+          renderDetail(d);
+          render();
+        })
+        .call(
+          d3.drag()
+            .on("start", (event, d) => {
+              if (!event.active) simulation.alphaTarget(0.3).restart();
+              d.fx = d.x; d.fy = d.y;
+            })
+            .on("drag", (event, d) => {
+              d.fx = event.x; d.fy = event.y;
+            })
+            .on("end", (event, d) => {
+              if (!event.active) simulation.alphaTarget(0);
+              d.fx = null; d.fy = null;
+            })
+        );
+
+      const label = labelLayer.selectAll("text")
+        .data(nodes)
+        .enter()
+        .append("text")
+        .text(d => d.label)
+        .attr("font-size", d => d.type === "topic" ? 11 : 13)
+        .attr("font-weight", d => d.type === "topic" ? 500 : 600)
+        .attr("fill", "#0f172a")
+        .attr("text-anchor", "middle")
+        .style("pointer-events", "none");
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x = Math.max(28, Math.min(width - 28, d.x)))
+          .attr("cy", d => d.y = Math.max(28, Math.min(height - 28, d.y)));
+
+        label
+          .attr("x", d => d.x)
+          .attr("y", d => d.y + (d.type === "topic" ? -14 : 40));
+      });
+
+      node.attr("opacity", d => {
+        if (!state.selectedId) return 1;
+        if (d.id === state.selectedId) return 1;
+        const selectedLinks = links.filter(l => (l.source.id || l.source) === state.selectedId || (l.target.id || l.target) === state.selectedId);
+        const neighborIds = new Set();
+        selectedLinks.forEach(l => {
+          neighborIds.add(l.source.id || l.source);
+          neighborIds.add(l.target.id || l.target);
+        });
+        return neighborIds.has(d.id) ? 1 : 0.22;
+      });
+
+      link.attr("opacity", d => {
+        if (!state.selectedId) return d.type === "constituent" ? 0.75 : 0.9;
+        const sid = d.source.id || d.source;
+        const tid = d.target.id || d.target;
+        return sid === state.selectedId || tid === state.selectedId ? 1 : 0.12;
+      });
+
+      label.attr("opacity", d => d.type === "surface" || state.showTopics || state.expandedSurfaceId ? 1 : 0);
+
+      if (state.selectedId) {
+        const selectedNode = nodes.find(n => n.id === state.selectedId)
+          || (state.graph && state.graph.nodes.find(n => n.id === state.selectedId))
+          || null;
+        if (selectedNode) {
+          renderDetail(selectedNode);
+        } else {
+          state.selectedId = null;
+          renderDetail(null);
+        }
+      } else {
+        renderDetail(null);
+      }
+    }
+
+    viewModeEl.addEventListener("change", () => { state.viewMode = viewModeEl.value; render(); });
+    searchModeEl.addEventListener("change", () => { state.searchMode = searchModeEl.value; render(); });
+    thresholdEl.addEventListener("input", () => {
+      state.threshold = parseFloat(thresholdEl.value);
+      thresholdValueEl.textContent = state.threshold.toFixed(2);
+      render();
+    });
+    showTopicsEl.addEventListener("change", () => { state.showTopics = showTopicsEl.checked; render(); });
+    showExternalEl.addEventListener("change", () => {
+      state.showExternal = showExternalEl.checked;
+      if (state.selectedId && state.graph) {
+        const node = state.graph.nodes.find(n => n.id === state.selectedId);
+        renderDetail(node || null);
+      }
+    });
+    queryEl.addEventListener("input", () => { state.query = queryEl.value; render(); });
+
+    fetch("/assets/surface-graph.json")
+      .then(r => r.json())
+      .then(graph => {
+        state.graph = graph;
+      applyRequestedFocus();
+        thresholdValueEl.textContent = state.threshold.toFixed(2);
+        render();
+      })
+      .catch(err => {
+        detailEl.innerHTML = `<h2>Details</h2><div class="detail-empty">Failed to load graph data: ${String(err)}</div>`;
+      });
+  </script>
+<footer class="footer">
+      <div class="home-shell">
+        <div class="footer-row">
+          <div>© SocioProphet</div>
+          <div class="footer-links">
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/">Documentation</a>
+            <a href="https://vue.socioprophet.com">Portal</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

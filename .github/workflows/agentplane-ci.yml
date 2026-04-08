@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bash syntax
+        run: bash -n runners/qemu-local.sh
+
+      - name: Python syntax
+        run: |
+          python3 -m py_compile scripts/*.py
+
+      - name: Bundle validation
+        run: |
+          python3 scripts/validate_bundle.py bundles/example-agent/bundle.json
