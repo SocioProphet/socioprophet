@@ -34,11 +34,11 @@ Sensitive reports include situations involving:
 - guardian-linked or household-linked risk
 - situations requiring a safeguarding review before normal disclosure
 
-Sensitive reports should be handled through a documented safeguarding pathway rather than the ordinary review path.
+Sensitive reports must be handled through a documented safeguarding pathway rather than the ordinary review path.
 
 ## Escalation model
 
-Academy should support a documented escalation path for:
+Academy must support a documented escalation path for:
 - review
 - intervention
 - restricted handling

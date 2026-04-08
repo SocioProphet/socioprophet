@@ -29,7 +29,7 @@ The interaction model is designed to:
 
 Adult-to-minor interactions must be bounded by the documented safeguarding model. Academy does not treat unrestricted private adult-to-minor communication as a normal operating mode.
 
-Where minor participation exists, the contract should favor:
+Where minor participation exists, the contract must favor:
 - structured sessions
 - attributable records
 - guardian-aware or safeguarded pathways
@@ -41,11 +41,11 @@ Learner-to-learner interaction may be permitted within documented boundaries, bu
 
 ## Guardian-linked pathways
 
-Where policy requires it, guardians are linked into visibility, approval, or oversight pathways. Guardian-linked pathways should be explicit rather than informal.
+Where policy requires it, guardians are linked into visibility, approval, or oversight pathways. Guardian-linked pathways must be explicit rather than informal.
 
 ## Reviewability
 
-Important interaction pathways should be:
+Important interaction pathways must be:
 - attributable
 - bounded by role
 - reviewable when policy requires it

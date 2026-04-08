@@ -21,7 +21,7 @@ Current implementation may temporarily omit routes that are not yet built. Publi
 ## Canonical routes
 Primary:
 - /academy/
-- /documentation/
+- /
 - /organizations/
 
 Secondary surfaces (after alignment and review):
@@ -41,7 +41,7 @@ Subsections:
 3. Institutions & Sovereign Systems
 4. Teams & Employers
 
-/institutions/ is not a peer public brand. If used later, it should redirect to /organizations/#institutions-and-sovereign-systems.
+/institutions/ is not a peer public brand. If used later, it must redirect to /organizations/#institutions-and-sovereign-systems.
 
 ## Visual system
 Canonical public shell:
@@ -110,8 +110,8 @@ Deployment, routing, auth, integrations, admin/operator guidance
 Cybernetics systems foundations, methods, architecture logic, advanced details, diagrams, worked examples, course content
 
 Target path model:
-- /documentation/ -> product/operator docs
-- /documentation/manual/ -> textbook/manual layer
+- / -> product/operator docs
+- /guide/architecture -> textbook/manual layer
 
 ## Survey schema
 Surveys are segmentation infrastructure, not just email capture.

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SocioProphet — Connection Recovery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/site.css" />
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+    <header class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="/" class="flex items-center gap-3"><img src="/icon.png" alt="SocioProphet" class="h-9 w-9" /><div class="font-semibold tracking-tight text-slate-900">SocioProphet</div></a>
+        <nav class="flex items-center gap-5 text-sm text-slate-600">
+          <a href="/auth/">Auth</a>
+          <a href="/auth/sign-in/">Sign in</a>
+          <a href="/auth/connections/">Connections</a>
+          <a href="/auth/recovery/" class="font-medium text-slate-900">Recovery</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-6 py-16">
+      <section class="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Step 3 / recovery UX</p>
+          <h1 class="mt-4 text-5xl font-semibold leading-tight">When browser auth gets weird, the product should recover gracefully.</h1>
+          <p class="mt-6 max-w-3xl text-lg text-slate-600">
+            Callback capture failures, expired sessions, denied scopes, and partial provider state must be legible and recoverable. We should never strand the user inside raw provider errors.
+          </p>
+
+          <div class="mt-8 grid gap-4">
+            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <h2 class="text-xl font-semibold">Automatic callback capture</h2>
+              <p class="mt-2 text-sm text-slate-600">Preferred path when localhost callback succeeds.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <h2 class="text-xl font-semibold">Paste callback URL</h2>
+              <p class="mt-2 text-sm text-slate-600">Fallback for headless, sandboxed, or cross-browser cases where auto-capture fails.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <h2 class="text-xl font-semibold">Reconnect or switch method</h2>
+              <p class="mt-2 text-sm text-slate-600">If OAuth fails, present a clean API-key or alternate login path instead of dead-ending.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <p class="text-sm text-slate-500">Example degraded-state screen</p>
+          <h2 class="mt-3 text-3xl font-semibold">We could not complete OpenAI connection automatically</h2>
+          <p class="mt-3 text-slate-600">
+            Your browser finished the provider login, but SocioProphet did not receive the callback locally. Choose one recovery path below.
+          </p>
+
+          <div class="mt-8 space-y-4">
+            <button class="w-full rounded-xl bg-slate-900 px-4 py-3 font-medium text-white">Paste callback URL</button>
+            <button class="w-full rounded-xl border border-slate-300 px-4 py-3 font-medium text-slate-900">Try login again</button>
+            <button class="w-full rounded-xl border border-slate-300 px-4 py-3 font-medium text-slate-900">Use alternate auth method</button>
+          </div>
+
+          <div class="mt-8 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+            <p class="text-sm text-slate-500">Connection states we should support</p>
+            <ul class="mt-3 space-y-2 text-sm text-slate-700">
+              <li>• Not connected</li>
+              <li>• Connecting</li>
+              <li>• Connected</li>
+              <li>• Needs re-auth</li>
+              <li>• Limited capability</li>
+              <li>• Failed test</li>
+              <li>• Revoked</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
