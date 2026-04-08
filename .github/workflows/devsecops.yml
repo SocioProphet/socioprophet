@@ -1,0 +1,45 @@
+name: devsecops
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "requirements-dev.txt"
+      - ".gitleaks.toml"
+      - "scripts/**"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/devsecops.yml"
+  push:
+    branches: [ master ]
+    paths:
+      - ".github/workflows/**"
+      - "requirements-dev.txt"
+      - ".gitleaks.toml"
+      - "scripts/**"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/devsecops.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  governance-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install python deps
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
+
+      - name: Verify workflow branches
+        run: python scripts/verify_workflow_branches.py
+
+      - name: Verify docs navigation rules still parse
+        run: python scripts/verify_docs_nav.py
+
+      - name: Validate UDM release schema
+        run: python scripts/validate_udm_release_schema.py
