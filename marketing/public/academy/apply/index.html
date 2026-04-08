@@ -9,21 +9,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
-    </script>    <script src="/__/firebase/12.10.0/firebase-app-compat.js"></script>
-    <script src="/__/firebase/12.10.0/firebase-firestore-compat.js"></script>
-    <script>
-      window.__MARKETING_FIREBASE_CONFIG__ = {
-        apiKey: "AIzaSyBBqwoel1-XjTwquy66vaNEWpnu29Qu6a0",
-        authDomain: "socioprophet-web-dev-env.firebaseapp.com",
-        projectId: "socioprophet-web-dev-env",
-        storageBucket: "socioprophet-web-dev-env.firebasestorage.app",
-        messagingSenderId: "515493591230",
-        appId: "1:515493591230:web:4744bd8ae63e9e689e86ef",
-        measurementId: "G-RCMK1FNR5S"
-      };
-      if (!firebase.apps.length) {
-        firebase.initializeApp(window.__MARKETING_FIREBASE_CONFIG__);
-      }
     </script>
 </head>
   <body class="bg-slate-50 text-slate-900 font-sans">
@@ -36,7 +21,7 @@
           </a>
           <nav class="flex w-full flex-wrap items-center justify-start gap-4 text-sm sm:w-auto sm:justify-end sm:gap-6">
             <a class="hover:underline" href="/academy/">Academy</a>
-            <a class="hover:underline" href="/documentation/">Documentation</a>
+            <a class="hover:underline" href="/documentation/guide/academy-policy-index/">Documentation</a>
             <a class="hover:underline" href="/organizations/">Organizations</a>
             <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
           </nav>
@@ -90,17 +75,36 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 class="text-xl font-semibold tracking-tight text-slate-950">Academy interest survey</h2>
           <p class="mt-2 text-sm text-slate-600">
-            We collect only enough to route you well. This remains a dev stub until first-party capture is wired.
+            We collect only enough to route you well. This is a first-party intake used to route follow-up appropriately.
           </p>
 
-          <form id="academyApplyForm" class="mt-6 grid gap-4 md:grid-cols-2">
+          
+          <div class="md:col-span-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-semibold tracking-tight text-slate-950">Safety, guardianship, and human safeguards</h2>
+            <p class="mt-2 text-sm text-slate-600">
+              Academy is human-first. Minor participation is bounded by the safeguarding model and the interaction contract. Review these before applying on behalf of a minor or guardian-linked learner.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-3 text-sm">
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/academy-safeguarding-and-minor-protection/" target="_blank" rel="noopener">
+                Safeguarding model
+              </a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/academy-interaction-contract/" target="_blank" rel="noopener">
+                Interaction contract
+              </a>
+              <a class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50" href="/documentation/guide/academy-guardian-rights-sensitive-reports-and-escalation/" target="_blank" rel="noopener">
+                Guardian rights and escalation
+              </a>
+            </div>
+          </div>
+
+<form id="academyApplyForm" class="mt-6 grid gap-4 md:grid-cols-2">
             <input type="hidden" name="assignment_id" value="">
             <input type="hidden" name="experiment_id" value="">
             <input type="hidden" name="variant_id" value="control">
             <input type="hidden" name="cta_id" value="">
             <input type="hidden" name="landing_path" value="">
-            <input type="hidden" name="privacy_policy_version" value="privacy-v0">
-            <input type="hidden" name="terms_version" value="terms-v0">
+            <input type="hidden" name="privacy_policy_version" value="privacy-v2">
+            <input type="hidden" name="terms_version" value="terms-v2">
             <input type="hidden" name="surface" value="academy" />
 
             <div class="md:col-span-2">
@@ -233,8 +237,8 @@
             form.elements["variant_id"].value = params.get("variant") || "control";
             form.elements["cta_id"].value = params.get("cta") || "academy_apply_submit";
             form.elements["landing_path"].value = params.get("from") || document.referrer || "";
-            form.elements["privacy_policy_version"].value = "privacy-v0";
-            form.elements["terms_version"].value = "terms-v0";
+            form.elements["privacy_policy_version"].value = "privacy-v2";
+            form.elements["terms_version"].value = "terms-v2";
             console.log("lead_intake id", data.id, "release", data.releaseId, "slot", data.releaseSlot);
             spTrack("academy_interest_submit", {
               surface: payload.surface || "",

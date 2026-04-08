@@ -1,9 +1,18 @@
-# Products Overview
+# Product Surface Overview
 
-Each domain surface is a product surface. For each surface we document:
-- Purpose
-- Audience (consumer vs commercial vs operator)
-- Privilege boundary (public/auth/operator/immutable)
-- Current routing (redirect vs hosted)
-- Next milestones
+This section tracks the major SocioProphet product surfaces and their current state of maturity.
 
+Some surfaces already have first-class pages and intake paths. Others currently exist as documentation stubs while the information architecture and routing models are defined.
+
+## Current product surfaces
+
+- AI Platform
+- Developer
+- Cloud Suite
+- Live Builds
+- Academy
+- Medical
+- Law
+- Wiki
+- Blog
+- Digital / Trust

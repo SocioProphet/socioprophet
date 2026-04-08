@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SocioProphet</title>
-    <meta name="description" content="SocioProphet: ideas that propagate, trust that compounds." />
+    <meta name="description" content="Ideas that propagate. Intelligence that compounds. Human-first learning, deployment, documentation, and trusted systems." />
     <meta property="og:title" content="SocioProphet" />
-    <meta property="og:description" content="Ideas that propagate. Trust that compounds." />
+    <meta property="og:description" content="Ideas that propagate. Intelligence that compounds. Human-first learning, deployment, documentation, and trusted systems." />
     <meta property="og:type" content="website" />
 
     <link rel="icon" href="/icon.png" />
@@ -15,166 +15,575 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/site.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 
-    <script>
-          }
-        }
-      }
-    </script>
-
-    <!-- GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GL5Y2786Z6"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag(){ dataLayer.push(arguments); }
       gtag("js", new Date());
       gtag("config", "G-GL5Y2786Z6");
-      function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
+      function spTrack(name, params) {
+        try {
+          if (typeof gtag === "function") gtag("event", name, params || {});
+        } catch (e) {}
+      }
     </script>
-  <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      .home-shell { max-width: 96rem; margin: 0 auto; padding: 0 1.5rem; }
+      @media (min-width: 1440px) { .home-shell { max-width: 104rem; } }
+      .home-header { border-bottom: 1px solid #e2e8f0; background: #fff; }
+      .home-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; flex-wrap: wrap; }
+      .home-brand { display: flex; align-items: center; gap: 0.75rem; color: #0f172a; text-decoration: none; }
+      .home-brand img { width: 2.25rem; height: 2.25rem; }
+      .home-brand-name { font-weight: 600; letter-spacing: -0.02em; }
+      .home-nav { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+      .home-nav a { color: #334155; text-decoration: none; font-size: 0.95rem; }
+      .home-nav a:hover { text-decoration: underline; }
+      .btn-dark { display: inline-flex; align-items: center; border-radius: 0.5rem; background: #0f172a; color: white; padding: 0.75rem 1.25rem; text-decoration: none; }
+      .btn-dark:hover { background: #1e293b; }
+      .btn-dark, .btn-dark:visited, .home-nav a.btn-dark, .home-nav a.btn-dark:visited { color: #ffffff !important; -webkit-text-fill-color: #ffffff; opacity: 1; }
+      .btn-light { display: inline-flex; align-items: center; border-radius: 0.5rem; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 0.75rem 1.25rem; text-decoration: none; }
+      .btn-light:hover { background: #f8fafc; }
+      .hero { padding: 2.1rem 0 4.1rem; }
+      .hero-grid { display: grid; gap: 3rem; align-items: start; }
+      .hero-copy { max-width: 43rem; padding-top: 0.15rem; }
+      @media (min-width: 1400px) { .hero-grid { gap: 4rem; } }
+      @media (min-width: 1024px) { .hero-grid { grid-template-columns: minmax(0, 0.98fr) minmax(620px, 1.18fr); } }
+      .hero h1 { font-size: 3rem; line-height: 1.05; margin: 0; }
+      .hero .subtle { color: #475569; }
+      .hero p { max-width: 42rem; font-size: 1.125rem; }
+      .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+      .mini-note { margin-top: 1rem; font-size: 0.75rem; color: #64748b; }
+      .panel { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 1rem; padding: 1.5rem; }
+      .panel-grid { display: grid; gap: 1rem; }
+      @media (min-width: 640px) { .panel-grid { grid-template-columns: 1fr 1fr; } }
+      .card { border: 1px solid #e2e8f0; background: white; border-radius: 0.75rem; padding: 1rem; }
+      .card-kicker { font-size: 0.75rem; color: #64748b; }
+      .section { border-top: 1px solid #e2e8f0; padding: 3rem 0; }
+      .section h2 { margin-top: 0; }
+      .product-grid { display: grid; gap: 1rem; margin-top: 1.5rem; }
+      @media (min-width: 768px) { .product-grid { grid-template-columns: 1fr 1fr; } }
+      @media (min-width: 1024px) { .product-grid { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+      .product-link { border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; text-decoration: none; color: #0f172a; background: white; display: block; }
+      .product-link:hover { background: #f8fafc; }
+      .surface-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+      .surface-pill { border: 1px solid #e2e8f0; background: white; border-radius: 9999px; padding: 0.6rem 1rem; text-decoration: none; color: #0f172a; font-size: 0.95rem; }
+      .surface-pill:hover { background: #f1f5f9; }
+      .footer { border-top: 1px solid #e2e8f0; }
+      .footer-row { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 2rem 0; font-size: 0.95rem; color: #475569; }
+      .footer-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+      .footer a { color: #475569; text-decoration: none; }
+      .footer a:hover { text-decoration: underline; }
+    
+      .platform-map { display: flex; flex-direction: column; gap: 1rem; padding-top: 0.8rem; }
+      .map-intro { display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
+      .map-intro h2 { margin: 0; font-size: 1.65rem; line-height: 1.15; }
+      .map-intro p { margin: 0; max-width: 42rem; }
+      .map-intro .card-kicker { order: 2; }
+      .map-stage { display: grid; gap: 1rem; align-items: stretch; }
+      @media (min-width: 1180px) { .map-stage { grid-template-columns: 190px minmax(0,1fr); } }
+      .map-rail { border: 1px solid #e2e8f0; background: white; border-radius: 0.85rem; padding: 0.9rem; }
+      .map-rail-title { font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+      .map-chip-row { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.7rem; }
+      .map-chip { border: 1px solid #cbd5e1; background: white; color: #0f172a; border-radius: 0.7rem; padding: 0.55rem 0.7rem; font: inherit; text-align: left; cursor: pointer; }
+      .map-chip:hover { background: #f8fafc; }
+      .map-chip.is-active { background: #0f172a; color: #ffffff; border-color: #0f172a; }
+      .map-note { margin: 0.85rem 0 0; font-size: 0.84rem; line-height: 1.45; color: #475569; }
+      .map-rail-link { display: inline-block; margin-top: 0.85rem; font-size: 0.92rem; font-weight: 600; color: #0f172a; text-decoration: none; }
+      .map-rail-link:hover { text-decoration: underline; }
+      .map-canvas-wrap { border: 1px solid #e2e8f0; border-radius: 1rem; background: white; padding: 0.75rem; }
+      .map-svg { width: 100%; height: auto; display: block; min-height: 340px; border: 1px solid #e2e8f0; border-radius: 1rem; background: white; }
+      @media (min-width: 1400px) { .map-svg { min-height: 400px; } }
+      .map-grid { display: grid; gap: 0.75rem; }
+      @media (min-width: 640px) { .map-grid { grid-template-columns: 1fr 1fr; } }
+      .map-link-card { border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1rem; background: white; text-decoration: none; color: #0f172a; display: block; }
+      .map-link-card:hover { background: #f8fafc; }
+      .map-link-card .kicker { font-size: 0.75rem; color: #64748b; }
+      .map-link-card p { margin-top: 0.35rem; }
+      .auth-story { background: #f8fafc; }
+      .auth-story-shell { display: grid; gap: 1.25rem; }
+      @media (min-width: 980px) { .auth-story-shell { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); align-items: start; } }
+      .auth-story-copy p { max-width: 44rem; }
+      .auth-story-grid { display: grid; gap: 1rem; }
+      @media (min-width: 768px) { .auth-story-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      .auth-story-card { border: 1px solid #e2e8f0; border-radius: 1rem; background: white; padding: 1rem; }
+      .auth-story-card p { margin: 0.45rem 0 0; color: #475569; font-size: 0.98rem; }
+
+    </style>
+      <script src="/assets/surface-graph-shared.js"></script>
 </head>
 
-  <body class="bg-white text-slate-900 font-sans">
-    <header class="border-b">
-      <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3" onclick="spTrack(cta_home_click,{href:/});">
-          <img src="/icon.png" alt="SocioProphet" class="h-9 w-9" />
-          <div class="font-semibold tracking-tight">SocioProphet</div>
-        </a>
-
-        <nav class="flex items-center gap-6 text-sm">
-          <a class="hover:underline" href="/organizations/">Organizations</a>
-          <a class="hover:underline" href="/documentation" onclick="spTrack(cta_docs_click,{href:this.getAttribute(href)});">Documentation</a>
-          <a class="hover:underline" href="https://vue.socioprophet.com" onclick="spTrack(cta_portal_click,{href:this.getAttribute(href)});">Portal</a>
-          <a class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-800"
-             href="https://vue.socioprophet.com/login"
-             onclick="spTrack(cta_login_click,{href:this.getAttribute(href)});">
-            Login
+  <body>
+    <header class="home-header">
+      <div class="home-shell">
+        <div class="home-header-row">
+          <a href="/" class="home-brand" onclick='spTrack("cta_home_click",{href:"/"})'>
+            <img src="/icon.png" alt="SocioProphet" />
+            <div class="home-brand-name">SocioProphet</div>
           </a>
-        </nav>
+
+          <nav class="home-nav">
+            <a href="/academy/">Commons</a>
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
+            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+          </nav>
+        </div>
       </div>
     </header>
 
     <main>
-      <!-- HERO -->
-      <section class="mx-auto max-w-6xl px-6 py-16">
-        <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <div class="space-y-6">
-            <h1 class="text-4xl font-semibold tracking-tight lg:text-5xl">
-              Ideas that propagate.
-              <span class="text-slate-600">Trust that compounds.</span>
-            </h1>
+      <section class="hero">
+        <div class="home-shell">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <div class="card-kicker">DETERMINISTIC AI • GOVERNED OPERATIONS • BOUNDARY-FIRST CYBERNETICS</div>
+              <h1>
+                Deterministic AI for governed operations.<br>
+                <span class="subtle">Built for Institutions, Operators, and Learning Systems.</span>
+              </h1>
 
-            <p class="text-lg text-slate-700 max-w-prose">
-              SocioProphet is building a platform where concept clarity drives adoption,
-              identity drives retention, and revenue follows trust—not coercion.
-            </p>
+              <p>
+                SocioProphet is a governed operational intelligence platform for Learning, Trust, and Deployment Surfaces. Start with Academy, open Documentation, or move into Organizations for institutional adoption, Entity Analytics, and Authorized Cyberdefense.
+              </p>
 
-            <div class="flex flex-wrap gap-3">
-              <a class="inline-flex items-center rounded-md bg-slate-900 px-5 py-3 text-white hover:bg-slate-800"
-                 href="https://vue.socioprophet.com/login"
-                 onclick="spTrack(cta_get_started_click,{href:this.getAttribute(href)});">
-                Get started
-              </a>
+              <div class="cta-row">
+                <a class="btn-dark" href="/academy/" onclick='spTrack("cta_commons_click",{href:this.getAttribute("href")})'>
+                  Enter Commons
+                </a>
 
-              <a class="inline-flex items-center rounded-md border border-slate-300 px-5 py-3 hover:bg-slate-50"
-                 href="/documentation"
-                 onclick="spTrack(cta_docs_click,{href:this.getAttribute(href)});">
-                Read the docs
-              </a>
+                <a class="btn-light" href="/organizations/" onclick='spTrack("cta_organizations_click",{href:this.getAttribute("href")})'>
+                  For Organizations
+                </a>
+                <a class="btn-light" href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>
+                  Open Documentation
+                </a>
+                <a class="btn-light" href="/map/" onclick='spTrack("cta_map_click",{href:this.getAttribute("href")})'>
+                  Explore the Map
+                </a>
+              </div>
+
+              <div class="mini-note">
+                Start with Commons for public learning and participation, Organizations for deployment, and Documentation for proof and technical depth.
+              </div>
             </div>
 
-            <div class="text-xs text-slate-500">
-              We measure meaning first, then behavior, then economics.
-            </div>
-          </div>
+            <div class="panel platform-map">
+              <div class="map-intro">
+                <h2>Prophet platform map</h2>
+                <div class="card-kicker">Explorer-inspired controls</div>
+                <p>Watch the platform graph build in rollout order from the live graph substrate: documentation, learning, deployment, technical product surfaces, and trust/governance.</p>
+              </div>
 
-          <div class="rounded-xl border bg-slate-50 p-6">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div class="rounded-lg bg-white p-4 border">
-                <div class="text-xs text-slate-500">Loop 1</div>
-                <div class="font-medium">Idea contagion</div>
-                <div class="text-sm text-slate-600">Propagation &gt; traffic hoarding</div>
+              <div class="map-stage">
+                <aside class="map-rail">
+                  <div class="map-rail-title">Modes</div>
+                  <div class="map-chip-row">
+                    <button class="map-chip is-active" type="button" data-home-mode="rollout">Rollout build</button>
+                    <button class="map-chip" type="button" data-home-mode="hybrid">Hybrid links</button>
+                    <button class="map-chip" type="button" data-home-mode="topology">Curated topology</button>
+                  </div>
+                  <p class="map-note">Click a node to open the explorer in a new tab focused on that surface.</p>
+                  <a class="map-rail-link" href="/map/?mode=hybrid" target="_blank" rel="noopener">Open explorer ↗</a>
+                </aside>
+
+                <div class="map-canvas-wrap">
+                  <svg id="homeGraph" class="map-svg" viewBox="0 0 760 420" role="img" aria-label="Prophet platform map"></svg>
+                </div>
               </div>
-              <div class="rounded-lg bg-white p-4 border">
-                <div class="text-xs text-slate-500">Loop 2</div>
-                <div class="font-medium">Identity formation</div>
-                <div class="text-sm text-slate-600">Return curves &gt; clicks</div>
-              </div>
-              <div class="rounded-lg bg-white p-4 border">
-                <div class="text-xs text-slate-500">Loop 3</div>
-                <div class="font-medium">Economic contagion</div>
-                <div class="text-sm text-slate-600">Trust → ARR, not hype</div>
-              </div>
-              <div class="rounded-lg bg-white p-4 border">
-                <div class="text-xs text-slate-500">Operating</div>
-                <div class="font-medium">OODA loop</div>
-                <div class="text-sm text-slate-600">Observe → Orient → Decide → Act</div>
+
+              <div class="map-grid">
+                <a class="map-link-card" href="/academy/">
+                  <div class="kicker">Commons</div>
+                  <strong>Open learning, governed participation, and shared knowledge infrastructure</strong>
+                  <p>Academy is the flagship live surface inside Commons for learners, families, mentors, and educators.</p>
+                </a>
+
+                <a class="map-link-card" href="/organizations/">
+                  <div class="kicker">Organizations</div>
+                  <strong>Deployment for enterprise, government and public sector, schools, and nonprofits</strong>
+                  <p>Start here for institutional evaluation, procurement review, deployment pathways, and governed adoption.</p>
+                </a>
+
+                <a class="map-link-card" href="/documentation/">
+                  <div class="kicker">Documentation</div>
+                  <strong>Architecture, governance, trust boundaries, and product proof</strong>
+                  <p>Start here for technical validation, system model review, and canonical platform direction.</p>
+                </a>
+
+                <a class="map-link-card" href="/documentation/guide/canonical-platform-direction/">
+                  <div class="kicker">Surface inventory</div>
+                  <strong>See which surfaces already have landing pages, intake, and documentation</strong>
+                  <p>Use this to understand what is fully live now and what is still maturing.</p>
+                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- PRODUCTS (single merged section) -->
-      <section class="border-t bg-white">
-        <div class="mx-auto max-w-6xl px-6 py-12">
-          <h2 class="text-2xl font-semibold tracking-tight">Products</h2>
-          <p class="mt-2 text-slate-600">Each surface has a purpose, privilege boundary, and routing policy.</p>
+      <section class="section">
+        <div class="home-shell">
+          <h2>Products</h2>
+          <p>Each surface serves a distinct audience, trust boundary, and operational purpose.</p>
 
-          <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-sm">
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/ai" onclick="spTrack(cta_product_click,{product:ai,href:this.getAttribute(href)});">
-              <div class="text-xs text-slate-500">.ai</div><div class="font-medium mt-1">AI Platform</div>
+          <div class="product-grid">
+            <a class="product-link" href="/documentation/guide/products/ai/" onclick='spTrack("cta_product_click",{product:"ai",href:this.getAttribute("href")})'>
+              <div class="card-kicker">.ai</div><div><strong>AI Platform</strong></div>
             </a>
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/dev" onclick="spTrack(cta_product_click,{product:dev,href:this.getAttribute(href)});">
-              <div class="text-xs text-slate-500">.dev</div><div class="font-medium mt-1">Developer</div>
+            <a class="product-link" href="/documentation/guide/products/dev/" onclick='spTrack("cta_product_click",{product:"dev",href:this.getAttribute("href")})'>
+              <div class="card-kicker">.dev</div><div><strong>Developer</strong></div>
             </a>
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/cloud" onclick="spTrack(cta_product_click,{product:cloud,href:this.getAttribute(href)});">
-              <div class="text-xs text-slate-500">.cloud</div><div class="font-medium mt-1">Cloud Suite</div>
+            <a class="product-link" href="/documentation/guide/products/cloud/" onclick='spTrack("cta_product_click",{product:"cloud",href:this.getAttribute("href")})'>
+              <div class="card-kicker">.cloud</div><div><strong>Cloud Suite</strong></div>
             </a>
-            <a class="rounded-xl border p-4 hover:bg-slate-50" href="/documentation/guide/products/live" onclick="spTrack(cta_product_click,{product:live,href:this.getAttribute(href)});">
-              <div class="text-xs text-slate-500">.live</div><div class="font-medium mt-1">Live Builds</div>
+            <a class="product-link" href="/documentation/guide/products/live/" onclick='spTrack("cta_product_click",{product:"live",href:this.getAttribute("href")})'>
+              <div class="card-kicker">.live</div><div><strong>Live Builds</strong></div>
             </a>
           </div>
         </div>
       </section>
 
-      <!-- MORE SURFACES (bottom) -->
-      <section class="border-t bg-slate-50">
-        <div class="mx-auto max-w-6xl px-6 py-10">
-          <div class="flex items-end justify-between gap-6 flex-wrap">
+
+      <section class="section">
+        <div class="home-shell">
+          <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:end;">
             <div>
-              <h2 class="text-lg font-semibold tracking-tight">More surfaces</h2>
-              <p class="mt-1 text-sm text-slate-600">Mission, knowledge, and trust surfaces—without clutter.</p>
+              <h2>Institutional path</h2>
+              <p>Organizations is the institutional landing for Governed AI, the Agent Plane, Entity Analytics, and Authorized Cyberdefense under Human Oversight.</p>
             </div>
-            <a class="text-sm text-slate-600 hover:underline" href="/documentation/guide/products/overview"
-               onclick="spTrack(cta_products_overview_click,{href:this.getAttribute(href)});">
-              See all →
-            </a>
+            <a href="/organizations/" onclick='spTrack("cta_organizations_surface_click",{href:this.getAttribute("href")})'>Open organizations →</a>
           </div>
 
-          <div class="mt-5 flex flex-wrap gap-2 text-sm">
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/academy" onclick="spTrack(cta_surface_click,{surface:academy,href:this.getAttribute(href)});">Academy (.academy)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/medical" onclick="spTrack(cta_surface_click,{surface:medical,href:this.getAttribute(href)});">Medical (.md)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/law" onclick="spTrack(cta_surface_click,{surface:law,href:this.getAttribute(href)});">Law (.law)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/wiki" onclick="spTrack(cta_surface_click,{surface:wiki,href:this.getAttribute(href)});">Wiki (.wiki)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/products/blog" onclick="spTrack(cta_surface_click,{surface:blog,href:this.getAttribute(href)});">Blog (.blog)</a>
-            <a class="rounded-full border bg-white px-4 py-2 hover:bg-slate-100" href="/documentation/guide/domain-surface" onclick="spTrack(cta_surface_click,{surface:digital,href:this.getAttribute(href)});">Digital / Trust (.digital)</a>
+          <div class="surface-row">
+            <a class="surface-pill" href="/organizations/" onclick='spTrack("cta_org_surface_click",{href:this.getAttribute("href")})'>Organizations</a>
+            <a class="surface-pill" href="/documentation/guide/organizations-governance-and-institutional-safety/" onclick='spTrack("cta_org_governance_click",{href:this.getAttribute("href")})'>Governance docs</a>
+            <a class="surface-pill" href="/documentation/guide/governed-ai-and-cybernetics/" onclick='spTrack("cta_org_governed_click",{href:this.getAttribute("href")})'>Governed AI</a>
+            <a class="surface-pill" href="/organizations/apply/" onclick='spTrack("cta_org_apply_click",{href:this.getAttribute("href")})'>Open deployment intake</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="background:#f8fafc;">
+        <div class="home-shell">
+          <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:end;">
+            <div>
+              <h2>More surfaces</h2>
+              <p>Mission, knowledge, and trust surfaces—without clutter.</p>
+            </div>
+            <a href="/documentation/guide/products/overview/" onclick='spTrack("cta_products_overview_click",{href:this.getAttribute("href")})'>See all →</a>
+          </div>
+
+          <div class="surface-row">
+            <a class="surface-pill" href="/documentation/guide/products/academy/" onclick='spTrack("cta_surface_click",{surface:"academy",href:this.getAttribute("href")})'>Academy (.academy)</a>
+            <a class="surface-pill" href="/documentation/guide/products/medical/" onclick='spTrack("cta_surface_click",{surface:"medical",href:this.getAttribute("href")})'>Medical (.md)</a>
+            <a class="surface-pill" href="/documentation/guide/products/law/" onclick='spTrack("cta_surface_click",{surface:"law",href:this.getAttribute("href")})'>Law (.law)</a>
+            <a class="surface-pill" href="/documentation/guide/products/wiki/" onclick='spTrack("cta_surface_click",{surface:"wiki",href:this.getAttribute("href")})'>Wiki (.wiki)</a>
+            <a class="surface-pill" href="/documentation/guide/products/blog/" onclick='spTrack("cta_surface_click",{surface:"blog",href:this.getAttribute("href")})'>Blog (.blog)</a>
+            <a class="surface-pill" href="/documentation/guide/digital-trust-and-capability-routing/" onclick='spTrack("cta_surface_click",{surface:"digital",href:this.getAttribute("href")})'>Digital / Trust (.digital)</a>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="border-t">
-      <div class="mx-auto max-w-6xl px-6 py-10 text-sm text-slate-600 flex flex-wrap gap-4 justify-between">
-        <div>© <span id="y"></span> SocioProphet</div>
-        <div class="flex gap-4">
-          <a class="hover:underline" href="/documentation" onclick="spTrack(cta_docs_click,{href:this.getAttribute(href)});">Docs</a>
-          <a class="hover:underline" href="https://vue.socioprophet.com" onclick="spTrack(cta_portal_click,{href:this.getAttribute(href)});">Portal</a>
-          <a class="hover:underline" href="/investor" onclick="spTrack(cta_investor_click,{href:this.getAttribute(href)});">Investor</a>
+    <footer class="footer">
+      <div class="home-shell">
+        <div class="footer-row">
+          <div>© <span id="y"></span> SocioProphet</div>
+          <div class="footer-links">
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Docs</a>
+            <a href="/auth/" onclick='spTrack("cta_auth_click",{href:this.getAttribute("href")})'>Auth</a>
+            <a href="/map/" onclick='spTrack("cta_map_click",{href:this.getAttribute("href")})'>Map</a>
+            <a href="/investor/" onclick='spTrack("cta_investor_click",{href:this.getAttribute("href")})'>Investor</a>
+          </div>
         </div>
       </div>
       <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
     </footer>
+  
+        <script>
+      (function () {
+        const el = document.getElementById("homeGraph");
+        if (!el || typeof d3 === "undefined") return;
+
+        const svg = d3.select(el);
+        const width = 760;
+        const height = 420;
+        const modeButtons = Array.from(document.querySelectorAll("[data-home-mode]"));
+        let graphData = null;
+        let simulation = null;
+        let timer = null;
+        let currentMode = "rollout";
+
+        function slug(text) {
+          return String(text || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        }
+
+        function colorFor(node) {
+          switch (node.category) {
+            case "learning":
+            case "deployment": return "#1d4ed8";
+            case "technical": return "#7c3aed";
+            case "trust":
+            case "governance": return "#0f766e";
+            case "domain": return "#b45309";
+            case "docs": return "#0f172a";
+            case "content": return "#64748b";
+            default: return "#64748b";
+          }
+        }
+
+        function featureSet(node) {
+          const values = [];
+          values.push("category:" + slug(node.category || ""));
+          values.push("group:" + slug(node.graph_group || ""));
+          for (const t of (node.topic_constituents || [])) values.push("topic:" + slug(t));
+          for (const t of (node.normalized_topics || [])) values.push("norm:" + slug(t));
+          for (const a of (node.audiences || [])) values.push("aud:" + slug(a));
+          for (const r of (node.related_surfaces || [])) values.push("rel:" + slug(r));
+          const overlay = node.investor_overlay || {};
+          if (overlay.lens) values.push("lens:" + slug(overlay.lens));
+          for (const d of (overlay.value_drivers || [])) values.push("driver:" + slug(d));
+          for (const p of (overlay.economic_profit_proxy || [])) values.push("proxy:" + slug(p));
+          return new Set(values.filter(Boolean));
+        }
+
+        function jaccard(a, b) {
+          const A = new Set(a);
+          const B = new Set(b);
+          let inter = 0;
+          for (const x of A) if (B.has(x)) inter += 1;
+          const uni = new Set([].concat(Array.from(A), Array.from(B))).size;
+          return uni ? inter / uni : 0;
+        }
+
+        function buildVectorLinks(surfaceNodes, threshold) {
+          const out = [];
+          for (let i = 0; i < surfaceNodes.length; i++) {
+            for (let j = i + 1; j < surfaceNodes.length; j++) {
+              const a = surfaceNodes[i];
+              const b = surfaceNodes[j];
+              const score = jaccard(featureSet(a), featureSet(b));
+              if (score >= threshold) out.push({ source: a.id, target: b.id, type: "vector", score: score });
+            }
+          }
+          return out;
+        }
+
+        function orderValue(node, index) {
+          const raw = Number(node.map_priority);
+          const priority = Number.isFinite(raw) ? raw : (1000 + index);
+          const docsBias = node.category === "docs" ? -100 : 0;
+          return priority + docsBias;
+        }
+
+        function initialPosition(node, index) {
+          const anchors = {
+            docs: [390, 155],
+            learning: [560, 150],
+            deployment: [560, 150],
+            technical: [255, 308],
+            trust: [458, 305],
+            governance: [458, 305],
+            domain: [610, 242],
+            content: [200, 165]
+          };
+          const anchor = anchors[node.category] || [390, 210];
+          const dx = ((index % 3) - 1) * 26;
+          const dy = ((Math.floor(index / 3) % 3) - 1) * 22;
+          node.x = anchor[0] + dx;
+          node.y = anchor[1] + dy;
+        }
+
+        function labelLines(text) {
+          if (String(text).includes(" / ")) return String(text).split(" / ");
+          const parts = String(text).split(" ");
+          if (parts.length >= 3) {
+            const mid = Math.ceil(parts.length / 2);
+            return [parts.slice(0, mid).join(" "), parts.slice(mid).join(" ")];
+          }
+          return [String(text)];
+        }
+
+        function stopScene() {
+          if (timer) {
+            window.clearInterval(timer);
+            timer = null;
+          }
+          if (simulation) {
+            simulation.stop();
+            simulation = null;
+          }
+        }
+
+        function setActiveMode(mode) {
+          currentMode = mode;
+          modeButtons.forEach(function (btn) {
+            btn.classList.toggle("is-active", btn.dataset.homeMode === mode);
+          });
+        }
+
+        function renderScene(mode) {
+          if (!graphData) return;
+          setActiveMode(mode);
+          stopScene();
+          svg.selectAll("*").remove();
+
+          const nodes = (graphData.nodes || [])
+            .filter(function (n) { return n.type === "surface"; })
+            .map(function (n, index) { return Object.assign({}, n, { __sourceIndex: index }); });
+
+          const ordered = nodes.slice().sort(function (a, b) {
+            return orderValue(a, a.__sourceIndex) - orderValue(b, b.__sourceIndex) ||
+              a.__sourceIndex - b.__sourceIndex ||
+              String(a.label || "").localeCompare(String(b.label || ""));
+          });
+
+          const orderById = new Map(ordered.map(function (n, i) { return [n.id, i]; }));
+          nodes.forEach(initialPosition);
+
+          const ids = new Set(nodes.map(function (n) { return n.id; }));
+          const curated = (((graphData.links || {}).curated) || [])
+            .filter(function (l) { return ids.has(l.source) && ids.has(l.target); })
+            .map(function (l) { return { source: l.source, target: l.target, type: "curated" }; });
+
+          const vectors = buildVectorLinks(nodes, 0.16);
+          const seen = new Set();
+          const links = (mode === "topology" ? curated : curated.concat(vectors)).filter(function (l) {
+            const key = [l.source, l.target].sort().join("::") + "::" + l.type;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+
+          const linkLayer = svg.append("g");
+          const nodeLayer = svg.append("g");
+          const labelLayer = svg.append("g");
+
+          const link = linkLayer.selectAll("line")
+            .data(links)
+            .enter()
+            .append("line")
+            .attr("stroke", function (d) { return d.type === "vector" ? "#cbd5e1" : "#94a3b8"; })
+            .attr("stroke-width", function (d) { return d.type === "vector" ? 1.5 : 2; })
+            .attr("stroke-dasharray", function (d) { return d.type === "vector" ? "4 4" : null; })
+            .attr("opacity", 0);
+
+          const node = nodeLayer.selectAll("circle")
+            .data(nodes)
+            .enter()
+            .append("circle")
+            .attr("r", function (d) { return d.category === "docs" ? 18 : 14; })
+            .attr("fill", function (d) { return colorFor(d); })
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 2)
+            .attr("opacity", 0)
+            .style("cursor", "pointer")
+            .on("click", function (_, d) {
+              const href = "/map/?focus=" + encodeURIComponent(d.id) + "&mode=hybrid";
+              window.open(href, "_blank", "noopener,noreferrer");
+            });
+
+          const groups = labelLayer.selectAll("g")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .style("pointer-events", "none")
+            .attr("opacity", 0);
+
+          groups.each(function (d) {
+            const g = d3.select(this);
+            labelLines(d.label).forEach(function (line, i) {
+              g.append("text")
+                .attr("text-anchor", "middle")
+                .attr("y", i * 11)
+                .attr("font-size", 10.5)
+                .attr("font-weight", d.category === "docs" ? 700 : 600)
+                .attr("fill", "#0f172a")
+                .text(line);
+            });
+          });
+
+          simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(function (d) { return d.id; }).distance(function (l) { return l.type === "vector" ? 150 : 120; }).strength(function (l) { return l.type === "vector" ? 0.18 : 0.42; }))
+            .force("charge", d3.forceManyBody().strength(-320))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(32));
+
+          let visibleCount = mode === "rollout" ? 0 : ordered.length;
+
+          function isVisible(nodeDatum) {
+            return (orderById.get(nodeDatum.id) ?? 9999) < visibleCount;
+          }
+
+          function linkVisible(linkDatum) {
+            const s = linkDatum.source.id || linkDatum.source;
+            const t = linkDatum.target.id || linkDatum.target;
+            return (orderById.get(s) ?? 9999) < visibleCount && (orderById.get(t) ?? 9999) < visibleCount;
+          }
+
+          function updateVisibility() {
+            link.attr("opacity", function (d) { return linkVisible(d) ? (d.type === "vector" ? 0.65 : 0.95) : 0; });
+            node.attr("opacity", function (d) { return isVisible(d) ? 1 : 0; });
+            groups.attr("opacity", function (d) { return isVisible(d) ? 1 : 0; });
+          }
+
+          function ticked() {
+            link
+              .attr("x1", function (d) { return d.source.x; })
+              .attr("y1", function (d) { return d.source.y; })
+              .attr("x2", function (d) { return d.target.x; })
+              .attr("y2", function (d) { return d.target.y; });
+
+            node
+              .attr("cx", function (d) { return d.x; })
+              .attr("cy", function (d) { return d.y; });
+
+            groups
+              .attr("transform", function (d) { return "translate(" + d.x + "," + (d.y + 28) + ")"; });
+          }
+
+          simulation.on("tick", ticked);
+          ticked();
+          updateVisibility();
+
+          if (mode === "rollout") {
+            timer = window.setInterval(function () {
+              visibleCount = Math.min(ordered.length, visibleCount + 1);
+              updateVisibility();
+              simulation.alpha(0.85).restart();
+              if (visibleCount >= ordered.length) {
+                window.clearInterval(timer);
+                timer = null;
+                window.setTimeout(function () { if (simulation) simulation.alphaTarget(0); }, 1200);
+              }
+            }, 260);
+          } else {
+            simulation.alpha(0.7).restart();
+            window.setTimeout(function () { if (simulation) simulation.alphaTarget(0); }, 900);
+          }
+        }
+
+        modeButtons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            renderScene(btn.dataset.homeMode || "rollout");
+          });
+        });
+
+        fetch("/assets/surface-graph.json")
+          .then(function (r) { return r.json(); })
+          .then(function (graph) {
+            graphData = graph;
+            renderScene(currentMode);
+          })
+          .catch(function (err) {
+            console.error("homeGraph render failed", err);
+          });
+      })();
+    </script>
+
   </body>
 </html>

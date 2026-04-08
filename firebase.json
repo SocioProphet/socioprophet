@@ -2,18 +2,14 @@
   "hosting": [
     {
       "target": "docs",
-      "public": "docs/.vitepress/dist",
+      "public": "docs/.vitepress/publish",
       "ignore": [
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
       ],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
+      "cleanUrls": true,
+      "trailingSlash": false
     },
     {
       "target": "marketing",

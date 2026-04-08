@@ -18,6 +18,9 @@
       "hosting": {
         "marketing": [
           "socioprophet-marketing"
+        ],
+        "docs": [
+          "socioprophet-web"
         ]
       }
     }
