@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "agentplane/**"
+      - "formal/**"
       - ".github/workflows/agentplane-deployment-invariants.yml"
   pull_request:
     paths:
       - "agentplane/**"
+      - "formal/**"
       - ".github/workflows/agentplane-deployment-invariants.yml"
 
 jobs:

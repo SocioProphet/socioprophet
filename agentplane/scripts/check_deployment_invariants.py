@@ -35,7 +35,17 @@ def out_dir(bundle: dict[str, Any], bundle_path: Path) -> Path:
     if not raw:
         raise ValueError("bundle missing spec.artifacts.outDir")
     p = Path(raw)
-    return p if p.is_absolute() else (bundle_path.parent / p).resolve()
+    if p.is_absolute():
+        return p
+    root = repo_root(bundle_path.parent)
+    ap_root = root / "agentplane"
+    candidate_ap = (ap_root / p).resolve()
+    candidate_bundle = (bundle_path.parent / p).resolve()
+    if candidate_ap.exists():
+        return candidate_ap
+    if candidate_bundle.exists():
+        return candidate_bundle
+    return candidate_ap
 
 
 def main() -> int:
