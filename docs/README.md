@@ -8,6 +8,11 @@ This repo should carry **SocioProphet-specific** doctrine, product constraints, 
 - Philosophy index: `docs/philosophy/README.md`
 - Liberty by Design (product doctrine): `docs/philosophy/liberty-by-design.md`
 
+## Constitutional mapping
+
+- Constitutional docs index: `docs/constitutional/README.md`
+- Doctrine contract map: `docs/constitutional/doctrine-map.yaml`
+
 ## Specs
 
 Doctrine-linked specification stubs and formal specs live under `spec/`.
