@@ -1,0 +1,60 @@
+apiVersion: control.socioprophet.org/v1alpha1
+kind: MeshSkill
+metadata:
+  id: sp.control.checkout-validate@e23.proc7-3.draft+l0
+  merkle_root: sha256:REPLACE_ME
+  signer: mesh-registry
+  owner: team-checkout
+  publication_scope: internal
+spec:
+  lane: hard
+  class: verify
+  coordinates:
+    env: preview
+    topology_scope: service.checkout
+    trust_class: internal
+    tenant_scope: default
+    frontier_hops: 2
+    data_sensitivity: redacted
+  actions:
+    - build_artifact
+    - deploy_shadow_cell
+    - replay_traffic_window
+    - run_contract_checks
+    - compare_slo_regressions
+    - emit_evidence_bundle
+  plan:
+    ref: cairn://plans/checkout-validate/v3
+    deterministic: true
+    timeout_s: 900
+    max_cost_units: 250
+    idempotency_key_strategy: sha256(patch_ref,dependency_lock,traffic_window)
+  inputs:
+    - patch_ref
+    - dependency_lock
+    - traffic_window
+  outputs:
+    - verdict
+    - evidence_bundle_ref
+    - promoted_claim_refs
+  policy:
+    allow_autoapprove_below_risk: 30
+    deny:
+      - live_prod_write
+      - pii_export
+      - frontier_hops_gt_2
+    require_human_approval_for:
+      - prod
+      - commit
+  evidence:
+    require:
+      - logs
+      - traces
+      - metrics
+      - config_diff
+      - dependency_diff
+      - policy_decision
+      - cairn_before
+      - cairn_after
+  side_effects: ephemeral_internal
+  risk: 18
