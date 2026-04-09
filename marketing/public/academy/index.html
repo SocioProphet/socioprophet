@@ -7,7 +7,8 @@
     <meta name="description" content="A people-first cybernetics systems learning surface for learners, families, mentors, organizations, and future opportunity pathways." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+      <script src="/assets/surface-graph-shared.js"></script>
+</head>
   <body class="bg-slate-50 text-slate-900 font-sans">
     <header class="border-b border-slate-200 bg-white/95 backdrop-blur">
       <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6">
@@ -16,11 +17,11 @@
             <img src="/icon.png" alt="SocioProphet" class="h-9 w-9 shrink-0" />
             <div class="truncate font-semibold tracking-tight">SocioProphet</div>
           </a>
-          <nav class="flex w-full flex-wrap items-center justify-start gap-4 text-sm sm:w-auto sm:justify-end sm:gap-6">
-            <a class="hover:underline" href="/academy/">Academy</a>
-            <a class="hover:underline" href="/documentation/guide/academy-policy-index/">Documentation</a>
-            <a class="hover:underline" href="/organizations/">Organizations</a>
-            <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
+          <nav class="home-nav">
+            <a href="/academy/">Commons</a>
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
+            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
           </nav>
         </div>
       </div>
@@ -30,7 +31,7 @@
       <section class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
         <div class="space-y-6">
           <div class="inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-            Academy • K-12 • Lifelong Learning • Cybernetics Systems
+            Commons • Academy • Learning • Mentorship • Cybernetics Systems
           </div>
 
           <div class="max-w-4xl space-y-5">
@@ -39,7 +40,7 @@
             </h1>
 
             <p class="max-w-3xl text-lg text-slate-700">
-              Academy is the flagship SocioProphet learning surface: a people-first entry point for families, learners, mentors, and organizations seeking serious systems education, guided cohorts, and ethical pathways from knowledge into real capability.
+              Academy is the flagship live learning surface inside Commons: a people-first entry point for families, learners, mentors, and organizations seeking serious systems education, guided cohorts, and ethical pathways from knowledge into real capability.
             </p>
 
             <div class="grid gap-3 text-sm text-slate-600 sm:grid-cols-3">

@@ -11,6 +11,7 @@
     <script>
       function spTrack(name, params){ try{ if(typeof gtag==="function") gtag("event", name, params||{}); }catch(e){} }
     </script>
+    <script src="/assets/surface-graph-shared.js"></script>
 </head>
   <body class="bg-slate-50 text-slate-900 font-sans">
     <header class="border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -19,12 +20,12 @@
           <img src="/icon.png" alt="SocioProphet" class="h-9 w-9" />
           <div class="font-semibold tracking-tight">SocioProphet</div>
         </a>
-        <nav class="flex items-center gap-6 text-sm">
-          <a class="hover:underline" href="/documentation/">Documentation</a>
-          <a class="hover:underline" href="/organizations/">Organizations</a>
-          <a class="hover:underline" href="/organizations/apply/">Apply</a>
-          <a class="hover:underline" href="https://vue.socioprophet.com">Portal</a>
-        </nav>
+        <nav class="home-nav">
+            <a href="/academy/">Commons</a>
+            <a href="/organizations/">Organizations</a>
+            <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
+            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
+          </nav>
       </div>
     </header>
 

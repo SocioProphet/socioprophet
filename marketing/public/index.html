@@ -35,7 +35,7 @@
       .home-shell { max-width: 96rem; margin: 0 auto; padding: 0 1.5rem; }
       @media (min-width: 1440px) { .home-shell { max-width: 104rem; } }
       .home-header { border-bottom: 1px solid #e2e8f0; background: #fff; }
-      .home-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; flex-wrap: wrap; }
+      .home-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; flex-wrap: wrap; }
       .home-brand { display: flex; align-items: center; gap: 0.75rem; color: #0f172a; text-decoration: none; }
       .home-brand img { width: 2.25rem; height: 2.25rem; }
       .home-brand-name { font-weight: 600; letter-spacing: -0.02em; }
@@ -47,9 +47,9 @@
       .btn-dark, .btn-dark:visited, .home-nav a.btn-dark, .home-nav a.btn-dark:visited { color: #ffffff !important; -webkit-text-fill-color: #ffffff; opacity: 1; }
       .btn-light { display: inline-flex; align-items: center; border-radius: 0.5rem; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 0.75rem 1.25rem; text-decoration: none; }
       .btn-light:hover { background: #f8fafc; }
-      .hero { padding: 3.5rem 0 4.75rem; }
+      .hero { padding: 2.1rem 0 4.1rem; }
       .hero-grid { display: grid; gap: 3rem; align-items: start; }
-      .hero-copy { max-width: 43rem; padding-top: 0.7rem; }
+      .hero-copy { max-width: 43rem; padding-top: 0.15rem; }
       @media (min-width: 1400px) { .hero-grid { gap: 4rem; } }
       @media (min-width: 1024px) { .hero-grid { grid-template-columns: minmax(0, 0.98fr) minmax(620px, 1.18fr); } }
       .hero h1 { font-size: 3rem; line-height: 1.05; margin: 0; }
@@ -113,7 +113,8 @@
       .auth-story-card p { margin: 0.45rem 0 0; color: #475569; font-size: 0.98rem; }
 
     </style>
-  </head>
+      <script src="/assets/surface-graph-shared.js"></script>
+</head>
 
   <body>
     <header class="home-header">
@@ -125,12 +126,10 @@
           </a>
 
           <nav class="home-nav">
+            <a href="/academy/">Commons</a>
             <a href="/organizations/">Organizations</a>
             <a href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>Documentation</a>
-            <a href="/auth/" onclick='spTrack("cta_auth_click",{href:this.getAttribute("href")})'>Auth</a>
-            <a class="btn-dark" href="/auth/sign-in/" onclick='spTrack("cta_login_click",{href:this.getAttribute("href")})'>
-              Login
-            </a>
+            <a href="https://vue.socioprophet.com" onclick='spTrack("cta_portal_click",{href:this.getAttribute("href")})'>Portal</a>
           </nav>
         </div>
       </div>
@@ -152,12 +151,15 @@
               </p>
 
               <div class="cta-row">
-                <a class="btn-dark" href="/academy/" onclick='spTrack("cta_academy_click",{href:this.getAttribute("href")})'>
-                  Explore Academy
+                <a class="btn-dark" href="/academy/" onclick='spTrack("cta_commons_click",{href:this.getAttribute("href")})'>
+                  Enter Commons
                 </a>
 
                 <a class="btn-light" href="/organizations/" onclick='spTrack("cta_organizations_click",{href:this.getAttribute("href")})'>
                   For Organizations
+                </a>
+                <a class="btn-light" href="/documentation/" onclick='spTrack("cta_docs_click",{href:this.getAttribute("href")})'>
+                  Open Documentation
                 </a>
                 <a class="btn-light" href="/map/" onclick='spTrack("cta_map_click",{href:this.getAttribute("href")})'>
                   Explore the Map
@@ -165,18 +167,7 @@
               </div>
 
               <div class="mini-note">
-                Start with a real surface: Academy for learning, Organizations for deployment, and Documentation for deeper system detail.
-              </div>
-
-              <div class="panel" style="margin-top:1.25rem;padding:1rem 1.1rem;">
-                <div class="card-kicker">Auth & Connections</div>
-                <h3 style="margin:0.35rem 0 0.5rem;font-size:1.05rem;line-height:1.2;">Sign in once. Connect capabilities deliberately.</h3>
-                <p style="margin:0;color:#475569;">Keep identity, provider routing, and recovery flows nearby without turning the homepage into a second auth page.</p>
-                <div class="surface-row" style="margin-top:0.85rem;">
-                  <a class="surface-pill" href="/auth/" onclick='spTrack("cta_auth_hub_click",{href:this.getAttribute("href")})'>Auth hub</a>
-                  <a class="surface-pill" href="/auth/connections/" onclick='spTrack("cta_auth_connections_click",{href:this.getAttribute("href")})'>Provider connections</a>
-                  <a class="surface-pill" href="/auth/recovery/" onclick='spTrack("cta_auth_recovery_click",{href:this.getAttribute("href")})'>Recovery states</a>
-                </div>
+                Start with Commons for public learning and participation, Organizations for deployment, and Documentation for proof and technical depth.
               </div>
             </div>
 
@@ -206,21 +197,21 @@
 
               <div class="map-grid">
                 <a class="map-link-card" href="/academy/">
-                  <div class="kicker">Academy</div>
-                  <strong>Learning, family, mentorship, and cybernetics education</strong>
-                  <p>Start here if you are a learner, family, mentor, or educator.</p>
+                  <div class="kicker">Commons</div>
+                  <strong>Open learning, governed participation, and shared knowledge infrastructure</strong>
+                  <p>Academy is the flagship live surface inside Commons for learners, families, mentors, and educators.</p>
                 </a>
 
                 <a class="map-link-card" href="/organizations/">
                   <div class="kicker">Organizations</div>
-                  <strong>Deploy the platform in schools, nonprofits, public-interest, and mission-aligned institutions</strong>
-                  <p>Start here if you are evaluating institutional or deployment use.</p>
+                  <strong>Deployment for enterprise, government and public sector, schools, and nonprofits</strong>
+                  <p>Start here for institutional evaluation, procurement review, deployment pathways, and governed adoption.</p>
                 </a>
 
                 <a class="map-link-card" href="/documentation/">
                   <div class="kicker">Documentation</div>
-                  <strong>Architecture, product surfaces, trust model, and canonical direction</strong>
-                  <p>Start here if you want the underlying system model and deeper product context.</p>
+                  <strong>Architecture, governance, trust boundaries, and product proof</strong>
+                  <p>Start here for technical validation, system model review, and canonical platform direction.</p>
                 </a>
 
                 <a class="map-link-card" href="/documentation/guide/canonical-platform-direction/">
