@@ -59,11 +59,15 @@ def main() -> int:
                 problems.append(f'{wf}: expected push.branches to include {default_branch}, found {sorted(branches) or "<none>"}')
 
         if is_docs_deploy:
-            if branches & docs_deploy_branches:
+            if not push or not branches:
+                problems.append(
+                    f'{wf}: docs deploy workflow has no push.branches configured'
+                )
+            elif branches & docs_deploy_branches:
                 saw_master_docs_deploy = True
             elif not branches.issubset(transitional):
                 problems.append(
-                    f'{wf}: docs deploy branches {sorted(branches) or "<none>"} do not include required {sorted(docs_deploy_branches)}'
+                    f'{wf}: docs deploy branches {sorted(branches)} do not include required {sorted(docs_deploy_branches)}'
                 )
 
     if not saw_master_docs_deploy:

@@ -7,6 +7,21 @@ docs:
     - main
   nav_exceptions:
     - docs/guide/legal-entity-reference-fabric.md
+    - docs/guide/agent-corps-and-operational-roles.md
+    - docs/guide/domain-surface.md
+    - docs/guide/governed-cybernetic-stack.md
+    - docs/guide/intake-udm-schema.md
+    - docs/guide/lsa-lsi-lda-geometry.md
+    - docs/guide/marketer-safe-outputs-and-segment-proofs.md
+    - docs/guide/operating-modes-learning-and-defense.md
+    - docs/guide/product-surface-maturity-matrix.md
+    - docs/guide/product-surface-standard.md
+    - docs/guide/products/io.md
+    - docs/guide/products/kg.md
+    - docs/guide/products/kr.md
+    - docs/guide/products/sh.md
+    - docs/guide/semantic-model-workstreams.md
+    - docs/guide/worked-example-michael-cross-context.md
 
 udm:
   doc_path: docs/guide/intake-udm-schema.md

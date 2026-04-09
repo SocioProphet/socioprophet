@@ -35,6 +35,7 @@ jobs:
 
   postgres-migration-smoke:
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('entity-fabric/sql/*.sql') != '' }}
     services:
       postgres:
         image: postgres:16-alpine
