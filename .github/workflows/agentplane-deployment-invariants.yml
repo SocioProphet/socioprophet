@@ -1,0 +1,22 @@
+name: agentplane-deployment-invariants
+
+on:
+  push:
+    paths:
+      - "agentplane/**"
+      - ".github/workflows/agentplane-deployment-invariants.yml"
+  pull_request:
+    paths:
+      - "agentplane/**"
+      - ".github/workflows/agentplane-deployment-invariants.yml"
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run agentplane deployment invariant checks
+        run: bash agentplane/tests/run_ci_checks.sh
