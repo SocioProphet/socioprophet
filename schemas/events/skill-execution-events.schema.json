@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/events/skill-execution-events.schema.json",
+  "title": "SkillExecutionEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "event_name", "occurred_at", "actor", "run", "status"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_name": {
+      "type": "string",
+      "enum": [
+        "skill.requested",
+        "skill.planned",
+        "skill.resolved",
+        "skill.admitted",
+        "skill.materialized",
+        "skill.started",
+        "action.started",
+        "action.completed",
+        "action.failed",
+        "evidence.attached",
+        "skill.evaluated",
+        "policy.denied",
+        "approval.requested",
+        "approval.granted",
+        "approval.denied",
+        "claim.promoted",
+        "claim.rejected",
+        "claim.retracted",
+        "commit.approved",
+        "commit.executed",
+        "commit.denied",
+        "skill.archived"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["human", "agent", "service", "scheduler"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["run_id", "skill_id"],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skill_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace_id": {
+          "type": "string"
+        },
+        "span_id": {
+          "type": "string"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "env": {
+          "type": "string"
+        },
+        "topology_scope": {
+          "type": "string"
+        },
+        "trust_class": {
+          "type": "string"
+        },
+        "tenant_scope": {
+          "type": "string"
+        },
+        "frontier_hops": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "data_sensitivity": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["requested", "planned", "resolved", "admitted", "materialized", "running", "succeeded", "failed", "denied", "approved", "promoted", "rejected", "committed", "archived"]
+    },
+    "refs": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "proposal_ref": {
+          "type": "string"
+        },
+        "evidence_bundle_ref": {
+          "type": "string"
+        },
+        "cairn_before_ref": {
+          "type": "string"
+        },
+        "cairn_after_ref": {
+          "type": "string"
+        },
+        "claim_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "parent_run_id": {
+          "type": "string"
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

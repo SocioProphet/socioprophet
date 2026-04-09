@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/control-plane/mesh-skill.schema.json",
+  "title": "MeshSkill",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {
+      "const": "control.socioprophet.org/v1alpha1"
+    },
+    "kind": {
+      "const": "MeshSkill"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "merkle_root", "signer"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "merkle_root": {
+          "type": "string",
+          "pattern": "^sha256:[A-Za-z0-9]+$"
+        },
+        "signer": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lane", "class", "coordinates", "inputs", "outputs", "evidence"],
+      "properties": {
+        "lane": {
+          "const": "hard"
+        },
+        "class": {
+          "type": "string",
+          "enum": ["read", "replay", "simulate", "verify", "commit"]
+        },
+        "coordinates": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["env", "topology_scope", "trust_class", "tenant_scope", "frontier_hops", "data_sensitivity"],
+          "properties": {
+            "env": {
+              "type": "string",
+              "minLength": 1
+            },
+            "topology_scope": {
+              "type": "string",
+              "minLength": 1
+            },
+            "trust_class": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tenant_scope": {
+              "type": "string",
+              "minLength": 1
+            },
+            "frontier_hops": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "data_sensitivity": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "plan": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "deterministic": {
+              "type": "boolean"
+            },
+            "timeout_s": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_cost_units": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "idempotency_key_strategy": {
+              "type": "string"
+            }
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "policy": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "allow_autoapprove_below_risk": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "deny": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "require_human_approval_for": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["require"],
+          "properties": {
+            "require": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        },
+        "side_effects": {
+          "type": "string",
+          "enum": ["none", "ephemeral_internal", "artifact_write", "topology_mutation", "external_commit"]
+        },
+        "risk": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["actions"]
+        },
+        {
+          "required": ["plan"]
+        }
+      ]
+    }
+  }
+}
