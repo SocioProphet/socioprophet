@@ -34,6 +34,7 @@ export default defineConfig({
             { text: "Architecture", link: "/guide/architecture" },
             { text: "Canonical Platform Direction", link: "/guide/canonical-platform-direction" },
             { text: "Surface Inventory", link: "/guide/surface-inventory" },
+            { text: "Desktop Linux Distro Strategy", link: "/guide/desktop-linux-distro-strategy" },
           ],
         },
         {
