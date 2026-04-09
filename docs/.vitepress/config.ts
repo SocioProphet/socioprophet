@@ -70,7 +70,7 @@ export default defineConfig({
             { text: "Identity Prime and Event IR", link: "/guide/identity-prime-and-event-ir" },
             { text: "Policy Constrained Merging and Unmerge", link: "/guide/policy-constrained-merging-and-unmerge" },
             { text: "Marketer-Safe Outputs and Segment Proofs", link: "/guide/marketer-safe-outputs-and-segment-proofs" },
-            { text: "Intake UDM and Release Schema", link: "/guide/intake-udm-schema" },
+            { text: "Intake UDM + Release Schema", link: "/guide/intake-udm-schema" },
             { text: "Worked Example: Michael Cross-Context", link: "/guide/worked-example-michael-cross-context" },
           ],
         },
