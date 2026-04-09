@@ -12,6 +12,7 @@ const Header = () => {
         <StyledTitleLink href="/">SocioProphet</StyledTitleLink>
       </StyledHeaderTitle>
       <StyledNavLinks>
+        <HeaderLink isExternal={false} link="/feed" label="Feed" />
         <HeaderLink isExternal link={GITHUB} label="GitHub" />
         <HeaderLink isExternal link={WIKI} label="Wiki" />
         <HeaderLink isExternal link={BLOG} label="Blog" />

@@ -19,6 +19,39 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Content posts: anyone can read; signed-in users can create.
+    // Updates are restricted to upvote-count increments only.
+    // Only the original submitter may delete their post.
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll(['title', 'url', 'source', 'submittedBy', 'createdAt', 'upvotes', 'tags', 'type'])
+        && request.resource.data.submittedBy == request.auth.uid
+        && request.resource.data.upvotes == 0
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 300
+        && request.resource.data.url is string
+        && request.resource.data.tags is list
+        && request.resource.data.tags.size() <= 20;
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes'])
+        && request.resource.data.upvotes == resource.data.upvotes + 1;
+      allow delete: if signedIn() && request.auth.uid == resource.data.submittedBy;
+    }
+
+    // Content sources: anyone can read; signed-in users can register.
+    // Only the registering user may update or delete.
+    match /sources/{sourceId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll(['name', 'url', 'registeredBy', 'createdAt'])
+        && request.resource.data.registeredBy == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 200
+        && request.resource.data.url is string;
+      allow update, delete: if signedIn() && request.auth.uid == resource.data.registeredBy;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
