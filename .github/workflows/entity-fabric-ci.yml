@@ -1,0 +1,80 @@
+name: entity-fabric-ci
+
+on:
+  pull_request:
+    paths:
+      - "entity-fabric/**"
+      - "docs/guide/legal-entity-reference-fabric.md"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/entity-fabric-ci.yml"
+      - "scripts/validate_entity_fabric.py"
+  push:
+    branches: [ master ]
+    paths:
+      - "entity-fabric/**"
+      - "docs/guide/legal-entity-reference-fabric.md"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/entity-fabric-ci.yml"
+      - "scripts/validate_entity_fabric.py"
+
+permissions:
+  contents: read
+
+jobs:
+  contract-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install python deps
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
+      - name: Validate entity-fabric presence and Avro bundle
+        run: python scripts/validate_entity_fabric.py
+
+  postgres-migration-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: entity_fabric
+          POSTGRES_PASSWORD: entity_fabric
+          POSTGRES_DB: entity_fabric
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U entity_fabric -d entity_fabric"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Apply split DDL
+        env:
+          PGPASSWORD: entity_fabric
+        run: |
+          for f in entity-fabric/sql/*.sql; do
+            psql -h 127.0.0.1 -U entity_fabric -d entity_fabric -v ON_ERROR_STOP=1 -f "$f"
+          done
+      - name: Inspect created tables
+        env:
+          PGPASSWORD: entity_fabric
+        run: |
+          psql -h 127.0.0.1 -U entity_fabric -d entity_fabric -c "select schemaname, tablename from pg_tables where schemaname in ('core','priv') order by 1,2;"
+
+  parser-smoke:
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('entity-fabric/parsers/tests/**') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install parser test deps
+        run: python -m pip install --upgrade pip pytest lxml
+      - name: Run parser tests
+        run: pytest -q entity-fabric/parsers/tests
