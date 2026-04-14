@@ -1,0 +1,60 @@
+{
+  "apiVersion": "knowledge.socioprophet.org/v0.1",
+  "kind": "GeneralDescriptor",
+  "metadata": {
+    "id": "asset:github:SocioProphet/agentplane/docs/system-space.md",
+    "name": "system-space-strategy",
+    "displayName": "System Space Strategy",
+    "createdAt": "2026-04-05T00:00:00Z",
+    "updatedAt": "2026-04-05T00:00:00Z",
+    "version": "1.0.0",
+    "labels": ["system-space", "execution", "evidence-forward"]
+  },
+  "spec": {
+    "object": {
+      "objectType": "DocumentAsset",
+      "schemaRef": "schema:knowledge.asset.document/v0.1",
+      "sourceSystem": "github",
+      "sourceRef": {
+        "repo": "SocioProphet/agentplane",
+        "path": "docs/system-space.md",
+        "ref": "main"
+      },
+      "contentHash": "sha256:example"
+    },
+    "relationships": {
+      "domains": ["execution-control", "knowledge-commons"],
+      "categories": ["strategy", "architecture-note"],
+      "tasks": ["fleet-bootstrap", "run-replay-audit"],
+      "owners": ["team:agentplane"],
+      "contentSpaces": ["content-space:agentplane-system-space"],
+      "repos": ["SocioProphet/agentplane"],
+      "relatedObjects": ["bundle-schema-v0.1", "run-artifact-v0.1"]
+    },
+    "policies": {
+      "visibility": "internal",
+      "accessPolicyRef": "policy:knowledge/internal-read/v1",
+      "promotionPolicyRef": "policy:knowledge/promotion/v1",
+      "stewardReviewRequired": true,
+      "agentActionsAllowed": ["retrieve", "bundle", "summarize", "propose-promotion"]
+    },
+    "provenance": {
+      "hash": "sha256:example",
+      "lineage": {
+        "derivedFrom": [],
+        "supersedes": []
+      },
+      "evidenceRefs": ["evidence:github-commit:example"],
+      "stewards": ["team:agentplane"]
+    },
+    "presentations": {
+      "para": {
+        "projects": ["project:aokc-bootstrap"],
+        "areas": ["area:agentplane"],
+        "resources": ["resource:architecture"],
+        "archives": []
+      },
+      "labels": ["strategy", "internal"]
+    }
+  }
+}
