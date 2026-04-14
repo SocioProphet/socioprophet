@@ -1,0 +1,35 @@
+{
+  "event_id": "evt_01JQ2Y7M8AQ4J6K8F7M8Q1P4ZX",
+  "event_name": "evidence.attached",
+  "occurred_at": "2026-03-25T20:40:00Z",
+  "actor": {
+    "kind": "service",
+    "id": "skill-runtime-broker"
+  },
+  "run": {
+    "run_id": "run_01JQ2Y7H7F4Y2A8C9R1S3T6U9V",
+    "skill_id": "sp.control.checkout-validate@e23.proc7-3.draft+l0",
+    "trace_id": "trace_2db0e8e8a58e4e5bb5f6b6d6d8ef1d90",
+    "span_id": "span_3f89d7018d9d4c76",
+    "attempt": 1
+  },
+  "coordinates": {
+    "env": "preview",
+    "topology_scope": "service.checkout",
+    "trust_class": "internal",
+    "tenant_scope": "default",
+    "frontier_hops": 2,
+    "data_sensitivity": "redacted"
+  },
+  "status": "running",
+  "refs": {
+    "proposal_ref": "claim://candidate/checkout-patch-001",
+    "evidence_bundle_ref": "artifact://evidence/run_01JQ2Y7H7F4Y2A8C9R1S3T6U9V",
+    "cairn_before_ref": "cairn://checkout/preview/before/01JQ2Y6ZK7D",
+    "parent_run_id": "run_01JQ2Y6Q5B1X9N3L2W4E6R8T0Y"
+  },
+  "payload": {
+    "artifacts": ["logs", "traces", "metrics", "config_diff", "dependency_diff", "policy_decision", "cairn_before"],
+    "verdict_pending": true
+  }
+}

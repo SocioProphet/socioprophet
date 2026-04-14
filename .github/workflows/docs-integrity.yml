@@ -1,0 +1,56 @@
+name: docs-integrity
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/docs-integrity.yml"
+      - ".github/workflows/docs-pages-master.yml"
+      - "scripts/verify_docs_nav.py"
+      - "scripts/validate_udm_release_schema.py"
+      - "scripts/verify_workflow_branches.py"
+  push:
+    branches: [ master ]
+    paths:
+      - "docs/**"
+      - ".github/repo-standards.yml"
+      - ".github/workflows/docs-integrity.yml"
+      - ".github/workflows/docs-pages-master.yml"
+      - "scripts/verify_docs_nav.py"
+      - "scripts/validate_udm_release_schema.py"
+      - "scripts/verify_workflow_branches.py"
+
+permissions:
+  contents: read
+
+jobs:
+  docs-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Enable Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn --version
+      - name: Install docs deps
+        run: yarn --cwd docs install --frozen-lockfile || yarn --cwd docs install
+      - name: Install python deps
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
+      - name: Build docs
+        env:
+          DOCS_BASE: /documentation/
+        run: yarn --cwd docs build
+      - name: Verify docs navigation
+        run: python scripts/verify_docs_nav.py
+      - name: Validate UDM release schema doc
+        run: python scripts/validate_udm_release_schema.py
+      - name: Verify workflow branches
+        run: python scripts/verify_workflow_branches.py
