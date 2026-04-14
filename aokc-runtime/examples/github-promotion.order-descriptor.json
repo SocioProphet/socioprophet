@@ -1,0 +1,65 @@
+{
+  "apiVersion": "orders.socioprophet.org/v0.1",
+  "kind": "OrderDescriptor",
+  "metadata": {
+    "id": "order:promotion:github:SocioProphet/agentplane/docs/system-space.md",
+    "name": "promote-github-doc-to-canonical-asset",
+    "createdAt": "2026-04-05T00:00:00Z",
+    "createdBy": "principal:runtime:github-ingest",
+    "labels": ["promotion", "github", "canonical"]
+  },
+  "spec": {
+    "orderType": "AssetPromotionOrder",
+    "action": "promote_to_canonical_asset",
+    "targets": [
+      {
+        "targetRef": "asset:github:SocioProphet/agentplane/docs/system-space.md",
+        "targetType": "DocumentAsset"
+      }
+    ],
+    "inputs": {
+      "requestedOutputType": "PublishedKnowledgeUnit",
+      "contentSpace": "content-space:agentplane-system-space",
+      "destinationRepo": "SocioProphet/open-knowledge-commons"
+    },
+    "lifecycle": {
+      "state": "requested",
+      "allowedTransitions": [
+        "classified",
+        "validated",
+        "needs-human-review",
+        "approved",
+        "published",
+        "rejected",
+        "archived"
+      ]
+    },
+    "validation": {
+      "requiredChecks": [
+        "source-provenance-present",
+        "policy-check-passed",
+        "duplicate-check-complete",
+        "human-review-complete"
+      ],
+      "humanGateRequired": true,
+      "maxRunSeconds": 900
+    },
+    "policy": {
+      "policyPackRef": "policy:knowledge/promotion/v1",
+      "policyPackHash": "sha256:example",
+      "errorPolicyRef": "policy:orders/retry-none-human-escalate/v1"
+    },
+    "outputs": {
+      "expectedArtifacts": [
+        "ValidationArtifact",
+        "PromotionArtifact",
+        "PublicationArtifact",
+        "ReplayArtifact"
+      ],
+      "publishTargets": [
+        "ck:canonical-store",
+        "repo:SocioProphet/open-knowledge-commons"
+      ]
+    }
+  }
+}
