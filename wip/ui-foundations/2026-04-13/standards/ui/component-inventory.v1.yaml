@@ -1,0 +1,143 @@
+version: 1
+inventory_id: ui.component-inventory.v1
+owner_repo: sociosphere
+description: >
+  Canonical UI component + action inventory (contracts) for SocioProphet.
+  This is NOT implementation code. Implementations live in socioprophet-web.
+  Agents and UI both bind to these ids.
+
+components:
+  # --- Shell / global framing ---
+  - id: component.shell.app
+    kind: shell
+    title: App Shell
+    actions: [action.nav.open_global, action.search.open]
+  - id: component.nav.top_domains
+    kind: nav
+    title: Top Domain Navigation
+    actions: [action.nav.select_domain, action.nav.open_overflow]
+  - id: component.nav.left_rail
+    kind: nav
+    title: Left Rail Navigation
+    actions: [action.nav.select_section, action.nav.collapse]
+
+  # --- News & Events domain hub ---
+  - id: component.domain.news_events.hub
+    kind: page
+    title: News & Events Domain Hub
+    actions: [action.search.query, action.filters.open, action.nav.open_global]
+  - id: component.news.latest_list
+    kind: list
+    title: Latest News List
+    actions: [action.news.open_story, action.news.save_story, action.news.share_story]
+  - id: component.events.upcoming_widget
+    kind: widget
+    title: Upcoming Events Widget
+    actions: [action.events.open_event, action.events.open_calendar]
+  - id: component.maps_analytics.widget
+    kind: widget
+    title: Maps & Analytics Widget
+    actions: [action.maps.open_analysis, action.maps.open_map]
+
+  # --- Dashboard / feed mechanics shown in screenshots ---
+  - id: component.dashboard.news_feed
+    kind: page
+    title: News Feed Dashboard
+    actions: [action.news.refresh, action.search.query, action.filters.open]
+  - id: component.dashboard.stock_ticker
+    kind: widget
+    title: Stock Ticker Strip
+    actions: [action.ticker.select_symbol, action.ticker.pin_symbol]
+  - id: component.news.story_card
+    kind: card
+    title: News Story Card
+    actions: [action.news.open_story, action.news.open_source, action.news.rate_quality]
+  - id: component.qos.badges
+    kind: widget
+    title: Quality / QoS Badges
+    actions: [action.qos.explain, action.qos.filter_by_level]
+  - id: component.trending.topics
+    kind: widget
+    title: Trending Topics
+    actions: [action.trending.select_topic, action.filters.open]
+
+  # --- Facets / summaries / agent activity (bottom-left & rails in screenshots) ---
+  - id: component.facet.domain_rail
+    kind: facet
+    title: Domain Facet Rail
+    actions: [action.facet.select, action.facet.clear]
+  - id: component.agent.activity
+    kind: panel
+    title: Agent Activity Panel
+    actions: [action.agent.open_trace, action.agent.pause, action.agent.resume]
+  - id: component.argument.summaries
+    kind: panel
+    title: Argument Summaries
+    actions: [action.argument.open, action.argument.expand, action.argument.export]
+
+  # --- Document + PDF + annotations ---
+  - id: component.doc.composer
+    kind: editor
+    title: Document Composer
+    actions: [action.doc.format_bold, action.doc.format_italic, action.doc.insert_link, action.doc.insert_image]
+  - id: component.doc.pdf_viewer
+    kind: viewer
+    title: PDF Viewer
+    actions: [action.pdf.page_next, action.pdf.page_prev, action.pdf.zoom_in, action.pdf.zoom_out, action.pdf.download]
+  - id: component.doc.annotation_overlay
+    kind: overlay
+    title: Annotation Overlay
+    actions: [action.annotation.highlight, action.annotation.comment, action.annotation.link, action.annotation.delete]
+  - id: component.doc.notes_panel
+    kind: panel
+    title: Notes Panel
+    actions: [action.notes.create, action.notes.edit, action.notes.delete]
+
+actions:
+  - id: action.nav.open_global
+  - id: action.nav.open_overflow
+  - id: action.nav.select_domain
+  - id: action.nav.select_section
+  - id: action.nav.collapse
+  - id: action.search.open
+  - id: action.search.query
+  - id: action.filters.open
+  - id: action.news.refresh
+  - id: action.news.open_story
+  - id: action.news.open_source
+  - id: action.news.save_story
+  - id: action.news.share_story
+  - id: action.news.rate_quality
+  - id: action.events.open_event
+  - id: action.events.open_calendar
+  - id: action.ticker.select_symbol
+  - id: action.ticker.pin_symbol
+  - id: action.maps.open_analysis
+  - id: action.maps.open_map
+  - id: action.qos.explain
+  - id: action.qos.filter_by_level
+  - id: action.trending.select_topic
+  - id: action.facet.select
+  - id: action.facet.clear
+  - id: action.agent.open_trace
+  - id: action.agent.pause
+  - id: action.agent.resume
+  - id: action.argument.open
+  - id: action.argument.expand
+  - id: action.argument.export
+  - id: action.doc.format_bold
+  - id: action.doc.format_italic
+  - id: action.doc.insert_link
+  - id: action.doc.insert_image
+  - id: action.pdf.page_next
+  - id: action.pdf.page_prev
+  - id: action.pdf.zoom_in
+  - id: action.pdf.zoom_out
+  - id: action.pdf.download
+  - id: action.annotation.highlight
+  - id: action.annotation.comment
+  - id: action.annotation.link
+  - id: action.annotation.delete
+  - id: action.notes.create
+  - id: action.notes.edit
+  - id: action.notes.delete
