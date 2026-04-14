@@ -12,6 +12,9 @@ on:
       - "formal/**"
       - ".github/workflows/agentplane-deployment-invariants.yml"
 
+permissions:
+  contents: read
+
 jobs:
   checks:
     runs-on: ubuntu-latest
