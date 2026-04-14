@@ -1,0 +1,31 @@
+{
+  "@context": "https://raw.githubusercontent.com/SourceOS-Linux/sourceos-spec/main/semantic/context.jsonld",
+  "@id": "urn:sourceos:repo:SocioProphet:socioprophet",
+  "@type": ["RepoDescriptor", "Repository"],
+  "name": "socioprophet",
+  "description": "Umbrella public surface and integration presentation repo for the broader SocioProphet platform.",
+  "repositoryFullName": "SocioProphet/socioprophet",
+  "repoUrl": "https://github.com/SocioProphet/socioprophet",
+  "organization": "SocioProphet",
+  "defaultBranch": "master",
+  "semanticDescriptorVersion": "0.1.0",
+  "topologyRole": "rolePublicDocsSurface",
+  "connectsTo": [
+    "urn:sourceos:repo:SocioProphet:sociosphere",
+    "urn:sourceos:repo:SociOS-Linux:agentos-spine",
+    "urn:sourceos:repo:SourceOS-Linux:sourceos-spec",
+    "urn:sourceos:repo:SociOS-Linux:socioslinux-web"
+  ],
+  "publicSurfaceFor": [
+    "urn:sourceos:repo:SocioProphet:sociosphere",
+    "urn:sourceos:repo:SociOS-Linux:agentos-spine",
+    "urn:sourceos:repo:SourceOS-Linux:sourceos-spec"
+  ],
+  "consumesVocabularyFrom": "urn:sourceos:repo:SourceOS-Linux:sourceos-spec",
+  "notThisRepo": [
+    "platform workspace controller",
+    "Linux integration spine",
+    "canonical typed-contract registry",
+    "immutable substrate"
+  ]
+}
