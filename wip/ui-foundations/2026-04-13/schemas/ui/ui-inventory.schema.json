@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sociosphere.local/schemas/ui/ui-inventory.schema.json",
+  "title": "UI Inventory",
+  "type": "object",
+  "required": ["version", "screens"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "product": { "type": "string" },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "route", "title", "blocks"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_\\-\\.]*$" },
+          "route": { "type": "string", "pattern": "^/" },
+          "title": { "type": "string", "minLength": 1 },
+          "icon": { "type": "string" },
+          "description": { "type": "string" },
+          "capabilities_required": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "policy_actions": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "evidence_events": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "blocks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "type"],
+              "additionalProperties": true,
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z][a-z0-9_\\-\\.]*$" },
+                "type": { "type": "string", "minLength": 1 },
+                "title": { "type": "string" },
+                "props": { "type": "object", "additionalProperties": true },
+                "capability_ref": { "type": "string" },
+                "policy_action": { "type": "string" },
+                "evidence_event": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

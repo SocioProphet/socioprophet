@@ -1,0 +1,16 @@
+name: doctrine-links
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Check doctrine-linked specs exist and keep replay references
+        run: python3 tools/ci/check_doctrine_links.py
