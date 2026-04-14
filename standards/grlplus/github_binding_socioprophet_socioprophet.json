@@ -1,0 +1,29 @@
+{
+  "schema_version": "grlplus-github-binding/0.1",
+  "repo_full_name": "SocioProphet/socioprophet",
+  "default_branch": "master",
+  "binding_rationale": "Chosen because collaborator access is live and the repo shows active issue usage aligned with SocioProphet governance and planning work.",
+  "observed_issue_style": {
+    "title_pattern": "Descriptive work-item titles, sometimes with EPIC or P0 or E0 prefixes.",
+    "body_sections": ["Goal", "Definition of Done", "Acceptance Criteria", "Exit criteria"],
+    "checkbox_usage": true
+  },
+  "recommended_label_set": [
+    "grlplus",
+    "semantic-worklist",
+    "governance",
+    "profile:strategy",
+    "profile:cyber",
+    "profile:safety",
+    "severity:low",
+    "severity:medium",
+    "severity:high",
+    "severity:critical",
+    "intervention:monitor",
+    "intervention:gather_evidence",
+    "intervention:add_direct_argument_coverage",
+    "intervention:reduce_dependency_uncertainty",
+    "intervention:resolve_contradictory_tradeoff"
+  ],
+  "github_issue_body_template": "Goal: {goal_summary}\n\nDefinition of Done:\n- [ ] Closure criteria satisfied\n- [ ] Evidence attached\n- [ ] Review completed\n\nAcceptance Criteria:\n- [ ] Severity and SLA fields populated\n- [ ] Reason codes preserved\n- [ ] Dependencies enumerated\n\nExit criteria:\n- closure_rule_code: {closure_rule_code}\n- escalation_rule_code: {escalation_rule_code}\n"
+}
