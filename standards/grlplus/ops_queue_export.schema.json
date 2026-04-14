@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GRLPlus Ops Queue Export",
+  "type": "object",
+  "required": ["schema_version", "platform", "profile", "items"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "grlplus-ops-queue-export/0.1"},
+    "platform": {"type": "string", "const": "ops_queue"},
+    "profile": {"type": "string", "enum": ["strategy", "cyber", "safety"]},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind", "element_id", "owner", "severity", "intervention", "reason_codes",
+          "sla_due_in_days", "review_cadence_days", "closure_rule_code", "escalation_rule_code",
+          "closure_criteria", "escalation_trigger", "task_payload"
+        ],
+        "properties": {
+          "kind": {"type": "string", "const": "semantic_work_item"},
+          "element_id": {"type": "string", "minLength": 1},
+          "owner": {"type": ["string", "null"]},
+          "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+          "intervention": {"type": "string", "enum": ["monitor", "gather_evidence", "add_direct_argument_coverage", "reduce_dependency_uncertainty", "resolve_contradictory_tradeoff"]},
+          "reason_codes": {"type": "array", "items": {"type": "string"}},
+          "sla_due_in_days": {"type": "integer", "minimum": 0},
+          "review_cadence_days": {"type": "integer", "minimum": 0},
+          "closure_rule_code": {"type": "string", "enum": ["CR_MIN_DIRECT_ARGUMENT_1", "CR_MIN_DIRECT_ARGUMENT_2", "CR_MIN_EVIDENCE_LINK_1", "CR_MIN_TELEMETRY_ARTIFACT_1", "CR_DIVERGENCE_BELOW_WARNING", "CR_OWNER_APPROVAL_REQUIRED"]},
+          "escalation_rule_code": {"type": "string", "enum": ["ER_BREACH_SLA_ONCE", "ER_BREACH_SLA_TWICE", "ER_CRITICAL_IMMEDIATE", "ER_PERSISTENT_HIGH_TWO_REVIEWS", "ER_MISSING_DIRECT_ARGUMENT_BLOCKS_CLOSURE"]},
+          "closure_criteria": {"type": "string", "minLength": 1},
+          "escalation_trigger": {"type": "string", "minLength": 1},
+          "task_payload": {
+            "type": "object",
+            "required": ["title", "next_action"],
+            "properties": {
+              "title": {"type": "string", "minLength": 1},
+              "next_action": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
