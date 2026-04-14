@@ -460,6 +460,62 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.60.0.tgz#3afdb30405f6d4248df5e72e1ca86c5eab55fab8"
   integrity sha512-PrsWNQ8BuE00O3Xsx3ALh2Df8fAj9+cvvX9AIA6o4KpATR98c9mud4XtDWVvsEuyia5U4tVSTKygawyJkjm60w==
 
+"@se-oss/deasync-darwin-arm64@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-darwin-arm64/-/deasync-darwin-arm64-1.0.1.tgz#4fa435a33bc6b4d644ec36204f1b7521ce4f7097"
+  integrity sha512-0YWmIDEGQfW3GGopmZHhfA6mamsG0HFKZhmBzHVyFiMKkJts8kpQwGbGrWlK8eOAoPCihOsG6tCotYR3p7HZaQ==
+
+"@se-oss/deasync-darwin-x64@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-darwin-x64/-/deasync-darwin-x64-1.0.1.tgz#b80dcb457666ebb3749805af57f2e5e7f78ba7ea"
+  integrity sha512-r3FRTLIXqGqOb1DjTLW3YhO/Dd1vA2qRLP0Ym3Wmk3yMv6c/nm15zg6UVoXbgBu8cjbvcsI/OfbHPdErmjMWsw==
+
+"@se-oss/deasync-linux-arm64-gnu@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-linux-arm64-gnu/-/deasync-linux-arm64-gnu-1.0.1.tgz#2e7c9ae6ecb580e6dacb97affc092c5738006407"
+  integrity sha512-657uRew7fZAx663Li03ilLV2lN09Dqb/NxawlDu8kKmboK1BLitHJRS+taiT5oFZqyIDrU45tlQKfCrW0p0sYA==
+
+"@se-oss/deasync-linux-arm64-musl@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-linux-arm64-musl/-/deasync-linux-arm64-musl-1.0.1.tgz#9fdf2a3450af2aaaaea4d7843d4a7d14c9874c6a"
+  integrity sha512-IE3fIQPIJtko4lx9sRam+Zz0P4xbpAPJgDCHaz6k9cP1yUvVI179B4IZRnFx0GyjyQpm0KhHoIGHJc4KUmA81Q==
+
+"@se-oss/deasync-linux-x64-gnu@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-linux-x64-gnu/-/deasync-linux-x64-gnu-1.0.1.tgz#1e61f7034fc18a44bdb99431893d57c89db202bd"
+  integrity sha512-XQl7etZESGIjIraCyxfAey8ZTIJUB4dUFU3rPR/xLVn9bKpZGlJLIms0z3hoHX9mipO+Cqo53vK4IVm6A7U/ww==
+
+"@se-oss/deasync-linux-x64-musl@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-linux-x64-musl/-/deasync-linux-x64-musl-1.0.1.tgz#44f278f1c83fef2512d724b315488de46f220531"
+  integrity sha512-vWgFAZlqImqMV6jhCWV7C9wcCS1eb1ajhlKduBRPfyUxxkoObe+EqTG2BKJAuafxp3/KS1aUsIMJma9mhwFvow==
+
+"@se-oss/deasync-win32-arm64-msvc@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-win32-arm64-msvc/-/deasync-win32-arm64-msvc-1.0.1.tgz#a2bd4374aef4d80202e6f98805b35d32dcfe95e8"
+  integrity sha512-yk7lEE7Zd8GX7o6CuUbg3HnnmUhBx4tgfn5ff3eoq05CgBO6Z3ZtL4l+utAe1cxcFaXPhyvcgnHYyA4OF544tg==
+
+"@se-oss/deasync-win32-x64-msvc@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync-win32-x64-msvc/-/deasync-win32-x64-msvc-1.0.1.tgz#a2fb75346ab9bb7ac25874e3486d2a1f4c1a20ae"
+  integrity sha512-ixizmuLGRPGyAesWUNWVzVOsvuunNb/qMqU8SmjfLR/vVgzdQEkSHFf+fkX9GXPN6FDv+DAz5uskTzhjUyCXFA==
+
+"@se-oss/deasync@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@se-oss/deasync/-/deasync-1.0.1.tgz#18301ef127366e2bda5f2ebb10670dde16d8e326"
+  integrity sha512-Ha7P/xCNxOuH72BNdLRWs4TT8rsMMrERnHtfKWBeTWu+UFW9OBTrRgfZJOlbAAQFR0l4Q30cpAn8CuR7PXWcPg==
+  dependencies:
+    type-fest "^4.37.0"
+  optionalDependencies:
+    "@se-oss/deasync-darwin-arm64" "1.0.1"
+    "@se-oss/deasync-darwin-x64" "1.0.1"
+    "@se-oss/deasync-linux-arm64-gnu" "1.0.1"
+    "@se-oss/deasync-linux-arm64-musl" "1.0.1"
+    "@se-oss/deasync-linux-x64-gnu" "1.0.1"
+    "@se-oss/deasync-linux-x64-musl" "1.0.1"
+    "@se-oss/deasync-win32-arm64-msvc" "1.0.1"
+    "@se-oss/deasync-win32-x64-msvc" "1.0.1"
+
 "@shikijs/core@2.5.0", "@shikijs/core@^2.1.0":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@shikijs/core/-/core-2.5.0.tgz#e14d33961dfa3141393d4a76fc8923d0d1c4b62f"
@@ -895,6 +951,19 @@ mark.js@8.11.1:
   resolved "https://registry.yarnpkg.com/mark.js/-/mark.js-8.11.1.tgz#180f1f9ebef8b0e638e4166ad52db879beb2ffc5"
   integrity sha512-1I+1qpDt4idfgLQG+BNWmrqku+7/2bi5nLf4YwF8y8zXvmfiTBY3PV3ZibfrjBueCByROpuBjLLFCajqkgYoLQ==
 
+markdown-it-mathjax3@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-mathjax3/-/markdown-it-mathjax3-5.2.0.tgz#dbb3e0d059a3673339162d1d468ba52f3c5d7720"
+  integrity sha512-R+XAy5/7vSGuhG9Z0/cJm6zKxOzStcScfSKVwoarh4nBra+v1KClvbALr/xFTEe9iQhwfQM4SJnO68LXL+btMA==
+  dependencies:
+    "@se-oss/deasync" "^1.0.1"
+    mathxyjax3 "^0.8.3"
+
+mathxyjax3@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/mathxyjax3/-/mathxyjax3-0.8.3.tgz#e505008b2c15f0f6608590c93a882a791635c1a4"
+  integrity sha512-eXjFaiyQsTdVOeTFoFaFJ/r1FITpB1f9c5MW4FETfcoVV/+xa5SD9pS05AwugzL/gNuDtWXrTOSmoD2e0Du+UA==
+
 mdast-util-to-hast@^13.0.0:
   version "13.2.1"
   resolved "https://registry.yarnpkg.com/mdast-util-to-hast/-/mdast-util-to-hast-13.2.1.tgz#d7ff84ca499a57e2c060ae67548ad950e689a053"
@@ -1106,6 +1175,11 @@ trim-lines@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/trim-lines/-/trim-lines-3.0.1.tgz#d802e332a07df861c48802c04321017b1bd87338"
   integrity sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==
+
+type-fest@^4.37.0:
+  version "4.41.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.41.0.tgz#6ae1c8e5731273c2bf1f58ad39cbae2c91a46c58"
+  integrity sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==
 
 unist-util-is@^6.0.0:
   version "6.0.1"

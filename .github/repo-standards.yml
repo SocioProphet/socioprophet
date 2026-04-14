@@ -1,0 +1,43 @@
+default_branch: master
+
+docs:
+  deploy_branches:
+    - master
+  transitional_allowed_branches:
+    - main
+  nav_exceptions:
+    - docs/guide/legal-entity-reference-fabric.md
+
+udm:
+  doc_path: docs/guide/intake-udm-schema.md
+  required_top_level_blocks:
+    - context
+    - platform
+    - experiment
+    - policy
+    - udm
+  required_udm_shape:
+    - udm.metadata
+    - udm.principal
+    - udm.target
+    - udm.observer
+    - udm.network.http
+    - udm.additional
+
+entity_fabric:
+  required_paths:
+    - entity-fabric/README.md
+    - entity-fabric/contracts/OVERVIEW.md
+    - entity-fabric/contracts/entity_fabric_avro.avsc
+    - entity-fabric/runtime/postgres_validation_harness.sh
+    - entity-fabric/reports/entity_fabric_runtime_readiness_report.md
+    - entity-fabric/reports/entity_fabric_parser_smoke_report.md
+    - entity-fabric/reports/entity_fabric_validation_report.md
+  required_sql:
+    - entity-fabric/sql/00_extensions_and_types.sql
+    - entity-fabric/sql/10_core_reference.sql
+    - entity-fabric/sql/20_attribute_and_relationship.sql
+    - entity-fabric/sql/30_designation_evidence_credential.sql
+    - entity-fabric/sql/40_priv_matching.sql
+    - entity-fabric/sql/50_views.sql
+    - entity-fabric/sql/60_predicate_seed.sql
