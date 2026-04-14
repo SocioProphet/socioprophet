@@ -37,6 +37,8 @@ export default defineConfig({
             { text: "Desktop Linux Distro Strategy", link: "/guide/desktop-linux-distro-strategy" },
             { text: "Domain Surface", link: "/guide/domain-surface" },
             { text: "Governed Cybernetic Stack", link: "/guide/governed-cybernetic-stack" },
+            { text: "MeshRush", link: "/guide/mesh-rush" },
+            { text: "Documentation Home and Repository Status", link: "/guide/documentation-home-and-repository-status" },
           ],
         },
         {
@@ -47,6 +49,9 @@ export default defineConfig({
             { text: "Platform Human Protection and Safeguarding", link: "/guide/platform-human-protection-and-safeguarding" },
             { text: "Provider Safety and Capability Eligibility", link: "/guide/provider-safety-and-capability-eligibility" },
             { text: "Provenance, Promotion, and Reversibility", link: "/guide/provenance-promotion-and-reversibility" },
+            { text: "Trust Center", link: "/guide/trust-center" },
+            { text: "System Cards and Assurance", link: "/guide/system-cards-and-assurance" },
+            { text: "Reporting and Disclosure", link: "/guide/reporting-and-disclosure" },
           ],
         },
         {
@@ -60,6 +65,7 @@ export default defineConfig({
             { text: "Digital Trust and Capability Routing", link: "/guide/digital-trust-and-capability-routing" },
             { text: "Provider Capability Routing", link: "/guide/provider-capability-routing" },
             { text: "Operating Modes: Learning and Defense", link: "/guide/operating-modes-learning-and-defense" },
+            { text: "Deployment Modes and Data Boundaries", link: "/guide/deployment-modes-and-data-boundaries" },
           ],
         },
         {
@@ -88,6 +94,7 @@ export default defineConfig({
             { text: "LSA / LSI / LDA Geometry", link: "/guide/lsa-lsi-lda-geometry" },
             { text: "Temporal Graph Evolution", link: "/guide/temporal-graph-evolution" },
             { text: "Twenty-Three Topic Canon", link: "/guide/twenty-three-topic-canon" },
+            { text: "Model Behavior and Command Resolution", link: "/guide/model-behavior-and-command-resolution" },
           ],
         },
         {
