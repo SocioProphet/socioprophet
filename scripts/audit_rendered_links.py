@@ -4,6 +4,7 @@ from urllib.parse import urljoin, urlparse
 from urllib.error import HTTPError, URLError
 from html.parser import HTMLParser
 import json, csv
+import re
 
 BASE = "https://socioprophet.com"
 SEEDS = [
