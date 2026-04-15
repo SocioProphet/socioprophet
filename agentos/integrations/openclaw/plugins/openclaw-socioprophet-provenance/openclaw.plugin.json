@@ -1,0 +1,32 @@
+{
+  "id": "socioprophet-provenance",
+  "name": "Socioprophet Provenance",
+  "description": "Log TurnEvent payloads for provenance debugging and expose a plugin health route.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "distillerUrl": {
+        "type": "string",
+        "minLength": 1
+      },
+      "bearerTokenEnvVar": {
+        "type": "string",
+        "minLength": 1,
+        "default": "DISTILLER_SHARED_TOKEN"
+      },
+      "emitMessageEvents": {
+        "type": "boolean",
+        "default": true
+      },
+      "emitToolEvents": {
+        "type": "boolean",
+        "default": true
+      },
+      "routePath": {
+        "type": "string",
+        "default": "/sp/provenance/health"
+      }
+    }
+  }
+}
