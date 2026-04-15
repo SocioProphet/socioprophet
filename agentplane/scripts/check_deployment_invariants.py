@@ -152,7 +152,9 @@ def main() -> int:
                 if not (tdir.exists() and (tdir / "bundle.json").exists()):
                     errors.append(f"PointerTargetExists: {name} points to missing bundle dir {target}")
                     continue
-                tb = load_json(tdir / "bundle.json")
+                tb = require_json(tdir / "bundle.json", errors)
+                if tb is None:
+                    continue
                 tlane = (((tb.get("spec") or {}).get("policy") or {}).get("lane"))
                 if name == "current-prod" and tlane != "prod":
                     errors.append("ProfileBundleLaneConsistency: current-prod points to non-prod lane bundle")
