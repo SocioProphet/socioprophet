@@ -61,8 +61,9 @@ Rollback ==
   /\ UNCHANGED <<exists, lane, closed, coherent, replayable>>
 
 Next ==
-  \E b \in Bundles:
-      RunToStaging(b) \/ Promote(b) \/ Rollback
+  (\E b \in Bundles:
+      RunToStaging(b) \/ Promote(b))
+  \/ Rollback
 
 InvPointerTargetsExist ==
   /\ ptr["current-staging"] # NULL => exists[ptr["current-staging"]]
