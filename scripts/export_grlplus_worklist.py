@@ -105,13 +105,14 @@ def main(argv: List[str]) -> int:
             intervention = item.get("intervention_category") or item.get("intervention") or "gather_evidence"
             severity = item.get("severity") or p.get("severity_mapping", {}).get(intervention, "medium")
             owner = item.get("owner_actor_id") or item.get("owner") or p.get("review_owner_template")
+            assignee = item.get("github_assignee") or item.get("assignee")
             closure_rule_code = item.get("closure_rule_code") or p.get("closure_rule_code")
             escalation_rule_code = item.get("escalation_rule_code") or p.get("escalation_rule_code")
             out_items.append({
                 "title": item.get("title") or f"[{intervention}] {element_id}",
                 "body": item.get("body") or build_issue_body(binding, element_id, closure_rule_code, escalation_rule_code),
                 "labels": normalize_labels(args.profile, severity, intervention, item.get("labels")),
-                "assignee": owner,
+                "assignee": assignee,
                 "severity": severity,
                 "owner_actor_id": owner,
                 "element_id": element_id,
