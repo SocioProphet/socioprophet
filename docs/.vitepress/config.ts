@@ -91,6 +91,18 @@ export default defineConfig({
           ],
         },
         {
+          text: "Trust Center",
+          items: [
+            { text: "Trust Center", link: "/guide/trust-center" },
+            { text: "Reporting and Disclosure", link: "/guide/reporting-and-disclosure" },
+            { text: "Deployment Modes and Data Boundaries", link: "/guide/deployment-modes-and-data-boundaries" },
+            { text: "System Cards and Assurance", link: "/guide/system-cards-and-assurance" },
+            { text: "Model Behavior and Command Resolution", link: "/guide/model-behavior-and-command-resolution" },
+            { text: "Documentation Home and Repository Status", link: "/guide/documentation-home-and-repository-status" },
+            { text: "Mesh Rush", link: "/guide/mesh-rush" },
+          ],
+        },
+        {
           text: "Learning & Academy",
           items: [
             { text: "Academy Policy Index", link: "/guide/academy-policy-index" },
