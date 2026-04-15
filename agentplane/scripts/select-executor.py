@@ -70,7 +70,20 @@ def main():
                     if ssh_ok(ref):
                         return (name, ref, caps), rejected
                     die(f"requested executor {requested_ref} is unreachable", 2)
-            return None, rejected
+            # requested_ref was not found among admissible candidates; check if it
+            # exists in the inventory at all (inadmissible or unknown)
+            all_refs = {ex.get("sshRef") or ex.get("name") for ex in executors}
+            if requested_ref not in all_refs:
+                die(
+                    f"requested executor ref '{requested_ref}' not found in inventory"
+                    f" (known refs: {sorted(r for r in all_refs if r)})",
+                    2,
+                )
+            die(
+                f"requested executor ref '{requested_ref}' is inadmissible for"
+                f" backend={backend} (does not satisfy backend constraints)",
+                2,
+            )
 
         for name, ref, caps in candidates:
             if name == default and ssh_ok(ref):
@@ -92,7 +105,7 @@ def main():
         chosen, rejected = choose_for_backend(effective_backend)
 
     if chosen is None:
-        die(f"no reachable executor satisfies backend={requested_backend}", 2)
+        die(f"no reachable executor satisfies backend={effective_backend} (backendIntent={requested_backend})", 2)
 
     name, ref, caps = chosen
     decision = {

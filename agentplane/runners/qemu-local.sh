@@ -25,6 +25,26 @@ REMOTE_TIMEOUT="${REMOTE_TIMEOUT:-900}"
 TARGET_SYSTEM="aarch64-linux"
 WATCH="false"
 
+# Portable timeout: prefer system 'timeout', then 'gtimeout' (macOS + coreutils),
+# then fall back to a plain exec (no timeout enforcement) with a warning.
+_TIMEOUT_CMD=""
+if command -v timeout >/dev/null 2>&1; then
+  _TIMEOUT_CMD="timeout"
+elif command -v gtimeout >/dev/null 2>&1; then
+  _TIMEOUT_CMD="gtimeout"
+else
+  echo "[runner] WARNING: 'timeout'/'gtimeout' not found; run will not be time-bounded (install GNU coreutils to enable)" >&2
+fi
+
+run_with_timeout() {
+  local secs="$1"; shift
+  if [[ -n "$_TIMEOUT_CMD" ]]; then
+    "$_TIMEOUT_CMD" "$secs" "$@"
+  else
+    "$@"
+  fi
+}
+
 cmd="${1:-}"
 shift || true
 bundle_dir=""
@@ -239,7 +259,7 @@ run_lima_process() {
   rsync -a --delete --exclude '.git/' --exclude 'artifacts/' --exclude 'state/pointers/' "${AP_ROOT}/" "${remote}:${REMOTE_ROOT}/repo/"
 
   set +e
-  timeout "$max_run_seconds" ssh "$remote" bash -s <<EOS
+  run_with_timeout "$max_run_seconds" ssh "$remote" bash -s <<EOS
 set -euo pipefail
 ART="${REMOTE_ROOT}/artifacts"
 mkdir -p "\$ART"
@@ -303,7 +323,7 @@ run_vm_backend() {
   mkdir -p "${AP_ROOT}/${out_dir}"
   export QEMU_OPTS="${QEMU_OPTS:-} -virtfs local,path=${AP_ROOT}/${out_dir},mount_tag=artifacts,security_model=none,id=artifacts -nographic -serial mon:stdio"
   set +e
-  timeout "$max_run_seconds" "$run_script" > "${AP_ROOT}/${out_dir}/guest-serial.log" 2>&1
+  run_with_timeout "$max_run_seconds" "$run_script" > "${AP_ROOT}/${out_dir}/guest-serial.log" 2>&1
   rc=$?
   set -e
   echo "$rc" > "${AP_ROOT}/${out_dir}/runner-exitcode.txt"
