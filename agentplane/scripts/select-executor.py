@@ -46,10 +46,9 @@ def main():
     default = inv.get("defaultExecutor")
     executors = inv.get("executors", [])
 
-    rejected: list[dict] = []
-
     def choose_for_backend(backend: str):
         candidates = []
+        rejected = []
         for ex in executors:
             name = ex.get("name")
             ref = ex.get("sshRef") or name
@@ -69,28 +68,28 @@ def main():
             for name, ref, caps in candidates:
                 if ref == requested_ref:
                     if ssh_ok(ref):
-                        return (name, ref, caps)
+                        return (name, ref, caps), rejected
                     die(f"requested executor {requested_ref} is unreachable", 2)
-            return None
+            return None, rejected
 
         for name, ref, caps in candidates:
             if name == default and ssh_ok(ref):
-                return (name, ref, caps)
+                return (name, ref, caps), rejected
 
         for name, ref, caps in candidates:
             if ssh_ok(ref):
-                return (name, ref, caps)
+                return (name, ref, caps), rejected
 
-        return None
+        return None, rejected
 
     effective_backend = requested_backend
     normalization_reason = None
-    chosen = choose_for_backend(effective_backend)
+    chosen, rejected = choose_for_backend(effective_backend)
 
     if chosen is None and requested_backend in ("qemu", "microvm"):
         effective_backend = "lima-process"
         normalization_reason = "no-reachable-kvm-executor"
-        chosen = choose_for_backend(effective_backend)
+        chosen, rejected = choose_for_backend(effective_backend)
 
     if chosen is None:
         die(f"no reachable executor satisfies backend={requested_backend}", 2)
