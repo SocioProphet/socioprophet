@@ -9,9 +9,11 @@ DEFAULT_PLUGIN_ID = "socioprophet-provenance"
 DEFAULT_PLUGIN_PATH = "./plugins/openclaw-socioprophet-provenance"
 
 
-def load_json(path: Path) -> dict[str, Any]:
+def load_json(path: Path, allow_missing: bool = False) -> dict[str, Any]:
     if not path.exists():
-        return {}
+        if allow_missing:
+            return {}
+        raise FileNotFoundError(f"Base config does not exist: {path}")
     raw = path.read_text(encoding="utf-8").strip()
     return json.loads(raw) if raw else {}
 
@@ -35,6 +37,8 @@ def ensure_dict(parent: dict[str, Any], key: str) -> dict[str, Any]:
 def main() -> int:
     ap = argparse.ArgumentParser(description="Merge the Socioprophet provenance plugin into an existing OpenClaw config.")
     ap.add_argument("--base", required=True, help="Path to existing openclaw.json")
+    ap.add_argument("--allow-missing-base", action="store_true",
+                    help="Allow --base to be missing and start from an empty config")
     ap.add_argument("--output", help="Write merged config here; defaults to in-place")
     ap.add_argument("--backup", action="store_true", help="Write <base>.bak before in-place update")
     ap.add_argument("--plugin-id", default=DEFAULT_PLUGIN_ID)
@@ -48,7 +52,10 @@ def main() -> int:
 
     base_path = Path(args.base).expanduser().resolve()
     out_path = Path(args.output).expanduser().resolve() if args.output else base_path
-    cfg = load_json(base_path)
+    try:
+        cfg = load_json(base_path, allow_missing=args.allow_missing_base)
+    except (FileNotFoundError, OSError) as exc:
+        ap.error(str(exc))
     if args.backup and out_path == base_path and base_path.exists():
         backup_path = base_path.with_suffix(base_path.suffix + ".bak")
         shutil.copy2(base_path, backup_path)
