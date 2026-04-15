@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "@type": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "component_type": {
+      "type": "string"
+    },
+    "props": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "a11y_role": {
+      "type": "string"
+    },
+    "tokens": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "@type",
+    "id",
+    "version",
+    "component_type"
+  ],
+  "title": "UI Component (v0)"
+}

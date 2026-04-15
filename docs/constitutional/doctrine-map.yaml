@@ -1,0 +1,53 @@
+version: 1
+doctrine:
+  file: docs/philosophy/liberty-by-design.md
+requirements:
+  specs:
+    - path: spec/constitutional/rights-of-verification-charter-v1.md
+      require_headings:
+        - Overview
+        - User rights
+        - System duties
+        - Invariants
+    - path: spec/security/attestation-envelope-v1.md
+      require_headings:
+        - Scope
+        - Required fields
+        - Verification checks
+        - Example envelope
+    - path: spec/security/transparency-log-v1.md
+      require_headings:
+        - Event classes
+        - Entry fields
+        - Query and export expectations
+        - Inclusion and consistency expectations
+    - path: spec/security/witness-diversity-policy-v1.md
+      require_headings:
+        - Diversity dimensions
+        - Quorum expectations
+        - Failure conditions
+        - Review guidance
+    - path: spec/security/audit-bundle-and-replay-v1.md
+      require_headings:
+        - Bundle contents
+        - Replay contract
+        - Expected outputs
+        - Example verification command
+    - path: spec/governance/governance-lifecycle-v1.md
+      require_headings:
+        - Lifecycle states
+        - Required evidence per state
+        - Denial and appeal behavior
+        - Publication rules
+    - path: spec/metrics/curvature-proxy-metrics-v1.md
+      require_headings:
+        - Metric catalog
+        - Collection strategy
+        - Threshold guidance
+        - Dashboard and alert notes
+    - path: spec/privacy/privacy-boundaries-v1.md
+      require_headings:
+        - Principles
+        - Data handling boundaries
+        - Access audit requirements
+        - Review and redaction notes
