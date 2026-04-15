@@ -17,6 +17,8 @@ def main() -> int:
     bundle_path = sys.argv[1]
     if not os.path.exists(bundle_path):
         die(f"bundle not found: {bundle_path}", 2)
+    bundle_path = os.path.abspath(bundle_path)
+    bundle_dir = os.path.dirname(bundle_path)
 
     with open(bundle_path, "r", encoding="utf-8") as f:
         try:
@@ -73,12 +75,14 @@ def main() -> int:
     out_dir = artifacts.get("outDir")
     if not out_dir:
         die("spec.artifacts.outDir is required", 2)
+    if not os.path.isabs(out_dir):
+        out_dir = os.path.abspath(os.path.join(bundle_dir, out_dir))
 
     os.makedirs(out_dir, exist_ok=True)
     report = {
         "kind": "ValidationArtifact",
         "bundle": f'{md.get("name")}@{md.get("version")}',
-        "bundlePath": os.path.abspath(bundle_path),
+        "bundlePath": bundle_path,
         "validatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "result": "pass",
     }
