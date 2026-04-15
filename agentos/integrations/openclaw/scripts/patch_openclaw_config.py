@@ -69,13 +69,12 @@ def main() -> int:
     entries = ensure_dict(plugins, "entries")
     entry = ensure_dict(entries, args.plugin_id)
     entry["enabled"] = True
-    entry["config"] = {
-        "distillerUrl": args.distiller_url,
-        "bearerTokenEnvVar": args.bearer_token_env_var,
-        "emitMessageEvents": args.emit_message_events == "true",
-        "emitToolEvents": args.emit_tool_events == "true",
-        "routePath": args.route_path,
-    }
+    plugin_cfg = ensure_dict(entry, "config")
+    plugin_cfg["distillerUrl"] = args.distiller_url
+    plugin_cfg["bearerTokenEnvVar"] = args.bearer_token_env_var
+    plugin_cfg["emitMessageEvents"] = args.emit_message_events == "true"
+    plugin_cfg["emitToolEvents"] = args.emit_tool_events == "true"
+    plugin_cfg["routePath"] = args.route_path
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(cfg, indent=2) + "\n", encoding="utf-8")
