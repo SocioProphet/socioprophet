@@ -98,19 +98,23 @@ def main(argv: List[str]) -> int:
     if args.platform == "github_issues":
         out_items = []
         for item in items:
+            raw_element_id = item.get("element_id")
+            if not isinstance(raw_element_id, str) or not raw_element_id.strip():
+                die(f"Worklist item is missing required non-empty element_id: {item!r}")
+            element_id = raw_element_id.strip()
             intervention = item.get("intervention_category") or item.get("intervention") or "gather_evidence"
             severity = item.get("severity") or p.get("severity_mapping", {}).get(intervention, "medium")
             owner = item.get("owner_actor_id") or item.get("owner") or p.get("review_owner_template")
             closure_rule_code = item.get("closure_rule_code") or p.get("closure_rule_code")
             escalation_rule_code = item.get("escalation_rule_code") or p.get("escalation_rule_code")
             out_items.append({
-                "title": item.get("title") or f"[{intervention}] {item.get('element_id', 'unknown')}",
-                "body": item.get("body") or build_issue_body(binding, item.get("element_id", "unknown"), closure_rule_code, escalation_rule_code),
+                "title": item.get("title") or f"[{intervention}] {element_id}",
+                "body": item.get("body") or build_issue_body(binding, element_id, closure_rule_code, escalation_rule_code),
                 "labels": normalize_labels(args.profile, severity, intervention, item.get("labels")),
                 "assignee": owner,
                 "severity": severity,
                 "owner_actor_id": owner,
-                "element_id": item.get("element_id", ""),
+                "element_id": element_id,
                 "intervention_category": intervention,
                 "reason_codes": item.get("reason_codes", []),
                 "sla_due_in_days": int(item.get("sla_due_in_days", p.get("default_sla_due_in_days", 7))),
