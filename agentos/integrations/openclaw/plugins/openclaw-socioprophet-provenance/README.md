@@ -6,7 +6,7 @@ What it does:
 - uses `definePluginEntry(...)`
 - registers typed lifecycle hooks with `api.on(...)`
 - registers a narrow plugin-managed HTTP health route with `api.registerHttpRoute(...)`
-- emits structured `TurnEvent` payloads to the external distiller service
+- observes and logs lifecycle event data for provenance-oriented development
 
 Why a plugin instead of only a standalone hook:
 - plugin hooks sit on the native SDK surface
