@@ -115,8 +115,15 @@ def check_pack_files() -> dict[str, Any]:
     out = {}
     for key, path in files.items():
         out[key] = {'exists': path.exists(), 'path': str(path)}
+
+    plugin_config_path = files['openclaw_plugin_config']
+    if not plugin_config_path.exists():
+        out['missing_example_config'] = True
+        return out
+
+    out['missing_example_config'] = False
     try:
-        cfg = read_json(files['openclaw_plugin_config'])
+        cfg = read_json(plugin_config_path)
         entry = cfg['plugins']['entries']['socioprophet-provenance']
         out['plugin_entry_enabled'] = bool(entry.get('enabled'))
         out['plugin_distiller_url'] = entry.get('config', {}).get('distillerUrl')
