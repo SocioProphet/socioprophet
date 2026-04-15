@@ -1,7 +1,7 @@
 {
   "id": "socioprophet-provenance",
   "name": "Socioprophet Provenance",
-  "description": "Emit structured TurnEvent payloads to an external distiller and expose a plugin health route.",
+  "description": "Log TurnEvent payloads for provenance debugging and expose a plugin health route.",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
