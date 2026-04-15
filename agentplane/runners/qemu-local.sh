@@ -312,9 +312,10 @@ JSON
 
 run_vm_backend() {
   local name="$1" ver="$2" out_dir="$3" placement_json="$4" profile="$5" bundle_dir="$6" max_run_seconds="$7" fail_on_timeout="$8"
-  local effective_backend remote vm_out run_script rc
+  local effective_backend remote vm_out run_script rc bundle_lane
   effective_backend="$(echo "$placement_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("effectiveBackend",""))' 2>/dev/null || true)"
   remote="$(echo "$placement_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("sshRef",""))' 2>/dev/null || true)"
+  bundle_lane="$(resolve_bundle_lane "$bundle_dir" "$profile")"
   command -v nix >/dev/null || { echo "[runner] ERROR: nix is required for VM builds" >&2; return 2; }
   NIX_PROGRESS_STYLE=none TERM=dumb nix build ".#packages.${TARGET_SYSTEM}.vm-example-agent" --no-link
   vm_out="$(nix path-info ".#packages.${TARGET_SYSTEM}.vm-example-agent")"
@@ -351,7 +352,7 @@ JSON
 {
   "kind": "RunArtifact",
   "bundle": "${name}@${ver}",
-  "lane": "${profile}",
+  "lane": "${bundle_lane}",
   "backend": "${effective_backend}",
   "executedIn": "vm-guest",
   "startedAt": "$(date -Iseconds)",
