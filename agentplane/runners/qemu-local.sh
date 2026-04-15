@@ -178,11 +178,58 @@ PYI
   fi
 }
 
+resolve_bundle_lane() {
+  local bundle_dir="$1" fallback_lane="$2"
+  python3 - "$bundle_dir" "$fallback_lane" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+bundle_dir = Path(sys.argv[1])
+fallback_lane = sys.argv[2]
+
+candidates = [
+    bundle_dir / "spec.json",
+    bundle_dir / "bundle.json",
+    bundle_dir / "bundle" / "spec.json",
+]
+
+def lane_from_doc(doc):
+    if not isinstance(doc, dict):
+        return None
+    policy = doc.get("policy")
+    if isinstance(policy, dict) and policy.get("lane"):
+        return policy["lane"]
+    spec = doc.get("spec")
+    if isinstance(spec, dict):
+        policy = spec.get("policy")
+        if isinstance(policy, dict) and policy.get("lane"):
+            return policy["lane"]
+    return None
+
+for candidate in candidates:
+    if not candidate.is_file():
+        continue
+    try:
+        with candidate.open("r", encoding="utf-8") as fh:
+            doc = json.load(fh)
+    except Exception:
+        continue
+    lane = lane_from_doc(doc)
+    if lane:
+        print(lane)
+        break
+else:
+    print(fallback_lane)
+PY
+}
+
 run_lima_process() {
   local name="$1" ver="$2" out_dir="$3" placement_json="$4" profile="$5" bundle_dir="$6" max_run_seconds="$7" fail_on_timeout="$8" executor_ref="$9"
-  local remote effective_backend
+  local remote effective_backend bundle_lane
   effective_backend="$(echo "$placement_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("effectiveBackend","lima-process"))' 2>/dev/null || true)"
   remote="$(echo "$placement_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("sshRef",""))' 2>/dev/null || true)"
+  bundle_lane="$(resolve_bundle_lane "$bundle_dir" "$profile")"
   remote="${remote:-${executor_ref:-}}"
   if [[ -z "$remote" ]]; then remote="$(read_default_executor_from_inventory || true)"; fi
   if [[ -z "$remote" ]]; then remote="$(read_first_executor_from_machines || true)"; fi
@@ -202,7 +249,7 @@ cat > "\$ART/run-artifact.json" <<JSON
 {
   "kind": "RunArtifact",
   "bundle": "${name}@${ver}",
-  "lane": "${profile}",
+  "lane": "${bundle_lane}",
   "backend": "${effective_backend}",
   "executedIn": "lima-vm",
   "startedAt": "\$(date -Iseconds)",
