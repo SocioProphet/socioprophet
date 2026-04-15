@@ -62,7 +62,11 @@ def main() -> int:
         print(json.dumps({"status": "FAIL", "errors": [f"bundle not found: {bundle_path}"], "warnings": []}, indent=2))
         return 1
 
-    bundle = load_json(bundle_path)
+    bundle = require_json(bundle_path, errors)
+    if bundle is None:
+        print(json.dumps({"status": "FAIL", "errors": errors, "warnings": warnings}, indent=2))
+        return 1
+
     md = bundle.get("metadata") or {}
     spec = bundle.get("spec") or {}
     policy = spec.get("policy") or {}
