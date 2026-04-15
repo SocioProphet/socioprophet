@@ -55,7 +55,7 @@ services:
     networks: [ai_stack]
 
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:${QDRANT_IMAGE_TAG:-v1.13.4}
     restart: unless-stopped
     volumes:
       - qdrant-data:/qdrant/storage
@@ -64,7 +64,7 @@ services:
     networks: [ai_stack]
 
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.5.7}
     restart: unless-stopped
     volumes:
       - ollama-data:/root/.ollama
@@ -73,7 +73,7 @@ services:
     networks: [ai_stack]
 
   vllm:
-    image: vllm/vllm-openai:latest
+    image: vllm/vllm-openai:${VLLM_IMAGE_TAG:-v0.8.5}
     restart: unless-stopped
     ipc: host
     environment:
