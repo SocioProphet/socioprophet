@@ -31,18 +31,17 @@ Restart or start the gateway as needed. OpenClaw’s plugin docs show `openclaw 
 
 ## 5. Smoke test
 
-Run the full smoke chain with exported tokens:
+The helper smoke scripts below are not yet landed in this PR. Treat these command names as planned workflow placeholders, not runnable in-repo steps for the current review snapshot:
 
-- `./scripts/smoke_openclaw_plugin.sh`
-- `./scripts/smoke_distiller_commit.sh`
-- `./scripts/smoke_reasoner_http.sh`
-
-Or run `./scripts/host_smoke_all.sh` once everything is configured.
+- `./scripts/smoke_openclaw_plugin.sh` *(not yet landed in this PR)*
+- `./scripts/smoke_distiller_commit.sh` *(not yet landed in this PR)*
+- `./scripts/smoke_reasoner_http.sh` *(not yet landed in this PR)*
+- `./scripts/host_smoke_all.sh` *(not yet landed in this PR; intended wrapper once the smoke scripts land)*
 
 ## 6. Capture immutable evidence
 
-Run `./scripts/capture_live_evidence.sh` and keep the resulting timestamped directory as the first-pass proof packet.
+`./scripts/capture_live_evidence.sh` is also not yet landed in this PR. Keep the resulting timestamped directory as the first-pass proof packet once that helper is added.
 
 ## 7. Hyperon bridge proof
 
-Run `./scripts/smoke_reasoner_hyperon.sh`. If local `metta-py`/`metta-repl` is not available, the bridge can try Docker/Podman based execution. Treat the result as `DerivedClaim` only until manually reviewed.
+`./scripts/smoke_reasoner_hyperon.sh` is not yet landed in this PR. If local `metta-py`/`metta-repl` is not available, the planned bridge flow can try Docker/Podman based execution. Treat the result as `DerivedClaim` only until manually reviewed.
