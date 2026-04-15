@@ -21,12 +21,7 @@ permissions:
 jobs:
   analyze-javascript:
     name: Analyze (javascript-typescript)
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
-      - fedora
-      - coreos
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,12 +40,7 @@ jobs:
 
   analyze-python-dynamic:
     name: Analyze (python) (dynamic)
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
-      - fedora
-      - coreos
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
