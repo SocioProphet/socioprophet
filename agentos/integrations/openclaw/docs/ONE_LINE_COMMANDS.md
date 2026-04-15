@@ -39,5 +39,5 @@ cd /path/to/local_first_ai_stack_v5 && OPENCLAW_GATEWAY_TOKEN=... ./scripts/capt
 ## Run the Hyperon CLI bridge candidate directly
 
 ```bash
-cd /path/to/local_first_ai_stack_v5 && python3 reasoner/hyperon_cli_bridge.py --job examples/reasoning-job.example.json --mode auto --output pretty
+cd /path/to/local_first_ai_stack_v5 && python3 reasoner/hyperon_cli_bridge.py --job examples/reasoning-job.example.json --mode auto
 ```
