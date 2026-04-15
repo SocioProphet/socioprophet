@@ -73,9 +73,17 @@ def main(argv: List[str]) -> int:
     ]
 
     try:
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        die(f"delegated export failed: {e}")
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            die(f"delegated export failed: {e}")
+    finally:
+        try:
+            temp_generic.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            die(f"failed to remove temporary file {temp_generic}: {e}")
 
     print(f"[grlplus-export-report] OK: wrote {args.platform} bundle to {args.output}")
     return 0
