@@ -44,7 +44,18 @@ def main() -> int:
         }, indent=2))
         return 1
 
-    proc = subprocess.run([binary], text=True, capture_output=True)
+    try:
+        proc = subprocess.run([binary, '--version'], text=True, capture_output=True, timeout=10)
+    except subprocess.TimeoutExpired:
+        print(json.dumps({
+            'ok': False,
+            'mode': args.mode,
+            'binary': binary,
+            'error': 'Hyperon executable timed out in non-interactive probe mode',
+            'claims': build_claim(job, 'Hyperon bridge execution timed out while probing the CLI.'),
+        }, indent=2))
+        return 1
+
     stdout = proc.stdout.strip()
     print(json.dumps({
         'ok': proc.returncode == 0,
