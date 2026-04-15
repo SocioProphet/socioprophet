@@ -66,7 +66,6 @@ test("Firestore rules: posts - create, read, upvote, delete", async (t) => {
     await testEnv.cleanup();
   });
 
-  const { serverTimestamp } = require("@firebase/rules-unit-testing");
   const alice = testEnv.authenticatedContext("alice").firestore();
   const bob = testEnv.authenticatedContext("bob").firestore();
   const anon = testEnv.unauthenticatedContext().firestore();
@@ -76,7 +75,7 @@ test("Firestore rules: posts - create, read, upvote, delete", async (t) => {
     url: "https://example.com/article",
     source: "Example",
     submittedBy: "alice",
-    createdAt: serverTimestamp(),
+    createdAt: new Date(),
     upvotes: 0,
     tags: ["tech", "news"],
     type: "article",
@@ -126,7 +125,6 @@ test("Firestore rules: sources - create, read, update, delete", async (t) => {
     await testEnv.cleanup();
   });
 
-  const { serverTimestamp } = require("@firebase/rules-unit-testing");
   const alice = testEnv.authenticatedContext("alice").firestore();
   const bob = testEnv.authenticatedContext("bob").firestore();
   const anon = testEnv.unauthenticatedContext().firestore();
@@ -135,7 +133,7 @@ test("Firestore rules: sources - create, read, update, delete", async (t) => {
     name: "Hacker News",
     url: "https://news.ycombinator.com",
     registeredBy: "alice",
-    createdAt: serverTimestamp(),
+    createdAt: new Date(),
   };
 
   // anyone can read sources
