@@ -1,0 +1,122 @@
+name: socioprophet-local-first-ai-stack-v2
+
+networks:
+  ai_stack:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  qdrant-data:
+  ollama-data:
+  vllm-cache:
+  distiller-data:
+  reasoner-data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: litellm_change_me
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [ai_stack]
+
+  litellm:
+    image: docker.litellm.ai/berriai/litellm-database:main-v1.83.0-stable
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://litellm:litellm_change_me@postgres:5432/litellm
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-change-me}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:-salt-change-me}
+      LITELLM_LOCAL_MODEL_COST_MAP: "True"
+      VLLM_API_KEY: ${VLLM_API_KEY:-token-vllm-local}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    command: ["--config", "/app/config.yaml"]
+    volumes:
+      - ../configs/litellm.config.yaml:/app/config.yaml:ro
+    ports:
+      - "127.0.0.1:4000:4000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [ai_stack]
+
+  qdrant:
+    image: qdrant/qdrant:${QDRANT_IMAGE_TAG:-v1.13.4}
+    restart: unless-stopped
+    volumes:
+      - qdrant-data:/qdrant/storage
+    ports:
+      - "127.0.0.1:6333:6333"
+    networks: [ai_stack]
+
+  ollama:
+    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.5.7}
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    networks: [ai_stack]
+
+  vllm:
+    image: vllm/vllm-openai:${VLLM_IMAGE_TAG:-v0.8.5}
+    restart: unless-stopped
+    ipc: host
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    command:
+      - --model
+      - Qwen/Qwen2.5-32B-Instruct
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-key
+      - ${VLLM_API_KEY:-token-vllm-local}
+    volumes:
+      - vllm-cache:/root/.cache/huggingface
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks: [ai_stack]
+
+  distiller:
+    build:
+      context: ../distiller
+    restart: unless-stopped
+    environment:
+      DISTILLER_SHARED_TOKEN: ${DISTILLER_SHARED_TOKEN:-change-me}
+      MEM0_ENABLE: "false"
+      DISTILLER_DATA_DIR: /data
+    volumes:
+      - distiller-data:/data
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks: [ai_stack]
+
+  reasoner:
+    build:
+      context: ../reasoner
+    restart: unless-stopped
+    environment:
+      REASONER_SHARED_TOKEN: ${REASONER_SHARED_TOKEN:-change-me}
+      REASONER_MODE: heuristic
+      REASONER_DATA_DIR: /data/reasoner
+    volumes:
+      - reasoner-data:/data/reasoner
+    ports:
+      - "127.0.0.1:8090:8090"
+    networks: [ai_stack]
