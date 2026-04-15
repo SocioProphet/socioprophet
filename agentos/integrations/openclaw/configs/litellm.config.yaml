@@ -1,0 +1,27 @@
+model_list:
+  - model_name: local-primary
+    litellm_params:
+      model: openai/qwen-72b-instruct
+      api_base: http://vllm:8000/v1
+      api_key: os.environ/VLLM_API_KEY
+
+  - model_name: local-fallback
+    litellm_params:
+      model: openai/llama3.1
+      api_base: http://ollama:11434/v1
+      api_key: os.environ/OLLAMA_API_KEY
+
+  - model_name: remote-safe
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+litellm_settings:
+  fallbacks:
+    - {"local-primary": ["local-fallback", "remote-safe"]}
+
+router_settings:
+  provider_budget_config:
+    openai:
+      budget_limit: 20
+      time_period: 1mo
