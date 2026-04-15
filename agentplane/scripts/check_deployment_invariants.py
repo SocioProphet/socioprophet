@@ -99,7 +99,12 @@ def main() -> int:
 
     root = repo_root(bundle_path.parent)
     inv_path = root / "agentplane" / "fleet" / "inventory.json"
-    inv = load_json(inv_path) if inv_path.exists() else None
+    inv = None
+    if inv_path.exists():
+        try:
+            inv = load_json(inv_path)
+        except Exception as e:
+            errors.append(f"invalid JSON in {inv_path}: {e}")
 
     if placement:
         if placement.get("kind") != "PlacementDecision":
