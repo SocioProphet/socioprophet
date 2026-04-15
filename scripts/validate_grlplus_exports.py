@@ -11,7 +11,7 @@ Exit codes:
 
 Notes:
 - dependency-light by design
-- uses jsonschema when available
+- requires jsonschema for schema validation
 - treats this repo as an integration/export guardrail, not canonical subsystem runtime ownership
 """
 
