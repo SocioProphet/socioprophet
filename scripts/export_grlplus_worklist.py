@@ -139,12 +139,16 @@ def main(argv: List[str]) -> int:
     else:
         out_items = []
         for item in items:
+            element_id = item.get("element_id")
+            if not isinstance(element_id, str) or not element_id.strip():
+                die("ops_queue export requires each item to include a non-empty element_id")
+            element_id = element_id.strip()
             intervention = item.get("intervention") or item.get("intervention_category") or "gather_evidence"
             severity = item.get("severity") or p.get("severity_mapping", {}).get(intervention, "medium")
             owner = item.get("owner") or item.get("owner_actor_id") or p.get("review_owner_template")
             out_items.append({
                 "kind": "semantic_work_item",
-                "element_id": item.get("element_id", ""),
+                "element_id": element_id,
                 "owner": owner,
                 "severity": severity,
                 "intervention": intervention,
@@ -156,7 +160,7 @@ def main(argv: List[str]) -> int:
                 "closure_criteria": item.get("closure_criteria") or p.get("closure_criteria_template"),
                 "escalation_trigger": item.get("escalation_trigger") or p.get("escalation_trigger_template"),
                 "task_payload": {
-                    "title": item.get("title") or f"[{intervention}] {item.get('element_id', 'unknown')}",
+                    "title": item.get("title") or f"[{intervention}] {element_id}",
                     "next_action": item.get("next_action") or item.get("suggested_evidence_ask") or p.get("evidence_request_template"),
                 },
             })
