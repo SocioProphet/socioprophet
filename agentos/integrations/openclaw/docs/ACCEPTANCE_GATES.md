@@ -11,8 +11,8 @@ This pack is not considered operationally proven until the first real-host evide
 | Plugin health route | `curl /sp/provenance/health` | returns 200 with plugin health payload |
 | Distiller health | `curl http://127.0.0.1:8080/healthz` | returns `ok: true` |
 | Reasoner health | `curl http://127.0.0.1:8090/healthz` | returns `ok: true` |
-| Distiller write path | `scripts/smoke_distiller_commit.sh` | turn accepted and basic memory commit accepted |
-| Reasoner write path | `scripts/smoke_reasoner_http.sh` | job accepted and at least one claim returned |
-| Evidence capture | `scripts/capture_live_evidence.sh` | timestamped evidence directory created with manifest and command outputs |
+| Distiller write path | Follow-up automation: `scripts/smoke_distiller_commit.sh` (not yet included in-repo for this PR); validate manually for now | turn accepted and basic memory commit accepted |
+| Reasoner write path | Follow-up automation: `scripts/smoke_reasoner_http.sh` (not yet included in-repo for this PR); validate manually for now | job accepted and at least one claim returned |
+| Evidence capture | Follow-up automation: `scripts/capture_live_evidence.sh` (not yet included in-repo for this PR); capture the evidence bundle manually for now | timestamped evidence directory created with manifest and command outputs |
 
 No broader rollout should happen before these gates pass on a real host.
