@@ -57,7 +57,16 @@ def normalize_labels(profile: str, severity: str, intervention: str, extra: List
         f"severity:{severity}",
         f"intervention:{intervention}",
     ]
-    for x in extra or []:
+    if extra is None:
+        extras: List[str] = []
+    else:
+        if not isinstance(extra, list):
+            die("labels must be a list of strings")
+        for i, x in enumerate(extra):
+            if not isinstance(x, str):
+                die(f"labels[{i}] must be a string")
+        extras = extra
+    for x in extras:
         if x not in labels:
             labels.append(x)
     return labels
