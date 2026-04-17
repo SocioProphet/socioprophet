@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python3 -m pip install --upgrade pip jsonschema
+python3 -m pip install "jsonschema>=4,<5"
 
 python3 scripts/export_grlplus_worklist_report.py \
   --input standards/grlplus/examples/semantic_worklist_report.example.json \
