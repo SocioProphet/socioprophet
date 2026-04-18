@@ -10,8 +10,8 @@
     "name": "example-agent",
     "source": {
       "git": {
-        "dirty": true,
-        "rev": "UNSET"
+        "dirty": false,
+        "rev": "3907fc4f3788ff5b7e4002731c35b56f63119a4b"
       }
     },
     "version": "0.1.0"
@@ -25,7 +25,7 @@
       "humanGateRequired": false,
       "lane": "staging",
       "maxRunSeconds": 20,
-      "policyPackHash": "UNSET",
+      "policyPackHash": "sha256:exampleagentpolicyv1",
       "policyPackRef": "policy-packs/dev/default"
     },
     "secrets": {
