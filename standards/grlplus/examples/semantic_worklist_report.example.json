@@ -1,0 +1,33 @@
+{
+  "schema_version": "grlplus-worklist-report-example/0.1",
+  "active_domain_profile": "strategy",
+  "summary": {
+    "items": 1,
+    "severity_counts": {
+      "medium": 1
+    }
+  },
+  "items": [
+    {
+      "element_id": "goal.outcome",
+      "owner_actor_id": "actor.strategy",
+      "criticality": 0.9,
+      "intervention_category": "gather_evidence",
+      "reason_codes": [
+        "RC_CONFIDENCE_SCALAR_GAP",
+        "RC_CONFIDENCE_INTERVAL_GAP"
+      ],
+      "severity": "medium",
+      "sla_due_in_days": 7,
+      "review_cadence_days": 7,
+      "dependency_targets": [
+        "softgoal.tradeoff"
+      ],
+      "suggested_evidence_ask": "Attach market, delivery, financial, or decision evidence directly covering goal.outcome.",
+      "closure_rule_code": "CR_DIVERGENCE_BELOW_WARNING",
+      "escalation_rule_code": "ER_BREACH_SLA_TWICE",
+      "closure_criteria": "Close when at least 1 direct argument and 1 evidence link are attached, and material divergence is reduced below the warning threshold.",
+      "escalation_trigger": "Escalate if SLA is breached twice or if medium or high severity persists for two reviews."
+    }
+  ]
+}

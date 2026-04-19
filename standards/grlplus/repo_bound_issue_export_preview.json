@@ -1,0 +1,15 @@
+{
+  "schema_version": "grlplus-github-bound-preview/0.1",
+  "repo_full_name": "SocioProphet/socioprophet",
+  "profile": "strategy",
+  "preview_items": [
+    {
+      "title": "[gather_evidence] goal.outcome",
+      "labels": ["grlplus", "semantic-worklist", "profile:strategy", "severity:medium", "intervention:gather_evidence"],
+      "severity": "medium",
+      "closure_rule_code": "CR_DIVERGENCE_BELOW_WARNING",
+      "escalation_rule_code": "ER_BREACH_SLA_TWICE",
+      "body_example": "Goal: address semantic governance for goal.outcome\n\nDefinition of Done:\n- [ ] Closure criteria satisfied\n- [ ] Evidence attached\n- [ ] Review completed\n\nAcceptance Criteria:\n- [ ] Severity and SLA fields populated\n- [ ] Reason codes preserved\n- [ ] Dependencies enumerated\n\nExit criteria:\n- closure_rule_code: CR_DIVERGENCE_BELOW_WARNING\n- escalation_rule_code: ER_BREACH_SLA_TWICE\n"
+    }
+  ]
+}
