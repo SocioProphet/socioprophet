@@ -12,6 +12,7 @@
       <div class="status-stack">
         <span :class="['tag', dataMode === 'live' ? 'tag-green' : 'tag-blue']">{{ dataModeLabel }}</span>
         <span class="tag tag-blue">advisory routing</span>
+        <span class="tag">last loaded · {{ lastLoadedAtLabel }}</span>
         <span class="tag">/map</span>
       </div>
     </header>
@@ -24,6 +25,19 @@
 
     <div v-if="snapshot" class="map-grid">
       <aside class="panel left-panel">
+        <section class="panel-section">
+          <div class="section-title">Workbench controls</div>
+          <button class="primary" type="button" :disabled="refreshing" @click="refreshSnapshot">
+            {{ refreshing ? 'Refreshing…' : 'Refresh snapshot' }}
+          </button>
+          <div class="control-actions">
+            <button class="secondary" type="button" @click="jumpToPanel('feature-panel')">Feature</button>
+            <button class="secondary" type="button" @click="jumpToPanel('evidence-panel')">Evidence</button>
+            <button class="secondary" type="button" @click="jumpToPanel('governance-panel')">Governance</button>
+          </div>
+          <p class="lookup-status">{{ refreshStatus || `Current data mode: ${dataModeLabel}` }}</p>
+        </section>
+
         <section class="panel-section">
           <div class="section-title">Layers</div>
           <button
@@ -43,7 +57,9 @@
           <div class="section-title">Spatial lookup</div>
           <label class="input-label">H3 cell</label>
           <input v-model="h3Cell" class="field" type="text" />
-          <button class="primary" type="button" @click="refreshH3">Inspect H3</button>
+          <button class="primary" type="button" :disabled="h3Loading" @click="refreshH3">
+            {{ h3Loading ? 'Inspecting…' : 'Inspect H3' }}
+          </button>
           <p v-if="lookupStatus" class="lookup-status">{{ lookupStatus }}</p>
         </section>
 
@@ -69,7 +85,7 @@
       </main>
 
       <aside class="panel right-panel">
-        <section class="panel-section">
+        <section id="feature-panel" class="panel-section">
           <div class="section-title">Feature inspector</div>
           <h2>{{ selectedFeature?.gaia_ref?.entity_id || 'No feature selected' }}</h2>
           <div class="detail-grid">
@@ -78,13 +94,14 @@
             <span>GAIA type</span><strong>{{ selectedFeature?.gaia_ref?.entity_type || '—' }}</strong>
             <span>Safety</span><strong>{{ selectedFeature?.routing?.safety_status || routeSafetyStatus }}</strong>
             <span>Data mode</span><strong>{{ dataModeLabel }}</strong>
+            <span>Last loaded</span><strong>{{ lastLoadedAtLabel }}</strong>
           </div>
           <div class="tag-row">
             <span v-for="cell in featureH3Cells" :key="cell" class="tag">{{ cell }}</span>
           </div>
         </section>
 
-        <section class="panel-section">
+        <section id="evidence-panel" class="panel-section">
           <div class="section-title">Evidence</div>
           <h2>{{ sherlockResult?.title || 'Sherlock evidence' }}</h2>
           <p>{{ sherlockResult?.snippet || 'No evidence loaded.' }}</p>
@@ -93,12 +110,13 @@
           </ul>
         </section>
 
-        <section class="panel-section">
+        <section id="governance-panel" class="panel-section">
           <div class="section-title">Governance</div>
           <div class="detail-grid">
             <span>Attribution</span><strong>{{ governance?.attribution_required ? 'required' : 'not required' }}</strong>
             <span>Lanes</span><strong>{{ governance?.validation_lanes?.length || 0 }}</strong>
             <span>Receipt</span><strong>{{ selectedReceipt?.integrity?.digest ? 'digest' : 'unsigned' }}</strong>
+            <span>Mode</span><strong>{{ dataModeLabel }}</strong>
           </div>
           <ul class="evidence-list">
             <li v-for="lane in governance?.validation_lanes || []" :key="lane.id">{{ lane.id }} · {{ lane.state || 'unknown' }}</li>
@@ -121,9 +139,13 @@ import {
 import type { GaiaMapSnapshot, H3FeatureLayerSearch, MapLayer, ResponseReceipt } from '../types/gaiaMap';
 
 const loading = ref(true);
+const refreshing = ref(false);
+const h3Loading = ref(false);
 const error = ref<string | null>(null);
 const warning = ref<string | null>(null);
+const refreshStatus = ref<string | null>(null);
 const lookupStatus = ref<string | null>(null);
+const lastLoadedAt = ref<Date | null>(null);
 const dataMode = ref<GaiaMapDataMode>('live');
 const snapshot = ref<GaiaMapSnapshot | null>(null);
 const h3Result = ref<H3FeatureLayerSearch | null>(null);
@@ -134,6 +156,7 @@ let map: maplibregl.Map | null = null;
 let marker: maplibregl.Marker | null = null;
 
 const dataModeLabel = computed(() => (dataMode.value === 'live' ? 'live API' : 'demo fallback'));
+const lastLoadedAtLabel = computed(() => lastLoadedAt.value?.toLocaleString() || 'not loaded');
 const layers = computed(() => snapshot.value?.layers.layers || []);
 const selectedLayer = computed<MapLayer | undefined>(() => layers.value.find((layer) => layer.layer_id === selectedLayerId.value) || layers.value[0]);
 const selectedFeature = computed(() => h3Result.value?.features?.[0] || snapshot.value?.feature || null);
@@ -187,17 +210,19 @@ function updateMapMarker() {
   map.easeTo({ center, zoom: 13, duration: 600 });
 }
 
-async function refreshH3() {
-  lookupStatus.value = 'Inspecting H3 cell…';
-  const result = await fetchFeaturesByH3WithFallback(h3Cell.value);
-  h3Result.value = result.result;
-  dataMode.value = result.mode === 'demo' ? 'demo' : dataMode.value;
-  warning.value = result.warning || warning.value;
-  lookupStatus.value = result.mode === 'live' ? 'H3 lookup returned from live API.' : 'H3 lookup returned from demo fallback.';
-  updateMapMarker();
+function jumpToPanel(panelId: string) {
+  document.getElementById(panelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-onMounted(async () => {
+async function loadSnapshot(reason: 'initial' | 'manual' = 'initial') {
+  const initialLoad = snapshot.value === null;
+  loading.value = initialLoad;
+  refreshing.value = !initialLoad;
+  error.value = null;
+  if (reason === 'manual') {
+    refreshStatus.value = 'Refreshing GAIA map snapshot…';
+  }
+
   try {
     const result = await fetchGaiaMapSnapshotWithFallback();
     snapshot.value = result.snapshot;
@@ -205,13 +230,54 @@ onMounted(async () => {
     dataMode.value = result.mode;
     warning.value = result.warning || null;
     selectedLayerId.value = result.snapshot.layers.layers[0]?.layer_id || null;
+    lastLoadedAt.value = new Date();
+    refreshStatus.value = result.mode === 'live'
+      ? 'Snapshot loaded from live GAIA OSM API.'
+      : 'Snapshot loaded from deterministic demo fallback.';
     await nextTick();
     initializeMap();
+    updateMapMarker();
   } catch (err) {
-    error.value = err instanceof Error ? err.message : String(err);
+    const message = err instanceof Error ? err.message : String(err);
+    if (!snapshot.value) {
+      error.value = message;
+    }
+    refreshStatus.value = snapshot.value
+      ? `Refresh failed; keeping last loaded snapshot: ${message}`
+      : null;
   } finally {
     loading.value = false;
+    refreshing.value = false;
   }
+}
+
+async function refreshSnapshot() {
+  await loadSnapshot('manual');
+}
+
+async function refreshH3() {
+  h3Loading.value = true;
+  lookupStatus.value = 'Inspecting H3 cell…';
+  try {
+    const result = await fetchFeaturesByH3WithFallback(h3Cell.value);
+    h3Result.value = result.result;
+    dataMode.value = result.mode === 'demo' ? 'demo' : dataMode.value;
+    warning.value = result.warning || warning.value;
+    lookupStatus.value = result.mode === 'live' ? 'H3 lookup returned from live API.' : 'H3 lookup returned from demo fallback.';
+    updateMapMarker();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    lookupStatus.value = `H3 lookup failed; keeping previous result: ${message}`;
+    if (!snapshot.value) {
+      error.value = message;
+    }
+  } finally {
+    h3Loading.value = false;
+  }
+}
+
+onMounted(async () => {
+  await loadSnapshot('initial');
 });
 
 onUnmounted(() => {
