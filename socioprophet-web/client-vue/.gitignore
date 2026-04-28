@@ -1,3 +1,4 @@
+# Product-shell local/generated artifacts.
 node_modules/
 dist/
 package-lock.json
