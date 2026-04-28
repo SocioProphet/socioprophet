@@ -175,8 +175,12 @@ function updateMapMarker() {
 }
 
 async function refreshH3() {
-  h3Result.value = await fetchFeaturesByH3(h3Cell.value);
-  updateMapMarker();
+  try {
+    h3Result.value = await fetchFeaturesByH3(h3Cell.value);
+    updateMapMarker();
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : String(err);
+  }
 }
 
 onMounted(async () => {
