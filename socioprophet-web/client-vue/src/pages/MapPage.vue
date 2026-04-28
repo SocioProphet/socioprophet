@@ -2,24 +2,27 @@
   <section class="map-page">
     <header class="map-page-header">
       <div>
-        <p class="eyebrow">Maps &amp; Analytics · live surface</p>
+        <p class="eyebrow">Maps &amp; Analytics · {{ dataModeLabel }}</p>
         <h1>OpenStreetMap × GAIA world model</h1>
         <p class="map-subtitle">
-          Read-only fixture-backed map workbench for OSM identity, GAIA bindings, H3 lookup,
-          advisory routing, Sherlock evidence, provenance, and governance state.
+          Read-only map workbench for OSM identity, GAIA bindings, H3 lookup, advisory routing,
+          Sherlock evidence, provenance, and governance state.
         </p>
       </div>
       <div class="status-stack">
-        <span class="tag tag-green">fixture-backed</span>
+        <span :class="['tag', dataMode === 'live' ? 'tag-green' : 'tag-blue']">{{ dataModeLabel }}</span>
         <span class="tag tag-blue">advisory routing</span>
         <span class="tag">/map</span>
       </div>
     </header>
 
     <div v-if="loading" class="state-card">Loading GAIA map state…</div>
-    <div v-else-if="error" class="state-card error">{{ error }}</div>
+    <div v-if="warning" class="state-card warning">
+      {{ warning }} This mode is for product demonstration only and is not a production data plane.
+    </div>
+    <div v-if="error && !snapshot" class="state-card error">{{ error }}</div>
 
-    <div v-else class="map-grid">
+    <div v-if="snapshot" class="map-grid">
       <aside class="panel left-panel">
         <section class="panel-section">
           <div class="section-title">Layers</div>
@@ -41,6 +44,7 @@
           <label class="input-label">H3 cell</label>
           <input v-model="h3Cell" class="field" type="text" />
           <button class="primary" type="button" @click="refreshH3">Inspect H3</button>
+          <p v-if="lookupStatus" class="lookup-status">{{ lookupStatus }}</p>
         </section>
 
         <section class="panel-section">
@@ -73,6 +77,7 @@
             <span>OSM ref</span><strong>{{ selectedFeature?.osm_ref?.osm_type }}/{{ selectedFeature?.osm_ref?.osm_id }}</strong>
             <span>GAIA type</span><strong>{{ selectedFeature?.gaia_ref?.entity_type || '—' }}</strong>
             <span>Safety</span><strong>{{ selectedFeature?.routing?.safety_status || routeSafetyStatus }}</strong>
+            <span>Data mode</span><strong>{{ dataModeLabel }}</strong>
           </div>
           <div class="tag-row">
             <span v-for="cell in featureH3Cells" :key="cell" class="tag">{{ cell }}</span>
@@ -108,11 +113,18 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import maplibregl from 'maplibre-gl';
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { fetchFeaturesByH3, fetchGaiaMapSnapshot } from '../api/gaiaMap';
+import {
+  fetchFeaturesByH3WithFallback,
+  fetchGaiaMapSnapshotWithFallback,
+  type GaiaMapDataMode,
+} from '../api/gaiaMap';
 import type { GaiaMapSnapshot, H3FeatureLayerSearch, MapLayer, ResponseReceipt } from '../types/gaiaMap';
 
 const loading = ref(true);
 const error = ref<string | null>(null);
+const warning = ref<string | null>(null);
+const lookupStatus = ref<string | null>(null);
+const dataMode = ref<GaiaMapDataMode>('live');
 const snapshot = ref<GaiaMapSnapshot | null>(null);
 const h3Result = ref<H3FeatureLayerSearch | null>(null);
 const selectedLayerId = ref<string | null>(null);
@@ -121,6 +133,7 @@ const mapContainer = ref<HTMLElement | null>(null);
 let map: maplibregl.Map | null = null;
 let marker: maplibregl.Marker | null = null;
 
+const dataModeLabel = computed(() => (dataMode.value === 'live' ? 'live API' : 'demo fallback'));
 const layers = computed(() => snapshot.value?.layers.layers || []);
 const selectedLayer = computed<MapLayer | undefined>(() => layers.value.find((layer) => layer.layer_id === selectedLayerId.value) || layers.value[0]);
 const selectedFeature = computed(() => h3Result.value?.features?.[0] || snapshot.value?.feature || null);
@@ -175,19 +188,23 @@ function updateMapMarker() {
 }
 
 async function refreshH3() {
-  try {
-    h3Result.value = await fetchFeaturesByH3(h3Cell.value);
-    updateMapMarker();
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : String(err);
-  }
+  lookupStatus.value = 'Inspecting H3 cell…';
+  const result = await fetchFeaturesByH3WithFallback(h3Cell.value);
+  h3Result.value = result.result;
+  dataMode.value = result.mode === 'demo' ? 'demo' : dataMode.value;
+  warning.value = result.warning || warning.value;
+  lookupStatus.value = result.mode === 'live' ? 'H3 lookup returned from live API.' : 'H3 lookup returned from demo fallback.';
+  updateMapMarker();
 }
 
 onMounted(async () => {
   try {
-    snapshot.value = await fetchGaiaMapSnapshot();
-    h3Result.value = snapshot.value.h3;
-    selectedLayerId.value = snapshot.value.layers.layers[0]?.layer_id || null;
+    const result = await fetchGaiaMapSnapshotWithFallback();
+    snapshot.value = result.snapshot;
+    h3Result.value = result.snapshot.h3;
+    dataMode.value = result.mode;
+    warning.value = result.warning || null;
+    selectedLayerId.value = result.snapshot.layers.layers[0]?.layer_id || null;
     await nextTick();
     initializeMap();
   } catch (err) {
