@@ -49,8 +49,9 @@ def main() -> int:
     for wf in sorted(WORKFLOWS.glob('*.yml')) + sorted(WORKFLOWS.glob('*.yaml')):
         data = load_yaml(wf)
         on_block = get_on_block(data)
-        push_value = on_block.get('push', {}) if isinstance(on_block, dict) else {}
-        push = push_value if isinstance(push_value, dict) else {}
+        push = on_block.get('push', {}) if isinstance(on_block, dict) else {}
+        if not isinstance(push, dict):
+            push = {}
         branches = set(normalize_branches(push.get('branches')))
         text = wf.read_text(encoding='utf-8')
         is_docs_deploy = 'Deploy Docs' in text or 'upload-pages-artifact' in text or 'deploy-pages' in text

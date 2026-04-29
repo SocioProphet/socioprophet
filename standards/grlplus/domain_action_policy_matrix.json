@@ -1,0 +1,54 @@
+{
+  "schema_version": "grlplus-action-policy/0.1",
+  "default_repo_full_name": "SocioProphet/socioprophet",
+  "closure_rule_catalog": {
+    "CR_MIN_DIRECT_ARGUMENT_1": "At least 1 direct argument must trace to the element.",
+    "CR_MIN_DIRECT_ARGUMENT_2": "At least 2 direct arguments must trace to the element.",
+    "CR_MIN_EVIDENCE_LINK_1": "At least 1 evidence link must support the element.",
+    "CR_MIN_TELEMETRY_ARTIFACT_1": "At least 1 telemetry or control artifact must be attached.",
+    "CR_DIVERGENCE_BELOW_WARNING": "Semantic divergence must fall below the configured warning threshold.",
+    "CR_OWNER_APPROVAL_REQUIRED": "Named review owner must approve closure."
+  },
+  "escalation_rule_catalog": {
+    "ER_BREACH_SLA_ONCE": "Escalate if SLA is breached once.",
+    "ER_BREACH_SLA_TWICE": "Escalate if SLA is breached twice.",
+    "ER_CRITICAL_IMMEDIATE": "Escalate immediately on critical severity.",
+    "ER_PERSISTENT_HIGH_TWO_REVIEWS": "Escalate if high severity persists for two reviews.",
+    "ER_MISSING_DIRECT_ARGUMENT_BLOCKS_CLOSURE": "Do not allow closure when direct argument coverage is missing."
+  },
+  "profiles": {
+    "strategy": {
+      "default_repo_full_name": "SocioProphet/socioprophet",
+      "default_sla_due_in_days": 7,
+      "default_review_cadence_days": 7,
+      "closure_rule_code": "CR_DIVERGENCE_BELOW_WARNING",
+      "escalation_rule_code": "ER_BREACH_SLA_TWICE",
+      "evidence_request_template": "Attach market, delivery, financial, or decision evidence directly covering the element and each listed reason code.",
+      "closure_criteria_template": "Close when at least 1 direct argument and 1 evidence link are attached, and material divergence is reduced below the warning threshold.",
+      "escalation_trigger_template": "Escalate if SLA is breached twice or if medium or high severity persists for two reviews.",
+      "review_owner_template": "actor.strategy"
+    },
+    "cyber": {
+      "default_repo_full_name": "SocioProphet/socioprophet",
+      "default_sla_due_in_days": 3,
+      "default_review_cadence_days": 3,
+      "closure_rule_code": "CR_MIN_TELEMETRY_ARTIFACT_1",
+      "escalation_rule_code": "ER_BREACH_SLA_ONCE",
+      "evidence_request_template": "Attach telemetry, control-state, incident, or threat evidence directly covering the element and each listed reason code.",
+      "closure_criteria_template": "Close when at least 1 direct argument, 1 evidence link, and 1 telemetry or control artifact are attached, and no high severity semantic divergence remains.",
+      "escalation_trigger_template": "Escalate immediately on critical severity, or if any high severity item breaches SLA once.",
+      "review_owner_template": "actor.security"
+    },
+    "safety": {
+      "default_repo_full_name": "SocioProphet/socioprophet",
+      "default_sla_due_in_days": 1,
+      "default_review_cadence_days": 1,
+      "closure_rule_code": "CR_MIN_DIRECT_ARGUMENT_2",
+      "escalation_rule_code": "ER_MISSING_DIRECT_ARGUMENT_BLOCKS_CLOSURE",
+      "evidence_request_template": "Attach direct safety case arguments, hazard or risk evidence, and explicit traceable evidence links covering the element and each listed reason code.",
+      "closure_criteria_template": "Close only when at least 2 direct safety arguments, explicit evidence links, and designated owner approval are present.",
+      "escalation_trigger_template": "Escalate immediately and block closure if direct argument coverage is missing or if any closure criterion is unmet.",
+      "review_owner_template": "actor.safety"
+    }
+  }
+}

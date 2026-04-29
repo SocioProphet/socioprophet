@@ -1,0 +1,37 @@
+{
+  "name": "socioprophet-web-vue-shell",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "verify": "npm run typecheck && npm run build"
+  },
+  "dependencies": {
+    "@carbon/styles": "^1.89.0",
+    "@carbon/vue": "^3.0.27",
+    "d3": "^7.9.0",
+    "maplibre-gl": "^5.7.1",
+    "rxjs": "^7.8.2",
+    "vue": "^3.4.0",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "sass": "^1.77.0",
+    "typescript": "^5.9.3",
+    "vite": "^5.0.0",
+    "vitest": "^4.0.16",
+    "vue-tsc": "^3.2.1"
+  },
+  "overrides": {
+    "qs": "^6.11.2"
+  },
+  "resolutions": {
+    "qs": "^6.11.2"
+  }
+}

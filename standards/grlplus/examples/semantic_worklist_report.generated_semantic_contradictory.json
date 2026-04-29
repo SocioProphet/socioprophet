@@ -1,0 +1,146 @@
+{
+  "active_domain_profile": "strategy",
+  "min_criticality": 0.8,
+  "items": [
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "goal.outcome",
+      "criticality": 1.0,
+      "intervention_category": "gather_evidence",
+      "reason_codes": [
+        "RC_CONFIDENCE_SCALAR_GAP",
+        "RC_CONFIDENCE_INTERVAL_GAP"
+      ],
+      "dependency_targets": [],
+      "cross_actor_dependency_count": 0,
+      "confidence": -1.0,
+      "scalar_signal": -0.375,
+      "interval_low": -0.42,
+      "interval_high": -0.33,
+      "interval_width": 0.09,
+      "suggested_evidence_ask": "Provide evidence and rationale updates for goal.outcome aligned to gather_evidence.",
+      "task_payload": {
+        "title": "[gather_evidence] goal.outcome",
+        "owner": "actor.strategy",
+        "reason_codes": [
+          "RC_CONFIDENCE_SCALAR_GAP",
+          "RC_CONFIDENCE_INTERVAL_GAP"
+        ],
+        "dependencies": [],
+        "next_action": "Owner actor.strategy: gather stronger evidence for goal.outcome to narrow interval width (0.09) and reduce posture-vs-structure divergence under the strategy profile."
+      }
+    },
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "goal.choice",
+      "criticality": 0.9,
+      "intervention_category": "add_direct_argument_coverage",
+      "reason_codes": [
+        "RC_DIRECT_ARGUMENT_COVERAGE_MISSING"
+      ],
+      "dependency_targets": [],
+      "cross_actor_dependency_count": 0,
+      "confidence": null,
+      "scalar_signal": 1.0,
+      "interval_low": 1.0,
+      "interval_high": 1.0,
+      "interval_width": 0.0,
+      "suggested_evidence_ask": "Provide evidence and rationale updates for goal.choice aligned to add_direct_argument_coverage.",
+      "task_payload": {
+        "title": "[add_direct_argument_coverage] goal.choice",
+        "owner": "actor.strategy",
+        "reason_codes": [
+          "RC_DIRECT_ARGUMENT_COVERAGE_MISSING"
+        ],
+        "dependencies": [],
+        "next_action": "Owner actor.strategy: add at least 1 more trace-linked arguments directly covering goal.choice or its incident decisions."
+      }
+    },
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "softgoal.tradeoff",
+      "criticality": 0.9,
+      "intervention_category": "add_direct_argument_coverage",
+      "reason_codes": [
+        "RC_DIRECT_ARGUMENT_COVERAGE_MISSING",
+        "RC_CONTRADICTORY_TRADEOFF"
+      ],
+      "dependency_targets": [],
+      "cross_actor_dependency_count": 0,
+      "confidence": null,
+      "scalar_signal": 0.0,
+      "interval_low": -0.1,
+      "interval_high": 0.1,
+      "interval_width": 0.2,
+      "suggested_evidence_ask": "Provide evidence and rationale updates for softgoal.tradeoff aligned to add_direct_argument_coverage.",
+      "task_payload": {
+        "title": "[add_direct_argument_coverage] softgoal.tradeoff",
+        "owner": "actor.strategy",
+        "reason_codes": [
+          "RC_DIRECT_ARGUMENT_COVERAGE_MISSING",
+          "RC_CONTRADICTORY_TRADEOFF"
+        ],
+        "dependencies": [],
+        "next_action": "Owner actor.strategy: add at least 1 more trace-linked arguments directly covering softgoal.tradeoff or its incident decisions."
+      }
+    },
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "task.option_a",
+      "criticality": 0.8,
+      "intervention_category": "monitor",
+      "reason_codes": [],
+      "dependency_targets": [
+        "resource.shared"
+      ],
+      "cross_actor_dependency_count": 1,
+      "confidence": 1.0,
+      "scalar_signal": 1.0,
+      "interval_low": 1.0,
+      "interval_high": 1.0,
+      "interval_width": 0.0,
+      "suggested_evidence_ask": "Provide evidence and rationale updates for task.option_a aligned to monitor.",
+      "task_payload": {
+        "title": "[monitor] task.option_a",
+        "owner": "actor.strategy",
+        "reason_codes": [],
+        "dependencies": [
+          "resource.shared"
+        ],
+        "next_action": "Owner actor.strategy: monitor task.option_a; current evidence and propagated structure are aligned within the strategy profile thresholds."
+      }
+    },
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "task.option_b",
+      "criticality": 0.8,
+      "intervention_category": "monitor",
+      "reason_codes": [],
+      "dependency_targets": [
+        "resource.shared"
+      ],
+      "cross_actor_dependency_count": 1,
+      "confidence": 1.0,
+      "scalar_signal": 1.0,
+      "interval_low": 1.0,
+      "interval_high": 1.0,
+      "interval_width": 0.0,
+      "suggested_evidence_ask": "Provide evidence and rationale updates for task.option_b aligned to monitor.",
+      "task_payload": {
+        "title": "[monitor] task.option_b",
+        "owner": "actor.strategy",
+        "reason_codes": [],
+        "dependencies": [
+          "resource.shared"
+        ],
+        "next_action": "Owner actor.strategy: monitor task.option_b; current evidence and propagated structure are aligned within the strategy profile thresholds."
+      }
+    }
+  ],
+  "summary": {
+    "items": 5,
+    "owners": [
+      "actor.strategy"
+    ]
+  }
+}
