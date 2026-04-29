@@ -1,5 +1,6 @@
 const express = require('express');
 const NodeCache = require('node-cache');
+const crypto = require('crypto');
 
 const router = express.Router();
 const cache = new NodeCache({ stdTTL: 300 });
@@ -58,7 +59,7 @@ router.get('/dashboard', async (_req, res) => {
     cache.set(endpoint, payload);
     return res.json(payload);
   } catch (error) {
-    const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestId = crypto.randomUUID();
     console.error(`[procybernetica-dashboard] requestId=${requestId} upstream request failed`, error);
     return res.status(502).json(
       buildUnavailablePayload(
