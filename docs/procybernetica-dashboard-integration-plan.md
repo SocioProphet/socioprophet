@@ -58,6 +58,6 @@ The route expects Sherlock-search to expose:
 - `SocioProphet/sherlock-search` owns the search/discovery and payload contract side.
 - `SocioProphet/socioprophet` owns the customer-facing React UI and thin server proxy.
 
-## Why the route is not already patched in this branch
+## Wiring status
 
-This branch was created through the GitHub connector path used in chat. In this turn, the connector path available for this repo allowed clean creation of new files, but not a clean in-place patch flow for the existing route registry and server mount files. This note preserves the exact remaining delta so a final follow-up patch can be landed quickly.
+This branch stages the dashboard files and the server route module, and includes the explicit route registration and server mount updates listed above.

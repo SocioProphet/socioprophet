@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const rssRouter = require("./routes/api/rss-route");
+const proCyberneticaRouter = require("./routes/api/procybernetica-dashboard-route");
 
 const app = express();
 const port = process.env.PORT;
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/api/feed", rssRouter);
+app.use("/api/procybernetica", proCyberneticaRouter);
 
 const server = app.listen(port, () =>
   console.log(`Server up and running on port ${port}.`)

@@ -8,12 +8,12 @@ This view is intended to be mounted at:
 
 - `/procybernetica`
 
-## Required follow-up wiring
+## Client wiring in this branch
 
-Because the current GitHub connector path used for this scaffold can create new files but does not expose a clean patch path for existing files in this turn, the following existing files still need one follow-up edit:
+The dashboard is wired in this branch with the following client changes:
 
 - `src/routes.js` – import `ProCyberneticaDashboard` and add the `/procybernetica` route.
-- optional: add a header navigation link once the route is active.
+- Optional: add a header navigation link once the route is active.
 
 ## Data source
 

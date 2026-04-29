@@ -1,4 +1,3 @@
-export {};
 const express = require('express');
 const NodeCache = require('node-cache');
 
@@ -7,7 +6,7 @@ const cache = new NodeCache({ stdTTL: 300 });
 
 const DEFAULT_PATH = '/api/procybernetica/dashboard';
 
-const buildUnavailablePayload = (reason: string) => ({
+const buildUnavailablePayload = (reason) => ({
   generatedAtUtc: new Date().toISOString(),
   status: 'unavailable',
   reason,
@@ -22,7 +21,7 @@ const buildUnavailablePayload = (reason: string) => ({
   contradictions: [],
 });
 
-router.get('/dashboard', async (_req: Request, res: any) => {
+router.get('/dashboard', async (_req, res) => {
   const baseUrl = process.env.SHERLOCK_SEARCH_BASE_URL;
 
   if (!baseUrl) {
@@ -59,8 +58,13 @@ router.get('/dashboard', async (_req: Request, res: any) => {
     cache.set(endpoint, payload);
     return res.json(payload);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown Sherlock-search proxy failure';
-    return res.status(502).json(buildUnavailablePayload(message));
+    const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    console.error(`[procybernetica-dashboard] requestId=${requestId} upstream request failed`, error);
+    return res.status(502).json(
+      buildUnavailablePayload(
+        `Unable to reach Sherlock-search upstream. Provide this requestId to operators: ${requestId}`
+      )
+    );
   }
 });
 

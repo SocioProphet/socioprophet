@@ -32,6 +32,8 @@ type DashboardRow = {
 };
 
 type DashboardPayload = {
+  status?: string;
+  reason?: string;
   generatedAtUtc: string;
   totals: {
     subjects: number;
@@ -58,10 +60,21 @@ const ProCyberneticaDashboard = () => {
       try {
         setLoading(true);
         const res = await fetch(endpoint);
+        const json = (await res.json().catch(() => null)) as DashboardPayload | null;
         if (!res.ok) {
+          if (json && json.status === 'unavailable') {
+            const reason = json.reason ? `${json.reason} (HTTP ${res.status})` : `Dashboard unavailable (HTTP ${res.status})`;
+            if (isMounted) {
+              setData(json);
+              setError(reason);
+            }
+            return;
+          }
           throw new Error(`Dashboard request failed: ${res.status}`);
         }
-        const json = (await res.json()) as DashboardPayload;
+        if (!json) {
+          throw new Error('Dashboard response was not valid JSON');
+        }
         if (isMounted) {
           setData(json);
           setError(null);
