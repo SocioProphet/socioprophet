@@ -57,7 +57,7 @@
           <div class="section-title">Spatial lookup</div>
           <label class="input-label">H3 cell</label>
           <input v-model="h3Cell" class="field" type="text" />
-          <button class="primary" type="button" :disabled="h3Loading" @click="refreshH3">
+          <button class="primary" type="button" :disabled="h3Loading" data-testid="h3-inspect-button" @click="refreshH3">
             {{ h3Loading ? 'Inspecting…' : 'Inspect H3' }}
           </button>
           <p v-if="lookupStatus" class="lookup-status">{{ lookupStatus }}</p>

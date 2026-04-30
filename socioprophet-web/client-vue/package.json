@@ -9,7 +9,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
-    "verify": "npm run typecheck && npm run build"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "@carbon/styles": "^1.89.0",
@@ -22,6 +24,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/test-utils": "^2.4.9",
+    "happy-dom": "^20.8.9",
     "sass": "^1.77.0",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",

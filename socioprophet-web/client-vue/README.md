@@ -25,6 +25,7 @@ Required verification:
 ```bash
 npm install
 npm run typecheck
+npm test
 npm run build
 ```
 
@@ -34,7 +35,38 @@ The repo workflow for this surface is:
 client-vue-product-build
 ```
 
-## Local development
+## Testing
+
+### Unit and smoke tests
+
+Run the full test suite (offline, no browser required):
+
+```bash
+cd socioprophet-web/client-vue
+npm install
+npm test
+```
+
+Watch mode for local development:
+
+```bash
+npm run test:watch
+```
+
+The tests use [Vitest](https://vitest.dev/) with `happy-dom` and `@vue/test-utils`.
+MapLibre-GL is stubbed so tests run without WebGL.
+
+### What the smoke tests cover
+
+| Criterion | Test file |
+|-----------|-----------|
+| 1. `/map` route loads | `MapPage.smoke.test.ts` |
+| 2. Map canvas renders | `MapPage.smoke.test.ts` |
+| 3. Fallback mode when API unavailable | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
+| 4. Live API mode when API available | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
+| 5. H3 lookup does not blank the page | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
+| 6. Evidence / governance / runtime panels | `MapPage.smoke.test.ts` |
+| 7. Backend status displayed clearly | `MapPage.smoke.test.ts` |
 
 ```bash
 cd socioprophet-web/client-vue

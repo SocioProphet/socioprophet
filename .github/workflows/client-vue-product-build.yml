@@ -35,5 +35,8 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Run unit and smoke tests
+        run: npm test
+
       - name: Build Vue shell
         run: npm run build
