@@ -1,4 +1,7 @@
 import type {
+  GaiaLayerCatalog,
+  GaiaLayerEntry,
+  GaiaTileManifest,
   GaiaMapSnapshot,
   GovernanceState,
   H3FeatureLayerSearch,
@@ -324,6 +327,120 @@ export async function fetchGaiaMapSnapshotWithFallback(): Promise<GaiaMapLoadRes
       snapshot: demoGaiaMapSnapshot(),
       mode: 'demo',
       warning: `Using deterministic demo fallback because the GAIA OSM API is unavailable: ${errorMessage(err)}`,
+    };
+  }
+}
+
+// ── GAIA Layer Catalog API ───────────────────────────────────────────────────
+// Consumes Prophet Platform endpoints:
+//   GET /gaia/layers
+//   GET /gaia/layers/{layer_id}
+//   GET /gaia/tile-manifests/{layer_id}
+
+/** Returns true if the tile URL is a placeholder/non-production URL (demo://, placeholder://, fixture://). */
+export function isPlaceholderTileUrl(url: string): boolean {
+  return /^(placeholder|demo|fixture):\/\//i.test(url);
+}
+
+const DEMO_CATALOG_LAYER: GaiaLayerEntry = {
+  layer_id: 'gaia-osm-demo-road-layer-v1',
+  title: 'GAIA OSM Demo Road Layer',
+  layer_type: 'vector',
+  sources: [
+    { source_type: 'openstreetmap', source_ref: 'demo://osm/way/424242', fixture_backed: true },
+  ],
+  attribution: {
+    attribution_text: '© OpenStreetMap contributors',
+    license_refs: ['ODbL-1.0'],
+    source_urls: ['https://www.openstreetmap.org/copyright'],
+  },
+  spatial: {
+    h3_cells: [DEFAULT_H3_CELL],
+    bbox: [-74.012, 40.706, -73.998, 40.716],
+  },
+  provenance: {
+    source_refs: ['demo://gaia/osm-road-feature-binding.sample.v1.json'],
+    fixture_digest: 'demo-fallback-gaia-osm-v1',
+    source_receipt_ref: 'demo://gaia/source-receipt.v1.json',
+  },
+  classification: {
+    safety_status: 'advisory',
+    fixture_backed: true,
+    production_ready: false,
+  },
+  generated_at: '2025-01-01T00:00:00Z',
+  response_receipt: demoReceipt('gaia-layer-catalog', 'advisory'),
+};
+
+const DEMO_CATALOG: GaiaLayerCatalog = {
+  layers: [DEMO_CATALOG_LAYER],
+  generated_at: '2025-01-01T00:00:00Z',
+  response_receipt: demoReceipt('gaia-layer-catalog', 'advisory'),
+};
+
+function demoCatalogTileManifest(layerId: string): GaiaTileManifest {
+  return {
+    layer_id: layerId,
+    url_template: `placeholder://tiles/${layerId}/{z}/{x}/{y}.mvt`,
+    format: 'mvt-metadata',
+    is_placeholder: true,
+    is_production: false,
+    generated_at: '2025-01-01T00:00:00Z',
+    attribution: '© OpenStreetMap contributors',
+    source_receipt_ref: 'demo://gaia/source-receipt.v1.json',
+    response_receipt: demoReceipt('gaia-tile-manifest', 'advisory'),
+  };
+}
+
+export function demoGaiaLayerCatalog(): GaiaLayerCatalog {
+  return cloneDemo(DEMO_CATALOG);
+}
+
+export async function fetchGaiaLayers(): Promise<GaiaLayerCatalog> {
+  return getJson<GaiaLayerCatalog>('/gaia/layers');
+}
+
+export async function fetchGaiaLayerById(layerId: string): Promise<GaiaLayerEntry> {
+  return getJson<GaiaLayerEntry>(`/gaia/layers/${encodeURIComponent(layerId)}`);
+}
+
+export async function fetchGaiaTileManifest(layerId: string): Promise<GaiaTileManifest> {
+  return getJson<GaiaTileManifest>(`/gaia/tile-manifests/${encodeURIComponent(layerId)}`);
+}
+
+export type GaiaLayerCatalogLoadResult = {
+  catalog: GaiaLayerCatalog;
+  mode: GaiaMapDataMode;
+  warning?: string;
+};
+
+export async function fetchGaiaLayerCatalogWithFallback(): Promise<GaiaLayerCatalogLoadResult> {
+  try {
+    return { catalog: await fetchGaiaLayers(), mode: 'live' };
+  } catch (err) {
+    return {
+      catalog: demoGaiaLayerCatalog(),
+      mode: 'demo',
+      warning: `Using demo layer catalog fallback because the GAIA catalog API is unavailable: ${errorMessage(err)}`,
+    };
+  }
+}
+
+export type GaiaTileManifestLoadResult = {
+  manifest: GaiaTileManifest;
+  mode: GaiaMapDataMode;
+  warning?: string;
+};
+
+export async function fetchGaiaTileManifestWithFallback(layerId: string): Promise<GaiaTileManifestLoadResult> {
+  try {
+    const manifest = await fetchGaiaTileManifest(layerId);
+    return { manifest, mode: 'live' };
+  } catch (err) {
+    return {
+      manifest: demoCatalogTileManifest(layerId),
+      mode: 'demo',
+      warning: `Using demo tile manifest fallback: ${errorMessage(err)}`,
     };
   }
 }

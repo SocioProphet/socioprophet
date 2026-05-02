@@ -155,3 +155,61 @@ export type GaiaMapSnapshot = {
   governance: GovernanceState;
   search: SherlockResult;
 };
+
+// ── GAIA Layer Catalog API types ────────────────────────────────────────────
+// These correspond to the Prophet Platform endpoints:
+//   GET /gaia/layers
+//   GET /gaia/layers/{layer_id}
+//   GET /gaia/tile-manifests/{layer_id}
+
+export type GaiaLayerSource = {
+  source_type: string;
+  source_ref?: string;
+  fixture_backed?: boolean;
+};
+
+export type GaiaLayerEntry = {
+  layer_id: string;
+  title: string;
+  layer_type?: string;
+  sources?: GaiaLayerSource[];
+  attribution?: {
+    attribution_text?: string;
+    license_refs?: string[];
+    source_urls?: string[];
+  };
+  spatial?: {
+    h3_cells?: string[];
+    bbox?: number[];
+  };
+  provenance?: {
+    source_refs?: string[];
+    fixture_digest?: string;
+    source_receipt_ref?: string;
+  };
+  classification?: {
+    safety_status?: string;
+    fixture_backed?: boolean;
+    production_ready?: boolean;
+  };
+  generated_at?: string;
+  response_receipt?: ResponseReceipt;
+};
+
+export type GaiaLayerCatalog = {
+  layers: GaiaLayerEntry[];
+  generated_at?: string;
+  response_receipt?: ResponseReceipt;
+};
+
+export type GaiaTileManifest = {
+  layer_id: string;
+  url_template: string;
+  format?: string;
+  is_placeholder: boolean;
+  is_production?: boolean;
+  generated_at?: string;
+  attribution?: string;
+  source_receipt_ref?: string;
+  response_receipt?: ResponseReceipt;
+};

@@ -29,12 +29,17 @@ vi.mock('../api/gaiaMap', async (importOriginal) => {
     ...actual,
     fetchGaiaMapSnapshotWithFallback: vi.fn(),
     fetchFeaturesByH3WithFallback: vi.fn(),
+    fetchGaiaLayerCatalogWithFallback: vi.fn(),
+    fetchGaiaTileManifestWithFallback: vi.fn(),
   };
 });
 
 import {
   fetchGaiaMapSnapshotWithFallback,
   fetchFeaturesByH3WithFallback,
+  fetchGaiaLayerCatalogWithFallback,
+  fetchGaiaTileManifestWithFallback,
+  demoGaiaLayerCatalog,
 } from '../api/gaiaMap';
 
 // ──────────────────────────────────────────────────────────────
@@ -51,6 +56,39 @@ function makeRouter() {
 // ──────────────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────────────
+
+function demoCatalogResult() {
+  return {
+    catalog: demoGaiaLayerCatalog(),
+    mode: 'demo' as const,
+    warning: undefined,
+  };
+}
+
+function liveCatalogResult() {
+  return {
+    catalog: demoGaiaLayerCatalog(),
+    mode: 'live' as const,
+    warning: undefined,
+  };
+}
+
+function demoTileManifestResult(layerId = 'gaia-osm-demo-road-layer-v1') {
+  return {
+    manifest: {
+      layer_id: layerId,
+      url_template: `placeholder://tiles/${layerId}/{z}/{x}/{y}.mvt`,
+      format: 'mvt-metadata',
+      is_placeholder: true,
+      is_production: false,
+      generated_at: '2025-01-01T00:00:00Z',
+      attribution: '© OpenStreetMap contributors',
+      source_receipt_ref: 'demo://gaia/source-receipt.v1.json',
+    },
+    mode: 'demo' as const,
+    warning: undefined,
+  };
+}
 
 function demoFallbackResult() {
   return {
@@ -84,6 +122,12 @@ async function clickH3InspectButton(wrapper: ReturnType<typeof mount>) {
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+// Set up default catalog/tile-manifest mocks for all tests
+beforeEach(() => {
+  vi.mocked(fetchGaiaLayerCatalogWithFallback).mockResolvedValue(demoCatalogResult());
+  vi.mocked(fetchGaiaTileManifestWithFallback).mockResolvedValue(demoTileManifestResult());
 });
 
 // ──────────────────────────────────────────────────────────────
