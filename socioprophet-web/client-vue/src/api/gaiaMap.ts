@@ -1,5 +1,10 @@
 import type {
+  GaiaLayerCatalog,
+  GaiaLayerCatalogLoadResult,
+  GaiaLayerEntry,
   GaiaMapSnapshot,
+  GaiaTileManifest,
+  GaiaTileManifestLoadResult,
   GovernanceState,
   H3FeatureLayerSearch,
   MapLayer,
@@ -15,6 +20,7 @@ const API_BASE = (import.meta as any).env?.VITE_GAIA_MAP_API_BASE || '/api';
 const DEFAULT_OSM_TYPE = 'way';
 const DEFAULT_OSM_ID = '424242';
 const DEFAULT_H3_CELL = '8928308280fffff';
+const DEFAULT_GAIA_LAYER_ID = 'osm-layer-manifest-candidate-lower-manhattan-bounded-extract-2026-04-26';
 
 export type GaiaMapDataMode = 'live' | 'demo';
 
@@ -57,6 +63,80 @@ function demoReceipt(responseKind: string, routeSafetyStatus: ResponseReceipt['r
     },
   };
 }
+
+const DEMO_GAIA_LAYER: GaiaLayerEntry = {
+  manifest_version: 'v1',
+  layer_id: DEFAULT_GAIA_LAYER_ID,
+  layer_type: 'vector',
+  title: 'GAIA OSM Bounded Ingest Layer – Lower Manhattan Bounded Extract',
+  description: 'Bounded OSM ingest layer manifest candidate. Fixture-backed catalog surface. Not production tile-serving. Advisory only.',
+  sources: [
+    {
+      source_id: 'osm-source-envelope-lower-manhattan-bounded-extract-2026-04-26',
+      source_type: 'OpenStreetMap extract',
+      source_refs: [
+        'osm-extract://bounded/lower-manhattan/2026-04-26',
+        'osm-source-receipt.v1.json',
+        'osm-feature-bindings.v1.json',
+      ],
+    },
+  ],
+  tiles: {
+    url_template: 'placeholder://tiles/gaia/osm-bounded/{z}/{x}/{y}.mvt',
+    min_zoom: 0,
+    max_zoom: 14,
+    format: 'mvt',
+  },
+  spatial: {
+    bbox: [-74.012, 40.705, -73.998, 40.718],
+    h3_cells: ['89283082807ffff', DEFAULT_H3_CELL, '8928308281fffff'],
+    crs: 'EPSG:4326',
+  },
+  attribution: {
+    attribution_text: '© OpenStreetMap contributors',
+    license_refs: ['ODbL-1.0'],
+    source_urls: ['https://www.openstreetmap.org'],
+  },
+  provenance: {
+    source_refs: [
+      'osm-source-receipt.v1.json',
+      'osm-feature-bindings.v1.json',
+      'osm-extract://bounded/lower-manhattan/2026-04-26',
+    ],
+    fixture_digest: 'sha256:e5baba1a98e0e59887bf19fe840b0544904f23d05e5fb9989a9f53f86d1b360b',
+    runtime_refs: ['gaia-bounded-osm-ingest-runner@v1'],
+    created_at: '2026-04-27T06:10:00Z',
+    content_hash: 'sha256:ae4f4d078e81de81fd413ad2f243f250af99bc268580143801fa18875214c5d9',
+  },
+  classification: {
+    data_class: 'public',
+    handling_tags: ['demo', 'osm', 'bounded-extract', 'geospatial', 'advisory'],
+  },
+  response_receipt: demoReceipt('gaia-layer', 'advisory'),
+};
+
+const DEMO_GAIA_CATALOG: GaiaLayerCatalog = {
+  layers: [DEMO_GAIA_LAYER],
+  catalog_mode: 'fixture-backed',
+  production_tile_serving: false,
+  response_receipt: demoReceipt('gaia-layer-list', 'advisory'),
+};
+
+const DEMO_GAIA_TILE_MANIFEST: GaiaTileManifest = {
+  manifest_version: DEMO_GAIA_LAYER.manifest_version,
+  layer_id: DEMO_GAIA_LAYER.layer_id,
+  layer_type: DEMO_GAIA_LAYER.layer_type,
+  title: DEMO_GAIA_LAYER.title,
+  description: DEMO_GAIA_LAYER.description,
+  tile_serving_status: 'fixture-placeholder-not-production',
+  production_tile_serving: false,
+  tiles: DEMO_GAIA_LAYER.tiles,
+  spatial: DEMO_GAIA_LAYER.spatial,
+  attribution: DEMO_GAIA_LAYER.attribution,
+  provenance: DEMO_GAIA_LAYER.provenance,
+  classification: DEMO_GAIA_LAYER.classification,
+  response_receipt: demoReceipt('gaia-tile-manifest', 'advisory'),
+};
 
 const DEMO_LAYER: MapLayer = {
   manifest_version: 'v1',
@@ -258,8 +338,59 @@ export function demoGaiaMapSnapshot(): GaiaMapSnapshot {
   return cloneDemo(DEMO_SNAPSHOT);
 }
 
+export function demoGaiaLayerCatalog(): GaiaLayerCatalog {
+  return cloneDemo(DEMO_GAIA_CATALOG);
+}
+
+export function demoGaiaTileManifest(layerId = DEFAULT_GAIA_LAYER_ID): GaiaTileManifest {
+  const manifest = cloneDemo(DEMO_GAIA_TILE_MANIFEST);
+  manifest.layer_id = layerId;
+  return manifest;
+}
+
+export function isPlaceholderTileUrl(urlTemplate?: string | null): boolean {
+  if (!urlTemplate) return true;
+  return urlTemplate.startsWith('placeholder://') || urlTemplate.startsWith('demo://');
+}
+
 export async function fetchMapLayers(): Promise<MapLayerList> {
   return getJson<MapLayerList>('/map-layers');
+}
+
+export async function fetchGaiaLayers(): Promise<GaiaLayerCatalog> {
+  return getJson<GaiaLayerCatalog>('/gaia/layers');
+}
+
+export async function fetchGaiaLayerById(layerId: string): Promise<GaiaLayerEntry> {
+  return getJson<GaiaLayerEntry>(`/gaia/layers/${encodeURIComponent(layerId)}`);
+}
+
+export async function fetchGaiaTileManifest(layerId: string): Promise<GaiaTileManifest> {
+  return getJson<GaiaTileManifest>(`/gaia/tile-manifests/${encodeURIComponent(layerId)}`);
+}
+
+export async function fetchGaiaLayerCatalogWithFallback(): Promise<GaiaLayerCatalogLoadResult> {
+  try {
+    return { catalog: await fetchGaiaLayers(), mode: 'live' };
+  } catch (err) {
+    return {
+      catalog: demoGaiaLayerCatalog(),
+      mode: 'demo',
+      warning: `Using demo GAIA layer catalog because the catalog API is unavailable: ${errorMessage(err)}`,
+    };
+  }
+}
+
+export async function fetchGaiaTileManifestWithFallback(layerId: string): Promise<GaiaTileManifestLoadResult> {
+  try {
+    return { manifest: await fetchGaiaTileManifest(layerId), mode: 'live' };
+  } catch (err) {
+    return {
+      manifest: demoGaiaTileManifest(layerId),
+      mode: 'demo',
+      warning: `Using demo GAIA tile manifest because the catalog API did not return layer metadata: ${errorMessage(err)}`,
+    };
+  }
 }
 
 export async function fetchFeatureByOsm(
