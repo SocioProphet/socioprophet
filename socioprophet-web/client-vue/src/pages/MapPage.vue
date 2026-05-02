@@ -234,6 +234,7 @@ const runtimes = computed(() => snapshot.value?.runtimeBoundaries.runtimes || []
 const routeSafetyStatus = computed(() => snapshot.value?.routes.default_safety_status || 'advisory');
 const selectedReceipt = computed<ResponseReceipt | undefined>(() => selectedFeature.value?.response_receipt || selectedGaiaLayer.value?.response_receipt || selectedLayer.value?.response_receipt);
 const featureH3Cells = computed(() => selectedFeature.value?.spatial?.h3_cells || []);
+const evidenceRefs = computed(() => sherlockResult.value?.evidence_refs || selectedFeature.value?.provenance?.source_refs || []);
 const selectedCatalogH3Cells = computed(() => selectedTileManifest.value?.spatial?.h3_cells || selectedGaiaLayer.value?.spatial?.h3_cells || []);
 const selectedLayerSourceRefs = computed(() => selectedTileManifest.value?.provenance?.source_refs || selectedGaiaLayer.value?.provenance?.source_refs || []);
 const catalogProductionTileServing = computed(() => gaiaCatalog.value?.production_tile_serving === true ? 'true' : 'false');
