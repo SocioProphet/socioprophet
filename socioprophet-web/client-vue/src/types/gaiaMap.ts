@@ -50,6 +50,95 @@ export type MapLayerList = {
   response_receipt: ResponseReceipt;
 };
 
+export type GaiaLayerEntry = {
+  manifest_version: string;
+  layer_id: string;
+  layer_type: string;
+  title: string;
+  description?: string;
+  sources?: Array<{
+    source_id?: string;
+    source_type?: string;
+    source_refs?: string[];
+    [key: string]: unknown;
+  }>;
+  tiles?: {
+    url_template: string;
+    min_zoom?: number;
+    max_zoom?: number;
+    format?: string;
+  };
+  spatial?: {
+    bbox?: number[];
+    h3_cells?: string[];
+    crs?: string;
+  };
+  attribution?: {
+    attribution_text?: string;
+    license_ref?: string;
+    license_refs?: string[];
+    source_url?: string;
+    source_urls?: string[];
+  };
+  provenance?: {
+    source_refs?: string[];
+    fixture_digest?: string;
+    runtime_refs?: string[];
+    created_at?: string;
+    content_hash?: string;
+  };
+  classification?: {
+    data_class?: string;
+    handling_tags?: string[];
+    [key: string]: unknown;
+  };
+  response_receipt?: ResponseReceipt;
+};
+
+export type GaiaLayerCatalog = {
+  layers: GaiaLayerEntry[];
+  catalog_mode?: string;
+  production_tile_serving?: boolean;
+  response_receipt?: ResponseReceipt;
+};
+
+export type GaiaTileManifest = {
+  manifest_version?: string;
+  layer_id: string;
+  layer_type?: string;
+  title?: string;
+  description?: string;
+  tile_serving_status?: string;
+  production_tile_serving?: boolean;
+  tiles?: {
+    url_template: string;
+    min_zoom?: number;
+    max_zoom?: number;
+    format?: string;
+  };
+  spatial?: {
+    bbox?: number[];
+    h3_cells?: string[];
+    crs?: string;
+  };
+  attribution?: GaiaLayerEntry['attribution'];
+  provenance?: GaiaLayerEntry['provenance'];
+  classification?: GaiaLayerEntry['classification'];
+  response_receipt?: ResponseReceipt;
+};
+
+export type GaiaLayerCatalogLoadResult = {
+  catalog: GaiaLayerCatalog;
+  mode: 'live' | 'demo';
+  warning?: string;
+};
+
+export type GaiaTileManifestLoadResult = {
+  manifest: GaiaTileManifest;
+  mode: 'live' | 'demo';
+  warning?: string;
+};
+
 export type OsmFeatureBinding = {
   binding_version: string;
   binding_id: string;
