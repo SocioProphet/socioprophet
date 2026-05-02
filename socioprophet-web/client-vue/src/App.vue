@@ -10,6 +10,7 @@
         <RouterLink to="/markets/indices-funds">Capital &amp; Markets</RouterLink>
         <RouterLink to="/weather/forecast">Weather &amp; Resources</RouterLink>
         <RouterLink to="/map">Maps</RouterLink>
+        <RouterLink to="/feed">Feed</RouterLink>
       </nav>
       <div class="sp-profile-indicator" aria-hidden="true" />
     </header>

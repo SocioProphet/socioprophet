@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 import { domainSurfaces } from './config/domainRoutes';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
+import FeedPage from './pages/FeedPage.vue';
 import MapPage from './pages/MapPage.vue';
 import './styles.css';
 
@@ -13,6 +14,7 @@ const mockedSurfaceRoutes = domainSurfaces
 const routes = [
   { path: '/', redirect: '/news' },
   { path: '/map', component: MapPage },
+  { path: '/feed', component: FeedPage },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];
