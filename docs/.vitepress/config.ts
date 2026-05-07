@@ -34,6 +34,7 @@ export default defineConfig({
           items: [
             { text: "Getting Started", link: "/guide/getting-started" },
             { text: "Architecture", link: "/guide/architecture" },
+            { text: "Cross-Lane Artifact Canon", link: "/guide/cross-lane-artifact-canon" },
             { text: "Canonical Platform Direction", link: "/guide/canonical-platform-direction" },
             { text: "Event-Native Orchestration Workbench", link: "/guide/event-native-orchestration-workbench" },
             { text: "Surface Inventory", link: "/guide/surface-inventory" },
@@ -77,6 +78,7 @@ export default defineConfig({
           items: [
             { text: "Entity Analytics Overview", link: "/guide/entity-analytics-overview" },
             { text: "Entity Analytics Reference", link: "/guide/entity-analytics-reference" },
+            { text: "Cross-Lane Artifact Canon", link: "/guide/cross-lane-artifact-canon" },
             { text: "Legal Entity Reference Fabric", link: "/guide/legal-entity-reference-fabric" },
             { text: "Entity Graph and Safe Linkage", link: "/guide/entity-graph-and-safe-linkage" },
             { text: "Identity Prime and Event IR", link: "/guide/identity-prime-and-event-ir" },
@@ -105,6 +107,7 @@ export default defineConfig({
           text: "Trust Center",
           items: [
             { text: "Trust Center", link: "/guide/trust-center" },
+            { text: "Cross-Lane Artifact Canon", link: "/guide/cross-lane-artifact-canon" },
             { text: "Reporting and Disclosure", link: "/guide/reporting-and-disclosure" },
             { text: "Deployment Modes and Data Boundaries", link: "/guide/deployment-modes-and-data-boundaries" },
             { text: "System Cards and Assurance", link: "/guide/system-cards-and-assurance" },
