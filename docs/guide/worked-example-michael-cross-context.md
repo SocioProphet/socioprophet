@@ -310,6 +310,11 @@ The blocked export decision must produce an artifact $\Pi_{23}$ containing at le
 - replay hook: artifact and policy version hashes
 - safe alternative: emit only bounded non-patient cohort output
 
+This sketch maps directly to the platform’s public-safe `ProofPack` profile: decision artifact refs, claim refs, evidence refs, policy refs, replay refs, counterexample refs, and safe alternative refs.
+
+Companion reference:
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
+
 ## 10. Safe alternative
 
 The system must not stop at “no.” It must provide the safe path.
@@ -339,3 +344,7 @@ Entity Analytics asks a stricter sequence:
 6. Can the system prove why?
 
 That difference is the whole design. The same evidence that improves linkage can also become the channel by which protected identity primes leak. The purpose of the framework is to make that channel explicit, reviewable, reversible, and provable.
+
+For the reusable public contract shape that packages those proof ingredients, see:
+
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
