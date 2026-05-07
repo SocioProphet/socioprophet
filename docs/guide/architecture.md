@@ -17,6 +17,11 @@ The platform is organized around a few core claims:
 
 This is not a chat-first architecture. It is a controlled systems architecture.
 
+Across all layers, the platform uses a shared cross-lane artifact canon that connects runtime artifacts, knowledge artifacts, Entity Analytics proof artifacts, Capability Fabric receipts, and public-safe product evidence into one governed evidence model.
+
+Primary reference:
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
+
 ## 2. Primary layers
 
 ### Organizations and institutional deployment
@@ -36,6 +41,7 @@ Key references:
 - [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
 - [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
 - [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ### Agent plane and operator workflows
 
@@ -47,6 +53,7 @@ Key references:
 - [Provider Capability Routing](/guide/provider-capability-routing)
 - [Provider Safety and Capability Eligibility](/guide/provider-safety-and-capability-eligibility)
 - [Auth Recovery and Connection Health](/guide/auth-recovery-and-connection-health)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ### Entity Analytics
 
@@ -60,6 +67,7 @@ Key references:
 - [Entity Graph and Safe Linkage](/guide/entity-graph-and-safe-linkage)
 - [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
 - [Marketer-Safe Outputs and Segment Proofs](/guide/marketer-safe-outputs-and-segment-proofs)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ### Authorized cyberdefense and simulation
 
@@ -125,6 +133,7 @@ Primary references:
 - [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
 - [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
 - [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ## 7. Public-safe versus restricted material
 
@@ -149,18 +158,21 @@ Primary reference:
 - [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
 - [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
 - [Authorized Cyberdefense and Simulation](/guide/authorized-cyberdefense-and-simulation)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ### Operator and security path
 - [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
 - [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
 - [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
 - [Entity Analytics Reference](/guide/entity-analytics-reference)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ### Builder and researcher path
 - [Semantic Vector Stack](/guide/semantic-vector-stack)
 - [Hybrid Representation Builder](/guide/hybrid-representation-builder)
 - [Operating Modes: Learning and Defense](/guide/operating-modes-learning-and-defense)
 - [23-Topic Canon](/guide/twenty-three-topic-canon)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ## 9. Use this page
 
