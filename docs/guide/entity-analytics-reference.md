@@ -137,6 +137,11 @@ A proof artifact carries:
 
 The artifact is how the system moves from “we think this happened” to “we can replay what happened and explain why.”
 
+When those proof artifacts need to cross public-safe review, audit, disclosure, or replay boundaries, they can be packaged through the platform’s `ProofPack` profile rather than treated as an unrelated proof model.
+
+Companion reference:
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
+
 ## 4. Identity-prime basis
 
 Fix a finite prime-topic basis
@@ -447,6 +452,7 @@ It connects directly to:
 - [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
 - [Agent Plane and Operator Workflows](/guide/agent-plane-and-operator-workflows)
 - [Boundary-Centric Cyber Hypergraph](/guide/boundary-centric-cyber-hypergraph)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ## 14. Operator checklist
 
@@ -472,5 +478,6 @@ Companion pages provide narrower entry points:
 - [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
 - [Marketer-Safe Outputs and Segment Proofs](/guide/marketer-safe-outputs-and-segment-proofs)
 - [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
 
 Use the companion pages for focused reading. Use this page for the full public technical model.
