@@ -73,6 +73,10 @@ The proof plane emits signed or otherwise evidence-bearing artifacts for:
 - suppression or coarsening decisions
 - replay and audit workflows
 
+The public-safe packaging profile for those outputs is described in:
+
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
+
 ## 4. Canonical objects
 
 The physical model is statement-centric with a stable entity cluster on top.
@@ -285,6 +289,7 @@ This page extends and narrows several existing public technical pages:
 - [Entity Graph and Safe Linkage](/guide/entity-graph-and-safe-linkage)
 - [Policy-Constrained Merging and Unmerge](/guide/policy-constrained-merging-and-unmerge)
 - [Organizations Governance and Institutional Safety](/guide/organizations-governance-and-institutional-safety)
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
 
 Where those pages discuss governed identity and linkage in general, this page specializes the pattern for legal entities, registries, sanctions, and evidence-bearing reference data.
 
@@ -305,11 +310,15 @@ The implementation is not yet production-ready. The main remaining gaps are:
 - broader connector coverage
 - proof/export artifact standardization
 
+The public contract direction for that proof/export standardization is described in:
+
+- [ProofPack and Entity Proof Contract](/guide/proofpack-and-entity-proof-contract)
+
 ## 11. Operational checklist
 
 Before promoting this subsystem into a production lane, confirm:
 
-1. storage schema executes cleanly in a real engine
+1. storage schema executes cleanly in a real PostgreSQL runtime
 2. source rights are encoded and enforced
 3. relationship predicates remain semantically distinct
 4. sanctions parsers preserve source-local identifiers and designation lineage
@@ -325,6 +334,6 @@ The next engineering work items are:
 - expand parser coverage for additional official source families
 - complete the contract parity between SQL, JSON Schema, and Avro
 - add screening-case and screening-hit private workflow objects
-- define proofpack export objects and signatures
+- define ProofPack export objects and signatures
 
 This page is the public narrative anchor for that implementation work.
