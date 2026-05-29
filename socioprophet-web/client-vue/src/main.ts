@@ -2,9 +2,11 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 import { domainSurfaces } from './config/domainRoutes';
+import CodeSearch from './pages/CodeSearch.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
+import Journal from './pages/Journal.vue';
 import MapPage from './pages/MapPage.vue';
 import NLBootEvidence from './pages/NLBootEvidence.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
@@ -21,6 +23,8 @@ const routes = [
   { path: '/control-plane', component: ControlPlaneLifecycle },
   { path: '/nlboot', component: NLBootEvidence },
   { path: '/reader', component: Reader },
+  { path: '/journal', component: Journal },
+  { path: '/code', component: CodeSearch },
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
   ...mockedSurfaceRoutes,
