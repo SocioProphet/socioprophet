@@ -6,6 +6,7 @@
         <RouterLink to="/news">News &amp; Events</RouterLink>
         <RouterLink to="/professional-intelligence">Professional Intelligence</RouterLink>
         <RouterLink to="/control-plane">SourceOS</RouterLink>
+        <RouterLink to="/journal">Adapter Seams</RouterLink>
         <RouterLink to="/law/international-law">Law &amp; Regulation</RouterLink>
         <RouterLink to="/people/search">People &amp; Society</RouterLink>
         <RouterLink to="/economy/macro-economics">Economy &amp; Industry</RouterLink>
@@ -29,6 +30,8 @@
         <RouterLink to="/control-plane" title="SourceOS Control Plane">CP</RouterLink>
         <RouterLink to="/nlboot" title="NLBoot Evidence">NB</RouterLink>
         <RouterLink to="/reader" title="Reader">▤</RouterLink>
+        <RouterLink to="/journal" title="Journal">J</RouterLink>
+        <RouterLink to="/code" title="Code Search">CS</RouterLink>
         <RouterLink to="/map" title="Maps">⌖</RouterLink>
         <RouterLink to="/people/search" title="People">◫</RouterLink>
         <RouterLink to="/economy/macro-economics" title="Economy">◔</RouterLink>
@@ -82,6 +85,8 @@ const activeDomain = computed(() => {
   if (route.path.startsWith('/professional-intelligence')) return 'Professional Intelligence';
   if (route.path.startsWith('/control-plane')) return 'SourceOS Lifecycle';
   if (route.path.startsWith('/nlboot')) return 'SourceOS Lifecycle';
+  if (route.path.startsWith('/journal')) return 'Adapter Seams';
+  if (route.path.startsWith('/code')) return 'Adapter Seams';
   if (route.path.startsWith('/map')) return 'Maps & Analytics';
   if (surface.value?.domain) return surface.value.domain;
   if (route.path.startsWith('/analytics')) return 'Maps & Analytics';
@@ -108,6 +113,14 @@ const tabLinks = computed(() => {
     ];
   }
 
+  if (activeDomain.value === 'Adapter Seams') {
+    return [
+      { label: 'Journal', to: '/journal' },
+      { label: 'Code Search', to: '/code' },
+      { label: 'Reader', to: '/reader' },
+    ];
+  }
+
   const surfaces = surfacesForDomain(activeDomain.value).slice(0, 6);
   if (activeDomain.value === 'Maps & Analytics') {
     return [
@@ -122,6 +135,8 @@ const breadcrumbs = computed(() => {
   if (route.path.startsWith('/professional-intelligence')) return ['Professional Intelligence OS', 'Operating dashboard'];
   if (route.path.startsWith('/control-plane')) return ['SourceOS Lifecycle', 'Control-plane evidence'];
   if (route.path.startsWith('/nlboot')) return ['SourceOS Lifecycle', 'NLBoot evidence'];
+  if (route.path.startsWith('/journal')) return ['Adapter Seams', 'Journal stream'];
+  if (route.path.startsWith('/code')) return ['Adapter Seams', 'Code search'];
   if (route.path.startsWith('/map')) return ['Maps & Analytics', 'OpenStreetMap', 'GAIA world model'];
   if (surface.value) return [surface.value.domain, surface.value.item];
   const fallback = domainSurfaces.find((item) => route.path.startsWith(item.route));
