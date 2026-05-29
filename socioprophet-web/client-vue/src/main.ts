@@ -5,6 +5,7 @@ import { domainSurfaces } from './config/domainRoutes';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
 import MapPage from './pages/MapPage.vue';
+import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import './styles.css';
 
 const mockedSurfaceRoutes = domainSurfaces
@@ -13,6 +14,7 @@ const mockedSurfaceRoutes = domainSurfaces
 
 const routes = [
   { path: '/', redirect: '/news' },
+  { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
   ...mockedSurfaceRoutes,
