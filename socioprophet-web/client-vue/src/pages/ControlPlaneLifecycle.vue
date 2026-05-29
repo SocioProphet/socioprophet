@@ -14,6 +14,12 @@
 
     <BoundaryNotice :label="state.boundaryLabel" :message="state.boundaryNotice" />
 
+    <RouteStatePanel
+      state="mock"
+      title="Fixture lifecycle state"
+      :message="`${state.lifecycle.length} lifecycle states, ${state.evidenceGates.length} evidence gates, and ${state.blocked.length} blocked actions are loaded from fixture state. No enrollment, assignment, disk write, reboot, or host mutation authority is active.`"
+    />
+
     <section class="evidence-grid evidence-grid--metrics" aria-label="Lifecycle lane completion">
       <article v-for="metric in state.metrics" :key="metric.name" class="evidence-card evidence-metric">
         <div class="evidence-row">
@@ -142,6 +148,7 @@
 <script setup lang="ts">
 import BoundaryNotice from '../components/BoundaryNotice.vue';
 import ModeBadge from '../components/ModeBadge.vue';
+import RouteStatePanel from '../components/RouteStatePanel.vue';
 import { sourceOSLifecycleState as state, type LifecycleStatus } from '../features/sourceos-lifecycle/state';
 
 function toneForStatus(status: LifecycleStatus): 'success' | 'warning' | 'danger' | 'muted' {
