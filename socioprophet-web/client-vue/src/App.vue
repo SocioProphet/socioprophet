@@ -5,6 +5,7 @@
       <nav class="sp-domain-nav" aria-label="Primary domains">
         <RouterLink to="/news">News &amp; Events</RouterLink>
         <RouterLink to="/professional-intelligence">Professional Intelligence</RouterLink>
+        <RouterLink to="/control-plane">SourceOS</RouterLink>
         <RouterLink to="/law/international-law">Law &amp; Regulation</RouterLink>
         <RouterLink to="/people/search">People &amp; Society</RouterLink>
         <RouterLink to="/economy/macro-economics">Economy &amp; Industry</RouterLink>
@@ -25,6 +26,8 @@
       <aside class="sp-left-rail" aria-label="Workspace rail">
         <RouterLink to="/news" title="News">☷</RouterLink>
         <RouterLink to="/professional-intelligence" title="Professional Intelligence">PI</RouterLink>
+        <RouterLink to="/control-plane" title="SourceOS Control Plane">CP</RouterLink>
+        <RouterLink to="/nlboot" title="NLBoot Evidence">NB</RouterLink>
         <RouterLink to="/reader" title="Reader">▤</RouterLink>
         <RouterLink to="/map" title="Maps">⌖</RouterLink>
         <RouterLink to="/people/search" title="People">◫</RouterLink>
@@ -77,6 +80,8 @@ const route = useRoute();
 const surface = computed(() => surfaceForRoute(route.path));
 const activeDomain = computed(() => {
   if (route.path.startsWith('/professional-intelligence')) return 'Professional Intelligence';
+  if (route.path.startsWith('/control-plane')) return 'SourceOS Lifecycle';
+  if (route.path.startsWith('/nlboot')) return 'SourceOS Lifecycle';
   if (route.path.startsWith('/map')) return 'Maps & Analytics';
   if (surface.value?.domain) return surface.value.domain;
   if (route.path.startsWith('/analytics')) return 'Maps & Analytics';
@@ -94,6 +99,15 @@ const tabLinks = computed(() => {
     ];
   }
 
+  if (activeDomain.value === 'SourceOS Lifecycle') {
+    return [
+      { label: 'Lifecycle Control', to: '/control-plane' },
+      { label: 'NLBoot Evidence', to: '/nlboot' },
+      { label: 'Gates', to: '/gates' },
+      { label: 'Attestations', to: '/attestations' },
+    ];
+  }
+
   const surfaces = surfacesForDomain(activeDomain.value).slice(0, 6);
   if (activeDomain.value === 'Maps & Analytics') {
     return [
@@ -106,6 +120,8 @@ const tabLinks = computed(() => {
 
 const breadcrumbs = computed(() => {
   if (route.path.startsWith('/professional-intelligence')) return ['Professional Intelligence OS', 'Operating dashboard'];
+  if (route.path.startsWith('/control-plane')) return ['SourceOS Lifecycle', 'Control-plane evidence'];
+  if (route.path.startsWith('/nlboot')) return ['SourceOS Lifecycle', 'NLBoot evidence'];
   if (route.path.startsWith('/map')) return ['Maps & Analytics', 'OpenStreetMap', 'GAIA world model'];
   if (surface.value) return [surface.value.domain, surface.value.item];
   const fallback = domainSurfaces.find((item) => route.path.startsWith(item.route));
