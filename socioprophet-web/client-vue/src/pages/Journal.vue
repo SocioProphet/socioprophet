@@ -9,13 +9,18 @@
           This page does not connect to a live TriRPC backend.
         </p>
       </div>
-      <span class="adapter-pill adapter-pill--warn">mock only</span>
+      <ModeBadge label="mock only" tone="warning" />
     </header>
 
-    <section class="adapter-card adapter-boundary">
-      <strong>Boundary</strong>
-      <p>Events are generated from the local mock adapter. No writeback, authorization, or backend stream is declared here.</p>
-    </section>
+    <BoundaryNotice
+      label="mock boundary"
+      message="Events are generated from the local mock adapter. No writeback, authorization, or backend stream is declared here."
+    />
+
+    <RouteStatePanel v-if="isLoading" state="loading" title="Loading fixture stream" message="Reading mock TriRPC journal events from the local adapter." />
+    <RouteStatePanel v-else-if="errorMessage" state="error" title="Adapter unavailable" :message="errorMessage" />
+    <RouteStatePanel v-else-if="events.length === 0" state="empty" title="No journal events" message="The fixture stream returned no events. This is an empty mock state, not a backend outage." />
+    <RouteStatePanel v-else state="mock" title="Mock journal stream" :message="`${events.length} fixture events loaded from the mock adapter.`" />
 
     <section class="adapter-grid">
       <article v-for="event in events" :key="event.ts + event.kind" class="adapter-card">
@@ -32,9 +37,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import BoundaryNotice from '../components/BoundaryNotice.vue';
+import ModeBadge from '../components/ModeBadge.vue';
+import RouteStatePanel from '../components/RouteStatePanel.vue';
 import { triRpc, type EventEnvelope } from '../services/triRpc';
 
 const events = ref<EventEnvelope[]>([]);
+const isLoading = ref(true);
+const errorMessage = ref('');
 
 onMounted(async () => {
   try {
@@ -43,14 +53,9 @@ onMounted(async () => {
       if (events.value.length > 100) events.value.shift();
     }
   } catch (error) {
-    events.value.push({
-      ts: new Date().toISOString(),
-      space: 'client-vue',
-      ns: 'journal',
-      actor: { id: 'adapter-boundary', pk: 'none' },
-      kind: 'adapter.unavailable',
-      body: { error: error instanceof Error ? error.message : String(error) },
-    });
+    errorMessage.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    isLoading.value = false;
   }
 });
 </script>
@@ -63,9 +68,6 @@ onMounted(async () => {
 h1, p { margin-top: 0; }
 p, pre, code, .adapter-row span { color: rgba(255,255,255,.70); }
 .adapter-card { padding: 1rem; }
-.adapter-boundary { border-color: rgba(241,194,27,.45); background: rgba(241,194,27,.08); }
-.adapter-pill { display: inline-flex; align-items: center; height: fit-content; border-radius: 999px; padding: .2rem .55rem; font-size: .72rem; font-weight: 800; text-transform: uppercase; background: rgba(120,169,255,.15); color: var(--accent, #78a9ff); }
-.adapter-pill--warn { background: rgba(241,194,27,.18); color: #f1c21b; }
 .adapter-grid { display: grid; gap: 1rem; }
 .adapter-row { display: flex; justify-content: space-between; gap: 1rem; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: .75rem; border-radius: 12px; background: rgba(255,255,255,.06); }
