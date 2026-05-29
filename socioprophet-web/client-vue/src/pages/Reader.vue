@@ -17,6 +17,12 @@
       <p>{{ state.boundaryNotice }}</p>
     </section>
 
+    <RouteStatePanel
+      state="mock"
+      title="Fixture reader state"
+      :message="`${state.items.length} feed items, ${state.sources.length} sources, and ${state.events.length} canonical events are loaded from fixture state. No live feed, memory, graph, browser, or publication adapter is active.`"
+    />
+
     <section class="ticker-card" aria-label="Ticker proof of life">
       <span class="ticker-label">Ticker</span>
       <button
@@ -146,6 +152,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import RouteStatePanel from '../components/RouteStatePanel.vue';
 import { feedIntelligenceState as state } from '../features/feed-intelligence/state';
 import type { StoragePolicy } from '../features/feed-intelligence/types';
 
