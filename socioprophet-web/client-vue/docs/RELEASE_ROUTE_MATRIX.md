@@ -23,7 +23,7 @@ A route is not shippable because it renders. Release inclusion requires maturity
 
 | Route | Current level | State mode | Release posture | Why | Required before release |
 | --- | --- | --- | --- | --- | --- |
-| `/map` | L4 | live/fallback | Include candidate | Best current candidate: live/fallback map API posture, existing tests, clear GAIA/OSM workbench role. | Browser visual/accessibility review; route owner record; release note for fallback limits. |
+| `/map` | L4 | live/fallback | Include candidate | Static review passed for identity, mode disclosure, boundary language, loading/error/fallback state, labelled canvas, evidence/governance panels, placeholder-tile guard, attribution/provenance, and smoke coverage. See `MAP_VISUAL_ACCESSIBILITY_REVIEW.md`. | Browser screenshot QA, keyboard traversal evidence, narrow/mobile viewport evidence, route owner record, and release note for fallback limits. |
 | `/professional-intelligence` | L2 | fixture | Review only | Useful operating dashboard, but fixture-backed and dense. Actions are gated/disabled. | Live source contract, visual density pass, route-state review, source freshness model. |
 | `/control-plane` | L2 | fixture/evidence | Review only | Useful SourceOS lifecycle evidence view, but no real assignment/enrollment authority. | SourceOS/NLBoot owner contract refs, progressive disclosure, no-action release wording. |
 | `/nlboot` | L2 | fixture/evidence | Review only | Useful evidence inventory, but boot/hardware authority is intentionally absent. | Align object names to NLBoot contracts, digest overflow review, evidence fixture provenance. |
@@ -52,7 +52,25 @@ The first public/product release candidate should include only:
 
 1. `/map`
 
-Even `/map` remains conditional on visual/accessibility review and explicit fallback-mode wording.
+Even `/map` remains conditional on browser visual/accessibility review and explicit fallback-mode wording.
+
+## `/map` review evidence status
+
+Static/code review is complete and recorded in:
+
+```text
+docs/MAP_VISUAL_ACCESSIBILITY_REVIEW.md
+```
+
+The static review does not substitute for browser QA. `/map` is still blocked from public release pending:
+
+- desktop screenshot review;
+- narrow/mobile screenshot review;
+- keyboard traversal evidence;
+- visible focus review;
+- screen-reader order review for panels and canvas;
+- overflow review for detail grids and digest/source-ref strings;
+- public fallback-mode wording.
 
 ## Routes to hide or demote before public review
 
@@ -84,5 +102,5 @@ Do not ship the full Vue shell as product yet.
 The shell is now far more disciplined than the imported staging source, but most routes are still review/control surfaces rather than product routes. The correct first release posture is:
 
 - internal/demo: controlled route set above;
-- product candidate: `/map` only after visual/accessibility review;
+- product candidate: `/map` only after browser visual/accessibility review;
 - public route set: defer until release review passes.
