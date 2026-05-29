@@ -13,10 +13,7 @@
       </div>
     </header>
 
-    <section class="pi-card pi-boundary" aria-label="Professional Intelligence boundary">
-      <span class="pi-pill">read-only evidence surface</span>
-      <p>{{ state.boundaryNotice }}</p>
-    </section>
+    <BoundaryNotice :label="state.boundaryLabel" :message="state.boundaryNotice" />
 
     <section class="pi-grid pi-grid--metrics" aria-label="Workstream completion">
       <article v-for="metric in state.metrics" :key="metric.name" class="pi-card pi-metric">
@@ -36,7 +33,7 @@
         <h2>Gate status</h2>
         <ol class="pi-gates">
           <li v-for="gate in state.gates" :key="gate.name" :class="`pi-gate pi-gate--${gate.status}`">
-            <span class="pi-gate-status">{{ gate.status }}</span>
+            <ModeBadge :label="gate.status" :tone="gate.status === 'complete' ? 'success' : gate.status === 'active' ? 'warning' : 'muted'" />
             <div>
               <strong>{{ gate.name }}</strong>
               <p>{{ gate.summary }}</p>
@@ -60,10 +57,32 @@
     <section class="pi-card">
       <div class="pi-section-head">
         <div>
+          <h2>Gated actions</h2>
+          <p>Operator affordances remain disabled until authority, contracts, and write paths are real.</p>
+        </div>
+        <ModeBadge label="disabled" tone="warning" />
+      </div>
+      <div class="pi-grid pi-grid--actions">
+        <GatedActionCard
+          v-for="action in state.gatedActions"
+          :key="action.title"
+          :title="action.title"
+          :description="action.description"
+          :action-label="action.actionLabel"
+          :blocked-reason="action.blockedReason"
+          :status-label="action.statusLabel"
+          :tone="action.statusLabel === 'blocked' ? 'danger' : 'warning'"
+        />
+      </div>
+    </section>
+
+    <section class="pi-card">
+      <div class="pi-section-head">
+        <div>
           <h2>Active PR wave</h2>
           <p>Fixture-backed work records anchoring the replayed alignment wave.</p>
         </div>
-        <span class="pi-pill">{{ state.prs.length }} tracked PRs</span>
+        <ModeBadge :label="`${state.prs.length} tracked PRs`" />
       </div>
       <div class="pi-table-wrap">
         <table class="pi-table">
@@ -80,7 +99,7 @@
               <td>{{ item.repo }}</td>
               <td>{{ item.pr }}</td>
               <td>{{ item.capability }}</td>
-              <td><span :class="`pi-status pi-status--${item.status}`">{{ item.status }}</span></td>
+              <td><ModeBadge :label="item.status" :tone="item.status === 'merged' ? 'success' : 'warning'" /></td>
             </tr>
           </tbody>
         </table>
@@ -118,7 +137,10 @@
 </template>
 
 <script setup lang="ts">
-import { professionalIntelligenceControlState as state } from '../data/professionalIntelligenceControlState';
+import BoundaryNotice from '../components/BoundaryNotice.vue';
+import GatedActionCard from '../components/GatedActionCard.vue';
+import ModeBadge from '../components/ModeBadge.vue';
+import { professionalIntelligenceControlState as state } from '../features/professional-intelligence/state';
 </script>
 
 <style scoped>
@@ -214,17 +236,13 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.pi-grid--two {
+.pi-grid--two,
+.pi-grid--actions {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 .pi-card {
   padding: 1rem;
-}
-
-.pi-boundary {
-  border-color: rgba(241, 194, 27, 0.45);
-  background: rgba(241, 194, 27, 0.08);
 }
 
 .pi-metric-head,
@@ -244,7 +262,6 @@ h2 {
 .pi-section-head p,
 .pi-callout p,
 .pi-gate p,
-.pi-boundary p,
 .pi-source-list {
   color: rgba(255, 255, 255, 0.68);
 }
@@ -271,42 +288,6 @@ h2 {
 
 .pi-gate {
   margin-bottom: 0.9rem;
-}
-
-.pi-gate-status,
-.pi-status,
-.pi-pill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.18rem 0.55rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.pi-gate-status,
-.pi-pill {
-  margin-bottom: 0.35rem;
-  background: rgba(120, 169, 255, 0.15);
-  color: var(--accent, #78a9ff);
-}
-
-.pi-gate--complete .pi-gate-status,
-.pi-status--merged {
-  background: rgba(36, 161, 72, 0.18);
-  color: #42be65;
-}
-
-.pi-gate--active .pi-gate-status,
-.pi-status--open {
-  background: rgba(241, 194, 27, 0.18);
-  color: #f1c21b;
-}
-
-.pi-gate--pending .pi-gate-status {
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.7);
 }
 
 .pi-control {
