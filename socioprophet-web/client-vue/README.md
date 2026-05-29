@@ -1,6 +1,6 @@
 # SocioProphet Vue App Shell
 
-Status: promoted app-shell candidate
+Status: canonical app/workbench shell; quality-gated product surface
 
 ## Purpose
 
@@ -8,7 +8,39 @@ Status: promoted app-shell candidate
 
 It is separate from public marketing/docs surfaces. Marketing pages may link into this shell, but app routes are owned here.
 
-Current live product route:
+## UI quality governance
+
+All future UI work in this shell is governed by:
+
+```text
+docs/UI_PRODUCT_QUALITY_PLAN.md
+```
+
+A route is not product-ready because it renders. It is product-ready only when its information architecture, state model, runtime boundary, accessibility, validation, and acceptance criteria are explicit and tested.
+
+Future UI PRs must identify:
+
+- route(s) touched;
+- maturity level before and after;
+- state mode: design, fixture, mock adapter, live/fallback, or live-only;
+- authority boundary;
+- navigation touched;
+- tests added or updated;
+- visual review summary;
+- known gaps.
+
+Current route maturity is tracked in the quality plan.
+
+## Current route classes
+
+| Class | Examples | Posture |
+| --- | --- | --- |
+| Live-capable workbench | `/map` | Can call live API when configured; deterministic fallback otherwise. |
+| Evidence/fixture surface | `/professional-intelligence`, `/control-plane`, `/nlboot`, `/reader` | Useful product intent; not product-ready until quality gates pass. |
+| Mock adapter seam | `/journal`, `/code` | Contract sketch only; mock/test mode and fail-closed behavior. |
+| Domain taxonomy scaffold | `/news`, `/law/*`, `/people/*`, `/economy/*`, `/markets/*`, `/weather/*`, `/analytics/*` | Placeholder/scaffold unless promoted by a bounded PR. |
+
+Current live-capable product route:
 
 - `/map` — GAIA / OpenStreetMap workbench with live API mode and deterministic demo fallback mode.
 
@@ -60,13 +92,13 @@ MapLibre-GL is stubbed so tests run without WebGL.
 
 | Criterion | Test file |
 |-----------|-----------|
-| 1. `/map` route loads | `MapPage.smoke.test.ts` |
-| 2. Map canvas renders | `MapPage.smoke.test.ts` |
-| 3. Fallback mode when API unavailable | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
-| 4. Live API mode when API available | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
-| 5. H3 lookup does not blank the page | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
-| 6. Evidence / governance / runtime panels | `MapPage.smoke.test.ts` |
-| 7. Backend status displayed clearly | `MapPage.smoke.test.ts` |
+| `/map` route loads, canvas renders, fallback/live modes, H3 failure handling, evidence panels | `MapPage.smoke.test.ts`, `gaiaMap.test.ts` |
+| Professional Intelligence fixture and boundary | `ProfessionalIntelligence.smoke.test.ts` |
+| SourceOS and NLBoot evidence boundaries | `SourceOSNlbootEvidence.smoke.test.ts` |
+| Feed Intelligence fixture boundary | `FeedIntelligence.smoke.test.ts` |
+| Mock Journal and Code Search boundaries | `MockAdapterSeams.smoke.test.ts` |
+
+Local dev:
 
 ```bash
 cd socioprophet-web/client-vue
@@ -141,6 +173,12 @@ export OSM_MAP_API_CORS_ALLOWED_ORIGINS="http://localhost:5174"
 The Vue shell owns app/workbench routes including:
 
 - `/map`
+- `/professional-intelligence`
+- `/control-plane`
+- `/nlboot`
+- `/reader`
+- `/journal`
+- `/code`
 - `/news`
 - `/law/*`
 - `/people/*`
