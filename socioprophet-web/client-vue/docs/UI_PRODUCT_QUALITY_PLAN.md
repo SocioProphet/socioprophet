@@ -111,6 +111,14 @@ Every route must meet the baseline before graduation:
 - responsive behavior down to narrow laptop/mobile widths;
 - no horizontal overflow except intentional tables/carousels.
 
+The working review matrix is:
+
+```text
+docs/VISUAL_ACCESSIBILITY_REVIEW.md
+```
+
+That matrix is not a claim of completed browser QA. It is the checklist and route-by-route control surface for the next review pass.
+
 ### Gate 6 — Test coverage
 
 Every route needs at least smoke coverage.
