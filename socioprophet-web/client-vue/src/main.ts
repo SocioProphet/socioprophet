@@ -2,9 +2,11 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 import { domainSurfaces } from './config/domainRoutes';
+import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
 import MapPage from './pages/MapPage.vue';
+import NLBootEvidence from './pages/NLBootEvidence.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import './styles.css';
 
@@ -15,6 +17,8 @@ const mockedSurfaceRoutes = domainSurfaces
 const routes = [
   { path: '/', redirect: '/news' },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
+  { path: '/control-plane', component: ControlPlaneLifecycle },
+  { path: '/nlboot', component: NLBootEvidence },
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
   ...mockedSurfaceRoutes,
