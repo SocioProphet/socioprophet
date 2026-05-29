@@ -9,18 +9,24 @@
           query GitHub, Sourcegraph, or any live code index.
         </p>
       </div>
-      <span class="adapter-pill adapter-pill--warn">mock only</span>
+      <ModeBadge label="mock only" tone="warning" />
     </header>
 
     <section class="adapter-card search-row">
       <input v-model="query" placeholder="query" @keyup.enter="run" />
-      <button type="button" @click="run">Search</button>
+      <button type="button" :disabled="isLoading" @click="run">{{ isLoading ? 'Searching…' : 'Search' }}</button>
     </section>
 
-    <section class="adapter-card adapter-boundary">
-      <strong>Boundary</strong>
-      <p>Results come from the local mock adapter. No repository indexing, credential access, or remote search is declared here.</p>
-    </section>
+    <BoundaryNotice
+      label="mock boundary"
+      message="Results come from the local mock adapter. No repository indexing, credential access, or remote search is declared here."
+    />
+
+    <RouteStatePanel v-if="isLoading" state="loading" title="Searching fixture index" message="The local mock adapter is returning deterministic fixture results." />
+    <RouteStatePanel v-else-if="errorMessage" state="error" title="Search adapter unavailable" :message="errorMessage" />
+    <RouteStatePanel v-else-if="!hasSearched" state="idle" title="Search not started" message="Enter a query and run the mock adapter. No remote code index is contacted." />
+    <RouteStatePanel v-else-if="results.length === 0" state="empty" title="No mock results" message="The fixture adapter returned zero results for this query." />
+    <RouteStatePanel v-else state="ready" title="Mock results ready" :message="`${results.length} fixture results returned for '${query}'.`" />
 
     <section class="adapter-grid">
       <article v-for="result in results" :key="result.repo + result.path" class="adapter-card">
@@ -33,14 +39,31 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import BoundaryNotice from '../components/BoundaryNotice.vue';
+import ModeBadge from '../components/ModeBadge.vue';
+import RouteStatePanel from '../components/RouteStatePanel.vue';
 import { triRpc, type CodeSearchResult } from '../services/triRpc';
 
 const query = ref('main');
 const results = ref<CodeSearchResult[]>([]);
+const isLoading = ref(false);
+const hasSearched = ref(false);
+const errorMessage = ref('');
 
 async function run() {
-  const response = await triRpc.code.search({ query: query.value });
-  results.value = response.results || [];
+  isLoading.value = true;
+  errorMessage.value = '';
+  try {
+    const response = await triRpc.code.search({ query: query.value });
+    results.value = response.results || [];
+    hasSearched.value = true;
+  } catch (error) {
+    results.value = [];
+    hasSearched.value = true;
+    errorMessage.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 
@@ -52,11 +75,9 @@ async function run() {
 h1, p { margin-top: 0; }
 p { color: rgba(255,255,255,.70); }
 .adapter-card { padding: 1rem; }
-.adapter-boundary { border-color: rgba(241,194,27,.45); background: rgba(241,194,27,.08); }
-.adapter-pill { display: inline-flex; align-items: center; height: fit-content; border-radius: 999px; padding: .2rem .55rem; font-size: .72rem; font-weight: 800; text-transform: uppercase; background: rgba(120,169,255,.15); color: var(--accent, #78a9ff); }
-.adapter-pill--warn { background: rgba(241,194,27,.18); color: #f1c21b; }
 .adapter-grid { display: grid; gap: 1rem; }
 .search-row { display: flex; gap: .75rem; }
 input { flex: 1; min-width: 0; border: 1px solid rgba(255,255,255,.24); border-radius: 12px; padding: .75rem; background: rgba(255,255,255,.08); color: var(--text, #f4f4f4); }
 button { border: 0; border-radius: 12px; padding: .75rem 1rem; background: var(--accent, #78a9ff); color: #06111f; font-weight: 800; cursor: pointer; }
+button:disabled { opacity: 0.6; cursor: wait; }
 </style>
