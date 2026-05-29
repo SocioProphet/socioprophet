@@ -3,17 +3,7 @@
     <header class="sp-topbar">
       <RouterLink class="sp-brand" to="/news">SocioProphet</RouterLink>
       <nav class="sp-domain-nav" aria-label="Primary domains">
-        <RouterLink to="/news">News &amp; Events</RouterLink>
-        <RouterLink to="/professional-intelligence">Professional Intelligence</RouterLink>
-        <RouterLink to="/control-plane">SourceOS</RouterLink>
-        <RouterLink to="/journal">Adapter Seams</RouterLink>
-        <RouterLink to="/law/international-law">Law &amp; Regulation</RouterLink>
-        <RouterLink to="/people/search">People &amp; Society</RouterLink>
-        <RouterLink to="/economy/macro-economics">Economy &amp; Industry</RouterLink>
-        <RouterLink to="/markets/indices-funds">Capital &amp; Markets</RouterLink>
-        <RouterLink to="/weather/forecast">Weather &amp; Resources</RouterLink>
-        <RouterLink to="/map">Maps</RouterLink>
-        <RouterLink to="/feed">Feed</RouterLink>
+        <RouterLink v-for="item in topRoutes" :key="item.path" :to="item.path">{{ item.label }}</RouterLink>
       </nav>
       <div class="sp-profile-indicator" aria-hidden="true" />
     </header>
@@ -25,20 +15,14 @@
 
     <div class="sp-workspace">
       <aside class="sp-left-rail" aria-label="Workspace rail">
-        <RouterLink to="/news" title="News">☷</RouterLink>
-        <RouterLink to="/professional-intelligence" title="Professional Intelligence">PI</RouterLink>
-        <RouterLink to="/control-plane" title="SourceOS Control Plane">CP</RouterLink>
-        <RouterLink to="/nlboot" title="NLBoot Evidence">NB</RouterLink>
-        <RouterLink to="/reader" title="Reader">▤</RouterLink>
-        <RouterLink to="/journal" title="Journal">J</RouterLink>
-        <RouterLink to="/code" title="Code Search">CS</RouterLink>
-        <RouterLink to="/map" title="Maps">⌖</RouterLink>
-        <RouterLink to="/people/search" title="People">◫</RouterLink>
-        <RouterLink to="/economy/macro-economics" title="Economy">◔</RouterLink>
-        <RouterLink to="/analytics" title="Analytics">⌁</RouterLink>
-        <RouterLink to="/markets/indices-funds" title="Markets">▥</RouterLink>
-        <RouterLink to="/gates" title="Gates">◉</RouterLink>
-        <RouterLink to="/settings" title="Settings">⚙</RouterLink>
+        <RouterLink
+          v-for="item in railRoutes"
+          :key="item.path"
+          :to="item.path"
+          :title="`${item.label} · ${item.maturity} · ${item.stateMode}`"
+        >
+          {{ item.railLabel || item.label.slice(0, 2) }}
+        </RouterLink>
       </aside>
 
       <section class="sp-stage">
@@ -46,6 +30,9 @@
           <span v-for="(crumb, index) in breadcrumbs" :key="`${crumb}-${index}`">
             <span>{{ crumb }}</span>
             <span v-if="index < breadcrumbs.length - 1" class="sp-crumb-separator">/</span>
+          </span>
+          <span v-if="currentRouteEntry" class="sp-route-badge">
+            {{ currentRouteEntry.maturity }} · {{ currentRouteEntry.stateMode }}
           </span>
         </div>
         <RouterView />
@@ -74,52 +61,39 @@ import { computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router';
 import RuntimeAdapterStatusBadge from './components/RuntimeAdapterStatusBadge.vue';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
+import {
+  entriesForDomain,
+  leftRailRoutes,
+  registryEntryForPath,
+  topNavRoutes,
+} from './config/routeRegistry';
 import { getRuntimeFeature } from './runtime-adapters';
 import { runtimeFeatureIdsForPath } from './runtime-adapters/routeRuntimeFeatures';
 import type { RuntimeAdapterFeature } from './runtime-adapters';
 
 const route = useRoute();
 
+const topRoutes = topNavRoutes();
+const railRoutes = leftRailRoutes();
+
+const currentRouteEntry = computed(() => registryEntryForPath(route.path));
 const surface = computed(() => surfaceForRoute(route.path));
 const activeDomain = computed(() => {
-  if (route.path.startsWith('/professional-intelligence')) return 'Professional Intelligence';
-  if (route.path.startsWith('/control-plane')) return 'SourceOS Lifecycle';
-  if (route.path.startsWith('/nlboot')) return 'SourceOS Lifecycle';
-  if (route.path.startsWith('/journal')) return 'Adapter Seams';
-  if (route.path.startsWith('/code')) return 'Adapter Seams';
-  if (route.path.startsWith('/map')) return 'Maps & Analytics';
+  if (currentRouteEntry.value?.domain) return currentRouteEntry.value.domain;
   if (surface.value?.domain) return surface.value.domain;
   if (route.path.startsWith('/analytics')) return 'Maps & Analytics';
   return 'News & Events';
 });
 
 const tabLinks = computed(() => {
-  if (activeDomain.value === 'Professional Intelligence') {
-    return [
-      { label: 'Operating Dashboard', to: '/professional-intelligence' },
-      { label: 'Gates', to: '/gates' },
-      { label: 'Policies', to: '/policies' },
-      { label: 'Runs', to: '/runs' },
-      { label: 'Attestations', to: '/attestations' },
-    ];
-  }
+  if (currentRouteEntry.value?.tabs?.length) return currentRouteEntry.value.tabs;
 
-  if (activeDomain.value === 'SourceOS Lifecycle') {
-    return [
-      { label: 'Lifecycle Control', to: '/control-plane' },
-      { label: 'NLBoot Evidence', to: '/nlboot' },
-      { label: 'Gates', to: '/gates' },
-      { label: 'Attestations', to: '/attestations' },
-    ];
-  }
+  const registered = entriesForDomain(activeDomain.value)
+    .filter((entry) => entry.navTier !== 'hidden')
+    .slice(0, 6)
+    .map((entry) => ({ label: entry.label, to: entry.path }));
 
-  if (activeDomain.value === 'Adapter Seams') {
-    return [
-      { label: 'Journal', to: '/journal' },
-      { label: 'Code Search', to: '/code' },
-      { label: 'Reader', to: '/reader' },
-    ];
-  }
+  if (registered.length > 0) return registered;
 
   const surfaces = surfacesForDomain(activeDomain.value).slice(0, 6);
   if (activeDomain.value === 'Maps & Analytics') {
@@ -132,12 +106,7 @@ const tabLinks = computed(() => {
 });
 
 const breadcrumbs = computed(() => {
-  if (route.path.startsWith('/professional-intelligence')) return ['Professional Intelligence OS', 'Operating dashboard'];
-  if (route.path.startsWith('/control-plane')) return ['SourceOS Lifecycle', 'Control-plane evidence'];
-  if (route.path.startsWith('/nlboot')) return ['SourceOS Lifecycle', 'NLBoot evidence'];
-  if (route.path.startsWith('/journal')) return ['Adapter Seams', 'Journal stream'];
-  if (route.path.startsWith('/code')) return ['Adapter Seams', 'Code search'];
-  if (route.path.startsWith('/map')) return ['Maps & Analytics', 'OpenStreetMap', 'GAIA world model'];
+  if (currentRouteEntry.value?.breadcrumbs?.length) return currentRouteEntry.value.breadcrumbs;
   if (surface.value) return [surface.value.domain, surface.value.item];
   const fallback = domainSurfaces.find((item) => route.path.startsWith(item.route));
   if (fallback) return [fallback.domain, fallback.item];
@@ -150,3 +119,16 @@ const activeRuntimeFeatures = computed<RuntimeAdapterFeature[]>(() => {
     .filter((feature): feature is RuntimeAdapterFeature => Boolean(feature));
 });
 </script>
+
+<style scoped>
+.sp-route-badge {
+  margin-left: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+</style>
