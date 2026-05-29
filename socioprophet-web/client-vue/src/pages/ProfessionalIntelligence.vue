@@ -15,6 +15,12 @@
 
     <BoundaryNotice :label="state.boundaryLabel" :message="state.boundaryNotice" />
 
+    <RouteStatePanel
+      state="mock"
+      title="Fixture control state"
+      :message="`${state.metrics.length} metrics, ${state.gates.length} gates, and ${state.gatedActions.length} disabled gated actions are loaded from fixture state. No live telemetry, writeback, or execution authority is active.`"
+    />
+
     <section class="pi-grid pi-grid--metrics" aria-label="Workstream completion">
       <article v-for="metric in state.metrics" :key="metric.name" class="pi-card pi-metric">
         <div class="pi-metric-head">
@@ -140,6 +146,7 @@
 import BoundaryNotice from '../components/BoundaryNotice.vue';
 import GatedActionCard from '../components/GatedActionCard.vue';
 import ModeBadge from '../components/ModeBadge.vue';
+import RouteStatePanel from '../components/RouteStatePanel.vue';
 import { professionalIntelligenceControlState as state } from '../features/professional-intelligence/state';
 </script>
 
