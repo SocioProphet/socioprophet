@@ -8,6 +8,7 @@ import FeedPage from './pages/FeedPage.vue';
 import MapPage from './pages/MapPage.vue';
 import NLBootEvidence from './pages/NLBootEvidence.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
+import Reader from './pages/Reader.vue';
 import './styles.css';
 
 const mockedSurfaceRoutes = domainSurfaces
@@ -19,6 +20,7 @@ const routes = [
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },
   { path: '/nlboot', component: NLBootEvidence },
+  { path: '/reader', component: Reader },
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
   ...mockedSurfaceRoutes,
