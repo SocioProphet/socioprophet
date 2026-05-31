@@ -23,6 +23,23 @@
       :message="`${state.items.length} feed items, ${state.sources.length} sources, and ${state.events.length} canonical events are loaded from fixture state. No live feed, memory, graph, browser, or publication adapter is active.`"
     />
 
+    <section class="feed-card adapter-boundary" aria-label="Disabled adapter boundary">
+      <div class="panel-heading">
+        <span>Adapter boundary</span>
+        <strong>{{ adapterBoundarySummary() }}</strong>
+      </div>
+      <div class="adapter-grid">
+        <article v-for="adapter in feedIntelligenceAdapters" :key="adapter.id" class="adapter-card">
+          <div class="integration-heading">
+            <h3>{{ adapter.name }}</h3>
+            <span class="surface-status disabled">{{ adapter.status }}</span>
+          </div>
+          <p>{{ adapter.disabledReason }}</p>
+          <small>{{ adapter.owningArtifact }}</small>
+        </article>
+      </div>
+    </section>
+
     <section class="ticker-card" aria-label="Ticker proof of life">
       <span class="ticker-label">Ticker</span>
       <button
@@ -153,6 +170,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import RouteStatePanel from '../components/RouteStatePanel.vue';
+import {
+  adapterBoundarySummary,
+  feedIntelligenceAdapters,
+} from '../features/feed-intelligence/adapters';
 import { feedIntelligenceState as state } from '../features/feed-intelligence/state';
 import type { StoragePolicy } from '../features/feed-intelligence/types';
 
@@ -215,11 +236,13 @@ p { color: #525252; }
 .event-step.active { border-bottom-color: #f1c21b; }
 .event-step.blocked { border-bottom-color: #fa4d56; }
 .event-step span { color: #525252; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
-.integration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.integration-grid, .adapter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
 .integration-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .integration-heading h3 { margin: 0; }
+.adapter-card { display: grid; gap: .4rem; padding: .85rem; border: 1px solid #e0e0e0; background: #fff; }
+.adapter-card p { margin: 0; }
 .surface-status.wired { background: #defbe6; color: #0e6027; }
 .surface-status.specified { background: #edf5ff; color: #0043ce; }
-.surface-status.pending { background: #fcf4d6; color: #684e00; }
+.surface-status.pending, .surface-status.disabled { background: #fcf4d6; color: #684e00; }
 @media (max-width: 1100px) { .feed-grid { grid-template-columns: 1fr; } .feed-hero { flex-direction: column; } }
 </style>
