@@ -33,7 +33,7 @@ It does not implement:
 
 Those belong in follow-on PRs in their owning repositories after the product surface and contracts are accepted.
 
-The owning repository contract index for this feature is `INTEGRATION_LEDGER.md`. Future live integration work must start there and update it when adapters, authority boundaries, tests, or rollback behavior change.
+The owning repository contract index for this feature is `INTEGRATION_LEDGER.md`. Future live integration work must also satisfy `LIVE_ADAPTER_GATE.md` when adapters, authority boundaries, tests, or rollback behavior change.
 
 ## Files
 
@@ -48,6 +48,7 @@ The owning repository contract index for this feature is `INTEGRATION_LEDGER.md`
 | `memoryMeshPosture.ts` | Fixture-only MemoryMesh posture resolver. |
 | `meshRushGraphView.ts` | Fixture-only MeshRush graph-view resolver. |
 | `INTEGRATION_LEDGER.md` | Owning-repo contract ledger for BearBrowser, SlashTopics, New Hope, MemoryMesh, and MeshRush. |
+| `LIVE_ADAPTER_GATE.md` | Promotion gate required before fixture adapters can become live behavior. |
 | `../../__tests__/FeedIntelligenceFixtureChain.test.ts` | Aggregate fixture-chain coverage across scope, membrane, memory posture, and graph-view fixtures. |
 | `../../pages/Reader.vue` | Product shell page rendering the fixture state. |
 
