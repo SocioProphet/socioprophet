@@ -33,12 +33,15 @@ It does not implement:
 
 Those belong in follow-on PRs in their owning repositories after the product surface and contracts are accepted.
 
+The owning repository contract index for this feature is `INTEGRATION_LEDGER.md`. Future live integration work must start there and update it when adapters, authority boundaries, tests, or rollback behavior change.
+
 ## Files
 
 | Path | Purpose |
 | --- | --- |
 | `types.ts` | Contract types for sources, items, events, integrations, storage posture, and membrane decisions. |
 | `state.ts` | Fixture-backed state used by the current reader UI. |
+| `INTEGRATION_LEDGER.md` | Owning-repo contract ledger for BearBrowser, SlashTopics, New Hope, MemoryMesh, and MeshRush. |
 | `../../pages/Reader.vue` | Product shell page rendering the fixture state. |
 
 ## Acceptance posture
