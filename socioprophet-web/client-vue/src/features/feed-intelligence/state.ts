@@ -1,3 +1,7 @@
+import {
+  bearBrowserReaderHandoffFixture,
+  mapBearBrowserHandoffToFeedItem,
+} from './bearbrowserHandoff';
 import type { FeedIntelligenceState } from './types';
 
 export const feedIntelligenceState: FeedIntelligenceState = {
@@ -89,6 +93,7 @@ export const feedIntelligenceState: FeedIntelligenceState = {
       entities: ['BearBrowser', 'SourceOS', 'MemoryMesh'],
       claims: ['capture-is-not-publication', 'local-only-by-default'],
     },
+    mapBearBrowserHandoffToFeedItem(bearBrowserReaderHandoffFixture),
   ],
   events: [
     { id: 'event-001', type: 'FeedDiscovered', label: 'Feed discovered from source link or browser capture', status: 'complete', evidenceRef: 'eventlog://feed.discovered/001' },
