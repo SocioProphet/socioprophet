@@ -12,6 +12,14 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('Ticker proof-of-life event normalized into the reader stream');
   });
 
+  it('renders the local BearBrowser handoff fixture in the stream', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('BearBrowser local handoff fixture');
+    expect(wrapper.text()).toContain('browser-handoff-is-local-fixture');
+    expect(wrapper.text()).toContain('capture-is-not-publication');
+  });
+
   it('renders disabled adapter boundary before live behavior is enabled', () => {
     const wrapper = mount(Reader);
 
