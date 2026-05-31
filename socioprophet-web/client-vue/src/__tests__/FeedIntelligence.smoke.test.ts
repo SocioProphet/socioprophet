@@ -32,6 +32,18 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('MeshRush graph-view adapter');
   });
 
+  it('renders fixture-chain resolver outputs for the selected item', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('Fixture chain');
+    expect(wrapper.text()).toContain('feed-global-news');
+    expect(wrapper.text()).toContain('source-normalized-and-scope-resolved');
+    expect(wrapper.text()).toContain('memorymesh-feed-intelligence-profile');
+    expect(wrapper.text()).toContain('graph-view-feed-intelligence-reader-0001');
+    expect(wrapper.text()).toContain('advisoryOnly');
+    expect(wrapper.text()).toContain('traversal disabled');
+  });
+
   it('renders membrane, memory, graph, and integration surfaces', () => {
     const wrapper = mount(Reader);
 
