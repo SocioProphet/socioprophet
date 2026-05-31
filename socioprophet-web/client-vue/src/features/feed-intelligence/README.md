@@ -41,8 +41,19 @@ The owning repository contract index for this feature is `INTEGRATION_LEDGER.md`
 | --- | --- |
 | `types.ts` | Contract types for sources, items, events, integrations, storage posture, and membrane decisions. |
 | `state.ts` | Fixture-backed state used by the current reader UI. |
+| `adapters.ts` | Disabled live-adapter seams and forbidden side-effect declarations. |
+| `bearbrowserHandoff.ts` | Local-only BearBrowser handoff fixture mapper. |
+| `slashTopicsScope.ts` | Fixture-only SlashTopics scope resolver. |
+| `newHopeMembrane.ts` | Fixture-only New Hope membrane resolver. |
+| `memoryMeshPosture.ts` | Fixture-only MemoryMesh posture resolver. |
+| `meshRushGraphView.ts` | Fixture-only MeshRush graph-view resolver. |
 | `INTEGRATION_LEDGER.md` | Owning-repo contract ledger for BearBrowser, SlashTopics, New Hope, MemoryMesh, and MeshRush. |
+| `../../__tests__/FeedIntelligenceFixtureChain.test.ts` | Aggregate fixture-chain coverage across scope, membrane, memory posture, and graph-view fixtures. |
 | `../../pages/Reader.vue` | Product shell page rendering the fixture state. |
+
+## Fixture adapter posture
+
+The fixture adapter modules are local validation seams. They prove shape, coherence, and disabled-state behavior before live adapters exist. They must not perform live network calls, mutate scopes, make policy decisions, write durable memory, execute graph traversal, persist graph state, federate, or publish.
 
 ## Acceptance posture
 
