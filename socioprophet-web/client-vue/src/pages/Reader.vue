@@ -120,28 +120,34 @@
 
       <aside class="feed-card memex-panel" aria-label="Memex side panel">
         <div class="panel-heading">
-          <span>Memex</span>
+          <span>Fixture chain</span>
           <strong>right rail</strong>
         </div>
         <section class="memex-block">
           <h3>SlashTopics scope</h3>
-          <p>{{ selectedItem.topicScope }}</p>
-          <small>Public query and governance scope resolve here first.</small>
+          <p>{{ selectedSlashTopicScope?.scopeId ?? 'unresolved fixture scope' }}</p>
+          <small>{{ selectedSlashTopicScope?.privacyPosture ?? 'No fixture scope found for selected item.' }}</small>
         </section>
         <section class="memex-block">
           <h3>New Hope membrane</h3>
-          <p :class="['decision-pill', selectedItem.membraneDecision]">{{ selectedItem.membraneDecision }}</p>
-          <small>Admission controls publication, memory writeback, and graph expansion.</small>
+          <p :class="['decision-pill', selectedItem.membraneDecision]">{{ selectedNewHopeMembrane?.decision ?? selectedItem.membraneDecision }}</p>
+          <small>{{ selectedNewHopeMembrane?.reason ?? 'No fixture membrane event found.' }}</small>
         </section>
         <section class="memex-block">
           <h3>MemoryMesh posture</h3>
-          <p>{{ formatPolicy(selectedItem.storagePolicy) }}</p>
-          <small>Recall and writeback remain scoped and reviewable.</small>
+          <p>{{ selectedMemoryMeshPosture?.memoryProfileRef ?? formatPolicy(selectedItem.storagePolicy) }}</p>
+          <small>
+            {{ selectedMemoryMeshPosture?.recallPolicy.mode ?? 'displayOnly' }} ·
+            {{ selectedMemoryMeshPosture?.writebackPolicy.dryRunMode ?? 'no-writeback' }}
+          </small>
         </section>
         <section class="memex-block">
           <h3>MeshRush graph</h3>
-          <p>source → item → claim → entity → topic</p>
-          <small>Graph traversal is represented as evidence structure only.</small>
+          <p>{{ selectedMeshRushGraphView?.graphViewId ?? 'no fixture graph view' }}</p>
+          <small>
+            {{ selectedMeshRushGraphView?.displayMode ?? 'advisoryOnly' }} ·
+            traversal {{ selectedMeshRushGraphView?.boundary.liveTraversalEnabled ? 'enabled' : 'disabled' }}
+          </small>
         </section>
       </aside>
     </section>
@@ -174,6 +180,10 @@ import {
   adapterBoundarySummary,
   feedIntelligenceAdapters,
 } from '../features/feed-intelligence/adapters';
+import { resolveMeshRushGraphViewForItem } from '../features/feed-intelligence/meshRushGraphView';
+import { resolveMemoryMeshPostureForItem } from '../features/feed-intelligence/memoryMeshPosture';
+import { resolveNewHopeMembraneForItem } from '../features/feed-intelligence/newHopeMembrane';
+import { resolveSlashTopicScopeForSource } from '../features/feed-intelligence/slashTopicsScope';
 import { feedIntelligenceState as state } from '../features/feed-intelligence/state';
 import type { StoragePolicy } from '../features/feed-intelligence/types';
 
@@ -189,6 +199,13 @@ const filteredItems = computed(() => {
 });
 
 const selectedItem = computed(() => state.items.find((item) => item.id === selectedItemId.value) ?? state.items[0]);
+const selectedItemSource = computed(() => state.sources.find((source) => source.id === selectedItem.value.sourceId));
+const selectedSlashTopicScope = computed(() =>
+  selectedItemSource.value ? resolveSlashTopicScopeForSource(selectedItemSource.value) : undefined,
+);
+const selectedNewHopeMembrane = computed(() => resolveNewHopeMembraneForItem(selectedItem.value));
+const selectedMemoryMeshPosture = computed(() => resolveMemoryMeshPostureForItem(selectedItem.value));
+const selectedMeshRushGraphView = computed(() => resolveMeshRushGraphViewForItem(selectedItem.value));
 
 function formatPolicy(policy: StoragePolicy): string {
   return policy.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase());
