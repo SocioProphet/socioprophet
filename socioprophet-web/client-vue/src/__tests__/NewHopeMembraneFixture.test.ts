@@ -3,6 +3,7 @@ import { feedIntelligenceState } from '../features/feed-intelligence/state';
 import {
   newHopeMembraneBoundaryNotice,
   resolveNewHopeMembraneForItem,
+  resolveNewHopeReadOnlyMembrane,
 } from '../features/feed-intelligence/newHopeMembrane';
 
 describe('New Hope membrane fixture resolver', () => {
@@ -29,8 +30,61 @@ describe('New Hope membrane fixture resolver', () => {
     }
   });
 
+  it('keeps the read-only membrane resolver disabled by default', () => {
+    const resolution = resolveNewHopeReadOnlyMembrane({ enabled: false });
+
+    expect(resolution.status).toBe('disabled');
+    expect(resolution.membrane).toBeUndefined();
+    expect(resolution.reason).toContain('disabled');
+  });
+
+  it('handles missing item as unresolved without mutating policy state', () => {
+    const resolution = resolveNewHopeReadOnlyMembrane({ enabled: true });
+
+    expect(resolution.status).toBe('unresolved');
+    expect(resolution.membrane).toBeUndefined();
+    expect(resolution.reason).toContain('No Feed Intelligence item');
+  });
+
+  it('handles unknown item as unresolved', () => {
+    const resolution = resolveNewHopeReadOnlyMembrane({
+      enabled: true,
+      item: {
+        ...feedIntelligenceState.items[0],
+        id: 'item-unknown',
+      },
+    });
+
+    expect(resolution.status).toBe('unresolved');
+    expect(resolution.membrane).toBeUndefined();
+  });
+
+  it('resolves known item membrane in read-only mode', () => {
+    const resolution = resolveNewHopeReadOnlyMembrane({
+      enabled: true,
+      item: feedIntelligenceState.items[0],
+    });
+
+    expect(resolution.status).toBe('resolved');
+    expect(resolution.membrane?.eventId).toBe('newhope-feed-intelligence-001');
+    expect(resolution.reason).toContain('read-only');
+  });
+
+  it('does not promote guarded or blocked capture states', () => {
+    const captureItems = feedIntelligenceState.items.filter((item) => item.topicScope === '/capture/browser');
+
+    for (const item of captureItems) {
+      const resolution = resolveNewHopeReadOnlyMembrane({ enabled: true, item });
+      expect(resolution.status).toBe('resolved');
+      expect(resolution.membrane?.decision).toBe('quarantine');
+      expect(resolution.membrane?.downstreamEligibility.memoryWriteback).toBe('blocked');
+      expect(resolution.membrane?.downstreamEligibility.graphView).toBe('blocked');
+      expect(resolution.membrane?.downstreamEligibility.derivedPublication).toBe('blocked');
+    }
+  });
+
   it('states disabled live side effects explicitly', () => {
-    expect(newHopeMembraneBoundaryNotice()).toContain('fixture-only');
+    expect(newHopeMembraneBoundaryNotice()).toContain('read-only');
     expect(newHopeMembraneBoundaryNotice()).toContain('no live policy mutation');
     expect(newHopeMembraneBoundaryNotice()).toContain('publication');
     expect(newHopeMembraneBoundaryNotice()).toContain('memory writeback');
