@@ -40,6 +40,15 @@
       </div>
     </section>
 
+    <section class="feed-card adapter-boundary" aria-label="BearBrowser local-event resolver status">
+      <div class="panel-heading">
+        <span>BearBrowser local-event resolver</span>
+        <strong>{{ bearBrowserLocalEventResolution.status }}</strong>
+      </div>
+      <p>{{ bearBrowserLocalEventResolution.reason }}</p>
+      <small>{{ bearBrowserHandoffBoundaryNotice() }}</small>
+    </section>
+
     <section class="ticker-card" aria-label="Ticker proof of life">
       <span class="ticker-label">Ticker</span>
       <button
@@ -180,6 +189,10 @@ import {
   adapterBoundarySummary,
   feedIntelligenceAdapters,
 } from '../features/feed-intelligence/adapters';
+import {
+  bearBrowserHandoffBoundaryNotice,
+  resolveBearBrowserLocalEventHandoff,
+} from '../features/feed-intelligence/bearbrowserHandoff';
 import { resolveMeshRushGraphViewForItem } from '../features/feed-intelligence/meshRushGraphView';
 import { resolveMemoryMeshPostureForItem } from '../features/feed-intelligence/memoryMeshPosture';
 import { resolveNewHopeMembraneForItem } from '../features/feed-intelligence/newHopeMembrane';
@@ -206,6 +219,7 @@ const selectedSlashTopicScope = computed(() =>
 const selectedNewHopeMembrane = computed(() => resolveNewHopeMembraneForItem(selectedItem.value));
 const selectedMemoryMeshPosture = computed(() => resolveMemoryMeshPostureForItem(selectedItem.value));
 const selectedMeshRushGraphView = computed(() => resolveMeshRushGraphViewForItem(selectedItem.value));
+const bearBrowserLocalEventResolution = computed(() => resolveBearBrowserLocalEventHandoff({ enabled: false }));
 
 function formatPolicy(policy: StoragePolicy): string {
   return policy.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase());
