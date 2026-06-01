@@ -15,6 +15,23 @@ export type NewHopeMembraneFixture = {
   };
 };
 
+export type NewHopeReadOnlyResolverState = {
+  enabled: boolean;
+  item?: FeedItem;
+};
+
+export type NewHopeReadOnlyResolution =
+  | {
+      status: 'disabled' | 'unresolved';
+      membrane?: undefined;
+      reason: string;
+    }
+  | {
+      status: 'resolved';
+      membrane: NewHopeMembraneFixture;
+      reason: string;
+    };
+
 export const newHopeMembraneFixtures: NewHopeMembraneFixture[] = [
   {
     eventId: 'newhope-feed-intelligence-001',
@@ -78,6 +95,39 @@ export function resolveNewHopeMembraneForItem(item: FeedItem): NewHopeMembraneFi
   return newHopeMembraneFixtures.find((event) => event.feedItemRef === item.id);
 }
 
+export function resolveNewHopeReadOnlyMembrane(
+  state: NewHopeReadOnlyResolverState,
+): NewHopeReadOnlyResolution {
+  if (!state.enabled) {
+    return {
+      status: 'disabled',
+      reason: 'New Hope read-only membrane resolver is disabled.',
+    };
+  }
+
+  if (!state.item) {
+    return {
+      status: 'unresolved',
+      reason: 'No Feed Intelligence item was provided for read-only membrane resolution.',
+    };
+  }
+
+  const membrane = resolveNewHopeMembraneForItem(state.item);
+
+  if (!membrane) {
+    return {
+      status: 'unresolved',
+      reason: 'No fixture New Hope membrane event matched the selected item.',
+    };
+  }
+
+  return {
+    status: 'resolved',
+    membrane,
+    reason: 'Fixture New Hope membrane resolved in read-only mode.',
+  };
+}
+
 export function newHopeMembraneBoundaryNotice(): string {
-  return 'New Hope membrane resolution is fixture-only; no live policy mutation, publication, memory writeback, or graph traversal is active.';
+  return 'New Hope membrane resolution is read-only; no live policy mutation, publication, memory writeback, or graph traversal is active.';
 }
