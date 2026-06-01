@@ -50,6 +50,15 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('scope mutation');
   });
 
+  it('renders New Hope read-only membrane resolver status as disabled by default', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('New Hope read-only membrane resolver');
+    expect(wrapper.text()).toContain('New Hope read-only membrane resolver is disabled');
+    expect(wrapper.text()).toContain('no live policy mutation');
+    expect(wrapper.text()).toContain('memory writeback');
+  });
+
   it('renders fixture-chain resolver outputs for the selected item', () => {
     const wrapper = mount(Reader);
 
