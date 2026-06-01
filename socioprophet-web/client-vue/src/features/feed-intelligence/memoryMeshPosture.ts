@@ -21,6 +21,23 @@ export type MemoryMeshPostureFixture = {
   evidenceRefs: string[];
 };
 
+export type MemoryMeshReadOnlyResolverState = {
+  enabled: boolean;
+  item?: FeedItem;
+};
+
+export type MemoryMeshReadOnlyResolution =
+  | {
+      status: 'disabled' | 'unresolved';
+      posture?: undefined;
+      reason: string;
+    }
+  | {
+      status: 'resolved';
+      posture: MemoryMeshPostureFixture;
+      reason: string;
+    };
+
 export const memoryMeshPostureFixtures: MemoryMeshPostureFixture[] = [
   {
     memoryProfileRef: 'memorymesh-feed-intelligence-profile',
@@ -108,6 +125,39 @@ export function resolveMemoryMeshPostureForItem(item: FeedItem): MemoryMeshPostu
   return memoryMeshPostureFixtures.find((posture) => posture.feedItemRef === item.id);
 }
 
+export function resolveMemoryMeshReadOnlyPosture(
+  state: MemoryMeshReadOnlyResolverState,
+): MemoryMeshReadOnlyResolution {
+  if (!state.enabled) {
+    return {
+      status: 'disabled',
+      reason: 'MemoryMesh read-only posture resolver is disabled.',
+    };
+  }
+
+  if (!state.item) {
+    return {
+      status: 'unresolved',
+      reason: 'No Feed Intelligence item was provided for read-only memory posture resolution.',
+    };
+  }
+
+  const posture = resolveMemoryMeshPostureForItem(state.item);
+
+  if (!posture) {
+    return {
+      status: 'unresolved',
+      reason: 'No fixture MemoryMesh posture matched the selected item.',
+    };
+  }
+
+  return {
+    status: 'resolved',
+    posture,
+    reason: 'Fixture MemoryMesh posture resolved in read-only display mode.',
+  };
+}
+
 export function memoryMeshPostureBoundaryNotice(): string {
-  return 'MemoryMesh posture is fixture-only and display-only; no live recall, durable writeback, raw payload storage, or memory promotion is active.';
+  return 'MemoryMesh posture is read-only and display-only; no live recall, durable writeback, raw payload storage, or memory promotion is active.';
 }
