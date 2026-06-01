@@ -14,6 +14,23 @@ export type BearBrowserReaderHandoffFixture = {
   evidenceRefs: string[];
 };
 
+export type BearBrowserLocalEventAdapterState = {
+  enabled: boolean;
+  payload?: unknown;
+};
+
+export type BearBrowserLocalEventResolution =
+  | {
+      status: 'disabled' | 'missing' | 'invalid';
+      item?: undefined;
+      reason: string;
+    }
+  | {
+      status: 'accepted';
+      item: FeedItem;
+      reason: string;
+    };
+
 export const bearBrowserReaderHandoffFixture: BearBrowserReaderHandoffFixture = {
   sourceUrl: 'https://example.local/sourceos/bearbrowser-capture-demo',
   canonicalUrl: 'local://bearbrowser/captures/feed-intelligence-demo-001',
@@ -52,6 +69,59 @@ export function mapBearBrowserHandoffToFeedItem(
   };
 }
 
+export function resolveBearBrowserLocalEventHandoff(
+  state: BearBrowserLocalEventAdapterState,
+): BearBrowserLocalEventResolution {
+  if (!state.enabled) {
+    return {
+      status: 'disabled',
+      reason: 'BearBrowser local-event handoff adapter is disabled.',
+    };
+  }
+
+  if (state.payload === undefined || state.payload === null) {
+    return {
+      status: 'missing',
+      reason: 'No explicit local BearBrowser handoff payload was provided.',
+    };
+  }
+
+  if (!isBearBrowserReaderHandoffFixture(state.payload)) {
+    return {
+      status: 'invalid',
+      reason: 'Local BearBrowser handoff payload failed shape validation.',
+    };
+  }
+
+  return {
+    status: 'accepted',
+    item: mapBearBrowserHandoffToFeedItem(state.payload),
+    reason: 'Local BearBrowser handoff payload accepted as local-only reader item.',
+  };
+}
+
+export function isBearBrowserReaderHandoffFixture(
+  value: unknown,
+): value is BearBrowserReaderHandoffFixture {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const candidate = value as Partial<BearBrowserReaderHandoffFixture>;
+
+  return (
+    typeof candidate.sourceUrl === 'string' &&
+    typeof candidate.contentHash === 'string' &&
+    typeof candidate.capturedAt === 'string' &&
+    isBearBrowserProfileClass(candidate.browserProfileClass) &&
+    candidate.storagePolicyRequest === 'localOnly' &&
+    Array.isArray(candidate.evidenceRefs) &&
+    candidate.evidenceRefs.every((ref) => typeof ref === 'string')
+  );
+}
+
+function isBearBrowserProfileClass(value: unknown): value is BearBrowserProfileClass {
+  return value === 'human' || value === 'agent' || value === 'terminal';
+}
+
 export function bearBrowserHandoffBoundaryNotice(): string {
-  return 'BearBrowser handoff is fixture-only; no native browser bridge, network fetch, publication, memory writeback, or graph traversal is active.';
+  return 'BearBrowser handoff is local-event only; no native browser bridge, network fetch, publication, memory writeback, or graph traversal is active.';
 }
