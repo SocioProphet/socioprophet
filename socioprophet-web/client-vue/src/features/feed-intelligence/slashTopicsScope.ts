@@ -13,6 +13,23 @@ export type SlashTopicScopeFixture = {
   receiptRefs: string[];
 };
 
+export type SlashTopicsReadOnlyResolverState = {
+  enabled: boolean;
+  source?: FeedSource;
+};
+
+export type SlashTopicsReadOnlyResolution =
+  | {
+      status: 'disabled' | 'unresolved';
+      scope?: undefined;
+      reason: string;
+    }
+  | {
+      status: 'resolved';
+      scope: SlashTopicScopeFixture;
+      reason: string;
+    };
+
 export const slashTopicScopeFixtures: SlashTopicScopeFixture[] = [
   {
     scopeId: 'feed-global-news',
@@ -56,6 +73,39 @@ export function resolveSlashTopicScopeForSource(source: FeedSource): SlashTopicS
   return slashTopicScopeFixtures.find((scope) => scope.topic === source.scope);
 }
 
+export function resolveSlashTopicsReadOnlyScope(
+  state: SlashTopicsReadOnlyResolverState,
+): SlashTopicsReadOnlyResolution {
+  if (!state.enabled) {
+    return {
+      status: 'disabled',
+      reason: 'SlashTopics read-only resolver is disabled.',
+    };
+  }
+
+  if (!state.source) {
+    return {
+      status: 'unresolved',
+      reason: 'No Feed Intelligence source was provided for read-only scope resolution.',
+    };
+  }
+
+  const scope = resolveSlashTopicScopeForSource(state.source);
+
+  if (!scope) {
+    return {
+      status: 'unresolved',
+      reason: 'No fixture slash-topic scope matched the source scope.',
+    };
+  }
+
+  return {
+    status: 'resolved',
+    scope,
+    reason: 'Fixture slash-topic scope resolved in read-only mode.',
+  };
+}
+
 export function slashTopicScopeBoundaryNotice(): string {
-  return 'SlashTopics scope resolution is fixture-only; no feed fetch, scope mutation, publication, memory writeback, or graph traversal is active.';
+  return 'SlashTopics scope resolution is read-only; no feed fetch, scope mutation, publication, memory writeback, or graph traversal is active.';
 }
