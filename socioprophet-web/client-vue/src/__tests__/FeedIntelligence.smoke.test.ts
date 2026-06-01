@@ -41,6 +41,15 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('no native browser bridge');
   });
 
+  it('renders SlashTopics read-only resolver status as disabled by default', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('SlashTopics read-only resolver');
+    expect(wrapper.text()).toContain('SlashTopics read-only resolver is disabled');
+    expect(wrapper.text()).toContain('no feed fetch');
+    expect(wrapper.text()).toContain('scope mutation');
+  });
+
   it('renders fixture-chain resolver outputs for the selected item', () => {
     const wrapper = mount(Reader);
 
