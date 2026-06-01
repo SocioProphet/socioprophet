@@ -32,6 +32,15 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('MeshRush graph-view adapter');
   });
 
+  it('renders BearBrowser local-event resolver status as disabled by default', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('BearBrowser local-event resolver');
+    expect(wrapper.text()).toContain('disabled');
+    expect(wrapper.text()).toContain('BearBrowser local-event handoff adapter is disabled');
+    expect(wrapper.text()).toContain('no native browser bridge');
+  });
+
   it('renders fixture-chain resolver outputs for the selected item', () => {
     const wrapper = mount(Reader);
 
