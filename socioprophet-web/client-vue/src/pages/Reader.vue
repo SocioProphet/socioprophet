@@ -58,6 +58,15 @@
       <small>{{ slashTopicScopeBoundaryNotice() }}</small>
     </section>
 
+    <section class="feed-card adapter-boundary" aria-label="New Hope read-only membrane resolver status">
+      <div class="panel-heading">
+        <span>New Hope read-only membrane resolver</span>
+        <strong>{{ newHopeReadOnlyResolution.status }}</strong>
+      </div>
+      <p>{{ newHopeReadOnlyResolution.reason }}</p>
+      <small>{{ newHopeMembraneBoundaryNotice() }}</small>
+    </section>
+
     <section class="ticker-card" aria-label="Ticker proof of life">
       <span class="ticker-label">Ticker</span>
       <button
@@ -204,7 +213,11 @@ import {
 } from '../features/feed-intelligence/bearbrowserHandoff';
 import { resolveMeshRushGraphViewForItem } from '../features/feed-intelligence/meshRushGraphView';
 import { resolveMemoryMeshPostureForItem } from '../features/feed-intelligence/memoryMeshPosture';
-import { resolveNewHopeMembraneForItem } from '../features/feed-intelligence/newHopeMembrane';
+import {
+  newHopeMembraneBoundaryNotice,
+  resolveNewHopeMembraneForItem,
+  resolveNewHopeReadOnlyMembrane,
+} from '../features/feed-intelligence/newHopeMembrane';
 import {
   resolveSlashTopicScopeForSource,
   resolveSlashTopicsReadOnlyScope,
@@ -234,6 +247,7 @@ const selectedMemoryMeshPosture = computed(() => resolveMemoryMeshPostureForItem
 const selectedMeshRushGraphView = computed(() => resolveMeshRushGraphViewForItem(selectedItem.value));
 const bearBrowserLocalEventResolution = computed(() => resolveBearBrowserLocalEventHandoff({ enabled: false }));
 const slashTopicsReadOnlyResolution = computed(() => resolveSlashTopicsReadOnlyScope({ enabled: false }));
+const newHopeReadOnlyResolution = computed(() => resolveNewHopeReadOnlyMembrane({ enabled: false }));
 
 function formatPolicy(policy: StoragePolicy): string {
   return policy.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase());
