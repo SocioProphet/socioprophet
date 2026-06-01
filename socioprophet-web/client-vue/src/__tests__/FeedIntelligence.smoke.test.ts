@@ -59,6 +59,16 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('memory writeback');
   });
 
+  it('renders MemoryMesh read-only posture resolver status as disabled by default', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('MemoryMesh read-only posture resolver');
+    expect(wrapper.text()).toContain('MemoryMesh read-only posture resolver is disabled');
+    expect(wrapper.text()).toContain('no live recall');
+    expect(wrapper.text()).toContain('durable writeback');
+    expect(wrapper.text()).toContain('raw payload storage');
+  });
+
   it('renders fixture-chain resolver outputs for the selected item', () => {
     const wrapper = mount(Reader);
 
