@@ -49,6 +49,15 @@
       <small>{{ bearBrowserHandoffBoundaryNotice() }}</small>
     </section>
 
+    <section class="feed-card adapter-boundary" aria-label="SlashTopics read-only resolver status">
+      <div class="panel-heading">
+        <span>SlashTopics read-only resolver</span>
+        <strong>{{ slashTopicsReadOnlyResolution.status }}</strong>
+      </div>
+      <p>{{ slashTopicsReadOnlyResolution.reason }}</p>
+      <small>{{ slashTopicScopeBoundaryNotice() }}</small>
+    </section>
+
     <section class="ticker-card" aria-label="Ticker proof of life">
       <span class="ticker-label">Ticker</span>
       <button
@@ -196,7 +205,11 @@ import {
 import { resolveMeshRushGraphViewForItem } from '../features/feed-intelligence/meshRushGraphView';
 import { resolveMemoryMeshPostureForItem } from '../features/feed-intelligence/memoryMeshPosture';
 import { resolveNewHopeMembraneForItem } from '../features/feed-intelligence/newHopeMembrane';
-import { resolveSlashTopicScopeForSource } from '../features/feed-intelligence/slashTopicsScope';
+import {
+  resolveSlashTopicScopeForSource,
+  resolveSlashTopicsReadOnlyScope,
+  slashTopicScopeBoundaryNotice,
+} from '../features/feed-intelligence/slashTopicsScope';
 import { feedIntelligenceState as state } from '../features/feed-intelligence/state';
 import type { StoragePolicy } from '../features/feed-intelligence/types';
 
@@ -220,6 +233,7 @@ const selectedNewHopeMembrane = computed(() => resolveNewHopeMembraneForItem(sel
 const selectedMemoryMeshPosture = computed(() => resolveMemoryMeshPostureForItem(selectedItem.value));
 const selectedMeshRushGraphView = computed(() => resolveMeshRushGraphViewForItem(selectedItem.value));
 const bearBrowserLocalEventResolution = computed(() => resolveBearBrowserLocalEventHandoff({ enabled: false }));
+const slashTopicsReadOnlyResolution = computed(() => resolveSlashTopicsReadOnlyScope({ enabled: false }));
 
 function formatPolicy(policy: StoragePolicy): string {
   return policy.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase());
