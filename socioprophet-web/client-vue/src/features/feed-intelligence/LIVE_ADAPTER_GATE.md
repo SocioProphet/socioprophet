@@ -2,15 +2,15 @@
 
 Status: required promotion gate  
 Scope: `socioprophet-web/client-vue/src/features/feed-intelligence`  
-Current posture: fixture-backed reader with disabled live adapters
+Current posture: fixture-backed reader with disabled live adapters and completed default-disabled resolver status sequence
 
 ## Purpose
 
-This gate prevents fixture resolver modules from being silently promoted into live behavior. The Feed Intelligence reader currently renders fixture-backed state and fixture-chain status for BearBrowser, SlashTopics, New Hope, MemoryMesh, and MeshRush. That is intentional. Live behavior must be introduced adapter by adapter and only after the owning boundary, authority model, tests, disabled state, and rollback path are present.
+This gate prevents fixture resolver modules and read-only resolver seams from being silently promoted into live behavior. The Feed Intelligence reader currently renders fixture-backed state, fixture-chain status, disabled adapter boundaries, and default-disabled resolver status for BearBrowser, SlashTopics, New Hope, MemoryMesh, and MeshRush. That is intentional. Live behavior must be introduced adapter by adapter and only after the owning boundary, authority model, tests, disabled state, and rollback path are present.
 
 ## Gate rule
 
-No fixture adapter may become live unless the PR satisfies all checks below.
+No fixture adapter or read-only resolver seam may become live unless the PR satisfies all checks below.
 
 ## Required checks
 
@@ -23,6 +23,18 @@ No fixture adapter may become live unless the PR satisfies all checks below.
 | Validation | Unit, smoke, or fixture-chain tests cover normal, disabled, and failure cases. |
 | Side-effect review | The PR states whether the adapter can fetch, mutate, publish, persist, federate, write memory, or execute graph traversal. |
 | Rollback | The PR documents how to disable or revert the adapter without breaking the reader. |
+
+## Completed default-disabled resolver status sequence
+
+The resolver-gate sequence is complete as read-only/default-disabled UI and test coverage. This does not enable live adapter behavior.
+
+| Surface | Completed status | Still impossible by default |
+| --- | --- | --- |
+| BearBrowser | Local-event handoff resolver status exists and is disabled by default. | Native bridge activation, network fetch, publication, federation, memory writeback, graph traversal, persistence. |
+| SlashTopics | Read-only scope resolver status exists and is disabled by default. | Scope mutation, feed fetching, publication, federation, memory writeback, graph traversal, persistence. |
+| New Hope | Read-only membrane resolver status exists and is disabled by default. | Live policy mutation, publication, federation, memory writeback, graph traversal, persistence, promotion from guarded states. |
+| MemoryMesh | Read-only/display-only posture resolver status exists and is disabled by default. | Live recall, durable writeback, raw payload storage, memory promotion, graph traversal, persistence. |
+| MeshRush | Read-only/advisory-only graph-view resolver status exists and is disabled by default. | Live traversal, graph persistence, runtime execution, publication, federation, durable graph mutation. |
 
 ## Adapter-specific promotion requirements
 
@@ -76,6 +88,7 @@ A live MeshRush adapter requires:
 
 - Live adapters default to disabled.
 - Fixture state must remain usable without any live adapter.
+- Resolver status display does not imply adapter enablement.
 - Browser capture does not imply publication.
 - Scope resolution does not imply feed fetching.
 - Membrane admission does not imply memory writeback.
@@ -97,4 +110,6 @@ Any PR that enables live behavior must include a section titled `Live-adapter ga
 
 ## Current locked state
 
-The current reader passes the gate only as a fixture-backed surface. It has fixture modules for the full chain and tests for coherence, but no live adapter is enabled.
+The current reader passes the gate only as a fixture-backed, default-disabled surface. It has fixture modules, read-only resolver status seams, UI panels, unit tests, smoke tests, and aggregate chain coverage. No live adapter is enabled.
+
+Before any live adapter work begins, parent issue #354 must receive an explicit acceptance reconciliation stating which single adapter is next, which owning artifact authorizes it, and which side effects remain disallowed for that adapter tranche.
