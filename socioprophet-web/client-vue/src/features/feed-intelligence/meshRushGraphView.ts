@@ -18,6 +18,23 @@ export type MeshRushGraphViewFixture = {
   };
 };
 
+export type MeshRushReadOnlyResolverState = {
+  enabled: boolean;
+  item?: FeedItem;
+};
+
+export type MeshRushReadOnlyResolution =
+  | {
+      status: 'disabled' | 'unresolved';
+      graphView?: undefined;
+      reason: string;
+    }
+  | {
+      status: 'resolved';
+      graphView: MeshRushGraphViewFixture;
+      reason: string;
+    };
+
 export const meshRushGraphViewFixtures: MeshRushGraphViewFixture[] = [
   {
     graphViewId: 'graph-view-feed-intelligence-reader-0001',
@@ -76,6 +93,39 @@ export function resolveMeshRushGraphViewForItem(item: FeedItem): MeshRushGraphVi
   return meshRushGraphViewFixtures.find((view) => view.feedItemRef === item.id);
 }
 
+export function resolveMeshRushReadOnlyGraphView(
+  state: MeshRushReadOnlyResolverState,
+): MeshRushReadOnlyResolution {
+  if (!state.enabled) {
+    return {
+      status: 'disabled',
+      reason: 'MeshRush read-only graph-view resolver is disabled.',
+    };
+  }
+
+  if (!state.item) {
+    return {
+      status: 'unresolved',
+      reason: 'No Feed Intelligence item was provided for read-only graph-view resolution.',
+    };
+  }
+
+  const graphView = resolveMeshRushGraphViewForItem(state.item);
+
+  if (!graphView) {
+    return {
+      status: 'unresolved',
+      reason: 'No fixture MeshRush graph view matched the selected item.',
+    };
+  }
+
+  return {
+    status: 'resolved',
+    graphView,
+    reason: 'Fixture MeshRush graph view resolved in read-only display mode.',
+  };
+}
+
 export function meshRushGraphViewBoundaryNotice(): string {
-  return 'MeshRush graph view is fixture-only and advisory-only; no live traversal, graph persistence, publication, memory writeback, or runtime execution is active.';
+  return 'MeshRush graph view is read-only and advisory-only; no live traversal, graph persistence, publication, memory writeback, or runtime execution is active.';
 }
