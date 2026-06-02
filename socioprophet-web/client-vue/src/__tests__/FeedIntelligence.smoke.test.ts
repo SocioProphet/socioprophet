@@ -69,6 +69,16 @@ describe('Feed Intelligence Reader', () => {
     expect(wrapper.text()).toContain('raw payload storage');
   });
 
+  it('renders MeshRush read-only graph-view resolver status as disabled by default', () => {
+    const wrapper = mount(Reader);
+
+    expect(wrapper.text()).toContain('MeshRush read-only graph-view resolver');
+    expect(wrapper.text()).toContain('MeshRush read-only graph-view resolver is disabled');
+    expect(wrapper.text()).toContain('no live traversal');
+    expect(wrapper.text()).toContain('graph persistence');
+    expect(wrapper.text()).toContain('runtime execution');
+  });
+
   it('renders fixture-chain resolver outputs for the selected item', () => {
     const wrapper = mount(Reader);
 
