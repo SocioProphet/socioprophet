@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyBearBrowserExplicitLocalEventHandoff,
   bearBrowserHandoffBoundaryNotice,
   bearBrowserReaderHandoffFixture,
   isBearBrowserReaderHandoffFixture,
   mapBearBrowserHandoffToFeedItem,
   resolveBearBrowserLocalEventHandoff,
 } from '../features/feed-intelligence/bearbrowserHandoff';
+import { feedIntelligenceState } from '../features/feed-intelligence/state';
 
 describe('BearBrowser handoff fixture mapping', () => {
   it('maps a local handoff fixture into a quarantined local-only FeedItem', () => {
@@ -66,8 +68,72 @@ describe('BearBrowser handoff fixture mapping', () => {
     expect(resolution.item?.claims).toContain('capture-is-not-publication');
   });
 
+  it('keeps explicit local-event adapter disabled without mutating item state', () => {
+    const resolution = applyBearBrowserExplicitLocalEventHandoff({
+      enabled: false,
+      existingItems: feedIntelligenceState.items,
+      payload: bearBrowserReaderHandoffFixture,
+    });
+
+    expect(resolution.status).toBe('disabled');
+    expect(resolution.item).toBeUndefined();
+    expect(resolution.items).toEqual(feedIntelligenceState.items);
+  });
+
+  it('keeps missing explicit local payload failure-safe', () => {
+    const resolution = applyBearBrowserExplicitLocalEventHandoff({
+      enabled: true,
+      existingItems: feedIntelligenceState.items,
+    });
+
+    expect(resolution.status).toBe('missing');
+    expect(resolution.item).toBeUndefined();
+    expect(resolution.items).toEqual(feedIntelligenceState.items);
+  });
+
+  it('keeps invalid explicit local payload failure-safe', () => {
+    const resolution = applyBearBrowserExplicitLocalEventHandoff({
+      enabled: true,
+      existingItems: feedIntelligenceState.items,
+      payload: { sourceUrl: 'local://bad', storagePolicyRequest: 'hostedPublic' },
+    });
+
+    expect(resolution.status).toBe('invalid');
+    expect(resolution.item).toBeUndefined();
+    expect(resolution.items).toEqual(feedIntelligenceState.items);
+  });
+
+  it('maps an accepted explicit local payload as a local-only quarantined reader item', () => {
+    const existingItems = feedIntelligenceState.items.filter((item) => item.id !== 'item-bearbrowser-handoff-fixture-001');
+
+    const resolution = applyBearBrowserExplicitLocalEventHandoff({
+      enabled: true,
+      existingItems,
+      payload: bearBrowserReaderHandoffFixture,
+    });
+
+    expect(resolution.status).toBe('accepted');
+    expect(resolution.item.storagePolicy).toBe('localOnly');
+    expect(resolution.item.membraneDecision).toBe('quarantine');
+    expect(resolution.item.claims).toContain('capture-is-not-publication');
+    expect(resolution.items).toContainEqual(resolution.item);
+  });
+
+  it('upserts accepted explicit local payloads without duplicating reader items', () => {
+    const resolution = applyBearBrowserExplicitLocalEventHandoff({
+      enabled: true,
+      existingItems: feedIntelligenceState.items,
+      payload: bearBrowserReaderHandoffFixture,
+    });
+
+    const handoffItems = resolution.items.filter((item) => item.id === 'item-bearbrowser-handoff-fixture-001');
+
+    expect(resolution.status).toBe('accepted');
+    expect(handoffItems).toHaveLength(1);
+  });
+
   it('states disabled live side effects explicitly', () => {
-    expect(bearBrowserHandoffBoundaryNotice()).toContain('local-event only');
+    expect(bearBrowserHandoffBoundaryNotice()).toContain('explicit-local-event only');
     expect(bearBrowserHandoffBoundaryNotice()).toContain('no native browser bridge');
     expect(bearBrowserHandoffBoundaryNotice()).toContain('memory writeback');
     expect(bearBrowserHandoffBoundaryNotice()).toContain('graph traversal');
