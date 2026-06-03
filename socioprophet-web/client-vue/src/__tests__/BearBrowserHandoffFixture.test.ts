@@ -113,9 +113,9 @@ describe('BearBrowser handoff fixture mapping', () => {
     });
 
     expect(resolution.status).toBe('accepted');
-    expect(resolution.item.storagePolicy).toBe('localOnly');
-    expect(resolution.item.membraneDecision).toBe('quarantine');
-    expect(resolution.item.claims).toContain('capture-is-not-publication');
+    expect(resolution.item?.storagePolicy).toBe('localOnly');
+    expect(resolution.item?.membraneDecision).toBe('quarantine');
+    expect(resolution.item?.claims).toContain('capture-is-not-publication');
     expect(resolution.items).toContainEqual(resolution.item);
   });
 
