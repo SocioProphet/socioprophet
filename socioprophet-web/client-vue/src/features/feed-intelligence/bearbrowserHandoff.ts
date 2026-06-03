@@ -31,6 +31,24 @@ export type BearBrowserLocalEventResolution =
       reason: string;
     };
 
+export type BearBrowserExplicitLocalEventAdapterState = BearBrowserLocalEventAdapterState & {
+  existingItems: FeedItem[];
+};
+
+export type BearBrowserExplicitLocalEventAdapterResolution =
+  | {
+      status: 'disabled' | 'missing' | 'invalid';
+      item?: undefined;
+      items: FeedItem[];
+      reason: string;
+    }
+  | {
+      status: 'accepted';
+      item: FeedItem;
+      items: FeedItem[];
+      reason: string;
+    };
+
 export const bearBrowserReaderHandoffFixture: BearBrowserReaderHandoffFixture = {
   sourceUrl: 'https://example.local/sourceos/bearbrowser-capture-demo',
   canonicalUrl: 'local://bearbrowser/captures/feed-intelligence-demo-001',
@@ -100,6 +118,31 @@ export function resolveBearBrowserLocalEventHandoff(
   };
 }
 
+export function applyBearBrowserExplicitLocalEventHandoff(
+  state: BearBrowserExplicitLocalEventAdapterState,
+): BearBrowserExplicitLocalEventAdapterResolution {
+  const resolution = resolveBearBrowserLocalEventHandoff({
+    enabled: state.enabled,
+    payload: state.payload,
+  });
+
+  if (resolution.status !== 'accepted') {
+    return {
+      status: resolution.status,
+      items: [...state.existingItems],
+      reason: resolution.reason,
+    };
+  }
+
+  return {
+    status: 'accepted',
+    item: resolution.item,
+    items: upsertFeedItem(state.existingItems, resolution.item),
+    reason:
+      'Explicit local BearBrowser handoff payload accepted and mapped in memory as a local-only quarantined reader item.',
+  };
+}
+
 export function isBearBrowserReaderHandoffFixture(
   value: unknown,
 ): value is BearBrowserReaderHandoffFixture {
@@ -118,10 +161,14 @@ export function isBearBrowserReaderHandoffFixture(
   );
 }
 
+function upsertFeedItem(items: FeedItem[], item: FeedItem): FeedItem[] {
+  return [...items.filter((existingItem) => existingItem.id !== item.id), item];
+}
+
 function isBearBrowserProfileClass(value: unknown): value is BearBrowserProfileClass {
   return value === 'human' || value === 'agent' || value === 'terminal';
 }
 
 export function bearBrowserHandoffBoundaryNotice(): string {
-  return 'BearBrowser handoff is local-event only; no native browser bridge, network fetch, publication, memory writeback, or graph traversal is active.';
+  return 'BearBrowser handoff is explicit-local-event only; no native browser bridge, network fetch, publication, memory writeback, or graph traversal is active.';
 }
