@@ -11,6 +11,8 @@ if (process.env.NODE_ENV !== "production") {
 
 const rssRouter = require("./routes/api/rss-route");
 const buildsRouter = require("./routes/api/builds-route");
+const fleetRouter = require("./routes/api/fleet-route");
+const bootRouter = require("./routes/boot-route");
 const { requireAuth } = require("./middleware/auth");
 
 const app = express();
@@ -33,6 +35,10 @@ app.use(cookieParser());
 
 app.use("/api/feed", rssRouter);
 app.use("/api/builds", requireAuth, buildsRouter);
+app.use("/api/fleet", requireAuth, fleetRouter);
+// Device provisioning is UNAUTHENTICATED (claim-code authorized) — nlboot devices
+// have no Firebase token.
+app.use("/boot", bootRouter);
 
 const server = app.listen(port, () =>
   console.log(`Server up and running on port ${port}.`)

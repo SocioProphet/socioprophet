@@ -21,6 +21,18 @@ service cloud.firestore {
         allow read: if signedIn() && request.auth.uid == uid;
         allow write: if false;
       }
+
+      // Fleet devices: owner can read; server-only write (claim codes, assignments).
+      match /devices/{deviceId} {
+        allow read: if signedIn() && request.auth.uid == uid;
+        allow write: if false;
+      }
+    }
+
+    // Claim-code → device index, used by the unauthenticated /boot endpoint.
+    // Server-only (firebase-admin bypasses rules); never client-readable.
+    match /device_claims/{claim} {
+      allow read, write: if false;
     }
 
     // Intake is server-written only; client access denied.
