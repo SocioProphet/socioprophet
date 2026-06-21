@@ -10,6 +10,8 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const rssRouter = require("./routes/api/rss-route");
+const buildsRouter = require("./routes/api/builds-route");
+const { requireAuth } = require("./middleware/auth");
 
 const app = express();
 const port = process.env.PORT;
@@ -30,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/api/feed", rssRouter);
+app.use("/api/builds", requireAuth, buildsRouter);
 
 const server = app.listen(port, () =>
   console.log(`Server up and running on port ${port}.`)
