@@ -22,8 +22,10 @@ export interface BuildSpec {
   hostname: string;
   packages: string[];
   services?: Record<string, boolean>;
+  users?: { name: string; groups?: string[] }[];
 }
 
+export const whoami = () => authed("/whoami");
 export const createBuild = (spec: BuildSpec) =>
   authed("/", { method: "POST", body: JSON.stringify({ spec }) });
 export const listBuilds = () => authed("/");

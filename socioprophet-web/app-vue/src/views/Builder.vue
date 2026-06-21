@@ -13,18 +13,28 @@ const hostname = ref("sourceos");
 const packagesText = ref("");
 const enableSsh = ref(false);
 const enableDocker = ref(false);
+const usersText = ref("");
 const err = ref(""); const busy = ref(false);
 
-// Tier gates (advisory in UI; enforced server-side).
-const advanced = computed(() => auth.tier !== "free"); // services/users need paid+
+// Gates driven by the server-provided policy (server still enforces).
+const advanced = computed(() => !!auth.policy?.services);   // services/users → paid+
+const maxPackages = computed(() => auth.policy?.maxPackages ?? 10);
+const lane = computed(() => (auth.tier === "free"
+  ? "Built on shared CI runners (free tier)."
+  : "Built on a private on-demand VM (paid tier)."));
 
 const submit = async () => {
   err.value = ""; busy.value = true;
   const packages = packagesText.value.split(/[\s,]+/).map(s => s.trim()).filter(Boolean);
   const spec: BuildSpec = { edition: edition.value, arch: arch.value, hostname: hostname.value, packages };
-  if (advanced.value) spec.services = { openssh: enableSsh.value, docker: enableDocker.value };
+  if (advanced.value) {
+    spec.services = { openssh: enableSsh.value, docker: enableDocker.value };
+    const users = usersText.value.split(/[\s,]+/).map(s => s.trim()).filter(Boolean)
+      .map(name => ({ name, groups: ["wheel"] }));
+    if (users.length) spec.users = users;
+  }
   try {
-    const { buildId } = await createBuild(spec);
+    await createBuild(spec);
     router.push("/builds");
   } catch (e: any) { err.value = e.message; } finally { busy.value = false; }
 };
@@ -56,7 +66,7 @@ const submit = async () => {
     <label>Hostname</label>
     <input v-model="hostname" placeholder="sourceos" />
 
-    <label>Extra packages <span class="muted">(space or comma separated nixpkgs names)</span></label>
+    <label>Extra packages <span class="muted">(space/comma separated nixpkgs names · up to {{ maxPackages }})</span></label>
     <textarea v-model="packagesText" rows="3" placeholder="htop tmux ripgrep"></textarea>
 
     <div :class="{ gated: !advanced }" style="margin-top:8px">
@@ -67,10 +77,15 @@ const submit = async () => {
       <label style="display:inline-flex;gap:8px;align-items:center;width:auto;margin-left:18px">
         <input type="checkbox" style="width:auto" v-model="enableDocker" :disabled="!advanced" /> Docker
       </label>
+
+      <label style="margin-top:12px">Users <span v-if="!advanced" class="muted">— paid tier</span>
+        <span v-else class="muted">(space/comma separated; each added to wheel)</span></label>
+      <input v-model="usersText" :disabled="!advanced" placeholder="alice bob" />
     </div>
 
     <div style="margin-top:18px">
       <button class="btn" :disabled="busy" @click="submit">{{ busy ? "Submitting…" : "Build image" }}</button>
+      <span class="muted" style="margin-left:12px">{{ lane }}</span>
     </div>
     <p v-if="err" class="status-error" style="margin-top:12px">{{ err }}</p>
   </div>

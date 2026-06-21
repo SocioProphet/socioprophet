@@ -5,7 +5,7 @@ export {};
 //   GET  /api/builds/:id    one build + live status (reflected from GCS)
 const express = require("express");
 const { admin } = require("../../middleware/auth");
-const { dispatchGithubBuild, readBuildStatus } = require("../../services/buildOrchestrator");
+const { dispatchBuild, readBuildStatus } = require("../../services/buildOrchestrator");
 
 const router = express.Router();
 const db = () => admin.firestore();
@@ -66,7 +66,7 @@ router.post("/", async (req: any, res: any) => {
     });
 
     try {
-      const dispatch = await dispatchGithubBuild(uid, doc.id, spec);
+      const dispatch = await dispatchBuild(uid, doc.id, spec, tier);
       await doc.update({ status: "dispatched", lane: dispatch.lane });
     } catch (err: any) {
       await doc.update({ status: "error", error: String(err?.message || err) });
@@ -84,6 +84,13 @@ router.get("/", async (req: any, res: any) => {
     .orderBy("createdAt", "desc").limit(50).get();
   const builds = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
   return res.json({ builds });
+});
+
+// Caller's tier + what that tier may customize (for UI gating; server still enforces).
+router.get("/whoami", async (req: any, res: any) => {
+  const tier = await getTier(req.uid);
+  const policy = TIER_POLICY[tier] || TIER_POLICY.free;
+  return res.json({ uid: req.uid, email: req.userEmail || null, tier, policy });
 });
 
 router.get("/:id", async (req: any, res: any) => {
