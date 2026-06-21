@@ -1,0 +1,30 @@
+import { useAuth } from "../stores/auth";
+
+// Thin client for the authenticated /api/builds backend.
+async function authed(path: string, init: RequestInit = {}) {
+  const token = await useAuth().idToken();
+  const res = await fetch(`/api/builds${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(init.headers || {}),
+    },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `request failed (${res.status})`);
+  return data;
+}
+
+export interface BuildSpec {
+  edition: "desktop" | "server" | "edge";
+  arch: "x86_64" | "aarch64";
+  hostname: string;
+  packages: string[];
+  services?: Record<string, boolean>;
+}
+
+export const createBuild = (spec: BuildSpec) =>
+  authed("/", { method: "POST", body: JSON.stringify({ spec }) });
+export const listBuilds = () => authed("/");
+export const getBuild = (id: string) => authed(`/${id}`);
