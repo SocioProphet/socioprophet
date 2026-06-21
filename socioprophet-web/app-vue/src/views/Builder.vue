@@ -14,10 +14,12 @@ const packagesText = ref("");
 const enableSsh = ref(false);
 const enableDocker = ref(false);
 const usersText = ref("");
+const moduleSnippet = ref("");
 const err = ref(""); const busy = ref(false);
 
 // Gates driven by the server-provided policy (server still enforces).
 const advanced = computed(() => !!auth.policy?.services);   // services/users → paid+
+const premium = computed(() => !!auth.policy?.moduleEditor); // raw module → premium
 const maxPackages = computed(() => auth.policy?.maxPackages ?? 10);
 const lane = computed(() => (auth.tier === "free"
   ? "Built on shared CI runners (free tier)."
@@ -33,6 +35,7 @@ const submit = async () => {
       .map(name => ({ name, groups: ["wheel"] }));
     if (users.length) spec.users = users;
   }
+  if (premium.value && moduleSnippet.value.trim()) spec.moduleSnippet = moduleSnippet.value;
   try {
     await createBuild(spec);
     router.push("/builds");
@@ -81,6 +84,14 @@ const submit = async () => {
       <label style="margin-top:12px">Users <span v-if="!advanced" class="muted">— paid tier</span>
         <span v-else class="muted">(space/comma separated; each added to wheel)</span></label>
       <input v-model="usersText" :disabled="!advanced" placeholder="alice bob" />
+    </div>
+
+    <div :class="{ gated: !premium }" style="margin-top:8px">
+      <label>Custom NixOS module <span v-if="!premium" class="muted">— premium</span>
+        <span v-else class="muted">(raw module config; sandboxed, validated server-side)</span></label>
+      <textarea v-model="moduleSnippet" :disabled="!premium" rows="4"
+        placeholder="services.tailscale.enable = true;
+boot.kernelParams = [ &quot;quiet&quot; ];"></textarea>
     </div>
 
     <div style="margin-top:18px">

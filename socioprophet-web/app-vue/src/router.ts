@@ -6,6 +6,7 @@ const routes = [
   { path: "/login", component: () => import("./views/Login.vue"), meta: { public: true } },
   { path: "/builder", component: () => import("./views/Builder.vue") },
   { path: "/builds", component: () => import("./views/Builds.vue") },
+  { path: "/fleet", component: () => import("./views/Fleet.vue") },
 ];
 
 export const router = createRouter({ history: createWebHistory(), routes });

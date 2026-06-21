@@ -11,6 +11,7 @@ const logout = async () => { await auth.signOut(); router.push("/login"); };
     <strong>SourceOS Builder</strong>
     <router-link to="/builder">Build</router-link>
     <router-link to="/builds">My builds</router-link>
+    <router-link v-if="auth.tier === 'premium'" to="/fleet">Fleet</router-link>
     <span class="sp"></span>
     <span class="pill">{{ auth.tier }} tier</span>
     <span class="muted">{{ auth.user?.email }}</span>
