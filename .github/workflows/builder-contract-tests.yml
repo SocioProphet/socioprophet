@@ -5,6 +5,10 @@
 # fails the PR instead of shipping ad-hoc shapes.
 name: builder-contract-tests
 
+# Least-privilege: this workflow only reads the repo to run the contract test.
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "master" ]
