@@ -11,6 +11,9 @@
         ],
         "docs": [
           "socioprophet-web-dev-env"
+        ],
+        "app": [
+          "socioprophet-builder-dev"
         ]
       }
     },
@@ -21,6 +24,9 @@
         ],
         "docs": [
           "socioprophet-web"
+        ],
+        "app": [
+          "socioprophet-builder"
         ]
       }
     }
