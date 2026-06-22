@@ -1566,10 +1566,10 @@ mri@^1.2.0:
   resolved "https://registry.npmjs.org/mri/-/mri-1.2.0.tgz"
   integrity sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==
 
-nanoid@^3.3.11:
-  version "3.3.11"
-  resolved "https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz"
-  integrity sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==
+nanoid@^3.3.12:
+  version "3.3.15"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.15.tgz#36c490fad8c6e86c824c940dfdde999b69ed4316"
+  integrity sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==
 
 node-addon-api@^7.0.0:
   version "7.1.1"
@@ -1636,12 +1636,12 @@ postcss-value-parser@^4.2.0:
   resolved "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@^8.4.43, postcss@^8.5.10, postcss@^8.5.8:
-  version "8.5.10"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.10.tgz#8992d8c30acf3f12169e7c09514a12fed7e48356"
-  integrity sha512-pMMHxBOZKFU6HgAZ4eyGnwXF/EvPGGqUr0MnZ5+99485wwW41kW91A4LOGxSHhgugZmSChL5AlElNdwlNgcnLQ==
+postcss@^8.4.43, postcss@^8.5.15, postcss@^8.5.8:
+  version "8.5.15"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.15.tgz#d1eaf677a324e9ec02196da2d3fecf4a0b9a735c"
+  integrity sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==
   dependencies:
-    nanoid "^3.3.11"
+    nanoid "^3.3.12"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 
