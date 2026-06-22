@@ -12,21 +12,22 @@ const SPEC_VERSION = "2.0.0";
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 
-const loadSchema = (name: string) =>
-  JSON.parse(fs.readFileSync(path.join(__dirname, "schemas", `${name}.json`), "utf8"));
-
-const validators: Record<string, any> = {
-  BuildRequest: ajv.compile(loadSchema("BuildRequest")),
-  BuildValidationEvidenceBundle: ajv.compile(loadSchema("BuildValidationEvidenceBundle")),
-  OSImage: ajv.compile(loadSchema("OSImage")),
-  CatalogEntry: ajv.compile(loadSchema("CatalogEntry")),
-  NLBootPlan: ajv.compile(loadSchema("NLBootPlan")),
-  DeviceIdentity: ajv.compile(loadSchema("DeviceIdentity")),
-  BootProofRecord: ajv.compile(loadSchema("BootProofRecord")),
-  ContentSpec: ajv.compile(loadSchema("ContentSpec")),
-  ControlNodeProfile: ajv.compile(loadSchema("ControlNodeProfile")),
-  DesktopProfile: ajv.compile(loadSchema("DesktopProfile")),
-};
+// Register EVERY vendored schema with ajv first (so cross-schema $refs like
+// ContentRef resolve), then look up validators by each schema's $id.
+const schemasDir = path.join(__dirname, "schemas");
+const idByName: Record<string, string> = {};
+for (const file of fs.readdirSync(schemasDir).filter((f: string) => f.endsWith(".json"))) {
+  const schema = JSON.parse(fs.readFileSync(path.join(schemasDir, file), "utf8"));
+  if (schema.$id) { ajv.addSchema(schema); idByName[file.replace(/\.json$/, "")] = schema.$id; }
+}
+const validatorNames = [
+  "BuildRequest", "BuildValidationEvidenceBundle", "OSImage", "CatalogEntry",
+  "NLBootPlan", "DeviceIdentity", "BootProofRecord", "ContentSpec",
+  "ControlNodeProfile", "DesktopProfile", "Offer", "WorkOrder",
+  "UsageReceipt", "SettlementEvent",
+];
+const validators: Record<string, any> = {};
+for (const n of validatorNames) validators[n] = ajv.getSchema(idByName[n]);
 
 const RELEASE = "26.11";
 // editions → canonical OSImage hostProfile personas.
@@ -220,8 +221,49 @@ const builderControlNode = () => ({
   },
 });
 
+// ── Fog compute market — builds as billable fog compute ──────────────────────
+
+// The builder's standing FogCompute Offer (it offers build capacity).
+const fogOffer = () => ({
+  id: "urn:srcos:offer:sourceos-builder",
+  type: "Offer",
+  specVersion: SPEC_VERSION,
+  provider: { subjectId: BUILDER_NODE_REF },
+  resources: { cpuCores: 8, memoryBytes: 34359738368, storageBytes: 64424509440 },
+});
+
+// A build job submitted to the fog → WorkOrder (requestor = user, workload = the flavor).
+const workOrder = (buildId: string, uid: string, edition: string) => ({
+  id: `urn:srcos:workorder:${lc(buildId)}`,
+  type: "WorkOrder",
+  specVersion: SPEC_VERSION,
+  requestor: { subjectId: `urn:srcos:user:${uid}` },
+  workload: { image: contentSpecRef(edition) },
+});
+
+// Compute consumed by a finished build → UsageReceipt against its WorkOrder.
+const usageReceipt = (buildId: string, startedAt: string, endedAt: string, cpuSeconds: number) => ({
+  id: `urn:srcos:receipt:usage:${lc(buildId)}`,
+  type: "UsageReceipt",
+  specVersion: SPEC_VERSION,
+  workOrderId: `urn:srcos:workorder:${lc(buildId)}`,
+  provider: { subjectId: BUILDER_NODE_REF },
+  startedAt,
+  endedAt,
+  usage: { cpuSeconds: Math.max(0, Math.round(cpuSeconds)) },
+});
+
+// Maps a usage receipt to a settlement backend (paid/premium billing).
+const settlementEvent = (buildId: string) => ({
+  id: `urn:srcos:settlement:${lc(buildId)}`,
+  type: "SettlementEvent",
+  specVersion: SPEC_VERSION,
+  receiptId: `urn:srcos:receipt:usage:${lc(buildId)}`,
+});
+
 module.exports = {
   validate, buildRequest, evidenceBundle, osImage, catalogEntry,
   deviceIdentity, nlBootPlan, bootProofRecord,
-  contentSpec, desktopProfile, builderControlNode, SPEC_VERSION,
+  contentSpec, desktopProfile, builderControlNode,
+  fogOffer, workOrder, usageReceipt, settlementEvent, SPEC_VERSION,
 };

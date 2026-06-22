@@ -76,6 +76,11 @@ router.post("/", async (req: any, res: any) => {
     }
     await doc.update({ buildRequest });
 
+    // Conform: the build is a fog WorkOrder (billable compute work).
+    const wo = contracts.workOrder(doc.id, uid, spec.edition || "desktop");
+    const woErrors = contracts.validate("WorkOrder", wo);
+    if (!woErrors.length) await doc.update({ workOrder: wo });
+
     try {
       const dispatch = await dispatchBuild(uid, doc.id, spec, tier);
       await doc.update({ status: "dispatched", lane: dispatch.lane });
@@ -112,10 +117,13 @@ router.get("/editions", async (_req: any, res: any) => {
     return out;
   });
   const builder = contracts.builderControlNode();
+  const offer = contracts.fogOffer();
   return res.json({
     editions,
     builderControlNode: builder,
     builderControlNodeErrors: contracts.validate("ControlNodeProfile", builder),
+    fogOffer: offer,
+    fogOfferErrors: contracts.validate("Offer", offer),
   });
 });
 
@@ -163,6 +171,20 @@ router.get("/:id", async (req: any, res: any) => {
       const bundle = contracts.evidenceBundle(req.params.id, edition, ok, artifactRef);
       const be = contracts.validate("BuildValidationEvidenceBundle", bundle);
       if (!be.length) update.evidence = bundle; else errs.push("evidence: " + be.join("; "));
+
+      // Fog usage receipt for the consumed compute (+ settlement for paid/premium).
+      const started = data.createdAt?._seconds ? new Date(data.createdAt._seconds * 1000) : new Date();
+      const endedAt = new Date();
+      const cpuSeconds = (endedAt.getTime() - started.getTime()) / 1000;
+      const receipt = contracts.usageReceipt(req.params.id, started.toISOString(), endedAt.toISOString(), cpuSeconds);
+      const re = contracts.validate("UsageReceipt", receipt);
+      if (!re.length) update.usageReceipt = receipt; else errs.push("usage: " + re.join("; "));
+
+      if (data.tier === "paid" || data.tier === "premium") {
+        const settle = contracts.settlementEvent(req.params.id);
+        const se = contracts.validate("SettlementEvent", settle);
+        if (!se.length) update.settlement = settle; else errs.push("settlement: " + se.join("; "));
+      }
 
       if (errs.length) update.evidenceError = errs.join(" | ");
     }

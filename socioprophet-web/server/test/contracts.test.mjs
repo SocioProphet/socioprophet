@@ -80,5 +80,19 @@ ck("  operator-control-node + podman", bn.hostRole === "operator-control-node" &
 // The evidence bundle's profileRef now resolves to the builder control node.
 ck("evidence profileRef == builder node", ev.profileRef === bn.id);
 
+// Fog compute market — build as billable fog compute.
+const offer = c.fogOffer();
+ck("Offer conformant", c.validate("Offer", offer).length === 0);
+const wo = c.workOrder("Build-7", "user9", "server");
+ck("WorkOrder conformant", c.validate("WorkOrder", wo).length === 0);
+ck("  workload.image = content-spec", wo.workload.image === "urn:srcos:content-spec:sourceos-server");
+const ur = c.usageReceipt("Build-7", "2026-06-22T00:00:00Z", "2026-06-22T00:05:00Z", 300);
+ck("UsageReceipt conformant", c.validate("UsageReceipt", ur).length === 0);
+ck("  workOrderId links the WorkOrder", ur.workOrderId === wo.id);
+const settle = c.settlementEvent("Build-7");
+ck("SettlementEvent conformant", c.validate("SettlementEvent", settle).length === 0);
+ck("  receiptId links the UsageReceipt", settle.receiptId === ur.id);
+ck("bad WorkOrder REJECTED", c.validate("WorkOrder", { id: "urn:srcos:workorder:x", type: "WorkOrder" }).length > 0);
+
 console.log(fail ? `\n${fail} FAILED` : "\nALL CONFORMANCE CHECKS PASSED");
 process.exit(fail ? 1 : 0);

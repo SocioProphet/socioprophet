@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/SettlementEvent.json",
+  "title": "SettlementEvent",
+  "description": "Optional settlement event mapping a UsageReceipt to credits/tokens/escrow outcomes. Pluggable layer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "receiptId"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:settlement:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:settlement:<local-id>"
+    },
+    "type": {
+      "const": "SettlementEvent",
+      "description": "Discriminator constant — always \"SettlementEvent\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "receiptId": {
+      "type": "string",
+      "pattern": "^urn:srcos:receipt:usage:",
+      "description": "UsageReceipt URN."
+    },
+    "amount": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unit": {"type": "string"},
+        "value": {"type": "number"}
+      },
+      "description": "Settled amount (credits/tokens)."
+    },
+    "backend": {
+      "type": ["string", "null"],
+      "description": "Settlement backend identifier (e.g., internal-ledger, iexec, akash, golem)."
+    },
+    "txRef": {
+      "type": ["string", "null"],
+      "description": "Optional settlement transaction reference."
+    }
+  }
+}

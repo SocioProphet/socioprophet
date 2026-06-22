@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/UsageReceipt.json",
+  "title": "UsageReceipt",
+  "description": "FogCompute usage receipt emitted by a worker for a completed work order.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "workOrderId", "provider", "startedAt", "endedAt", "usage"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:receipt:usage:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:receipt:usage:<local-id>"
+    },
+    "type": {
+      "const": "UsageReceipt",
+      "description": "Discriminator constant — always \"UsageReceipt\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "workOrderId": {
+      "type": "string",
+      "pattern": "^urn:srcos:workorder:",
+      "description": "Associated WorkOrder URN."
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subjectId"],
+      "properties": {
+        "subjectId": {"type": "string"},
+        "nodeId": {"type": ["string", "null"]}
+      }
+    },
+    "startedAt": {"type": "string", "format": "date-time"},
+    "endedAt": {"type": "string", "format": "date-time"},
+    "exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {"type": ["integer", "null"]},
+        "status": {"type": ["string", "null"]}
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpuSeconds": {"type": "number", "minimum": 0},
+        "memoryPeakBytes": {"type": "integer", "minimum": 0},
+        "ioReadBytes": {"type": "integer", "minimum": 0},
+        "ioWriteBytes": {"type": "integer", "minimum": 0},
+        "gpuSeconds": {"type": "number", "minimum": 0}
+      },
+      "description": "Metered usage (best-effort, OS-derived)."
+    },
+    "outputs": {
+      "type": "array",
+      "items": {"$ref": "ContentRef.json"},
+      "description": "Output content references produced by the work order."
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "receiptHash": {"type": ["string", "null"]},
+        "signature": {"type": ["string", "null"]}
+      },
+      "description": "Optional receipt hash and signature."
+    }
+  }
+}
