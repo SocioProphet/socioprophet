@@ -42,10 +42,13 @@
   },
   "scripts": {
     "start": "node src/server.ts",
-    "dev": "nodemon src/server.ts"
+    "dev": "nodemon src/server.ts",
+    "test:contracts": "node test/contracts.test.mjs"
   },
   "author": "Will Jones",
   "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^1.4.0",

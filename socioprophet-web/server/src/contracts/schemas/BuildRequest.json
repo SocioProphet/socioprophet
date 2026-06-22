@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/BuildRequest.json",
+  "title": "BuildRequest",
+  "description": "A request to compose a ContentSpec plus zero or more OverlayBundles into one or more output artifacts or bundles.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "contentSpecRef", "outputs", "requestedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:build-request:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:build-request:<local-id>"
+    },
+    "type": {
+      "const": "BuildRequest",
+      "description": "Discriminator constant — always \"BuildRequest\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "contentSpecRef": {
+      "type": "string",
+      "description": "Reference to the ContentSpec being composed."
+    },
+    "overlayRefs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Optional overlay bundle refs to apply during composition."
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["iso", "pxe", "raw", "qcow2", "ami", "bootc", "ostree", "bundle", "docs-export", "other"]
+      },
+      "description": "Requested output artifact surfaces."
+    },
+    "channel": {
+      "type": ["string", "null"],
+      "description": "Optional release channel target such as dev, qa, or prod."
+    },
+    "architecture": {
+      "type": ["string", "null"],
+      "description": "Optional architecture target such as x86_64 or arm64."
+    },
+    "enrollmentProfileRef": {
+      "type": ["string", "null"],
+      "description": "Optional enrollment profile ref for install/runtime consumption."
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Execution-time parameters that do not change the canonical object family."
+    },
+    "requestedBy": {
+      "type": ["string", "null"],
+      "description": "Optional subject or actor ref that requested the build."
+    },
+    "requestedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time when the build request was created."
+    }
+  }
+}

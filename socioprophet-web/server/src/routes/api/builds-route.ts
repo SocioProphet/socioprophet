@@ -6,6 +6,7 @@ export {};
 const express = require("express");
 const { admin } = require("../../middleware/auth");
 const { dispatchBuild, readBuildStatus } = require("../../services/buildOrchestrator");
+const contracts = require("../../contracts");
 
 const router = express.Router();
 const db = () => admin.firestore();
@@ -59,11 +60,21 @@ router.post("/", async (req: any, res: any) => {
     const [ok, result] = validateSpec(req.body?.spec, policy);
     if (!ok) return res.status(400).json({ error: result });
     const spec = result;
+    const target = spec.target === "netboot" ? "netboot" : "iso";
 
     const doc = await db().collection("users").doc(uid).collection("builds").add({
       spec, tier, status: "queued",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    // Conform: persist a canonical sourceos-spec BuildRequest alongside the build.
+    const buildRequest = contracts.buildRequest(doc.id, uid, spec, target);
+    const reqErrors = contracts.validate("BuildRequest", buildRequest);
+    if (reqErrors.length) {
+      await doc.update({ status: "error", error: "BuildRequest not spec-conformant: " + reqErrors.join("; ") });
+      return res.status(500).json({ error: "internal: non-conformant BuildRequest", details: reqErrors });
+    }
+    await doc.update({ buildRequest });
 
     try {
       const dispatch = await dispatchBuild(uid, doc.id, spec, tier);
@@ -102,7 +113,18 @@ router.get("/:id", async (req: any, res: any) => {
   // Reflect live status from the build's GCS status.json.
   const live = await readBuildStatus(uid, req.params.id);
   if (live?.status && live.status !== snap.data()?.status) {
-    await ref.update({ status: live.status, ...(live.artifact ? { artifact: live.artifact } : {}) });
+    const update: any = { status: live.status };
+    if (live.artifact) update.artifact = live.artifact;
+    // On a terminal status, emit a spec-conformant BuildValidationEvidenceBundle
+    // — "validated" now means an evidence record exists, not a bucket glance.
+    if (live.status === "complete" || live.status === "error") {
+      const edition = snap.data()?.spec?.edition || "desktop";
+      const bundle = contracts.evidenceBundle(req.params.id, edition, live.status === "complete", live.artifact || null);
+      const errs = contracts.validate("BuildValidationEvidenceBundle", bundle);
+      if (!errs.length) update.evidence = bundle;
+      else update.evidenceError = errs.join("; ");
+    }
+    await ref.update(update);
   }
   const fresh = await ref.get();
   return res.json({ id: fresh.id, ...fresh.data() });
