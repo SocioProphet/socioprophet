@@ -1,0 +1,47 @@
+{
+  "schema_version": "grlplus-export-snapshot-expectations/0.1",
+  "expectations": {
+    "generated_semantic_contradictory": {
+      "profile": "strategy",
+      "github_issues": {
+        "repo_full_name": "SocioProphet/socioprophet",
+        "items": 5,
+        "first_item": {
+          "title": "[gather_evidence] goal.outcome",
+          "element_id": "goal.outcome",
+          "intervention_category": "gather_evidence",
+          "severity": "medium"
+        }
+      },
+      "ops_queue": {
+        "items": 5,
+        "first_item": {
+          "element_id": "goal.outcome",
+          "intervention": "gather_evidence",
+          "severity": "medium"
+        }
+      }
+    },
+    "generated_semantic_valid": {
+      "profile": "strategy",
+      "github_issues": {
+        "repo_full_name": "SocioProphet/socioprophet",
+        "items": 3,
+        "first_item": {
+          "title": "[add_direct_argument_coverage] goal.launch_viability",
+          "element_id": "goal.launch_viability",
+          "intervention_category": "add_direct_argument_coverage",
+          "severity": "medium"
+        }
+      },
+      "ops_queue": {
+        "items": 3,
+        "first_item": {
+          "element_id": "goal.launch_viability",
+          "intervention": "add_direct_argument_coverage",
+          "severity": "medium"
+        }
+      }
+    }
+  }
+}

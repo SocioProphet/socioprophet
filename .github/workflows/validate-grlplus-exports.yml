@@ -1,0 +1,36 @@
+name: Validate GRLPlus exports
+
+on:
+  pull_request:
+    paths:
+      - 'standards/grlplus/**'
+      - 'scripts/export_grlplus_worklist.py'
+      - 'scripts/export_grlplus_worklist_report.py'
+      - 'scripts/validate_grlplus_exports.py'
+      - 'ci/validate_grlplus_*.sh'
+      - '.github/workflows/validate-grlplus-exports.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'standards/grlplus/**'
+      - 'scripts/export_grlplus_worklist.py'
+      - 'scripts/export_grlplus_worklist_report.py'
+      - 'scripts/validate_grlplus_exports.py'
+      - 'ci/validate_grlplus_*.sh'
+      - '.github/workflows/validate-grlplus-exports.yml'
+
+jobs:
+  validate-grlplus-exports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate all GRLPlus export paths
+        run: bash ci/validate_grlplus_all.sh

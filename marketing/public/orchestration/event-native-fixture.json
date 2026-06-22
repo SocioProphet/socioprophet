@@ -1,0 +1,215 @@
+{
+  "mode": "fixture",
+  "readOnly": true,
+  "generatedFrom": "SocioProphet/prophet-platform/specs/orchestration/world_class_event_loop_demo.py",
+  "demoReport": {
+    "status": "pass",
+    "summary": {
+      "records": 4,
+      "admission": {
+        "total": 4,
+        "admitted": 2,
+        "waiting_for_approval": 1,
+        "blocked": 1,
+        "invalid": 0
+      },
+      "queue_counts": {
+        "pending": 2,
+        "waiting-approval": 1,
+        "blocked": 1,
+        "dead-letter": 0
+      },
+      "sherlock_records": 4
+    },
+    "invariants": {
+      "core_contract_valid": true,
+      "embodied_trace_valid": true,
+      "event_capability_valid": true,
+      "no_high_risk_direct_allow": true,
+      "camera_media_release_denied_by_default": true,
+      "every_reaction_has_idempotency_key": true,
+      "every_reaction_has_receipt_refs": true,
+      "agentplane_no_invalid_admissions": true,
+      "sourceos_replay_is_non_mutating": true,
+      "sherlock_index_covers_all_records": true
+    }
+  },
+  "eventCapabilityRecords": [
+    {
+      "record_id": "record:cool-room-with-fan",
+      "event": {
+        "event_id": "event:sensor:living-room-temp-high",
+        "event_type": "sensor.threshold_crossed",
+        "target_node_id": "node:living-room-fan-01",
+        "payload": {
+          "metric": "temperature_f",
+          "value": 78.4,
+          "threshold": 76,
+          "occupancy": "present"
+        },
+        "causality": {
+          "idempotency_key": "idem:event:sensor:living-room-temp-high:capability:cool-room-with-fan:node:living-room-fan-01:policy-epoch-0",
+          "policy_epoch": "policy-epoch-0"
+        }
+      },
+      "capability": {
+        "capability_id": "capability:cool-room-with-fan",
+        "display_name": "Cool room with fan when hot",
+        "effect_class": "low_risk_actuation",
+        "required_policy_outcome": "allowed"
+      },
+      "reaction": {
+        "reaction_id": "reaction:cool-room-with-fan",
+        "policy_outcome": "allowed",
+        "status": "scheduled"
+      },
+      "admission": "admitted",
+      "queue_state": "pending",
+      "receipt_refs": ["receipt:event:living-room-temp-high", "receipt:policy:allow-cool-living-room"]
+    },
+    {
+      "record_id": "record:observe-package-delivery",
+      "event": {
+        "event_id": "event:camera:package-delivered",
+        "event_type": "camera.semantic_event",
+        "target_node_id": "node:front-door-camera-01",
+        "payload": {
+          "summary": "package delivered",
+          "redaction_class": "metadata_only",
+          "media_retained": false
+        },
+        "causality": {
+          "idempotency_key": "idem:event:camera:package-delivered:capability:observe-camera-semantic-event:node:front-door-camera-01:policy-epoch-0",
+          "policy_epoch": "policy-epoch-0"
+        }
+      },
+      "capability": {
+        "capability_id": "capability:observe-camera-semantic-event",
+        "display_name": "Observe camera semantic event",
+        "effect_class": "observe",
+        "required_policy_outcome": "redacted"
+      },
+      "reaction": {
+        "reaction_id": "reaction:observe-package-delivery",
+        "policy_outcome": "redacted",
+        "status": "scheduled"
+      },
+      "admission": "admitted",
+      "queue_state": "pending",
+      "receipt_refs": ["receipt:event:package-delivered"]
+    },
+    {
+      "record_id": "record:security-arm-needs-approval",
+      "event": {
+        "event_id": "event:agent:propose-arm-security",
+        "event_type": "agent.plan_proposed",
+        "target_node_id": "node:security-system-01",
+        "payload": {
+          "requested_action": "arm_alarm",
+          "approval_token_present": false,
+          "capability_class": "high_risk_actuation"
+        },
+        "causality": {
+          "idempotency_key": "idem:event:agent:propose-arm-security:capability:arm-security-system:node:security-system-01:policy-epoch-0",
+          "policy_epoch": "policy-epoch-0"
+        }
+      },
+      "capability": {
+        "capability_id": "capability:arm-security-system",
+        "display_name": "Arm household security system",
+        "effect_class": "high_risk_actuation",
+        "required_policy_outcome": "requires_approval"
+      },
+      "reaction": {
+        "reaction_id": "reaction:security-arm-needs-approval",
+        "policy_outcome": "requires_approval",
+        "status": "blocked_or_waiting"
+      },
+      "admission": "waiting_for_approval",
+      "queue_state": "waiting-approval",
+      "receipt_refs": ["receipt:agent:propose-arm-security", "receipt:policy:requires-approval-arm-security"]
+    },
+    {
+      "record_id": "record:block-camera-media-release",
+      "event": {
+        "event_id": "event:agent:request-camera-media-release",
+        "event_type": "agent.plan_proposed",
+        "target_node_id": "node:front-door-camera-01",
+        "payload": {
+          "requested_action": "camera_media_release",
+          "capability_class": "high_risk_actuation"
+        },
+        "causality": {
+          "idempotency_key": "idem:event:agent:request-camera-media-release:capability:block-camera-media-release:node:front-door-camera-01:policy-epoch-0",
+          "policy_epoch": "policy-epoch-0"
+        }
+      },
+      "capability": {
+        "capability_id": "capability:block-camera-media-release",
+        "display_name": "Block camera media release",
+        "effect_class": "high_risk_actuation",
+        "required_policy_outcome": "denied"
+      },
+      "reaction": {
+        "reaction_id": "reaction:block-camera-media-release",
+        "policy_outcome": "denied",
+        "status": "blocked_or_waiting"
+      },
+      "admission": "blocked",
+      "queue_state": "blocked",
+      "receipt_refs": ["receipt:policy:deny-camera-media-release"]
+    }
+  ],
+  "sourceosQueue": {
+    "schema": "sourceos.orchestration.event-queue.v0.1",
+    "delivery_mode": "exactly_once_by_idempotency_key",
+    "non_mutating": true,
+    "counts": {
+      "pending": 2,
+      "waiting-approval": 1,
+      "blocked": 1,
+      "dead-letter": 0,
+      "replay": 1
+    }
+  },
+  "agentplaneAdmission": {
+    "schema": "agentplane.event_capability_admission.v0.1",
+    "agentMayExecute": true,
+    "summary": {
+      "total": 4,
+      "admitted": 2,
+      "waiting_for_approval": 1,
+      "blocked": 1,
+      "invalid": 0
+    }
+  },
+  "sherlockIndex": {
+    "schema": "sherlock.event-capability-index.v0.1",
+    "record_count": 4,
+    "source_authority": "Prophet Platform world-class event loop demo"
+  },
+  "embodiedTraceRecords": [
+    {
+      "record_id": "record:track-permanence-book-sofa",
+      "task_family": "track_permanence",
+      "query": "Where was the book?",
+      "target": {
+        "answer_type": "location",
+        "object_id": "book",
+        "value": "sofa",
+        "confidence": 1
+      },
+      "state_assertions": ["book on sofa after final observed placement"]
+    },
+    {
+      "record_id": "record:plan-generation-watch-tv",
+      "task_family": "plan_generation",
+      "query": "How to watch TV?",
+      "target": {
+        "answer_type": "plan",
+        "ordered_actions": ["enter_room:living_room", "sit:sofa", "watch:tv"]
+      },
+      "state_assertions": ["avoid walking to the same room twice", "avoid standing up after sitting without reason"]
+    }
+  ]
+}

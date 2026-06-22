@@ -1,125 +1,142 @@
 # socioprophet-web
 
-This directory contains the **entire SocioProphet web application**, split into a frontend SPA and a backend API. Use this README for operational details; component-level documentation lives in subdirectories.
+This directory contains the SocioProphet web surfaces that currently sit inside the `SocioProphet/socioprophet` integration repository.
 
-## Repository structure
+The active migration direction is **React to Vue**.
 
-| Path | Description |
-| --- | --- |
-| `client/` | React 18 + TypeScript SPA bundled with Webpack. |
-| `server/` | Express server that exposes `/api/feed/rss`. |
-| `scripts/` | Shell helpers used by the root `Makefile`. |
+The canonical product/app shell is:
 
-## Quick start (development)
-
-```bash
-# from /workspace/socioprophet
-make install_web
-make run_web
+```text
+socioprophet-web/client-vue
 ```
 
-### What runs where
+The older React client remains available as a legacy behavioral reference during transition. Do not start new product-shell work in the React client unless a later decision record explicitly reverses this migration direction.
 
-| Service | Default runtime | Notes |
+## Current surface map
+
+| Path | Status | Description |
 | --- | --- | --- |
-| Client | Webpack dev server | Configured in `client/webpack.config.js`. |
-| Server | Express | Entry point: `server/src/server.ts`. |
+| `client-vue/` | canonical product shell | Vue 3 + Vite app/workbench shell for `/map`, domain routes, runtime-adapter surfaces, and future product dashboards. |
+| `client/` | legacy/reference | React 18 + TypeScript SPA bundled with Webpack. Preserve as behavioral/visual reference until Vue parity and deprecation are explicitly accepted. |
+| `server/` | legacy/reference backend | Express server that exposes `/api/feed/rss`; useful as historical/reference API wiring unless separately modernized. |
+| `scripts/` | legacy web helpers | Shell helpers used by earlier root Makefile workflows. Review before reusing for Vue work. |
+| `docs/` | decision and migration records | Placement for app-shell deployment split, GAIA map promotion plan, and mdheller consolidation audit. |
 
-## Environment variables
+## Canonical Vue shell
 
-Create `.env` files in **both** subprojects.
+Use `client-vue/` for new product-shell work.
 
-### Client (`client/.env`)
+```bash
+cd socioprophet-web/client-vue
+npm install
+npm run typecheck
+npm test
+npm run build
+```
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `REACT_PORT` | ✅ | Port for the dev server (`webpack-dev-server`). |
-| `NODE_PORT` | ✅ | Target port for API proxying (`/api`). |
+The scoped CI workflow for this surface is:
 
-### Server (`server/.env`)
+```text
+client-vue-product-build
+```
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `PORT` | ✅ | HTTP port for the Express server. |
+It verifies only the Vue product shell and should not be expanded to Storybook, marketing/docs, or unrelated repo surfaces without a separate decision.
 
-## API overview
+Current route ownership for the Vue shell includes app/workbench routes such as:
 
-The backend exposes one API namespace:
+- `/map`
+- `/news`
+- `/law/*`
+- `/people/*`
+- `/economy/*`
+- `/markets/*`
+- `/weather/*`
+- `/analytics/*`
+
+Additional product-dashboard routes should be added under `client-vue/` only after checking the consolidation audit and preserving read-only/mock-boundary posture where backend integration is not yet real.
+
+## React client posture
+
+`client/` is not the future product-shell target.
+
+Keep it available while migrating because it still documents useful historical behavior:
+
+- top domain navigation;
+- secondary tab row;
+- left rail;
+- breadcrumb/stage layout;
+- ticker/feed affordances;
+- older Express API proxy expectations.
+
+Do not delete or relocate the React client until a dedicated deprecation PR proves Vue parity or records the remaining intentional gaps.
+
+## Server posture
+
+`server/` exposes the historical Express RSS endpoint:
 
 - `GET /api/feed/rss`
-  - Returns a JSON array of items: `{ title, link }`.
-  - Sourced from `https://hnrss.org/newest` (Hacker News RSS).
-  - Cached for **10 minutes** in-memory using `node-cache`.
+  - returns a JSON array of items: `{ title, link }`;
+  - historically sourced from `https://hnrss.org/newest`;
+  - cached in memory.
 
-The client fetches this endpoint in the ticker banner (`client/src/components/tickerFeed`).
+The current Vue product shell should not assume this server is the canonical backend for future product surfaces. Backend/runtime contracts belong in the owning subsystem repos unless this repo is only rendering fixture-backed or evidence-backed state.
 
-## Development workflows
+## Migration and retirement records
 
-### Install dependencies
+Start with these records before moving additional work:
+
+- `docs/MDHELLER_SOCIOPROPHET_WEB_CONSOLIDATION_AUDIT.md`
+- `docs/GAIA_MAP_VUE_SHELL_PROMOTION_PLAN.md`
+- `docs/CLIENT_VUE_DEPLOYMENT_SPLIT.md`
+- `client-vue/README.md`
+
+The consolidation audit is the control ledger for retiring `mdheller/socioprophet-web` as an active staging repo. It classifies source work as already promoted, replay-needed, superseded, reference-only, or do-not-transfer.
+
+## Development guidance
+
+For Vue product work:
 
 ```bash
-cd scripts
-bash install_web.sh
+cd socioprophet-web/client-vue
+cp .env.example .env.local
+npm install
+npm run dev
 ```
 
-### Run client + server together
+For React legacy reference only:
 
 ```bash
-cd scripts
-bash run_web.sh
-```
-
-### Run projects individually
-
-```bash
-cd client
+cd socioprophet-web/client
 cp .env.example .env
-# set REACT_PORT and NODE_PORT
-
-yarn
-
-yarn start
+# set REACT_PORT and NODE_PORT if running the old shell
 ```
+
+For the old Express server only:
 
 ```bash
-cd server
+cd socioprophet-web/server
 cp .env.example .env
-# set PORT
-
-yarn
-
-yarn run dev
+# set PORT if running the old server
 ```
 
-## Docker builds
+## Non-goals
 
-Both subprojects include Dockerfiles. They are **not** wired together with a `docker-compose.yml`.
+This README update does not:
 
-### Client container
+- delete or move the React client;
+- change deployment behavior;
+- promote any `mdheller/socioprophet-web` code by itself;
+- authorize real backend/device/runtime authority from mock UI state;
+- make the historical Express RSS server the future app backend.
 
-- Build stage uses `node:18-alpine`, runs `yarn build`.
-- Runtime stage uses `nginx:stable-alpine`.
-- Copies `/build` output to `/usr/share/nginx/html`.
-- Exposes port **80**.
-- The Dockerfile expects an `nginx/nginx.conf` file under the client directory.
+## Placement rule
 
-### Server container
+Use this repository for public web surfaces, app-shell integration, and product-facing evidence/workbench UI. Do not assume it is the canonical home for subsystem-owned schemas, runtime behavior, or backend contracts.
 
-- Uses `node:18-alpine`.
-- Installs dependencies and runs `yarn start`.
-- Exposes whatever `PORT` is configured at runtime.
+As a working rule:
 
-## Where to find detailed documentation
-
-Each directory ships with its own README. Start here:
-
-- `client/README.md`
-- `server/README.md`
-- `scripts/README.md`
-- `client/src/**/README.md`
-- `server/src/**/README.md`
-
-## Notes
-
-- `node_modules/` directories are included in this workspace but are not part of documentation updates.
-- The server uses CommonJS `require` syntax inside TypeScript for consistency; follow the existing patterns unless you explicitly refactor.
+- Vue app/workbench UI -> `socioprophet-web/client-vue`
+- old React behavior -> `socioprophet-web/client` as legacy/reference
+- product-shell migration records -> `socioprophet-web/docs`
+- subsystem runtime/control-plane specifics -> owning subsystem repo
+- marketing/docs/public static site -> existing marketing/docs surface, not `client-vue`

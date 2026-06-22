@@ -1,0 +1,92 @@
+{
+  "active_domain_profile": "strategy",
+  "min_criticality": 0.8,
+  "items": [
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "goal.launch_viability",
+      "criticality": 1.0,
+      "intervention_category": "add_direct_argument_coverage",
+      "reason_codes": [
+        "RC_DIRECT_ARGUMENT_COVERAGE_MISSING",
+        "RC_WIDE_INTERVAL"
+      ],
+      "dependency_targets": [],
+      "cross_actor_dependency_count": 0,
+      "confidence": null,
+      "scalar_signal": 0.3,
+      "interval_low": 0.0,
+      "interval_high": 0.6,
+      "interval_width": 0.6,
+      "suggested_evidence_ask": "Attach direct strategy arguments and evidence links covering goal.launch_viability so propagated support is trace-backed.",
+      "task_payload": {
+        "title": "[add_direct_argument_coverage] goal.launch_viability",
+        "owner": "actor.strategy",
+        "reason_codes": [
+          "RC_DIRECT_ARGUMENT_COVERAGE_MISSING",
+          "RC_WIDE_INTERVAL"
+        ],
+        "dependencies": [],
+        "next_action": "Owner actor.strategy: add trace-linked arguments and evidence directly covering goal.launch_viability, then rerun GRLPlus validation to reduce interval width below warning threshold."
+      }
+    },
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "goal.readiness",
+      "criticality": 0.9,
+      "intervention_category": "add_direct_argument_coverage",
+      "reason_codes": [
+        "RC_DIRECT_ARGUMENT_COVERAGE_MISSING"
+      ],
+      "dependency_targets": [],
+      "cross_actor_dependency_count": 0,
+      "confidence": null,
+      "scalar_signal": 1.0,
+      "interval_low": 1.0,
+      "interval_high": 1.0,
+      "interval_width": 0.0,
+      "suggested_evidence_ask": "Attach direct readiness evidence and rationale covering goal.readiness.",
+      "task_payload": {
+        "title": "[add_direct_argument_coverage] goal.readiness",
+        "owner": "actor.strategy",
+        "reason_codes": [
+          "RC_DIRECT_ARGUMENT_COVERAGE_MISSING"
+        ],
+        "dependencies": [],
+        "next_action": "Owner actor.strategy: add direct trace-linked arguments for goal.readiness so high propagated support is governance-backed."
+      }
+    },
+    {
+      "owner_actor_id": "actor.strategy",
+      "element_id": "goal.optional_reach",
+      "criticality": 0.85,
+      "intervention_category": "add_direct_argument_coverage",
+      "reason_codes": [
+        "RC_DIRECT_ARGUMENT_COVERAGE_MISSING"
+      ],
+      "dependency_targets": [],
+      "cross_actor_dependency_count": 0,
+      "confidence": null,
+      "scalar_signal": 1.0,
+      "interval_low": 1.0,
+      "interval_high": 1.0,
+      "interval_width": 0.0,
+      "suggested_evidence_ask": "Attach optional-reach evidence and rationale covering goal.optional_reach.",
+      "task_payload": {
+        "title": "[add_direct_argument_coverage] goal.optional_reach",
+        "owner": "actor.strategy",
+        "reason_codes": [
+          "RC_DIRECT_ARGUMENT_COVERAGE_MISSING"
+        ],
+        "dependencies": [],
+        "next_action": "Owner actor.strategy: add direct trace-linked arguments for goal.optional_reach to align argument coverage with propagated support."
+      }
+    }
+  ],
+  "summary": {
+    "items": 3,
+    "owners": [
+      "actor.strategy"
+    ]
+  }
+}

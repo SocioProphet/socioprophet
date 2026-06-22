@@ -1,0 +1,29 @@
+diff --git a/socioprophet-web/client/src/routes.js b/socioprophet-web/client/src/routes.js
+index 2c441b8..procyber 100644
+--- a/socioprophet-web/client/src/routes.js
++++ b/socioprophet-web/client/src/routes.js
+@@
+ import Landing from './views/landing/Landing';
+ import Terms from './views/legal/Terms';
+ import Privacy from './views/legal/Privacy';
+ import NotFound from './views/notFound/NotFound';
++import ProCyberneticaDashboard from './views/procyberneticaDashboard/ProCyberneticaDashboard';
+ 
+ const routes = [
+   { path: '/', element: <Landing /> },
++  { path: '/procybernetica', element: <ProCyberneticaDashboard /> },
+   { path: '/terms-of-use', element: <Terms /> },
+   { path: '/privacy-policy', element: <Privacy /> },
+   { path: '*', element: <NotFound /> },
+ ];
+
+diff --git a/socioprophet-web/server/src/server.ts b/socioprophet-web/server/src/server.ts
+index 379e90d..procyber 100644
+--- a/socioprophet-web/server/src/server.ts
++++ b/socioprophet-web/server/src/server.ts
+@@
+ const rssRouter = require('./routes/api/rss-route');
++const proCyberneticaRouter = require('./routes/api/procybernetica-dashboard-route');
+@@
+ app.use('/api/feed', rssRouter);
++app.use('/api/procybernetica', proCyberneticaRouter);

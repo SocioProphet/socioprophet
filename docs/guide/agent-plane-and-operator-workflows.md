@@ -4,6 +4,12 @@ This page is the public manual entry point for the operator workflow layer insid
 
 The Agent Plane explains how work moves from intent to bounded capability, from bounded capability to controlled execution, and from controlled execution to evidence, review, promotion, or reversal.
 
+The Agent Plane also participates in the platform-wide artifact canon: runtime evidence, replay records, promotion/reversal records, capability receipts, knowledge claims, and Entity Analytics proof artifacts are mapped through one shared cross-lane evidence vocabulary.
+
+Primary cross-lane reference:
+
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
+
 ## 1. Purpose
 
 The Agent Plane exists so institutions and operators can understand:
@@ -93,6 +99,7 @@ Relevant references:
 - [Governed AI and Cybernetics](/guide/governed-ai-and-cybernetics)
 - [Deterministic AI and Mathematical Safety](/guide/deterministic-ai-and-mathematical-safety)
 - [Provenance, Promotion, and Reversibility](/guide/provenance-promotion-and-reversibility)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ## 7. Relationship to Entity Analytics
 
@@ -112,6 +119,7 @@ Relevant references:
 - [Entity Analytics Reference](/guide/entity-analytics-reference)
 - [Identity Prime and Event-IR](/guide/identity-prime-and-event-ir)
 - [Worked Example: Michael Cross-Context](/guide/worked-example-michael-cross-context)
+- [Cross-Lane Artifact Canon](/guide/cross-lane-artifact-canon)
 
 ## 8. Relationship to organizations
 

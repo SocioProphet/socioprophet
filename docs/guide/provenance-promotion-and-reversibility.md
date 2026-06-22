@@ -2,6 +2,12 @@
 
 SocioProphet treats provenance, promotion, and reversibility as first-class system properties.
 
+The cross-lane artifact canon defines how runtime artifacts, knowledge claims, Entity Analytics proof artifacts, Capability Fabric receipts, and product-surface evidence share one public vocabulary for decisions, proof, time, and trust.
+
+Primary cross-lane reference:
+
+- [Cross-Lane Artifact Canon](./cross-lane-artifact-canon)
+
 ## 1. Provenance
 
 Every consequential action must be attributable.
@@ -51,6 +57,7 @@ We publish:
 - the logic of proof, promotion, and reversal
 - the fact of witness/quorum governance
 - the evidence and audit model
+- the public artifact vocabulary used to explain consequential transitions
 
 We do not publish:
 
@@ -61,6 +68,7 @@ We do not publish:
 
 ## 6. Related references
 
+- [Cross-Lane Artifact Canon](./cross-lane-artifact-canon)
 - [Deterministic AI and Mathematical Safety](./deterministic-ai-and-mathematical-safety)
 - [Governed AI and Cybernetics](./governed-ai-and-cybernetics)
 - [Authorized Cyberdefense and Simulation](./authorized-cyberdefense-and-simulation)

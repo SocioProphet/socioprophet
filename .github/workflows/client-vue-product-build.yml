@@ -1,0 +1,42 @@
+name: client-vue-product-build
+
+on:
+  pull_request:
+    paths:
+      - 'socioprophet-web/client-vue/**'
+      - '.github/workflows/client-vue-product-build.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'socioprophet-web/client-vue/**'
+      - '.github/workflows/client-vue-product-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  client-vue-product-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: socioprophet-web/client-vue
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run unit and smoke tests
+        run: npm test
+
+      - name: Build Vue shell
+        run: npm run build

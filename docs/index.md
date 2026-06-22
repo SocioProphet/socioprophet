@@ -8,6 +8,7 @@ SocioProphet documentation is organized around learning, governance, operations,
 - [Architecture](/guide/architecture)
 - [Canonical Platform Direction](/guide/canonical-platform-direction)
 - [Surface Inventory](/guide/surface-inventory)
+- [Repo Map](/repo-map)
 
 ## Institutional governance and safety
 
@@ -25,6 +26,7 @@ SocioProphet documentation is organized around learning, governance, operations,
 - [Auth Recovery and Connection Health](/guide/auth-recovery-and-connection-health)
 - [Digital Trust and Capability Routing](/guide/digital-trust-and-capability-routing)
 - [Provider Capability Routing](/guide/provider-capability-routing)
+- [Repo Map and Prophet Understand](/guide/repo-map-prophet-understand)
 
 ## Entity analytics and identity
 
@@ -56,6 +58,7 @@ SocioProphet documentation is organized around learning, governance, operations,
 ## Products
 
 - [Products Overview](/guide/products/overview)
+- [Repo Map and Prophet Understand](/guide/repo-map-prophet-understand)
 - [Academy](/guide/products/academy)
 - [AI](/guide/products/ai)
 - [Cloud](/guide/products/cloud)

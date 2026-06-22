@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event-Native Orchestration Workbench | SocioProphet</title>
+    <meta name="description" content="Read-only event-native orchestration workbench for governed device, agent, policy, queue, admission, search, and evidence flows." />
+    <link rel="icon" href="/icon.png" />
+    <link rel="stylesheet" href="/assets/site.css" />
+    <style>
+      :root {
+        --ink: #0f172a;
+        --muted: #475569;
+        --line: #e2e8f0;
+        --soft: #f8fafc;
+        --panel: #ffffff;
+        --blue: #1d4ed8;
+        --teal: #0f766e;
+        --amber: #b45309;
+        --red: #b91c1c;
+        --purple: #6d28d9;
+      }
+      body { margin: 0; color: var(--ink); background: #ffffff; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      a { color: inherit; }
+      .shell { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+      .topbar { border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 5; }
+      .topbar-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.75rem 0; flex-wrap: wrap; }
+      .brand { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; font-weight: 700; }
+      .brand img { width: 2rem; height: 2rem; }
+      .nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.92rem; color: var(--muted); }
+      .nav a { text-decoration: none; }
+      .nav a:hover { text-decoration: underline; }
+      .hero { padding: 2.5rem 0 1.25rem; }
+      .kicker { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+      h1 { font-size: clamp(2.2rem, 4vw, 4.25rem); line-height: 1.02; margin: 0.7rem 0 1rem; letter-spacing: -0.05em; max-width: 980px; }
+      .lead { color: var(--muted); max-width: 850px; font-size: 1.08rem; line-height: 1.65; }
+      .status-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 1.25rem 0 0; }
+      .pill { border: 1px solid var(--line); border-radius: 999px; padding: 0.5rem 0.75rem; background: white; font-size: 0.85rem; color: var(--muted); }
+      .pill strong { color: var(--ink); }
+      .layout { display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 1rem 0 3rem; }
+      @media (min-width: 1080px) { .layout { grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr); align-items: start; } }
+      .card { border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); box-shadow: 0 1px 2px rgba(15,23,42,0.04); }
+      .card-h { padding: 1rem 1rem 0.65rem; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+      .card-h h2 { margin: 0; font-size: 1.05rem; }
+      .card-b { padding: 1rem; }
+      .grid { display: grid; gap: 1rem; }
+      .metric-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @media (min-width: 720px) { .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      .metric { background: var(--soft); border: 1px solid var(--line); border-radius: 0.85rem; padding: 0.85rem; }
+      .metric .value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.04em; }
+      .metric .label { font-size: 0.78rem; color: var(--muted); }
+      .flow { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+      .flow span { border: 1px solid var(--line); border-radius: 0.65rem; padding: 0.45rem 0.6rem; background: white; font-size: 0.82rem; }
+      .flow b { color: #94a3b8; }
+      .toolbar { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.85rem; }
+      input, select { border: 1px solid #cbd5e1; border-radius: 0.7rem; padding: 0.65rem 0.75rem; font: inherit; background: white; color: var(--ink); }
+      input { flex: 1; min-width: 210px; }
+      .event-list { display: grid; gap: 0.7rem; }
+      .event-row { border: 1px solid var(--line); border-radius: 0.85rem; padding: 0.85rem; background: white; cursor: pointer; transition: border-color .16s ease, box-shadow .16s ease; }
+      .event-row:hover, .event-row.active { border-color: #94a3b8; box-shadow: 0 6px 22px rgba(15,23,42,0.08); }
+      .row-top { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+      .event-title { font-weight: 750; }
+      .event-meta { color: var(--muted); font-size: 0.84rem; margin-top: 0.25rem; word-break: break-word; }
+      .badges { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.65rem; }
+      .badge { border-radius: 999px; padding: 0.22rem 0.55rem; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--line); background: var(--soft); }
+      .allowed, .admitted { color: var(--teal); background: #ecfdf5; border-color: #bbf7d0; }
+      .redacted { color: var(--purple); background: #f5f3ff; border-color: #ddd6fe; }
+      .requires_approval, .waiting-for-approval, .waiting_for_approval { color: var(--amber); background: #fffbeb; border-color: #fde68a; }
+      .denied, .blocked { color: var(--red); background: #fef2f2; border-color: #fecaca; }
+      .queue-grid { display: grid; gap: 0.65rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .queue-card { border: 1px solid var(--line); border-radius: 0.8rem; padding: 0.75rem; background: var(--soft); }
+      .queue-card strong { font-size: 1.45rem; display: block; }
+      .drawer pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #0f172a; color: #e2e8f0; border-radius: 0.85rem; padding: 0.85rem; font-size: 0.78rem; line-height: 1.45; max-height: 420px; overflow: auto; }
+      .trace-list { display: grid; gap: 0.7rem; }
+      .trace { border: 1px solid var(--line); border-radius: 0.85rem; padding: 0.85rem; background: white; }
+      .trace p { margin: 0.4rem 0 0; color: var(--muted); }
+      .notice { border: 1px solid #bfdbfe; background: #eff6ff; color: #1e3a8a; border-radius: 1rem; padding: 1rem; margin-top: 1rem; }
+      .footer { border-top: 1px solid var(--line); padding: 1.5rem 0; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="shell topbar-row">
+        <a class="brand" href="/"><img src="/icon.png" alt="SocioProphet" /> SocioProphet</a>
+        <nav class="nav">
+          <a href="/documentation/guide/event-native-orchestration-workbench/">Docs</a>
+          <a href="/documentation/">Documentation</a>
+          <a href="/map/">Map</a>
+          <a href="/">Home</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero shell">
+        <div class="kicker">Fixture mode • Read-only • Evidence-backed</div>
+        <h1>Event-native orchestration workbench.</h1>
+        <p class="lead">A governed event causality surface for device, home, browser, shell, agent, policy, queue, admission, search, and replay flows. This first slice cannot actuate devices, call providers, collect credentials, or retain camera media.</p>
+        <div id="statusRow" class="status-row"></div>
+        <div class="notice"><strong>Boundary:</strong> every visible action is fixture-backed and non-mutating. High-risk actions render as approval-required or blocked, never as silent execution.</div>
+      </section>
+
+      <section class="shell layout">
+        <div class="grid">
+          <section class="card">
+            <div class="card-h"><h2>Control loop</h2><span class="pill">event membrane</span></div>
+            <div class="card-b flow">
+              <span>event</span><b>→</b><span>subscription</span><b>→</b><span>capability</span><b>→</b><span>policy</span><b>→</b><span>reaction</span><b>→</b><span>SourceOS queue</span><b>→</b><span>AgentPlane admission</span><b>→</b><span>Sherlock index</span>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-h"><h2>Event stream</h2><span id="eventCount" class="pill"></span></div>
+            <div class="card-b">
+              <div class="toolbar">
+                <input id="search" type="search" placeholder="Search events, policy outcomes, receipts…" />
+                <select id="stateFilter">
+                  <option value="all">All states</option>
+                  <option value="pending">Pending</option>
+                  <option value="waiting-approval">Waiting approval</option>
+                  <option value="blocked">Blocked</option>
+                </select>
+              </div>
+              <div id="events" class="event-list"></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-h"><h2>Embodied trace pane</h2><span class="pill">E2WM</span></div>
+            <div class="card-b"><div id="traces" class="trace-list"></div></div>
+          </section>
+        </div>
+
+        <aside class="grid">
+          <section class="card">
+            <div class="card-h"><h2>Demo report</h2><span id="reportStatus" class="pill"></span></div>
+            <div class="card-b"><div id="metrics" class="metric-grid"></div></div>
+          </section>
+
+          <section class="card">
+            <div class="card-h"><h2>SourceOS queue</h2><span class="pill">non-mutating replay</span></div>
+            <div class="card-b"><div id="queue" class="queue-grid"></div></div>
+          </section>
+
+          <section class="card drawer">
+            <div class="card-h"><h2>Evidence drawer</h2><span id="drawerState" class="pill">select an event</span></div>
+            <div class="card-b"><pre id="drawer">No event selected.</pre></div>
+          </section>
+
+          <section class="card">
+            <div class="card-h"><h2>Sherlock index</h2><span class="pill">evidence search</span></div>
+            <div class="card-b" id="sherlock"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="footer"><div class="shell">© <span id="year"></span> SocioProphet • Event-native orchestration fixture surface</div></footer>
+
+    <script>
+      const fmt = (value) => String(value ?? "");
+      const cls = (value) => fmt(value).replaceAll("_", "-");
+      let data = null;
+      let selectedId = null;
+
+      function badge(text, extra) { return `<span class="badge ${cls(extra || text)}">${text}</span>`; }
+      function metric(label, value) { return `<div class="metric"><div class="value">${value}</div><div class="label">${label}</div></div>`; }
+
+      function renderStatus() {
+        const row = document.getElementById("statusRow");
+        row.innerHTML = [
+          `<span class="pill"><strong>Mode</strong> ${data.mode}</span>`,
+          `<span class="pill"><strong>Read-only</strong> ${data.readOnly ? "yes" : "no"}</span>`,
+          `<span class="pill"><strong>Status</strong> ${data.demoReport.status}</span>`,
+          `<span class="pill"><strong>Records</strong> ${data.eventCapabilityRecords.length}</span>`
+        ].join("");
+        document.getElementById("reportStatus").textContent = data.demoReport.status;
+        document.getElementById("reportStatus").className = "pill allowed";
+      }
+
+      function renderMetrics() {
+        const s = data.demoReport.summary;
+        document.getElementById("metrics").innerHTML = [
+          metric("records", s.records),
+          metric("admitted", s.admission.admitted),
+          metric("waiting", s.admission.waiting_for_approval),
+          metric("blocked", s.admission.blocked)
+        ].join("");
+      }
+
+      function renderQueue() {
+        const counts = data.sourceosQueue.counts;
+        document.getElementById("queue").innerHTML = Object.entries(counts).map(([state, count]) => `
+          <div class="queue-card">
+            <strong>${count}</strong>
+            <span>${state}</span>
+          </div>
+        `).join("");
+      }
+
+      function eventText(record) {
+        return [
+          record.record_id,
+          record.event.event_id,
+          record.event.event_type,
+          record.event.target_node_id,
+          record.capability.capability_id,
+          record.capability.display_name,
+          record.capability.effect_class,
+          record.reaction.policy_outcome,
+          record.admission,
+          record.queue_state,
+          record.receipt_refs.join(" ")
+        ].join(" ").toLowerCase();
+      }
+
+      function renderEvents() {
+        const q = document.getElementById("search").value.toLowerCase().trim();
+        const state = document.getElementById("stateFilter").value;
+        const records = data.eventCapabilityRecords.filter((r) => {
+          const matchesSearch = !q || eventText(r).includes(q);
+          const matchesState = state === "all" || r.queue_state === state;
+          return matchesSearch && matchesState;
+        });
+        document.getElementById("eventCount").textContent = `${records.length} shown`;
+        document.getElementById("events").innerHTML = records.map((r) => `
+          <article class="event-row ${selectedId === r.record_id ? "active" : ""}" data-id="${r.record_id}">
+            <div class="row-top">
+              <div>
+                <div class="event-title">${r.capability.display_name}</div>
+                <div class="event-meta">${r.event.event_id} • ${r.event.event_type}</div>
+              </div>
+              ${badge(r.reaction.policy_outcome, r.reaction.policy_outcome)}
+            </div>
+            <div class="badges">
+              ${badge(r.admission, r.admission)}
+              ${badge(r.queue_state, r.queue_state)}
+              ${badge(r.capability.effect_class, r.capability.effect_class)}
+            </div>
+            <div class="event-meta">target: ${r.event.target_node_id}</div>
+            <div class="event-meta">idempotency: ${r.event.causality.idempotency_key}</div>
+          </article>
+        `).join("");
+        document.querySelectorAll(".event-row").forEach((row) => row.addEventListener("click", () => selectEvent(row.dataset.id)));
+      }
+
+      function selectEvent(id) {
+        selectedId = id;
+        const record = data.eventCapabilityRecords.find((r) => r.record_id === id);
+        document.getElementById("drawerState").textContent = record.queue_state;
+        document.getElementById("drawerState").className = `pill ${cls(record.queue_state)}`;
+        document.getElementById("drawer").textContent = JSON.stringify({
+          record_id: record.record_id,
+          event: record.event,
+          capability: record.capability,
+          reaction: record.reaction,
+          admission: record.admission,
+          queue_state: record.queue_state,
+          receipt_refs: record.receipt_refs,
+          invariant_note: "This fixture does not actuate devices or call providers."
+        }, null, 2);
+        renderEvents();
+      }
+
+      function renderTraces() {
+        document.getElementById("traces").innerHTML = data.embodiedTraceRecords.map((t) => `
+          <article class="trace">
+            ${badge(t.task_family, t.task_family)}
+            <h3>${t.query}</h3>
+            <p><strong>Target:</strong> ${JSON.stringify(t.target)}</p>
+            <p><strong>Assertions:</strong> ${t.state_assertions.join("; ")}</p>
+          </article>
+        `).join("");
+      }
+
+      function renderSherlock() {
+        document.getElementById("sherlock").innerHTML = `
+          <p><strong>${data.sherlockIndex.record_count}</strong> indexed event-capability records.</p>
+          <p style="color: var(--muted); line-height: 1.55;">Source authority: ${data.sherlockIndex.source_authority}. Search results preserve event id, capability id, policy outcome, idempotency key, policy epoch, and receipt refs.</p>
+        `;
+      }
+
+      async function boot() {
+        document.getElementById("year").textContent = new Date().getFullYear();
+        const response = await fetch("/orchestration/event-native-fixture.json", { cache: "no-store" });
+        data = await response.json();
+        renderStatus();
+        renderMetrics();
+        renderQueue();
+        renderEvents();
+        renderTraces();
+        renderSherlock();
+        if (data.eventCapabilityRecords[0]) selectEvent(data.eventCapabilityRecords[0].record_id);
+        document.getElementById("search").addEventListener("input", renderEvents);
+        document.getElementById("stateFilter").addEventListener("change", renderEvents);
+      }
+      boot().catch((err) => { document.getElementById("drawer").textContent = "Failed to load fixture: " + err.message; });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+name: event-orchestration-workbench
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'marketing/public/orchestration/**'
+      - 'docs/guide/event-native-orchestration-workbench.md'
+      - 'docs/orchestration/event-workbench.md'
+      - 'docs/.vitepress/config.ts'
+      - 'scripts/build_event_orchestration_fixture.py'
+      - 'scripts/smoke_build_event_orchestration_fixture.py'
+      - 'scripts/verify_event_orchestration_workbench.py'
+      - '.github/workflows/event-orchestration-workbench.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'marketing/public/orchestration/**'
+      - 'docs/guide/event-native-orchestration-workbench.md'
+      - 'docs/orchestration/event-workbench.md'
+      - 'docs/.vitepress/config.ts'
+      - 'scripts/build_event_orchestration_fixture.py'
+      - 'scripts/smoke_build_event_orchestration_fixture.py'
+      - 'scripts/verify_event_orchestration_workbench.py'
+      - '.github/workflows/event-orchestration-workbench.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Smoke fixture builder
+        run: python scripts/smoke_build_event_orchestration_fixture.py
+
+      - name: Verify event-native orchestration workbench
+        run: python scripts/verify_event_orchestration_workbench.py

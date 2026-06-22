@@ -20,8 +20,10 @@ export default defineConfig({
     nav: [
       { text: "Docs", link: "/" },
       { text: "Getting Started", link: "/guide/getting-started" },
+      { text: "Repo Map", link: "/repo-map" },
       { text: "Governance", link: "/guide/organizations-governance-and-institutional-safety" },
       { text: "Entity Analytics", link: "/guide/entity-analytics-reference" },
+      { text: "Legal Entities", link: "/guide/legal-entity-reference-fabric" },
       { text: "Academy", link: "/guide/academy-policy-index" },
       { text: "Products", link: "/guide/products/overview" },
     ],
@@ -32,7 +34,9 @@ export default defineConfig({
           items: [
             { text: "Getting Started", link: "/guide/getting-started" },
             { text: "Architecture", link: "/guide/architecture" },
+            { text: "Cross-Lane Artifact Canon", link: "/guide/cross-lane-artifact-canon" },
             { text: "Canonical Platform Direction", link: "/guide/canonical-platform-direction" },
+            { text: "Event-Native Orchestration Workbench", link: "/guide/event-native-orchestration-workbench" },
             { text: "Surface Inventory", link: "/guide/surface-inventory" },
             { text: "Desktop Linux Distro Strategy", link: "/guide/desktop-linux-distro-strategy" },
             { text: "Domain Surface", link: "/guide/domain-surface" },
@@ -74,6 +78,8 @@ export default defineConfig({
           items: [
             { text: "Entity Analytics Overview", link: "/guide/entity-analytics-overview" },
             { text: "Entity Analytics Reference", link: "/guide/entity-analytics-reference" },
+            { text: "Cross-Lane Artifact Canon", link: "/guide/cross-lane-artifact-canon" },
+            { text: "Legal Entity Reference Fabric", link: "/guide/legal-entity-reference-fabric" },
             { text: "Entity Graph and Safe Linkage", link: "/guide/entity-graph-and-safe-linkage" },
             { text: "Identity Prime and Event IR", link: "/guide/identity-prime-and-event-ir" },
             { text: "Policy Constrained Merging and Unmerge", link: "/guide/policy-constrained-merging-and-unmerge" },
@@ -101,6 +107,7 @@ export default defineConfig({
           text: "Trust Center",
           items: [
             { text: "Trust Center", link: "/guide/trust-center" },
+            { text: "Cross-Lane Artifact Canon", link: "/guide/cross-lane-artifact-canon" },
             { text: "Reporting and Disclosure", link: "/guide/reporting-and-disclosure" },
             { text: "Deployment Modes and Data Boundaries", link: "/guide/deployment-modes-and-data-boundaries" },
             { text: "System Cards and Assurance", link: "/guide/system-cards-and-assurance" },
@@ -125,6 +132,7 @@ export default defineConfig({
             { text: "Products Overview", link: "/guide/products/overview" },
             { text: "Product Surface Standard", link: "/guide/product-surface-standard" },
             { text: "Product Surface Maturity Matrix", link: "/guide/product-surface-maturity-matrix" },
+            { text: "Repo Map and Prophet Understand", link: "/guide/repo-map-prophet-understand" },
             { text: "Academy", link: "/guide/products/academy" },
             { text: "AI", link: "/guide/products/ai" },
             { text: "Cloud", link: "/guide/products/cloud" },
