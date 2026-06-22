@@ -23,6 +23,9 @@ const validators: Record<string, any> = {
   NLBootPlan: ajv.compile(loadSchema("NLBootPlan")),
   DeviceIdentity: ajv.compile(loadSchema("DeviceIdentity")),
   BootProofRecord: ajv.compile(loadSchema("BootProofRecord")),
+  ContentSpec: ajv.compile(loadSchema("ContentSpec")),
+  ControlNodeProfile: ajv.compile(loadSchema("ControlNodeProfile")),
+  DesktopProfile: ajv.compile(loadSchema("DesktopProfile")),
 };
 
 const RELEASE = "26.11";
@@ -39,9 +42,11 @@ const validate = (schema: string, obj: any): string[] => {
   return v(obj) ? [] : (v.errors || []).map((e: any) => `${e.instancePath || "/"} ${e.message}`);
 };
 
-// editions → canonical refs (ContentSpec / ControlNodeProfile families).
+// editions → canonical ContentSpec ref. The build/validation control node is a
+// single operator-control-node (ControlNodeProfile.hostRole only allows that) —
+// NOT the edition. profileRef points at the builder node, not the flavor.
 const contentSpecRef = (edition: string) => `urn:srcos:content-spec:sourceos-${edition}`;
-const controlNodeRef = (edition: string) => `urn:srcos:control-node:sourceos-${edition}`;
+const BUILDER_NODE_REF = "urn:srcos:control-node:sourceos-builder";
 const outputsFor = (target: string) => (target === "netboot" ? ["pxe"] : ["iso"]);
 
 // Build a spec-conformant BuildRequest from a validated user spec.
@@ -71,7 +76,7 @@ const evidenceBundle = (
   type: "BuildValidationEvidenceBundle",
   specVersion: SPEC_VERSION,
   buildRef: `urn:srcos:build-request:${buildId}`,
-  profileRef: controlNodeRef(edition),
+  profileRef: BUILDER_NODE_REF,
   artifactRefs: artifactRef ? [artifactRef] : [],
   scenarioResults: [
     { scenarioId: "image-build", status: ok ? "passed" : "failed", artifactRef: artifactRef || "urn:srcos:none" },
@@ -173,7 +178,50 @@ const bootProofRecord = (deviceId: string, planRef: string, outcome: string) => 
   bootedAt: new Date().toISOString(),
 });
 
+// ── Edition descriptors (resolve the contentSpecRef / profileRef the builder emits) ──
+
+const EDITION_NAMES: Record<string, string> = {
+  desktop: "SourceOS Desktop (GNOME)", server: "SourceOS Server", edge: "SourceOS Edge",
+};
+
+// Each edition is a canonical ContentSpec of kind os-flavor.
+const contentSpec = (edition: string) => ({
+  id: contentSpecRef(edition),
+  type: "ContentSpec",
+  specVersion: SPEC_VERSION,
+  name: EDITION_NAMES[edition] || `SourceOS ${edition}`,
+  kind: "os-flavor",
+});
+
+// The desktop edition's desktop environment.
+const desktopProfile = (edition: string) => ({
+  id: `urn:srcos:desktop-profile:sourceos-${edition}`,
+  type: "DesktopProfile",
+  specVersion: SPEC_VERSION,
+  desktopEnvironment: "gnome",
+});
+
+// The single operator-control-node that builds + validates images (the profileRef
+// the evidence bundles point at).
+const builderControlNode = () => ({
+  id: BUILDER_NODE_REF,
+  type: "ControlNodeProfile",
+  specVersion: SPEC_VERSION,
+  hostRole: "operator-control-node",
+  hostPlatform: "x86_64-linux",
+  containerRuntime: "podman",
+  // Compute-placement priority: prefer local, then the private GCP lane, then
+  // burst to cloud — mirrors the builder's free/paid build lanes.
+  placementOrder: ["local", "trusted-private", "burst-cloud"],
+  workspace: {
+    configDir: "/etc/sourceos",
+    stateDir: "/var/lib/sourceos",
+    evidenceDir: "/var/lib/sourceos/evidence",
+  },
+});
+
 module.exports = {
   validate, buildRequest, evidenceBundle, osImage, catalogEntry,
-  deviceIdentity, nlBootPlan, bootProofRecord, SPEC_VERSION,
+  deviceIdentity, nlBootPlan, bootProofRecord,
+  contentSpec, desktopProfile, builderControlNode, SPEC_VERSION,
 };

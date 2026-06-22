@@ -97,6 +97,28 @@ router.get("/", async (req: any, res: any) => {
   return res.json({ builds });
 });
 
+// Edition catalog: the canonical ContentSpec (+ DesktopProfile) each edition
+// resolves to, and the builder ControlNodeProfile the evidence bundles cite.
+// Makes contentSpecRef/profileRef resolvable + conformant.
+router.get("/editions", async (_req: any, res: any) => {
+  const editions = ["desktop", "server", "edge"].map((e) => {
+    const cs = contracts.contentSpec(e);
+    const out: any = { edition: e, contentSpec: cs, contentSpecErrors: contracts.validate("ContentSpec", cs) };
+    if (e === "desktop") {
+      const dp = contracts.desktopProfile(e);
+      out.desktopProfile = dp;
+      out.desktopProfileErrors = contracts.validate("DesktopProfile", dp);
+    }
+    return out;
+  });
+  const builder = contracts.builderControlNode();
+  return res.json({
+    editions,
+    builderControlNode: builder,
+    builderControlNodeErrors: contracts.validate("ControlNodeProfile", builder),
+  });
+});
+
 // Caller's tier + what that tier may customize (for UI gating; server still enforces).
 router.get("/whoami", async (req: any, res: any) => {
   const tier = await getTier(req.uid);

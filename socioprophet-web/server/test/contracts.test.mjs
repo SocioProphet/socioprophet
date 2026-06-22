@@ -66,5 +66,19 @@ ck("BootProofRecord conformant", c.validate("BootProofRecord", bp).length === 0)
 ck("  outcome success", bp.outcome === "success");
 ck("bad NLBootPlan REJECTED", c.validate("NLBootPlan", { id: "urn:srcos:nlboot-plan:x", type: "NLBootPlan" }).length > 0);
 
+// Edition descriptors — the refs the builder emits must resolve to conformant objects.
+for (const ed of ["desktop", "server", "edge"]) {
+  const cs = c.contentSpec(ed);
+  ck(`ContentSpec(${ed}) conformant`, c.validate("ContentSpec", cs).length === 0);
+  ck(`  os-flavor + content-spec urn`, cs.kind === "os-flavor" && cs.id === `urn:srcos:content-spec:sourceos-${ed}`);
+}
+const dp = c.desktopProfile("desktop");
+ck("DesktopProfile(gnome) conformant", c.validate("DesktopProfile", dp).length === 0);
+const bn = c.builderControlNode();
+ck("builder ControlNodeProfile conformant", c.validate("ControlNodeProfile", bn).length === 0);
+ck("  operator-control-node + podman", bn.hostRole === "operator-control-node" && bn.containerRuntime === "podman");
+// The evidence bundle's profileRef now resolves to the builder control node.
+ck("evidence profileRef == builder node", ev.profileRef === bn.id);
+
 console.log(fail ? `\n${fail} FAILED` : "\nALL CONFORMANCE CHECKS PASSED");
 process.exit(fail ? 1 : 0);
