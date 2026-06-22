@@ -5,6 +5,7 @@ export {};
 // or a TryAgainResponse when nothing is assigned/ready yet.
 const admin = require("firebase-admin");
 const contracts = require("../contracts");
+const { emitEvent } = require("./events");
 const GCS_BUCKET = process.env.SOURCEOS_GCS_BUCKET || "sourceos-artifacts-socioprophet";
 const SIGNED_TTL_MS = 15 * 60 * 1000;
 
@@ -108,6 +109,8 @@ const handleBootProof = async (announce: any) => {
   const errs = contracts.validate("BootProofRecord", proof);
   if (errs.length) return { http: 500, body: { error: "non-conformant BootProofRecord", details: errs } };
   await devRef.collection("bootProofs").add(proof);
+  await emitEvent("srcos.builder.boot.proof", proof.deviceRef, proof.id,
+    { outcome: proof.outcome, bootPlanRef: planRef }, "ops-history");
   return { http: 201, body: { recorded: proof.id, outcome: proof.outcome } };
 };
 

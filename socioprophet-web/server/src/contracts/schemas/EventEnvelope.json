@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/EventEnvelope.json",
+  "title": "EventEnvelope",
+  "description": "The universal wrapper for all AsyncAPI channel messages. Carries event identity, type, actor, target object, typed payload, and optional integrity hashes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "eventType",
+    "specVersion",
+    "occurredAt",
+    "actor",
+    "objectId",
+    "payload"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "pattern": "^urn:srcos:event:",
+      "description": "Stable URN identifier for this event. Pattern: urn:srcos:event:<local-id>"
+    },
+    "eventType": {
+      "type": "string",
+      "description": "Identifies the domain event (e.g. \"DatasetUpserted\", \"RunRecorded\", \"PolicyEvaluated\")."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time when the domain event occurred."
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subjectId"
+      ],
+      "properties": {
+        "subjectId": {
+          "type": "string"
+        },
+        "ip": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "description": "The subject that triggered this event (subjectId URN and optional IP address)."
+    },
+    "objectId": {
+      "type": "string",
+      "description": "URN of the primary object affected by this event."
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "The full domain object payload (typed by `eventType`)."
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "eventHash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "signature": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "description": "Optional integrity envelope: hash of the event payload and/or a cryptographic signature."
+    }
+  }
+}

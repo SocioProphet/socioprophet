@@ -94,5 +94,11 @@ ck("SettlementEvent conformant", c.validate("SettlementEvent", settle).length ==
 ck("  receiptId links the UsageReceipt", settle.receiptId === ur.id);
 ck("bad WorkOrder REJECTED", c.validate("WorkOrder", { id: "urn:srcos:workorder:x", type: "WorkOrder" }).length > 0);
 
+// Event-plane envelopes for the builder lifecycle.
+const evt = c.eventEnvelope("srcos.builder.build.completed", "urn:srcos:user:u9", "urn:srcos:build-request:b7", { status: "complete" });
+ck("EventEnvelope conformant", c.validate("EventEnvelope", evt).length === 0);
+ck("  eventId is event urn + actor.subjectId", /^urn:srcos:event:/.test(evt.eventId) && evt.actor.subjectId === "urn:srcos:user:u9");
+ck("bad EventEnvelope REJECTED", c.validate("EventEnvelope", { eventId: "x", eventType: "y" }).length > 0);
+
 console.log(fail ? `\n${fail} FAILED` : "\nALL CONFORMANCE CHECKS PASSED");
 process.exit(fail ? 1 : 0);

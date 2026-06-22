@@ -7,6 +7,7 @@ const express = require("express");
 const { admin } = require("../../middleware/auth");
 const { dispatchBuild, readBuildStatus } = require("../../services/buildOrchestrator");
 const contracts = require("../../contracts");
+const { emitEvent } = require("../../services/events");
 
 const router = express.Router();
 const db = () => admin.firestore();
@@ -84,6 +85,8 @@ router.post("/", async (req: any, res: any) => {
     try {
       const dispatch = await dispatchBuild(uid, doc.id, spec, tier);
       await doc.update({ status: "dispatched", lane: dispatch.lane });
+      await emitEvent("srcos.builder.build.dispatched", `urn:srcos:user:${uid}`,
+        buildRequest.id, { tier, lane: dispatch.lane, edition: spec.edition }, "fog");
     } catch (err: any) {
       await doc.update({ status: "error", error: String(err?.message || err) });
       return res.status(502).json({ error: "build dispatch failed", buildId: doc.id });
@@ -187,6 +190,11 @@ router.get("/:id", async (req: any, res: any) => {
       }
 
       if (errs.length) update.evidenceError = errs.join(" | ");
+
+      // Emit the terminal lifecycle event onto the planes.
+      await emitEvent(ok ? "srcos.builder.build.completed" : "srcos.builder.build.failed",
+        `urn:srcos:user:${uid}`, `urn:srcos:build-request:${req.params.id}`,
+        { status: live.status, artifactRef, tier: data.tier }, "ops-history");
     }
     await ref.update(update);
   }

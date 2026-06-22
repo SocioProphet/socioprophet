@@ -24,7 +24,7 @@ const validatorNames = [
   "BuildRequest", "BuildValidationEvidenceBundle", "OSImage", "CatalogEntry",
   "NLBootPlan", "DeviceIdentity", "BootProofRecord", "ContentSpec",
   "ControlNodeProfile", "DesktopProfile", "Offer", "WorkOrder",
-  "UsageReceipt", "SettlementEvent",
+  "UsageReceipt", "SettlementEvent", "EventEnvelope",
 ];
 const validators: Record<string, any> = {};
 for (const n of validatorNames) validators[n] = ajv.getSchema(idByName[n]);
@@ -261,9 +261,22 @@ const settlementEvent = (buildId: string) => ({
   receiptId: `urn:srcos:receipt:usage:${lc(buildId)}`,
 });
 
+// A canonical EventEnvelope for the builder's lifecycle on the event planes.
+let _evtSeq = 0;
+const eventEnvelope = (eventType: string, subjectId: string, objectId: string, payload: any = {}) => ({
+  eventId: `urn:srcos:event:${Date.now()}-${_evtSeq++}`,
+  eventType,
+  specVersion: SPEC_VERSION,
+  occurredAt: new Date().toISOString(),
+  actor: { subjectId },
+  objectId,
+  payload,
+});
+
 module.exports = {
   validate, buildRequest, evidenceBundle, osImage, catalogEntry,
   deviceIdentity, nlBootPlan, bootProofRecord,
   contentSpec, desktopProfile, builderControlNode,
-  fogOffer, workOrder, usageReceipt, settlementEvent, SPEC_VERSION,
+  fogOffer, workOrder, usageReceipt, settlementEvent,
+  eventEnvelope, SPEC_VERSION,
 };
