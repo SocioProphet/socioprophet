@@ -34,5 +34,18 @@ ck("  profileRef is control-node urn", /^urn:srcos:control-node:/.test(ev.profil
 const evF = c.evidenceBundle("abc", "server", false, null);
 ck("EvidenceBundle(fail) conformant", c.validate("BuildValidationEvidenceBundle", evF).length === 0);
 
+// OSImage per edition (host-profile mapping) + mixed-case build id → lowercase urn.
+for (const [ed, hp] of [["desktop", "workstation"], ["server", "vm-base"], ["edge", "edge-appliance"]]) {
+  const img = c.osImage("Build-XYZ", ed, { arch: "x86_64", channel: "paid", revision: "abc123" });
+  ck(`OSImage(${ed}) conformant`, c.validate("OSImage", img).length === 0);
+  ck(`  shortId so1-${hp}`, img.shortId === `so1-${hp}`);
+  ck("  id urn is lowercased", img.id === "urn:srcos:osimage:build-xyz");
+}
+const img1 = c.osImage("b1", "server", { arch: "aarch64" });
+const cat = c.catalogEntry("b1", img1.id, true, "urn:srcos:build-evidence:b1");
+ck("CatalogEntry conformant", c.validate("CatalogEntry", cat).length === 0);
+ck("  objectRef = OSImage urn", cat.objectRef === img1.id);
+ck("bad OSImage REJECTED", c.validate("OSImage", { id: "urn:srcos:osimage:x", type: "OSImage" }).length > 0);
+
 console.log(fail ? `\n${fail} FAILED` : "\nALL CONFORMANCE CHECKS PASSED");
 process.exit(fail ? 1 : 0);

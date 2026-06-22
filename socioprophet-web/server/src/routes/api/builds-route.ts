@@ -118,11 +118,31 @@ router.get("/:id", async (req: any, res: any) => {
     // On a terminal status, emit a spec-conformant BuildValidationEvidenceBundle
     // — "validated" now means an evidence record exists, not a bucket glance.
     if (live.status === "complete" || live.status === "error") {
-      const edition = snap.data()?.spec?.edition || "desktop";
-      const bundle = contracts.evidenceBundle(req.params.id, edition, live.status === "complete", live.artifact || null);
-      const errs = contracts.validate("BuildValidationEvidenceBundle", bundle);
-      if (!errs.length) update.evidence = bundle;
-      else update.evidenceError = errs.join("; ");
+      const data = snap.data() || {};
+      const edition = data.spec?.edition || "desktop";
+      const ok = live.status === "complete";
+      const errs: string[] = [];
+
+      // On success of an iso/qcow2 build: emit a conformant OSImage identity +
+      // register it as a CatalogEntry. artifactRefs then point at the OSImage urn.
+      let artifactRef = live.artifact || null;
+      if (ok && (data.spec?.target || "iso") !== "netboot") {
+        const img = contracts.osImage(req.params.id, edition, {
+          arch: data.spec?.arch, channel: data.tier, revision: live.revision,
+        });
+        const ie = contracts.validate("OSImage", img);
+        if (!ie.length) { update.osImage = img; artifactRef = img.id; } else errs.push("OSImage: " + ie.join("; "));
+
+        const cat = contracts.catalogEntry(req.params.id, img.id, true, `urn:srcos:build-evidence:${req.params.id.toLowerCase()}`);
+        const ce = contracts.validate("CatalogEntry", cat);
+        if (!ce.length) update.catalogEntry = cat; else errs.push("CatalogEntry: " + ce.join("; "));
+      }
+
+      const bundle = contracts.evidenceBundle(req.params.id, edition, ok, artifactRef);
+      const be = contracts.validate("BuildValidationEvidenceBundle", bundle);
+      if (!be.length) update.evidence = bundle; else errs.push("evidence: " + be.join("; "));
+
+      if (errs.length) update.evidenceError = errs.join(" | ");
     }
     await ref.update(update);
   }
