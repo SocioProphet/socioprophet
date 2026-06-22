@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/NLBootPlan.json",
+  "title": "NLBootPlan",
+  "description": "An NLBoot boot plan describing the ordered sequence of boot stages, artifact references, and verification policy for a target device.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "specVersion",
+    "targetDeviceRef",
+    "platform",
+    "status",
+    "stages",
+    "createdAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:nlboot-plan:[A-Za-z0-9._~-]+$",
+      "description": "Stable URN identifier. Pattern: urn:srcos:nlboot-plan:<local-id>"
+    },
+    "type": {
+      "const": "NLBootPlan",
+      "description": "Discriminator constant — always \"NLBootPlan\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "targetDeviceRef": {
+      "type": "string",
+      "description": "URN reference to the physical device or asset this plan targets."
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "apple-silicon-asahi",
+        "generic-uefi",
+        "generic-bios"
+      ],
+      "description": "Target platform type that determines bootloader selection and stage ordering."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "superseded",
+        "revoked"
+      ],
+      "description": "Lifecycle state of the boot plan."
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered list of boot stages that must be executed to complete the boot sequence.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "artifactRef",
+          "contentHash"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable stage name, e.g. \"m1n1\", \"u-boot\", \"kernel\"."
+          },
+          "artifactRef": {
+            "type": "string",
+            "description": "URN reference to the stage artifact in the artifact cache or release set."
+          },
+          "contentHash": {
+            "type": "string",
+            "description": "Content-addressed digest of the stage artifact, e.g. \"sha256:...\"."
+          },
+          "verificationRequired": {
+            "type": "boolean",
+            "description": "When true, the boot executor must verify the digest before executing this stage."
+          },
+          "notes": {
+            "type": ["string", "null"],
+            "description": "Optional human-readable notes for this stage."
+          }
+        }
+      }
+    },
+    "bootReleaseSetRef": {
+      "type": ["string", "null"],
+      "description": "Optional URN reference to the BootReleaseSet that sourced the artifacts for this plan."
+    },
+    "policyRef": {
+      "type": ["string", "null"],
+      "description": "Optional URN reference to the policy that governs execution of this boot plan."
+    },
+    "activatedAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 date-time when this plan was activated on the target device."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time when this boot plan was created."
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable notes about this boot plan."
+    }
+  }
+}

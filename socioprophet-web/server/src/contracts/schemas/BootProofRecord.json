@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/BootProofRecord.json",
+  "title": "BootProofRecord",
+  "description": "An immutable record proving the integrity and outcome of an NLBoot boot execution, linking the boot plan, per-stage evidence, and attestation refs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "specVersion",
+    "bootPlanRef",
+    "deviceRef",
+    "outcome",
+    "bootedAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:boot-proof:[A-Za-z0-9._~-]+$",
+      "description": "Stable URN identifier. Pattern: urn:srcos:boot-proof:<local-id>"
+    },
+    "type": {
+      "const": "BootProofRecord",
+      "description": "Discriminator constant — always \"BootProofRecord\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "bootPlanRef": {
+      "type": "string",
+      "description": "URN reference to the NLBootPlan that was executed."
+    },
+    "deviceRef": {
+      "type": "string",
+      "description": "URN reference to the physical device or asset on which the boot occurred."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failure",
+        "aborted"
+      ],
+      "description": "Overall outcome of the boot execution."
+    },
+    "bootedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time when the boot was initiated."
+    },
+    "stageProofs": {
+      "type": "array",
+      "description": "Per-stage proof items recording the artifact executed and verification verdict for each stage.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stageName",
+          "artifactRef",
+          "contentHash",
+          "verdict"
+        ],
+        "properties": {
+          "stageName": {
+            "type": "string",
+            "description": "Name of the boot stage, matching the stage name in the referenced NLBootPlan."
+          },
+          "artifactRef": {
+            "type": "string",
+            "description": "URN reference to the artifact that was loaded for this stage."
+          },
+          "contentHash": {
+            "type": "string",
+            "description": "Actual content digest observed at execution time, e.g. \"sha256:...\"."
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "skipped",
+              "failed",
+              "tampered"
+            ],
+            "description": "Verification verdict for this stage."
+          },
+          "notes": {
+            "type": ["string", "null"],
+            "description": "Optional diagnostic notes for this stage."
+          }
+        }
+      }
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URN references to AttestationEvidence objects captured during this boot."
+    },
+    "policyDecisionRef": {
+      "type": ["string", "null"],
+      "description": "Optional URN reference to the PolicyDecision that authorized this boot."
+    },
+    "signature": {
+      "type": ["string", "null"],
+      "description": "Optional cryptographic signature over the serialized proof record."
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable notes about this boot proof."
+    }
+  }
+}

@@ -47,5 +47,24 @@ ck("CatalogEntry conformant", c.validate("CatalogEntry", cat).length === 0);
 ck("  objectRef = OSImage urn", cat.objectRef === img1.id);
 ck("bad OSImage REJECTED", c.validate("OSImage", { id: "urn:srcos:osimage:x", type: "OSImage" }).length > 0);
 
+// Boot / fleet contracts.
+const di = c.deviceIdentity("Dev-1", "rack-01", "user9");
+ck("DeviceIdentity conformant", c.validate("DeviceIdentity", di).length === 0);
+ck("  trustLevel provisional", di.trustProfile.trustLevel === "provisional");
+ck("  id lowercased urn", di.id === "urn:srcos:device-identity:dev-1");
+
+const plan = c.nlBootPlan("dev1", "build7", [
+  { name: "kernel", artifactRef: "https://x/kernel", contentHash: "sha256:aa" },
+  { name: "initramfs", artifactRef: "https://x/initrd", contentHash: "sha256:bb" },
+]);
+ck("NLBootPlan conformant", c.validate("NLBootPlan", plan).length === 0);
+ck("  platform generic-uefi", plan.platform === "generic-uefi");
+ck("  2 stages", plan.stages.length === 2 && plan.stages[0].name === "kernel");
+
+const bp = c.bootProofRecord("dev1", plan.id, "success");
+ck("BootProofRecord conformant", c.validate("BootProofRecord", bp).length === 0);
+ck("  outcome success", bp.outcome === "success");
+ck("bad NLBootPlan REJECTED", c.validate("NLBootPlan", { id: "urn:srcos:nlboot-plan:x", type: "NLBootPlan" }).length > 0);
+
 console.log(fail ? `\n${fail} FAILED` : "\nALL CONFORMANCE CHECKS PASSED");
 process.exit(fail ? 1 : 0);

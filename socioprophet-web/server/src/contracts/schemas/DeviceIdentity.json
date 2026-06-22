@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/DeviceIdentity.json",
+  "title": "DeviceIdentity",
+  "description": "Device identity and trust profile for a SourceOS local-first workstation or operator device. Governs admission, attestation, capability assignment, and local data plane access.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "specVersion",
+    "deviceName",
+    "platform",
+    "trustProfile",
+    "registeredAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:device-identity:",
+      "description": "Stable device identity URN. Must be unique per device."
+    },
+    "type": { "const": "DeviceIdentity" },
+    "specVersion": { "type": "string" },
+    "deviceName": {
+      "type": "string",
+      "description": "Human-readable device name. Must not include raw network addresses or PII."
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["linux", "macos", "windows", "other"],
+      "description": "Host platform type."
+    },
+    "archClass": {
+      "type": ["string", "null"],
+      "enum": ["x86_64", "aarch64", "apple-silicon", "riscv64", "other", null],
+      "description": "CPU architecture class."
+    },
+    "trustProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trustLevel"],
+      "description": "Device trust posture evaluated at registration or last attestation.",
+      "properties": {
+        "trustLevel": {
+          "type": "string",
+          "enum": ["untrusted", "provisional", "trusted", "anchor"],
+          "description": "untrusted = not admitted; provisional = limited policy scope; trusted = full local data plane; anchor = quorum-eligible trust root."
+        },
+        "enrolledAt": { "type": ["string", "null"], "format": "date-time" },
+        "lastAttestedAt": { "type": ["string", "null"], "format": "date-time" },
+        "enrollmentRef": {
+          "type": ["string", "null"],
+          "description": "EnrollmentProfile URN governing this device's admission."
+        },
+        "attestationRefs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "AttestationEvidence URNs supporting the current trust level."
+        },
+        "trustExpiresAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Optional expiry for time-bounded trust grants."
+        },
+        "trustRevocationRef": {
+          "type": ["string", "null"],
+          "description": "RevocationEntry URN if trust has been revoked."
+        }
+      }
+    },
+    "capabilityProfileRef": {
+      "type": ["string", "null"],
+      "pattern": "^urn:srcos:workspace-capability-profile:",
+      "description": "WorkspaceCapabilityProfile URN describing surfaces available on this device."
+    },
+    "encryptionProfileRef": {
+      "type": ["string", "null"],
+      "pattern": "^urn:srcos:local-encryption-profile:",
+      "description": "LocalEncryptionProfile URN for this device's local data encryption posture."
+    },
+    "ownerRef": {
+      "type": ["string", "null"],
+      "description": "Subject or org authority reference for device ownership."
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policyDecisionRefs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    }
+  }
+}

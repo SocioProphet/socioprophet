@@ -6,6 +6,7 @@ export {};
 const express = require("express");
 const crypto = require("crypto");
 const { admin } = require("../../middleware/auth");
+const contracts = require("../../contracts");
 
 const router = express.Router();
 const db = () => admin.firestore();
@@ -30,14 +31,19 @@ router.post("/devices", async (req: any, res: any) => {
   const claim = crypto.randomBytes(18).toString("base64url");
 
   const devRef = db().collection("users").doc(uid).collection("devices").doc();
+  // Conform: a registered device is a canonical DeviceIdentity.
+  const identity = contracts.deviceIdentity(devRef.id, name, uid);
+  const idErrors = contracts.validate("DeviceIdentity", identity);
+  if (idErrors.length) return res.status(500).json({ error: "non-conformant DeviceIdentity", details: idErrors });
+
   await devRef.set({
-    name, claimCode: claim, assignedBuildId: null,
+    name, claimCode: claim, assignedBuildId: null, identity,
     createdAt: admin.firestore.FieldValue.serverTimestamp(), lastSeen: null,
   });
   // Top-level index the unauth /boot/announce resolves against.
   await db().collection("device_claims").doc(claim).set({ uid, deviceId: devRef.id });
 
-  return res.status(201).json({ deviceId: devRef.id, name, claimCode: claim });
+  return res.status(201).json({ deviceId: devRef.id, name, claimCode: claim, identityRef: identity.id });
 });
 
 router.get("/devices", async (req: any, res: any) => {

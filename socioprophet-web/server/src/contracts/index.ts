@@ -20,6 +20,9 @@ const validators: Record<string, any> = {
   BuildValidationEvidenceBundle: ajv.compile(loadSchema("BuildValidationEvidenceBundle")),
   OSImage: ajv.compile(loadSchema("OSImage")),
   CatalogEntry: ajv.compile(loadSchema("CatalogEntry")),
+  NLBootPlan: ajv.compile(loadSchema("NLBootPlan")),
+  DeviceIdentity: ajv.compile(loadSchema("DeviceIdentity")),
+  BootProofRecord: ajv.compile(loadSchema("BootProofRecord")),
 };
 
 const RELEASE = "26.11";
@@ -125,4 +128,52 @@ const catalogEntry = (buildId: string, osImageUrn: string, published: boolean, e
   updatedAt: new Date().toISOString(),
 });
 
-module.exports = { validate, buildRequest, evidenceBundle, osImage, catalogEntry, SPEC_VERSION };
+// ── Boot / fleet contracts ───────────────────────────────────────────────────
+
+// A registered fleet device → conformant DeviceIdentity.
+const deviceIdentity = (deviceId: string, name: string, uid: string) => ({
+  id: `urn:srcos:device-identity:${lc(deviceId)}`,
+  type: "DeviceIdentity",
+  specVersion: SPEC_VERSION,
+  deviceName: name,
+  platform: "linux",
+  archClass: "x86_64",
+  trustProfile: { trustLevel: "provisional", enrolledAt: new Date().toISOString() },
+  ownerRef: `urn:srcos:user:${uid}`,
+  registeredAt: new Date().toISOString(),
+});
+
+// The server-managed boot plan a device receives → conformant NLBootPlan.
+// `stages` = [{name, artifactRef, contentHash}] derived from the netboot manifest.
+const nlBootPlan = (deviceId: string, buildId: string, stages: any[]) => ({
+  id: `urn:srcos:nlboot-plan:${lc(buildId)}-${lc(deviceId)}`,
+  type: "NLBootPlan",
+  specVersion: SPEC_VERSION,
+  targetDeviceRef: `urn:srcos:device-identity:${lc(deviceId)}`,
+  platform: "generic-uefi",
+  status: "active",
+  stages: stages.map((s) => ({
+    name: s.name,
+    artifactRef: s.artifactRef,
+    contentHash: s.contentHash,
+    verificationRequired: true,
+  })),
+  bootReleaseSetRef: `urn:srcos:catalog-entry:${lc(buildId)}`,
+  createdAt: new Date().toISOString(),
+});
+
+// Evidence that a device booted a plan → conformant BootProofRecord.
+const bootProofRecord = (deviceId: string, planRef: string, outcome: string) => ({
+  id: `urn:srcos:boot-proof:${lc(deviceId)}-${Date.now()}`,
+  type: "BootProofRecord",
+  specVersion: SPEC_VERSION,
+  bootPlanRef: planRef,
+  deviceRef: `urn:srcos:device-identity:${lc(deviceId)}`,
+  outcome: ["success", "partial", "failure", "aborted"].includes(outcome) ? outcome : "failure",
+  bootedAt: new Date().toISOString(),
+});
+
+module.exports = {
+  validate, buildRequest, evidenceBundle, osImage, catalogEntry,
+  deviceIdentity, nlBootPlan, bootProofRecord, SPEC_VERSION,
+};
