@@ -1,0 +1,113 @@
+openapi: 3.1.0
+info:
+  title: SourceOS self-serve image builder API
+  version: "2.0.0"
+  description: >
+    Authenticated image-builder + nlboot fleet + boot provisioning endpoints.
+    Request/response objects conform to canonical sourceos-spec schemas
+    (referenced by their $id). Conformance is enforced by the builder contract
+    test (npm run test:contracts) and builder-contract-tests CI.
+servers:
+  - url: /
+tags: [{ name: builds }, { name: fleet }, { name: boot }]
+
+paths:
+  /api/builds:
+    post:
+      tags: [builds]
+      summary: Submit a build (persists a BuildRequest + WorkOrder, dispatches by tier)
+      security: [{ firebaseIdToken: [] }]
+      responses:
+        "201": { description: Dispatched; returns the buildId. }
+        "400": { description: Spec not allowed by tier policy. }
+        "429": { description: Daily build limit reached. }
+    get:
+      tags: [builds]
+      summary: List the caller's builds
+      security: [{ firebaseIdToken: [] }]
+      responses: { "200": { description: Builds list. } }
+  /api/builds/{id}:
+    get:
+      tags: [builds]
+      summary: One build + live status; on completion emits OSImage, CatalogEntry, evidence, UsageReceipt
+      security: [{ firebaseIdToken: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses:
+        "200":
+          description: Build with conformant artifacts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  buildRequest: { $ref: "https://schemas.srcos.ai/v2/BuildRequest.json" }
+                  osImage: { $ref: "https://schemas.srcos.ai/v2/OSImage.json" }
+                  catalogEntry: { $ref: "urn:srcos:schema:CatalogEntry" }
+                  evidence: { $ref: "https://schemas.srcos.ai/v2/BuildValidationEvidenceBundle.json" }
+                  usageReceipt: { $ref: "https://schemas.srcos.ai/v2/UsageReceipt.json" }
+        "404": { description: Not found. }
+  /api/builds/editions:
+    get:
+      tags: [builds]
+      summary: Edition descriptors (ContentSpec/DesktopProfile) + builder ControlNodeProfile + fog Offer
+      responses: { "200": { description: Validated edition + builder descriptors. } }
+  /api/builds/whoami:
+    get:
+      tags: [builds]
+      summary: Caller tier + policy
+      security: [{ firebaseIdToken: [] }]
+      responses: { "200": { description: tier + policy. } }
+
+  /api/fleet/devices:
+    post:
+      tags: [fleet]
+      summary: Register a device (emits a DeviceIdentity) and return its claim code
+      security: [{ firebaseIdToken: [] }]
+      responses:
+        "201": { description: deviceId + claimCode + DeviceIdentity ref. }
+        "403": { description: Fleet is premium-only. }
+    get:
+      tags: [fleet]
+      summary: List the caller's devices
+      security: [{ firebaseIdToken: [] }]
+      responses: { "200": { description: Devices. } }
+  /api/fleet/devices/{id}/assign:
+    post:
+      tags: [fleet]
+      summary: Assign a completed build to a device
+      security: [{ firebaseIdToken: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: Assigned. } }
+
+  /boot/announce:
+    post:
+      tags: [boot]
+      summary: nlboot device announcement (claim-code authorized; UNAUTHENTICATED)
+      description: >
+        Resolves the device by claim code, builds a canonical NLBootPlan from the
+        assigned build, and returns the wire-shape nlboot.BootInstructions derived
+        from it, or a TryAgainResponse.
+      responses:
+        "200": { description: BootInstructions or TryAgainResponse. }
+        "403": { description: Unknown claim code. }
+  /boot/proof:
+    post:
+      tags: [boot]
+      summary: Device reports a boot outcome (records a BootProofRecord)
+      responses:
+        "201": { description: BootProofRecord recorded. }
+        "403": { description: Unknown claim code. }
+
+components:
+  securitySchemes:
+    firebaseIdToken:
+      type: http
+      scheme: bearer
+      bearerFormat: Firebase ID token
+  schemas:
+    BuildRequest: { $ref: "https://schemas.srcos.ai/v2/BuildRequest.json" }
+    OSImage: { $ref: "https://schemas.srcos.ai/v2/OSImage.json" }
+    NLBootPlan: { $ref: "https://schemas.srcos.ai/v2/NLBootPlan.json" }
+    DeviceIdentity: { $ref: "https://schemas.srcos.ai/v2/DeviceIdentity.json" }
+    WorkOrder: { $ref: "https://schemas.srcos.ai/v2/WorkOrder.json" }
+    UsageReceipt: { $ref: "https://schemas.srcos.ai/v2/UsageReceipt.json" }
