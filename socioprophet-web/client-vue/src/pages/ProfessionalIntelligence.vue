@@ -21,6 +21,49 @@
       :message="`${state.metrics.length} metrics, ${state.gates.length} gates, and ${state.gatedActions.length} disabled gated actions are loaded from fixture state. No live telemetry, writeback, or execution authority is active.`"
     />
 
+    <section v-if="superiority" class="pi-card pi-superiority" aria-label="Comparative intelligence benchmark">
+      <div class="pi-section-head">
+        <div>
+          <h2>Comparative intelligence benchmark</h2>
+          <p>{{ superiority.reproduced_fact_count }} reproduced-by-us · {{ superiority.cited_fact_count }} cited (unverified)</p>
+        </div>
+        <ModeBadge
+          :label="superiorityMode === 'live' ? 'live · dashboard-bff' : 'fixture'"
+          :tone="superiorityMode === 'live' ? 'success' : 'warning'"
+        />
+      </div>
+
+      <p class="pi-headline">{{ superiority.headline_claim }}</p>
+
+      <div class="pi-xwalk">
+        <article v-for="m in superiority.metrics" :key="m.metric_definition_id" class="pi-metric-block">
+          <div class="pi-metric-block-head">
+            <strong>{{ m.metric_name }}</strong>
+            <ModeBadge
+              v-if="m.comparison_valid"
+              label="head-to-head"
+              tone="success"
+            />
+          </div>
+          <ul class="pi-fact-list">
+            <li v-for="f in m.ours" :key="`${f.model_release_id}-${f.scenario_id}`" class="pi-fact pi-fact--ours">
+              <ModeBadge label="reproduced" tone="success" />
+              <span class="pi-fact-model">{{ f.model_release_id }}</span>
+              <strong class="pi-fact-val">{{ fmtPct(f.value_scalar) }}</strong>
+              <span v-if="f.sample_n" class="pi-fact-n">n={{ f.sample_n }}</span>
+            </li>
+            <li v-for="f in m.cited" :key="`${f.provider_id}-${f.model_release_id}`" class="pi-fact pi-fact--cited">
+              <ModeBadge label="cited" tone="muted" />
+              <span class="pi-fact-model">{{ f.provider_id }} / {{ f.model_release_id }}</span>
+              <strong class="pi-fact-val">{{ fmtPct(f.value_scalar) }}</strong>
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="pi-disclaimer"><b>Provenance:</b> {{ superiority.disclaimer }}</p>
+    </section>
+
     <section class="pi-grid pi-grid--metrics" aria-label="Workstream completion">
       <article v-for="metric in state.metrics" :key="metric.name" class="pi-card pi-metric">
         <div class="pi-metric-head">
@@ -143,11 +186,33 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import BoundaryNotice from '../components/BoundaryNotice.vue';
 import GatedActionCard from '../components/GatedActionCard.vue';
 import ModeBadge from '../components/ModeBadge.vue';
 import RouteStatePanel from '../components/RouteStatePanel.vue';
 import { professionalIntelligenceControlState as state } from '../features/professional-intelligence/state';
+import {
+  fetchIntelligenceSuperiorityWithFallback,
+  type IntelligenceSuperiorityResponse,
+  type SuperiorityMode,
+} from '../api/intelligenceSuperiorityApi';
+
+// Live comparative-benchmark section — fronts dashboard-bff /v1/intelligence-superiority. Falls back to a
+// deterministic fixture (mode='fixture') when the backend is absent, so the page always renders the honest
+// reproduced-vs-cited structure. Separate from the fixture control-state above (that's workstream completion).
+const superiority = ref<IntelligenceSuperiorityResponse | null>(null);
+const superiorityMode = ref<SuperiorityMode>('fixture');
+const superiorityError = ref<string | undefined>(undefined);
+
+const fmtPct = (v: number) => `${(v * 100).toFixed(1)}%`;
+
+onMounted(async () => {
+  const result = await fetchIntelligenceSuperiorityWithFallback();
+  superiority.value = result.data;
+  superiorityMode.value = result.mode;
+  superiorityError.value = result.error;
+});
 </script>
 
 <style scoped>
@@ -333,6 +398,80 @@ h2 {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.8rem;
   overflow-wrap: anywhere;
+}
+
+.pi-superiority .pi-headline {
+  margin: 0.6rem 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--accent, #78a9ff);
+  background: rgba(120, 169, 255, 0.08);
+  border-radius: 0 10px 10px 0;
+  line-height: 1.5;
+}
+
+.pi-xwalk {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.pi-metric-block {
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pi-metric-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.pi-fact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pi-fact {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.pi-fact-model {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.pi-fact--cited .pi-fact-model {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.pi-fact-val {
+  font-variant-numeric: tabular-nums;
+}
+
+.pi-fact-n {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.pi-disclaimer {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.5;
 }
 
 @media (max-width: 760px) {
