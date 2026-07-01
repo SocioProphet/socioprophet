@@ -9,6 +9,7 @@ import FeedPage from './pages/FeedPage.vue';
 import Journal from './pages/Journal.vue';
 import MapPage from './pages/MapPage.vue';
 import NLBootEvidence from './pages/NLBootEvidence.vue';
+import PersonGraph from './pages/PersonGraph.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import Reader from './pages/Reader.vue';
 import './styles.css';
@@ -25,6 +26,7 @@ const routes = [
   { path: '/reader', component: Reader },
   { path: '/journal', component: Journal },
   { path: '/code', component: CodeSearch },
+  { path: '/person-graph', component: PersonGraph },
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
   ...mockedSurfaceRoutes,
