@@ -232,6 +232,20 @@ export const routeRegistry: RouteRegistryEntry[] = [
     breadcrumbs: ['Maps & Analytics', 'Analytics'],
     railLabel: '⌁',
   },
+  {
+    path: '/workbench',
+    label: 'Operator Workbench',
+    domain: 'Operator Workbench',
+    maturity: 'L1',
+    stateMode: 'design',
+    navTier: 'top',
+    userJob: 'Navigate the IBM-Carbon operator surfaces (Axonius asset graph, SCOPE-D, Orion, wargames) and the estate/cognitive-systems architecture maps.',
+    ownerPlane: 'client-vue static render-harness (public/workbench); IBM-Carbon fidelity mirror pending native-component migration',
+    boundary: 'Design render-harness mounted in an iframe; no live data or runtime authority.',
+    primaryObject: 'operator surface',
+    breadcrumbs: ['Operator Workbench', 'Surfaces'],
+    railLabel: 'WB',
+  },
 ];
 
 export function routesForNavTier(tier: NavTier): RouteRegistryEntry[] {

@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Saved Queries</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+thead th{text-align:left;padding:11px 14px;background:var(--page);color:var(--ink-dim);font-weight:600;font-size:11.5px;border-bottom:1px solid var(--line)}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--line)}
+tbody tr:hover{background:#fafbfc;cursor:pointer}
+.cbx{width:15px;height:15px;border:1.5px solid var(--line-2);border-radius:4px;display:inline-block}
+.cbx.on{background:var(--blue);border-color:var(--blue)}
+.stepn{background:var(--blue-bg);color:var(--blue);font-family:"Roboto Mono",monospace;font-size:11px;padding:2px 8px;border-radius:6px}
+.mod{background:var(--page);padding:2px 8px;border-radius:5px;font-size:11px;color:var(--ink-dim);margin-right:4px}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item active" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <b>Saved Queries</b></div><div class="sp"></div>
+<button class="btn">⚡ Actions ▾</button><button class="btn">⬆ Import</button></div>
+<div class="wrap" style="max-width:none"><div class="page-h"><h1>Saved Queries</h1><p>Reusable investigation paths. Each carries its investigation-step count and the modules it spans.</p></div>
+<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px">Total <b style="color:var(--ink);font-family:Roboto Mono">9</b> · 2 selected</div>
+<table><thead><tr><th style="width:30px"></th><th style="width:30px"></th><th>Name</th><th>Investigation Steps</th><th>Tags</th><th>Access</th><th>Module</th><th>Created</th></tr></thead><tbody><tr><td><span class="cbx "></span></td><td>☆</td><td style="font-weight:500">All user relationships</td>
+<td><span class="stepn">6</span></td><td></td><td>Public</td><td><span class="mod">Devices</span><span class="mod">Software</span></td><td class="mono" style="color:var(--ink-dim)"></td></tr><tr><td><span class="cbx "></span></td><td>☆</td><td style="font-weight:500">User access crit devs ext IPs</td>
+<td><span class="stepn">6</span></td><td></td><td>Public</td><td><span class="mod">Devices</span><span class="mod">Software</span></td><td class="mono" style="color:var(--ink-dim)"></td></tr><tr><td><span class="cbx on"></span></td><td>★</td><td style="font-weight:500">Domain ctrl w crit vulns</td>
+<td><span class="stepn">6</span></td><td></td><td>Public</td><td><span class="mod">Devices</span><span class="mod">Software</span></td><td class="mono" style="color:var(--ink-dim)">2024-02-11</td></tr><tr><td><span class="cbx "></span></td><td>☆</td><td style="font-weight:500">Non-active paid users</td>
+<td><span class="stepn">2</span></td><td></td><td>Public</td><td><span class="mod">Devices</span></td><td class="mono" style="color:var(--ink-dim)"></td></tr><tr><td><span class="cbx on"></span></td><td>☆</td><td style="font-weight:500">Users with unmanaged extensions</td>
+<td><span class="stepn">2</span></td><td></td><td>Public</td><td><span class="mod">Users</span></td><td class="mono" style="color:var(--ink-dim)">2024-02-11</td></tr></tbody></table>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>a saved query = a reproducible investigation step-stack</span><span style="margin-left:auto" class="mono">a22 · saved-queries</span></div>
+</div></main></div></body></html>

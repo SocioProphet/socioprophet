@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Application Settings — Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.dgrid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pie{width:190px;height:190px}
+.legend2{display:flex;flex-direction:column;gap:8px;font-size:12.5px;justify-content:center}
+.legend2 .r{display:flex;align-items:center;gap:8px}.legend2 .cb{width:14px;height:14px;border-radius:3px}
+.piewrap{display:flex;gap:24px;align-items:center;justify-content:center;padding:10px}
+.stacked .srow{display:grid;grid-template-columns:130px 1fr 34px;align-items:center;gap:10px;padding:6px 0;font-size:12.5px}
+.stacked .srow .bn{color:var(--ink-dim)}
+.stacked .srow .bar{display:flex;height:20px;border-radius:5px;overflow:hidden;gap:1px}
+.stacked .srow .bar i{height:100%}
+.stacked .srow .bv{font-family:"Roboto Mono",monospace;font-size:11px;text-align:right}
+.impactleg{display:flex;gap:16px;font-size:12px;color:var(--ink-dim);margin-top:12px;flex-wrap:wrap}
+.impactleg .r{display:flex;align-items:center;gap:6px}.impactleg .cb{width:13px;height:13px;border-radius:3px}
+.savedfilter{position:absolute;top:64px;right:150px;z-index:20;width:280px;background:var(--card);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 16px 44px rgba(20,30,50,.16);padding:8px}
+.savedfilter .fs{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line-2);border-radius:8px;color:var(--ink-faint);font-size:12px;margin-bottom:6px}
+.savedfilter .fi{padding:9px 11px;border-radius:8px;font-size:12.5px}
+.savedfilter .fi:hover{background:var(--page)}.savedfilter .fi .sub{font-size:11px;color:var(--ink-faint)}
+.savedfilter .fi.sel{background:var(--blue-bg)}.savedfilter .fi.new{color:var(--blue);border-top:1px solid var(--line);border-radius:0;margin-top:4px}
+.qchip{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid var(--line-2);border-radius:7px;background:var(--card);font-size:12px;margin-bottom:14px}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item active" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item " href="activities.html"><span class="ic">≣</span>Activities</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › Dashboards › <b>Application Settings — Grid Test</b></div><div class="sp"></div>
+<button class="btn">⚑ Saved Filters</button><button class="btn">⬒ Add Chart</button><button class="btn">★</button></div>
+<div class="wrap" style="max-width:none">
+<div class="savedfilter"><div class="fs">⌕ Search filters</div><div class="fi"><div>Empty</div><div class="sub">Not used</div></div><div class="fi sel"><div>Western Region ✓</div><div class="sub">Used by 1 user and 0 reports</div></div><div class="fi new">＋ New Filter</div></div>
+<span class="qchip">⬒ Devices: First Seen exists</span>
+<div class="dgrid2">
+<div class="card"><div class="ch"><h3>Properly Configured vs Misconfigured Settings</h3><span>⋮</span></div><div class="cb"><div class="piewrap">
+<svg class="pie" viewBox="0 0 42 42"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#3b3fb6" stroke-width="10" stroke-dasharray="48.7 51.3" transform="rotate(-90 21 21)"/><circle cx="21" cy="21" r="15.9" fill="none" stroke="#c1274f" stroke-width="10" stroke-dasharray="51.3 48.7" stroke-dashoffset="-48.7" transform="rotate(-90 21 21)"/></svg>
+<div class="legend2"><div class="r"><span class="cb" style="background:#c1274f"></span>Misconfigured 178 (51.30%)</div><div class="r"><span class="cb" style="background:#3b3fb6"></span>Properly Configured 169 (48.70%)</div></div>
+</div><div style="text-align:center;color:var(--ink-faint);font-size:11px">Total 347 (2 items)</div></div></div>
+<div class="card"><div class="ch"><h3>Misconfigured Settings per Application</h3><span>⋮</span></div><div class="cb stacked"><div class="srow"><span class="bn">Office365</span><div class="bar"><i style="background:#e5484d;width:80%"></i><i style="background:#f5a623;width:5%"></i><i style="background:#3b5bdb;width:5%"></i><i style="background:#dfe4ee;width:10%"></i></div><span class="bv">48</span></div><div class="srow"><span class="bn">ServiceNow</span><div class="bar"><i style="background:#e5484d;width:70%"></i><i style="background:#f5a623;width:12%"></i><i style="background:#3b5bdb;width:6%"></i><i style="background:#dfe4ee;width:12%"></i></div><span class="bv">44</span></div><div class="srow"><span class="bn">Salesforce</span><div class="bar"><i style="background:#e5484d;width:10%"></i><i style="background:#f5a623;width:70%"></i><i style="background:#3b5bdb;width:6%"></i><i style="background:#dfe4ee;width:14%"></i></div><span class="bv">32</span></div><div class="srow"><span class="bn">Google Workspace</span><div class="bar"><i style="background:#e5484d;width:20%"></i><i style="background:#f5a623;width:60%"></i><i style="background:#3b5bdb;width:8%"></i><i style="background:#dfe4ee;width:12%"></i></div><span class="bv">31</span></div><div class="srow"><span class="bn">Zoom</span><div class="bar"><i style="background:#e5484d;width:35%"></i><i style="background:#f5a623;width:20%"></i><i style="background:#3b5bdb;width:25%"></i><i style="background:#dfe4ee;width:20%"></i></div><span class="bv">20</span></div><div class="srow"><span class="bn">Okta</span><div class="bar"><i style="background:#f5a623;width:60%"></i><i style="background:#3b5bdb;width:40%"></i></div><span class="bv">3</span></div>
+<div class="impactleg"><span class="r"><span class="cb" style="background:#e5484d"></span>High Impact</span><span class="r"><span class="cb" style="background:#f5a623"></span>Medium</span><span class="r"><span class="cb" style="background:#3b5bdb"></span>Low</span><span class="r"><span class="cb" style="background:#dfe4ee"></span>Recommendation</span></div>
+<div style="color:var(--ink-faint);font-size:11px;margin-top:8px">Total 178 (6 items)</div></div></div>
+</div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>grid dashboard · saved filters · impact stratification</span><span style="margin-left:auto" class="mono">a18 · grid-dashboard</span></div>
+</div></main></div></body></html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Asset Profile — Installed Software</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.pcols{display:grid;grid-template-columns:220px 1fr;gap:16px}
+.pside{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;height:fit-content}
+.pside .grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;padding:8px 8px 5px}
+.pside .row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px;font-size:12.5px;color:var(--ink-dim)}
+.pside .row.on{background:var(--blue-bg);color:var(--blue);font-weight:500}
+.phead{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:14px}
+.phead .ic{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;background:var(--user-bg);color:var(--user);font-size:20px}
+.phead h1{margin:0;font-size:17px}.phead .sub{color:var(--ink-faint);font-size:12px;margin-top:2px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tabs button{padding:10px 15px;border:0;background:transparent;color:var(--ink-dim);font-size:13px;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--blue)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12px}
+thead th{text-align:left;padding:10px 13px;background:var(--page);color:var(--ink-dim);font-weight:600;font-size:11px;border-bottom:1px solid var(--line)}
+tbody td{padding:9px 13px;border-bottom:1px solid var(--line)}tbody tr:hover{background:#fafbfc}
+.mono{font-family:"Roboto Mono",monospace;font-size:11px}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item active" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item " href="activities.html"><span class="ic">≣</span>Activities</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <a href="a14_table.html">Devices</a> › <b>Win-Brownr</b></div><div class="sp"></div>
+<span style="font-size:12px;color:var(--ink-faint)" class="mono">3 of 4,878 devices</span><button class="btn">‹</button><button class="btn">›</button></div>
+<div class="wrap" style="max-width:none">
+<div class="phead"><div class="ic">⊞</div><div><h1>Win-Brownr</h1><div class="sub">Windows 10 · last seen 11 hours ago</div></div></div>
+<div class="tabs"><button class="on">Asset Profile</button><button>Enforcement Runs</button><button>Notes</button><button>Asset Investigation</button></div>
+<div class="pcols">
+<div class="pside">
+<div class="grp">Asset Fields</div><div class="row">⊟ All Fields</div><div class="row">⊞ Aggregated</div><div class="row">⊞ Preferred</div><div class="row">⚑ Tags</div>
+<div class="grp">Tables</div><div class="row on">⊞ Installed Software</div>
+<div class="grp">Adapter Connections</div><div class="row">◆ Check Point CloudGuard</div>
+</div>
+<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<div class="toolbar" style="margin:0;flex:1"><div class="searchbox" style="max-width:280px">⌕ <input placeholder="Search"></div><div class="select">Adapter Connections ▾</div><span style="color:var(--blue);font-size:12px">Reset</span></div>
+<span style="font-size:12px;color:var(--ink-dim)">Total <b>212</b> · <span style="color:var(--blue)">⬇ Export CSV</span></span></div>
+<table><thead><tr><th>Software Name</th><th>Version</th><th>Vendor</th><th>Publisher</th><th>Source</th></tr></thead><tbody><tr><td>7-Zip 19.00 (x64)</td><td class="mono">19.00.0.0</td><td>Igor Pavlov</td><td>Igor Pavlov</td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>7-Zip (edition)</td><td class="mono">19.00.0.0</td><td>Igor Pavlov</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Add-in Express .NET</td><td class="mono">8.7.4430.0</td><td>Add-in Express Ltd.</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Azure Log Analytics</td><td class="mono">8.0.1.946</td><td>Microsoft CoreXT</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Certificate Connector for Intune</td><td class="mono">6.2205.201.0</td><td>Microsoft Corporation</td><td>Microsoft</td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Cylance Optics Uninstaller</td><td class="mono">3.1.1000.104</td><td>Cylance, Inc.</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Cylance Unified Agent</td><td class="mono">2.4.1070.1</td><td>Cylance, Inc.</td><td>Cylance</td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>CylancePROTECT</td><td class="mono">2.1.1578.42</td><td>Cylance, Inc.</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Edge</td><td class="mono">103.0.1264.77</td><td>Microsoft</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Excel 365</td><td class="mono">16.0.13530.20528</td><td>Microsoft</td><td></td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr><tr><td>Git Credential Manager Core</td><td class="mono">2.0.452.3248</td><td>Microsoft Corporation</td><td>Microsoft</td><td class="mono" style="color:var(--ink-dim)">SCCM</td></tr></tbody></table></div>
+</div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>Tables → Installed Software (nested asset table within profile)</span><span style="margin-left:auto" class="mono">a15b · installed-software</span></div>
+</div></main></div></body></html>

@@ -12,6 +12,7 @@ import NLBootEvidence from './pages/NLBootEvidence.vue';
 import PersonGraph from './pages/PersonGraph.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import Reader from './pages/Reader.vue';
+import WorkbenchPage from './pages/WorkbenchPage.vue';
 import './styles.css';
 
 const mockedSurfaceRoutes = domainSurfaces
@@ -29,6 +30,7 @@ const routes = [
   { path: '/person-graph', component: PersonGraph },
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
+  { path: '/workbench', component: WorkbenchPage },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];

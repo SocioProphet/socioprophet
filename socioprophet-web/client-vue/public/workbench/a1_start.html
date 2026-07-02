@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asset Graph — Starting Point</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.startgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.startcard{display:flex;align-items:center;gap:13px;padding:15px 16px;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;transition:.14s;box-shadow:0 1px 2px rgba(20,30,50,.03)}
+.startcard:hover{border-color:var(--blue);box-shadow:0 3px 12px rgba(59,130,246,.1);transform:translateY(-1px)}
+.startcard .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:17px;flex:none}
+.startcard .tx .nm{font-size:13px;font-weight:600}
+.startcard .tx .ct{font-size:14px;font-weight:700;font-family:'Roboto Mono',monospace;margin-top:1px}
+.startcard.hi{outline:2px solid var(--blue);outline-offset:1px}
+.center-intro{text-align:center;margin:6px 0 22px}
+.center-intro h2{margin:0 0 4px;font-size:16px;font-weight:600}
+.center-intro p{margin:0;color:var(--ink-dim);font-size:12.5px}
+.filterrow{display:flex;justify-content:center;gap:10px;margin-bottom:22px}
+.filterrow .searchbox{max-width:300px;flex:none;width:300px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!--NAV-->
+  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group">
+      <div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item active" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item" href="a14_table.html"><span class="ic">▦</span>Inventory<span class="chev">▾</span></a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a>
+    </div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div>
+  </aside>
+
+  <!--MAIN-->
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb"><a href="dashboard.html">⌂</a> <span>›</span> <b>Asset Graph</b> <span>›</span> Starting Point</div>
+      <div class="sp"></div>
+      <button class="btn">Manage Asset Graphs</button>
+    </div>
+    <div class="wrap">
+      <div class="center-intro">
+        <h2>Select an asset type as a starting point</h2>
+        <p>Click a type to explore its relationships, segment it, or expand its graph.</p>
+      </div>
+      <div class="filterrow">
+        <div class="searchbox">⌕ <input placeholder="Search asset types…"></div>
+        <div class="select">Category ▾</div>
+      </div>
+      <div class="startgrid" id="grid"></div>
+      <div class="foot-note">
+        <span class="live"><i></i>mesh live</span>
+        <span>hellgraph ⇄ GAIA · Ontogenesis vocabulary</span>
+        <span>SCOPE-D gate clear · read-only</span>
+        <span style="margin-left:auto" class="mono">a1 · starting-point</span>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const T=[
+ ['Devices','⬒','device','31.1K','a3_segment_os.html'],
+ ['Users','☖','user','3.7K','a2_segment_users.html'],
+ ['Vulnerabilities Repository','⛨','vuln','235K',''],
+ ['Vulnerabilities','⛨','vuln','12.6K',''],
+ ['Software','❮❯','software','13.0K',''],
+ ['Application Extensions','◇','device','131',''],
+ ['Roles','⚿','user','415',''],
+ ['Groups','⬖','group','176',''],
+ ['Licenses','▤','facility','17',''],
+ ['Expenses','$','software','9',''],
+ ['Application Settings','⚙','device','101',''],
+ ['User Extensions','☖','user','396',''],
+ ['Activities','▦','facility','3,081',''],
+ ['SaaS Applications Repo','⬢','vuln','1,866',''],
+ ['SaaS Applications','⬢','net','91','a7_saas.html'],
+ ['Tickets','❏','software','15',''],
+ ['Accounts/Tenants','⚭','group','2',''],
+ ['Networks','⇆','net','4',''],
+ ['Containers','▥','software','72',''],
+ ['Disks','◎','user','208',''],
+];
+const V={device:['var(--device)','var(--device-bg)'],user:['var(--user)','var(--user-bg)'],vuln:['var(--vuln)','var(--vuln-bg)'],software:['var(--software)','var(--software-bg)'],facility:['var(--facility)','var(--facility-bg)'],net:['var(--net)','var(--net-bg)'],group:['var(--group)','var(--group-bg)']};
+document.getElementById('grid').innerHTML=T.map(([n,g,t,c,href])=>{
+  const [fg,bg]=V[t];
+  return `<a class="startcard ${n==='Devices'?'hi':''}" href="${href||'a3_segment_os.html'}">
+    <span class="ic" style="background:${bg};color:${fg}">${g}</span>
+    <span class="tx"><span class="nm">${n}</span><span class="ct" style="color:${fg}">${c}</span></span>
+  </a>`;
+}).join('');
+</script>
+</body>
+</html>

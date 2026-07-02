@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Query Wizard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.wizcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.expr{font-family:"Roboto Mono",monospace;font-size:12px;background:var(--page);border:1px solid var(--line);border-radius:8px;padding:11px 13px;color:var(--ink-dim);margin-bottom:16px}
+.expr .k{color:var(--violet)}.expr .s{color:var(--blue)}.expr .v{color:var(--green)}
+.clause{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.pill{padding:8px 11px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);font-size:12px;color:var(--ink)}
+.pill.op{background:var(--nav);color:#fff;border-color:var(--nav)}
+.pill.field{min-width:150px;display:flex;justify-content:space-between;gap:10px;color:var(--ink-dim)}
+.addbtn{width:34px;height:34px;border:1px dashed var(--line-2);border-radius:8px;background:var(--card);color:var(--ink-dim);font-size:16px}
+.adppick{margin-top:16px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.adppick .ph{padding:10px 13px;background:var(--page);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;display:flex;justify-content:space-between}
+.adprow2{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:12.5px}
+.adprow2 .cbx{width:15px;height:15px;border:1.5px solid var(--line-2);border-radius:4px}
+.adprow2 .cbx.on{background:var(--blue);border-color:var(--blue)}
+.adprow2 .lg{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:8px;color:#fff;font-weight:700}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item active" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <a href="a14_table.html">Inventory</a> › <b>Query Wizard</b></div><div class="sp"></div>
+<span class="chip grey">Wizard</span><span class="chip" style="background:var(--card);border:1px solid var(--line-2);color:var(--ink-dim)">Basic</span></div>
+<div class="wrap"><div class="page-h"><h1>Query Wizard — Show Devices</h1><p>Build a typed predicate across adapters. Emits an AST consumed by any graph or table view.</p></div>
+<div class="wizcard">
+<div class="expr">(<span class="k">specific_data.data.os.type</span> == <span class="v">"Cisco"</span>) and not (<span class="k">specific_data.data.hostname</span> == <span class="v">"aws-labnginx-6057635-dev.demo.local"</span>)</div>
+<div class="clause"><span class="pill op">WHERE</span><span class="pill">(</span><span class="pill">NOT</span><span class="pill">ALL ▾</span><span class="pill field">OS: Type <span>▾</span></span><span class="pill">equals ▾</span><span class="pill field">Cisco <span>▾</span></span><span class="pill">)</span></div>
+<div class="clause"><span class="pill op" style="background:var(--ink)">AND</span><span class="pill">(</span><span class="pill" style="background:var(--nav);color:#fff">NOT</span><span class="pill">ALL ▾</span><span class="pill field">Host Name <span>▾</span></span><span class="pill">equals ▾</span><span class="pill field">aws-labnginx… <span>▾</span></span><span class="pill">)</span></div>
+<div class="clause"><button class="addbtn">＋</button></div>
+<div class="adppick"><div class="ph"><span>Adapter scope</span><span style="color:var(--blue)">Select all · Clear all</span></div><div class="adprow2"><span class="cbx on"></span><span class="lg" style="background:#e0359e">BI</span>BigID</div><div class="adprow2"><span class="cbx "></span><span class="lg" style="background:#f59e0b">Ce</span>Censys</div><div class="adprow2"><span class="cbx on"></span><span class="lg" style="background:#1ba0d7">ci</span>Cisco</div><div class="adprow2"><span class="cbx "></span><span class="lg" style="background:#39b54a">M</span>Cisco Meraki</div><div class="adprow2"><span class="cbx on"></span><span class="lg" style="background:#7c5cff">csv</span>CSV</div><div class="adprow2"><span class="cbx on"></span><span class="lg" style="background:#e8590c">CD</span>Custom Data</div><div class="adprow2"><span class="cbx on"></span><span class="lg" style="background:#e5484d">CS</span>CrowdStrike</div><div class="adprow2"><span class="cbx on"></span><span class="lg" style="background:#0a7d3f">DC</span>DigiCert PKI</div></div>
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px"><button class="btn">Clear</button><button class="btn primary" onclick="location.href='a14_table.html'">Search</button></div>
+</div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>predicate AST → contract.predicate (SP-VIEW-SURFACE-001 §2.4)</span><span style="margin-left:auto" class="mono">a13 · query-wizard</span></div>
+</div></main></div></body></html>
