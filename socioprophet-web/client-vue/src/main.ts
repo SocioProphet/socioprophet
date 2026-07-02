@@ -13,7 +13,9 @@ import PersonGraph from './pages/PersonGraph.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import Reader from './pages/Reader.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
+import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
+import './components/workbench/primitives.css';
 
 const mockedSurfaceRoutes = domainSurfaces
   .filter((surface) => surface.route !== '/map')
@@ -31,6 +33,7 @@ const routes = [
   { path: '/map', component: MapPage },
   { path: '/feed', component: FeedPage },
   { path: '/workbench', component: WorkbenchPage },
+  { path: '/workbench/scope-d', component: ScopeDFabric },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];

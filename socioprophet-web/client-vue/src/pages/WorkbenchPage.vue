@@ -9,6 +9,7 @@
         <a :href="screenUrl('index.html')" :class="{ active: current === 'index.html' }" @click.prevent="current = 'index.html'">Index</a>
         <a :href="screenUrl('estate_aligned_architecture.html')" :class="{ active: current === 'estate_aligned_architecture.html' }" @click.prevent="current = 'estate_aligned_architecture.html'">Estate Architecture</a>
         <a :href="screenUrl('unified_cognitive_systems_map.html')" :class="{ active: current === 'unified_cognitive_systems_map.html' }" @click.prevent="current = 'unified_cognitive_systems_map.html'">Cognitive Systems Map</a>
+        <RouterLink to="/workbench/scope-d" class="wb-native">SCOPE-D (native) →</RouterLink>
         <a :href="screenUrl(current)" target="_blank" rel="noopener" class="wb-standalone">Open standalone ↗</a>
       </nav>
     </header>
@@ -28,6 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
 // Vite serves public/ at the app base; BASE_URL respects VITE_ROUTER_BASE so this resolves under any deploy path.
 const base = (import.meta as any).env?.BASE_URL || '/';

@@ -13,9 +13,17 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import WorkbenchPage from '../pages/WorkbenchPage.vue';
 
+// RouterLink is stubbed to a plain anchor so the page can mount without a full
+// router instance; `to` becomes the href (the SCOPE-D native link is /workbench/scope-d).
+const RouterLinkStub = {
+  props: ['to'],
+  template: '<a :href="to"><slot /></a>',
+};
+const mountOpts = { global: { stubs: { RouterLink: RouterLinkStub } } };
+
 describe('WorkbenchPage', () => {
   it('mounts and renders the workbench iframe defaulting to the launcher index', () => {
-    const wrapper = mount(WorkbenchPage);
+    const wrapper = mount(WorkbenchPage, mountOpts);
     const iframe = wrapper.find('iframe.wb-frame');
     expect(iframe.exists()).toBe(true);
     expect(iframe.attributes('src')).toContain('workbench/index.html');
@@ -23,21 +31,21 @@ describe('WorkbenchPage', () => {
   });
 
   it('surfaces the two architecture diagrams in the header nav', () => {
-    const wrapper = mount(WorkbenchPage);
+    const wrapper = mount(WorkbenchPage, mountOpts);
     const text = wrapper.text();
     expect(text).toContain('Estate Architecture');
     expect(text).toContain('Cognitive Systems Map');
   });
 
   it('switching to a surface updates the iframe src', async () => {
-    const wrapper = mount(WorkbenchPage);
+    const wrapper = mount(WorkbenchPage, mountOpts);
     const estateLink = wrapper.findAll('a').find((a) => a.text() === 'Estate Architecture')!;
     await estateLink.trigger('click');
     expect(wrapper.find('iframe.wb-frame').attributes('src')).toContain('estate_aligned_architecture.html');
   });
 
   it('every surface url is scoped under /workbench', () => {
-    const wrapper = mount(WorkbenchPage);
+    const wrapper = mount(WorkbenchPage, mountOpts);
     for (const a of wrapper.findAll('a')) {
       const href = a.attributes('href') || '';
       expect(href).toContain('workbench/');

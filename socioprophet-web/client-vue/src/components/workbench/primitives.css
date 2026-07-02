@@ -1,0 +1,87 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Workbench Carbon primitives — shared styles for the native Vue port of the
+   render-harness screens (SP-PRIMITIVES-002 → real components).
+
+   PROVENANCE: retinted verbatim from public/workbench/sp-primitives-carbon.js
+   `const CSS`, restricted to (a) the data-viz token extensions and (b) the
+   primitive classes NOT already defined in src/styles.css. The base tokens
+   (--sp-bg/border/text/canvas/blue/green/red) and the shared shell + stage
+   classes (.carbon-card, .canvas, .surface-header, .section-title, .eyebrow,
+   .tag, .tag-green, .tag-blue) are the house versions in styles.css and are
+   reused, not redefined here. This file only fills the gaps so the ported
+   primitive components render on the real Carbon theme of record.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Carbon data-viz extensions (not in styles.css base) */
+  --sp-blue-70: #0043ce;  --sp-blue-10: #edf5ff;
+  --sp-green-70: #0e6027; --sp-green-10: #defbe6;
+  --sp-red-70: #a2191f;   --sp-red-10: #fff1f1;
+  --sp-amber: #f1c21b;    --sp-amber-70: #684e00; --sp-amber-10: #fcf4d6;
+  --sp-purple: #8a3ffc;   --sp-purple-10: #f6f2ff;
+  --sp-teal: #009d9a;     --sp-teal-10: #d9fbfb;
+  --sp-gray-20: #e0e0e0;  --sp-gray-60: #525252;  --sp-gray-70: #393939;
+  /* asset-type semantic mapped onto the Carbon data-viz palette */
+  --device: #8a3ffc; --device-bg: #f6f2ff; --user: #0f62fe; --user-bg: #edf5ff;
+  --vuln: #009d9a;   --vuln-bg: #d9fbfb;   --software: #ff832b; --software-bg: #fff2e8;
+  --facility: #f1c21b; --facility-bg: #fcf4d6; --net: #009d9a; --net-bg: #d9fbfb;
+  --group: #fa4d56;  --group-bg: #fff1f1;
+}
+
+/* Carbon tags — the kinds not already in styles.css (green/blue live there) */
+.tag-red { border-color: var(--sp-red); color: var(--sp-red-70); background: var(--sp-red-10); }
+.tag-amber { border-color: var(--sp-amber); color: var(--sp-amber-70); background: var(--sp-amber-10); }
+.tag-purple { border-color: var(--sp-purple); color: #491d8b; background: var(--sp-purple-10); }
+.tag-grey { border-color: #c6c6c6; color: #525252; background: #f4f4f4; }
+
+/* metric card body */
+.carbon-card.metric .th { display: flex; align-items: center; gap: .6rem; font-size: .85rem; color: var(--sp-gray-60); font-weight: 500; }
+.carbon-card.metric .th .ic { width: 1.4rem; height: 1.4rem; display: grid; place-items: center; font-size: .8rem; }
+.carbon-card.metric .num { font-size: 2.1rem; font-weight: 600; margin-top: .5rem; letter-spacing: -.02em; }
+
+/* node object (P-NODE) — the canonical Axonius node, angular Carbon retint */
+.pnode { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: default; transform: translate(-50%, -50%); transition: transform .15s; }
+.pnode:hover { z-index: 6; }
+.pnode:hover .bub { transform: scale(1.06); }
+.pnode .bub { position: relative; border-radius: 50%; display: grid; place-items: center; transition: transform .15s; }
+.pnode .bub .cnt { position: absolute; top: -3px; right: -9px; background: #161616; color: #fff; font-family: 'Roboto Mono', ui-monospace, monospace; font-weight: 600; padding: 2px 7px; font-size: 10.5px; }
+.pnode .lbl { font-size: 12px; font-weight: 500; white-space: nowrap; color: #161616; }
+.pnode.is-static { position: relative; transform: none; }
+
+/* canvas children (base .canvas is in styles.css) */
+.canvas .hint { position: absolute; top: 14px; left: 16px; font-size: 11px; color: var(--sp-gray-60); z-index: 2; }
+.canvas svg.edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.elabel { font-size: 10px; fill: var(--sp-gray-60); font-family: 'Inter', sans-serif; }
+
+/* graph toolbar */
+.gtoolbar { position: absolute; left: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 0; z-index: 3; border: 1px solid var(--sp-gray-20); }
+.gtoolbar button { width: 30px; height: 30px; border: 0; border-bottom: 1px solid var(--sp-gray-20); background: #fff; color: var(--sp-gray-60); font-size: 13px; }
+.gtoolbar button:last-child { border-bottom: 0; }
+
+/* verdict (P-VERDICT) — angular */
+.pverdict { border: 1px solid var(--sp-gray-20); background: #fff; }
+.pverdict .vh { padding: 8px 12px; background: #161616; color: #fff; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+.pverdict .vr { display: flex; justify-content: space-between; padding: 8px 12px; font-size: 11.5px; border-bottom: 1px solid var(--sp-gray-20); }
+.pverdict .vr:last-child { border-bottom: 0; }
+.pverdict .vr .k { color: var(--sp-gray-60); font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 10.5px; }
+.pverdict .vr .v { font-weight: 600; font-size: 10.5px; }
+.v-pos { color: var(--sp-green-70); }
+.v-neg { color: var(--sp-red-70); }
+.v-zero { color: var(--sp-gray-60); }
+.pverdict .note { margin: 10px 12px; padding: 9px 11px; background: var(--sp-red-10); border: 1px solid var(--sp-red); color: var(--sp-red-70); font-size: 10.5px; line-height: 1.5; }
+
+/* bars (P-BARS) */
+.pbars .brow { display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 10px; padding: 6px 0; font-size: 12px; }
+.pbars .brow .bn { color: var(--sp-gray-60); font-size: 11.5px; }
+.pbars .brow .track { height: 18px; background: #e0e0e0; overflow: hidden; }
+.pbars .brow .track i { display: block; height: 100%; }
+.pbars .brow .bv { font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 11px; text-align: right; }
+
+/* steps (P-STEPS) */
+.psteps .step { border: 1px solid var(--sp-gray-20); padding: 8px 10px; margin-bottom: 6px; background: #fff; }
+.psteps .step.active { border-color: var(--sp-blue); background: var(--sp-blue-10); }
+.psteps .step .op { display: flex; justify-content: space-between; font-size: 12px; }
+.psteps .step .op b { color: #161616; }
+.psteps .step .op .c { font-family: 'Roboto Mono', ui-monospace, monospace; color: var(--sp-blue); font-size: 11px; }
+.psteps .step .d { font-size: 10.5px; color: var(--sp-gray-60); margin-top: 2px; }
+.psteps .step.start { border-style: dashed; color: var(--sp-gray-60); }
