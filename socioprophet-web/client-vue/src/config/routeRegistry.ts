@@ -268,6 +268,20 @@ export const routeRegistry: RouteRegistryEntry[] = [
       { label: 'SCOPE-D (native)', to: '/workbench/scope-d' },
     ],
   },
+  {
+    path: '/research',
+    label: 'Research Capture',
+    domain: 'Operator Workbench',
+    maturity: 'L2',
+    stateMode: 'fixture',
+    navTier: 'left-rail',
+    userJob: 'Capture open working tabs into a durable research list on close — never lose research.',
+    ownerPlane: 'client-vue capture store (localStorage first); future clip-inbox / capture-spine backend',
+    boundary: 'Local, non-destructive capture; enrichment verbs (find-similar/entity-extraction) are pending adapters.',
+    primaryObject: 'research capture list',
+    breadcrumbs: ['Operator Workbench', 'Research Capture'],
+    railLabel: 'RC',
+  },
 ];
 
 export function routesForNavTier(tier: NavTier): RouteRegistryEntry[] {

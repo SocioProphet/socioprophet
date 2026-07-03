@@ -27,15 +27,16 @@ a { color: inherit; }
 code, pre, .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 
 .sp-shell {
-  min-height: 100vh;
+  /* Grounded edge-to-edge to the viewport (dvh survives zoom + mobile chrome),
+     so the middle 1fr row is bounded and inner panels scroll — the page itself
+     never overflows. */
+  height: 100dvh;
+  width: 100%;
   display: grid;
-  grid-template-rows: 4.25rem 4.25rem minmax(0, 1fr) 5.5rem;
-  margin: 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0.75rem;
+  grid-template-rows: 3.5rem 3.25rem minmax(0, 1fr) 4.25rem;
+  margin: 0;
   overflow: hidden;
   background: var(--sp-bg);
-  box-shadow: 0 28px 85px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 .sp-topbar {
   display: grid;
@@ -85,7 +86,7 @@ code, pre, .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Men
 .sp-stage { min-width: 0; min-height: 0; display: grid; grid-template-rows: 3.75rem minmax(0, 1fr); background: var(--sp-canvas); color: var(--sp-canvas-text); }
 .sp-breadcrumbs { display: flex; align-items: center; gap: 0.65rem; padding: 0 2rem; border-bottom: 1px solid #d9d9d4; background: #fff; font-size: 1.05rem; }
 .sp-crumb-separator { margin-left: 0.65rem; color: #6f6f6f; }
-.sp-stage > :last-child { min-height: 0; }
+.sp-stage > :last-child { min-height: 0; overflow: auto; }
 
 .sp-agent-shell {
   display: grid;
