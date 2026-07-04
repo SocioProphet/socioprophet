@@ -18,8 +18,8 @@
     </header>
 
     <!-- KPI indicator tiles -->
-    <div class="ec-kpis" aria-label="Macro indicators" @keydown="arrowRove($event, $event.currentTarget, '.ec-kpi', 'h')">
-      <button v-for="k in indicators" :key="k.id" class="ec-kpi" :class="{ on: sel.kind === 'indicator' && sel.id === k.id }" @click="pickIndicator(k)">
+    <div class="ec-kpis" aria-label="Indicators" @keydown="arrowRove($event, $event.currentTarget, '.ec-kpi', 'h')">
+      <button v-for="k in kpis" :key="k.id" class="ec-kpi" :class="{ on: sel.kind === 'indicator' && sel.id === k.id }" @click="pickIndicator(k)">
         <div class="ec-kpi-top">
           <span class="ec-kpi-name">{{ k.name }}</span>
           <span class="ec-chg" :class="indTone(k)">{{ signed(k.changeAbs) }}{{ k.unit === '%' ? 'pp' : '' }}</span>
@@ -110,9 +110,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { indicators, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
+import { indicators, indicatorsForPath, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
@@ -120,11 +120,15 @@ import { arrowRove } from '../utils/listKeys';
 const sp = sparkPoints;
 const ar = areaPoints;
 
-const sel = ref<{ kind: 'sector' | 'indicator'; id: string }>({ kind: 'sector', id: sectors[0]!.id });
 const cmd = ref('');
 const route = useRoute();
-// Active Economy & Industry sub-domain shown as the board's lens.
+// Active Economy & Industry sub-domain → its own real KPI set; the sector-breadth
+// grid stays as shared market context.
 const scope = computed(() => navScopeForPath(route.path));
+const kpis = computed<Indicator[]>(() => indicatorsForPath(route.path));
+const sel = ref<{ kind: 'sector' | 'indicator'; id: string }>({ kind: 'indicator', id: kpis.value[0]!.id });
+// When the sub-domain (and its KPI set) changes, re-anchor an indicator selection.
+watch(() => route.path, () => { if (sel.value.kind === 'indicator' && kpis.value[0]) sel.value = { kind: 'indicator', id: kpis.value[0].id }; });
 onMounted(() => {
   const id = typeof route.query.k === 'string' ? route.query.k : '';
   const kind = route.query.kind === 'indicator' ? 'indicator' : 'sector';
