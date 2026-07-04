@@ -180,7 +180,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .mk-cmd input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: var(--accent-2); font-family: inherit; font-size: 0.78rem; text-transform: uppercase; } .mk-cmd input::placeholder { color: rgba(255, 160, 40, 0.5); text-transform: none; }
 .mk-cmd-go { border: none; background: var(--accent); color: var(--bg); font-family: inherit; font-size: 0.66rem; font-weight: 800; border-radius: 3px; padding: 0.1rem 0.4rem; cursor: pointer; }
 /* ticker tape */
-.mk-tape { display: flex; align-items: stretch; gap: 0; overflow-x: auto; border: 1px solid #1c222b; border-radius: 4px; background: #010204; }
+.mk-tape { display: flex; align-items: stretch; gap: 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
 .mk-tape-item { flex: 0 0 auto; display: inline-flex; align-items: baseline; gap: 0.4rem; border: none; border-right: 1px solid var(--line); background: transparent; color: inherit; padding: 0.3rem 0.7rem; cursor: pointer; font-family: inherit; } .mk-tape-item:hover { background: var(--accent-soft); }
 .mk-tape-sym { color: var(--accent); font-weight: 700; font-size: 0.72rem; } .mk-tape-px { font-size: 0.72rem; font-variant-numeric: tabular-nums; } .mk-tape .mk-chg { font-size: 0.68rem; }
 

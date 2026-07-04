@@ -114,7 +114,7 @@ h1 { margin: 0; font-size: 1.25rem; } .head p { margin: 0.25rem 0 0; color: rgba
 .bar { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.76rem; color: rgba(255, 255, 255, 0.6); }
 .bar b { color: rgba(255, 255, 255, 0.9); } .rooted { color: #93c5fd; }
 .error { color: #fca5a5; font-size: 0.85rem; } .muted { color: rgba(255, 255, 255, 0.5); font-size: 0.82rem; }
-.canvas-wrap { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; background: radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.06), transparent 70%), #0b1020; overflow: hidden; }
+.canvas-wrap { border: 1px solid var(--line-2); border-radius: 16px; background: radial-gradient(circle at 50% 40%, rgba(216, 162, 80, 0.05), transparent 70%), var(--surface); overflow: hidden; }
 .canvas { width: 100%; display: block; }
 .canvas line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 1; } .canvas line.primary { stroke: rgba(147, 197, 253, 0.4); stroke-width: 1.4; }
 .node { cursor: pointer; } .node circle { stroke: rgba(255, 255, 255, 0.55); transition: r 0.15s; } .node:hover circle { stroke: #fff; }

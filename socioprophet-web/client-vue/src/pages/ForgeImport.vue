@@ -121,7 +121,7 @@ h1 { margin: 0; font-size: 1.25rem; } header p { margin: 0.25rem 0 0; color: rgb
 .grid input[type=text], .grid input:not([type]), .grid input[type=password] { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 8px; padding: 0.35rem 0.5rem; color: #fff; font-size: 0.8rem; }
 .chk { flex-direction: row; align-items: center; gap: 0.4rem; }
 .go { border: none; background: #2563eb; color: #fff; border-radius: 10px; padding: 0.5rem 0.9rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; justify-self: start; } .go:disabled { opacity: 0.5; }
-.progress { display: grid; gap: 0.25rem; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.7rem 0.9rem; background: #0b1020; font-size: 0.78rem; }
+.progress { display: grid; gap: 0.25rem; border: 1px solid var(--line-2); border-radius: 12px; padding: 0.7rem 0.9rem; background: var(--surface-2); font-size: 0.78rem; }
 .step { display: flex; gap: 0.5rem; color: rgba(255, 255, 255, 0.75); } .step .ic { color: rgba(255, 255, 255, 0.4); }
 .step.error { color: #f87171; } .step.error .ic { color: #f87171; } .step.complete { color: #4ade80; } .step.complete .ic { color: #4ade80; }
 .link { color: #93c5fd; font-size: 0.78rem; margin-top: 0.3rem; }
