@@ -1,6 +1,8 @@
 /**
- * Verifies the News sub-domains are real views of the feed: Event Calendar
- * groups items by day, Recent Events is recency-ordered.
+ * Verifies the corrected News surface (Lobsters × Feedly): the default feed is a
+ * score-ranked story stream with community affordances, /news/recent is
+ * recency-ordered (newest first), and the Event Calendar lens still groups items
+ * by day.
  */
 import { mount, flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
@@ -19,29 +21,33 @@ async function mountAt(path: string) {
 }
 
 describe('news sub-domain views', () => {
+  it('the default feed is a Lobsters-style story stream with community affordances', async () => {
+    const wrapper = await mountAt('/news');
+    expect(wrapper.find('.nf-day').exists()).toBe(false);
+    expect(wrapper.findAll('.nf-story').length).toBeGreaterThan(0);
+    // Upvote + score + tags are the Lobsters layer the old inbox lacked.
+    expect(wrapper.find('.nf-up').exists()).toBe(true);
+    expect(wrapper.find('.nf-score').exists()).toBe(true);
+    expect(wrapper.find('.nf-tag').exists()).toBe(true);
+    // Stories are never downvoted — no downvote control in the stream.
+    expect(wrapper.find('.nf-story .nf-down').exists()).toBe(false);
+  });
+
+  it('Recent puts the newest story first', async () => {
+    const wrapper = await mountAt('/news/recent');
+    const first = wrapper.find('.nf-story .nf-story-title').text();
+    expect(first).toContain('Coalition reaches framework on cross-border data flows');
+  });
+
   it('Event Calendar groups items into multiple day sections', async () => {
     const wrapper = await mountAt('/news/calendar');
     const days = wrapper.findAll('.nf-day');
     expect(days.length).toBeGreaterThanOrEqual(4); // items span 5 days
     expect(wrapper.findAll('.nf-agenda').length).toBeGreaterThan(0);
-    // Day headers span the real date range.
     const text = wrapper.text();
     expect(text).toContain('Jul 3');
     expect(text).toContain('Jun 29');
-    // The magazine grid is not used in calendar mode.
-    expect(wrapper.find('.nf-mag').exists()).toBe(false);
-  });
-
-  it('Recent Events puts the newest item first', async () => {
-    const wrapper = await mountAt('/news/recent');
-    // The ticker mirrors the item order; newest published item leads.
-    const firstTick = wrapper.find('.nf-tick').text();
-    expect(firstTick).toContain('Coalition reaches framework on cross-border data flows');
-  });
-
-  it('the default feed shows the magazine grid (no calendar)', async () => {
-    const wrapper = await mountAt('/news');
-    expect(wrapper.find('.nf-day').exists()).toBe(false);
-    expect(wrapper.findAll('.nf-mag').length).toBeGreaterThan(0);
+    // Calendar lens replaces the story stream.
+    expect(wrapper.find('.nf-story').exists()).toBe(false);
   });
 });
