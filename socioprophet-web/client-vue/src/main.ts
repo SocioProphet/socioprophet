@@ -9,6 +9,14 @@ import { registryEntryForPath } from './config/routeRegistry';
 import Login from './pages/Login.vue';
 import ResearchList from './pages/ResearchList.vue';
 import CodeSearch from './pages/CodeSearch.vue';
+import WorkstationPipelines from './pages/WorkstationPipelines.vue';
+import WorkstationDeploy from './pages/WorkstationDeploy.vue';
+import WorkstationServices from './pages/WorkstationServices.vue';
+import WorkstationTerminal from './pages/WorkstationTerminal.vue';
+import ModelLabs from './pages/ModelLabs.vue';
+import DataSearch from './pages/DataSearch.vue';
+import KnowledgeGraph from './pages/KnowledgeGraph.vue';
+import ForgeImport from './pages/ForgeImport.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
@@ -42,6 +50,14 @@ const routes = [
   { path: '/feed', component: FeedPage },
   { path: '/workbench', component: WorkbenchPage },
   { path: '/workbench/scope-d', component: ScopeDFabric },
+  { path: '/workstation/pipelines', component: WorkstationPipelines },
+  { path: '/workstation/deploy', component: WorkstationDeploy },
+  { path: '/workstation/services', component: WorkstationServices },
+  { path: '/workstation/terminal', component: WorkstationTerminal },
+  { path: '/ai/labs', component: ModelLabs },
+  { path: '/data/search', component: DataSearch },
+  { path: '/knowledge/graph', component: KnowledgeGraph },
+  { path: '/forge/import', component: ForgeImport },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];

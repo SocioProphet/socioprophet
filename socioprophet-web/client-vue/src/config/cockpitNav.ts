@@ -133,3 +133,35 @@ export const OPERATOR_SHORTCUTS: NavLeaf[] = [
   { label: 'NLBoot Evidence', to: '/nlboot' },
   { label: 'Operator Workbench', to: '/workbench' },
 ];
+
+// Agent Machine cockpit — live on-device surfaces backed by the Noetica
+// agent-machine /api/* endpoints (sovereign, no auth). These are the ported
+// command-center surfaces: workstation ops, models, knowledge, forge.
+export const AGENT_COCKPIT: NavGroup[] = [
+  {
+    label: 'Workstation',
+    to: '/workstation/pipelines',
+    items: [
+      { label: 'Pipelines', to: '/workstation/pipelines' },
+      { label: 'Deploy', to: '/workstation/deploy' },
+      { label: 'Services · DevSpaces', to: '/workstation/services' },
+      { label: 'Terminal', to: '/workstation/terminal' },
+    ],
+  },
+  {
+    label: 'Knowledge & Data',
+    to: '/knowledge/graph',
+    items: [
+      { label: 'Knowledge Graph', to: '/knowledge/graph' },
+      { label: 'Search', to: '/data/search' },
+    ],
+  },
+  {
+    label: 'Models & Forge',
+    to: '/ai/labs',
+    items: [
+      { label: 'Model Labs', to: '/ai/labs' },
+      { label: 'Add Local Repo', to: '/forge/import' },
+    ],
+  },
+];

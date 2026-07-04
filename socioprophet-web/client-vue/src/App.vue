@@ -71,6 +71,16 @@
           class="sp-nav-link"
           @click="navOpen = false"
         >{{ op.label }}</RouterLink>
+        <template v-for="grp in agentCockpit" :key="grp.label">
+          <div class="sp-nav-section-title">{{ grp.label }}</div>
+          <RouterLink
+            v-for="leaf in grp.items"
+            :key="leaf.to"
+            :to="leaf.to"
+            class="sp-nav-link"
+            @click="navOpen = false"
+          >{{ leaf.label }}</RouterLink>
+        </template>
       </nav>
 
       <section class="sp-stage">
@@ -122,7 +132,7 @@ import { useAuth } from './stores/auth';
 import { useResearch } from './stores/research';
 import RuntimeAdapterStatusBadge from './components/RuntimeAdapterStatusBadge.vue';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
-import { CAPABILITY_RAIL, DOMAIN_MENU, OPERATOR_SHORTCUTS } from './config/cockpitNav';
+import { AGENT_COCKPIT, CAPABILITY_RAIL, DOMAIN_MENU, OPERATOR_SHORTCUTS } from './config/cockpitNav';
 import {
   entriesForDomain,
   registryEntryForPath,
@@ -144,6 +154,7 @@ const logout = async () => {
 const domainMenu = DOMAIN_MENU;
 const capabilityRail = CAPABILITY_RAIL;
 const operatorShortcuts = OPERATOR_SHORTCUTS;
+const agentCockpit = AGENT_COCKPIT;
 const navOpen = ref(false);
 
 // Two-letter abbreviation for the collapsed rail (e.g. "Algorithmic Trading" → "AT").
