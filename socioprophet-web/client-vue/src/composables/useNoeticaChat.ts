@@ -3,8 +3,18 @@
 // assistant text; intent/plan/step/narration/grounding/retrieval/deliberation
 // events are surfaced as a live reasoning trace (you watch the twin think);
 // `done` finalizes, `error` degrades honestly. One shared session below.
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { AM_BASE } from '../services/agentMachineApi';
+
+const STORE_KEY = 'noetica-chat-v1';
+function loadPersisted(): ChatTurn[] {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ChatTurn[];
+    return Array.isArray(parsed) ? parsed.map((t) => ({ ...t, streaming: false })) : [];
+  } catch { return []; }
+}
 
 export type Role = 'user' | 'assistant';
 export interface TraceItem { kind: string; text: string }
@@ -22,10 +32,15 @@ const TRACE_EVENTS = new Set(['intent', 'plan', 'step', 'narration', 'grounding'
 
 export function createNoeticaChat() {
   const sessionId = (globalThis.crypto?.randomUUID?.() ?? `sess-${Date.now()}`);
-  const turns = ref<ChatTurn[]>([]);
+  const turns = ref<ChatTurn[]>(loadPersisted());
   const busy = ref(false);
 
-  function reset() { turns.value = []; }
+  // Persist finalized history so a reload keeps the conversation.
+  watch(turns, (t) => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(t.filter((x) => !x.streaming))); } catch { /* quota/private-mode */ }
+  }, { deep: true });
+
+  function reset() { turns.value = []; try { localStorage.removeItem(STORE_KEY); } catch { /* */ } }
 
   async function send(text: string) {
     const msg = text.trim();

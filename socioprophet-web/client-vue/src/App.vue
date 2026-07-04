@@ -99,14 +99,20 @@
 
     <footer class="sp-agent-shell">
       <div class="sp-agent-search">
-        <button type="button" class="sp-cmd-glyph chat" title="Open Noetica" @click="router.push('/noetica')">◇</button>
+        <button
+          type="button"
+          class="sp-cmd-glyph"
+          :class="promptMode"
+          :title="promptMode === 'chat' ? 'Chat mode — click to switch to terminal' : 'Terminal mode — click to switch to chat'"
+          @click="togglePromptMode()"
+        >{{ promptMode === 'chat' ? '◇' : '›_' }}</button>
         <input
           v-model="cmdBar"
           type="text"
-          placeholder="Ask Noetica…  ⏎"
+          :placeholder="promptMode === 'chat' ? 'Ask Noetica…  ⏎' : 'Run a command…  ⏎'"
           spellcheck="false"
           autocomplete="off"
-          @keyup.enter="askNoetica()"
+          @keyup.enter="onPromptSubmit()"
         />
       </div>
       <div class="sp-capture-actions">
@@ -193,18 +199,27 @@ const navOpen = ref(false);
 // Quake drop-down terminal — shell-wide, toggled by the footer button or Ctrl+`.
 const termOpen = ref(false);
 const termPopout = ref(false);
-useOperatorTerminal();
+const term = useOperatorTerminal();
 const chat = useNoeticaChat();
 const cmdBar = ref('');
+// One command bar, two modes: chat (the Noetica social surface) or cmd (operator
+// terminal). The glyph toggles; Enter routes to the active mode.
+const promptMode = ref<'chat' | 'cmd'>('chat');
+function togglePromptMode() { promptMode.value = promptMode.value === 'chat' ? 'cmd' : 'chat'; }
 function toggleTerm() { termOpen.value = !termOpen.value; }
-// Footer prompt = the social surface's line into Noetica: navigate to the chat
-// surface and send. The operator terminal stays on the ›_ button / Ctrl+`.
-async function askNoetica() {
+async function onPromptSubmit() {
   const v = cmdBar.value.trim();
   if (!v) return;
   cmdBar.value = '';
-  if (route.path !== '/noetica') await router.push('/noetica');
-  chat.send(v);
+  if (promptMode.value === 'chat') {
+    if (route.path !== '/noetica') await router.push('/noetica');
+    chat.send(v);
+  } else {
+    termOpen.value = true;
+    await term.loadStatus();
+    term.input.value = v;
+    await term.run();
+  }
 }
 function onTermHotkey(e: KeyboardEvent) {
   // Ctrl+`  (backquote) — the classic Quake / VS Code terminal toggle.

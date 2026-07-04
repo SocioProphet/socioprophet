@@ -32,8 +32,13 @@
         </template>
         <template v-else>
           <div class="nx-assistant">
-            <div class="nx-a-label"><span class="nx-glyph sm">◇</span> Noetica</div>
-            <div v-if="t.trace && t.trace.length" class="nx-trace">
+            <div class="nx-a-label">
+              <span class="nx-glyph sm">◇</span> Noetica
+              <button v-if="t.trace && t.trace.length && !t.streaming" class="nx-trace-toggle" @click="toggleTrace(i)">
+                {{ expanded.has(i) ? '▾' : '▸' }} reasoning ({{ t.trace.length }})
+              </button>
+            </div>
+            <div v-if="t.trace && t.trace.length && (t.streaming || expanded.has(i))" class="nx-trace">
               <span v-for="(tr, j) in t.trace" :key="j" class="nx-tr" :class="tr.kind"><b>{{ tr.kind }}</b> {{ tr.text }}</span>
             </div>
             <div class="nx-a-body" :class="{ err: t.error }">
@@ -69,6 +74,8 @@ import { useNoeticaChat } from '../composables/useNoeticaChat';
 
 const chat = useNoeticaChat();
 const draft = ref('');
+const expanded = ref<Set<number>>(new Set());
+function toggleTrace(i: number) { if (expanded.value.has(i)) expanded.value.delete(i); else expanded.value.add(i); }
 const scrollEl = ref<HTMLElement | null>(null);
 const inputEl = ref<HTMLTextAreaElement | null>(null);
 
@@ -119,6 +126,7 @@ onMounted(() => inputEl.value?.focus());
 .nx-user { margin-left: auto; max-width: 78%; } .nx-bubble { background: #1f6feb; color: #fff; border-radius: 14px 14px 4px 14px; padding: 0.6rem 0.85rem; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
 .nx-assistant { max-width: 82%; }
 .nx-a-label { display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; color: #c58af9; margin-bottom: 0.35rem; }
+.nx-trace-toggle { border: none; background: transparent; color: rgba(255, 255, 255, 0.4); font-size: 0.66rem; cursor: pointer; padding: 0 0.2rem; } .nx-trace-toggle:hover { color: rgba(197, 138, 249, 0.9); }
 .nx-trace { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.45rem; }
 .nx-tr { font-size: 0.66rem; color: rgba(255, 255, 255, 0.6); background: rgba(255, 255, 255, 0.04); border: 1px solid #21262d; border-radius: 5px; padding: 0.08rem 0.4rem; } .nx-tr b { color: rgba(197, 138, 249, 0.9); text-transform: uppercase; letter-spacing: 0.03em; font-size: 0.58rem; margin-right: 0.25rem; }
 .nx-a-body { background: #010409; border: 1px solid #21262d; border-radius: 4px 14px 14px 14px; padding: 0.7rem 0.9rem; font-size: 0.92rem; line-height: 1.6; white-space: pre-wrap; color: rgba(255, 255, 255, 0.9); } .nx-a-body.err { color: #fca5a5; }

@@ -2,7 +2,12 @@
   <section class="ec" aria-label="Economy sector board">
     <header class="ec-toolbar">
       <div class="ec-title"><h1>Macro &amp; Sectors</h1><span class="ec-pill">fixture</span></div>
-      <div class="ec-asof">as of {{ asOfLabel }}</div>
+      <form class="term-cmd" @submit.prevent="runCmd">
+        <span class="term-cmd-prompt">›</span>
+        <input v-model="cmd" spellcheck="false" placeholder="Jump to indicator or sector (e.g. CPI, Energy)" />
+        <button type="submit" class="term-cmd-go">&lt;GO&gt;</button>
+      </form>
+      <div class="ec-asof">{{ asOfLabel }}</div>
     </header>
 
     <!-- KPI indicator tiles -->
@@ -106,8 +111,17 @@ const sp = sparkPoints;
 const ar = areaPoints;
 
 const sel = ref<{ kind: 'sector' | 'indicator'; id: string }>({ kind: 'sector', id: sectors[0]!.id });
+const cmd = ref('');
 function pickSector(s: Sector) { sel.value = { kind: 'sector', id: s.id }; }
 function pickIndicator(k: Indicator) { sel.value = { kind: 'indicator', id: k.id }; }
+function runCmd() {
+  const q = cmd.value.trim().toLowerCase();
+  if (!q) return;
+  const ind = indicators.find((k) => k.id === q || k.name.toLowerCase().includes(q));
+  if (ind) { pickIndicator(ind); cmd.value = ''; return; }
+  const sec = sectors.find((s) => s.id === q || s.name.toLowerCase().includes(q));
+  if (sec) { pickSector(sec); cmd.value = ''; }
+}
 
 const selectedSector = computed(() => (sel.value.kind === 'sector' ? sectors.find((s) => s.id === sel.value.id) : undefined));
 const selectedIndicator = computed(() => (sel.value.kind === 'indicator' ? indicators.find((k) => k.id === sel.value.id) : undefined));
@@ -136,14 +150,14 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 </script>
 
 <style scoped>
-.ec { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; background: #0d1117; color: rgba(255, 255, 255, 0.92); }
+.ec { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: #05070a; color: rgba(255, 255, 255, 0.9); }
 .ec-toolbar { display: flex; align-items: center; justify-content: space-between; }
-.ec-title { display: flex; align-items: baseline; gap: 0.6rem; } .ec-title h1 { margin: 0; font-size: 1.3rem; }
+.ec-title { display: flex; align-items: baseline; gap: 0.6rem; } .ec-title h1 { margin: 0; font-size: 1rem; letter-spacing: 0.06em; color: #ffa028; font-weight: 700; font-family: 'Roboto Mono', ui-monospace, monospace; text-transform: uppercase; }
 .ec-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .ec-asof { font-size: 0.74rem; color: rgba(255, 255, 255, 0.45); }
 
 .ec-kpis { display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.15rem; }
-.ec-kpi { flex: 0 0 auto; width: 176px; text-align: left; border: 1px solid #21262d; border-radius: 10px; background: #010409; color: inherit; padding: 0.55rem 0.65rem 0.4rem; cursor: pointer; display: grid; gap: 0.2rem; } .ec-kpi:hover { border-color: rgba(255, 255, 255, 0.2); } .ec-kpi.on { border-color: #58a6ff; }
+.ec-kpi { flex: 0 0 auto; width: 176px; text-align: left; border: 1px solid #21262d; border-radius: 10px; background: #010409; color: inherit; padding: 0.55rem 0.65rem 0.4rem; cursor: pointer; display: grid; gap: 0.2rem; } .ec-kpi:hover { border-color: rgba(255, 255, 255, 0.2); } .ec-kpi.on { border-color: #ffa028; }
 .ec-kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; }
 .ec-kpi-name { font-size: 0.68rem; color: rgba(255, 255, 255, 0.55); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ec-kpi-val { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; } .ec-unit { font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); margin-left: 1px; }
@@ -156,7 +170,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .ec-board { min-height: 0; display: flex; flex-direction: column; border: 1px solid #21262d; border-radius: 12px; overflow: hidden; }
 .ec-board-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0.6rem 0.85rem; border-bottom: 1px solid #21262d; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.5); } .ec-board-head span { font-size: 0.6rem; color: rgba(255, 255, 255, 0.35); }
 .ec-grid { min-height: 0; overflow-y: auto; padding: 0.6rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; align-content: start; }
-.ec-sector { text-align: left; border: 1px solid #21262d; border-left: 3px solid #8b949e; border-radius: 8px; background: #010409; color: inherit; padding: 0.5rem 0.6rem; cursor: pointer; display: grid; gap: 0.3rem; } .ec-sector:hover { border-top-color: rgba(255, 255, 255, 0.2); } .ec-sector.on { box-shadow: 0 0 0 1px #58a6ff; }
+.ec-sector { text-align: left; border: 1px solid #21262d; border-left: 3px solid #8b949e; border-radius: 8px; background: #010409; color: inherit; padding: 0.5rem 0.6rem; cursor: pointer; display: grid; gap: 0.3rem; } .ec-sector:hover { border-top-color: rgba(255, 255, 255, 0.2); } .ec-sector.on { box-shadow: 0 0 0 1px #ffa028; }
 .ec-sec-top { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; } .ec-sec-name { font-size: 0.8rem; font-weight: 600; }
 .ec-breadth { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); overflow: hidden; } .ec-breadth.big { height: 9px; }
 .ec-breadth-fill { height: 100%; border-radius: 3px; }

@@ -102,6 +102,13 @@ code, pre, .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Men
 .sp-cmd-glyph { border: 0; background: transparent; color: #8ab4f8; font-family: 'Roboto Mono', ui-monospace, monospace; font-weight: 700; font-size: 0.95rem; cursor: pointer; padding: 0 0.15rem; letter-spacing: -1px; }
 .sp-cmd-glyph:hover { color: #aecbfa; }
 .sp-cmd-glyph.chat { color: #c58af9; font-size: 1.05rem; } .sp-cmd-glyph.chat:hover { color: #d8b4fe; }
+
+/* Bloomberg-style amber command line, shared across the data screens */
+.term-cmd { flex: 0 1 340px; display: flex; align-items: center; gap: 0.4rem; border: 1px solid #ffa028; border-radius: 4px; background: rgba(255, 160, 40, 0.06); padding: 0.2rem 0.5rem; }
+.term-cmd-prompt { color: #ffa028; font-weight: 700; font-family: 'Roboto Mono', ui-monospace, monospace; }
+.term-cmd input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #ffd9a8; font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.78rem; }
+.term-cmd input::placeholder { color: rgba(255, 160, 40, 0.5); }
+.term-cmd-go { border: none; background: #ffa028; color: #05070a; font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.66rem; font-weight: 800; border-radius: 3px; padding: 0.1rem 0.4rem; cursor: pointer; }
 .sp-runtime-strip { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.1rem; }
 .sp-runtime-strip__label { color: #c6c6c6; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 

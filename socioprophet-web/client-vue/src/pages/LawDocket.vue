@@ -2,6 +2,11 @@
   <section class="lw" aria-label="Legal docket">
     <header class="lw-toolbar">
       <div class="lw-title"><h1>Docket</h1><span class="lw-pill">fixture</span></div>
+      <form class="term-cmd" @submit.prevent="runCmd">
+        <span class="term-cmd-prompt">›</span>
+        <input v-model="cmd" spellcheck="false" placeholder="Jump to a cite or title (e.g. HR-2026-882)" />
+        <button type="submit" class="term-cmd-go">&lt;GO&gt;</button>
+      </form>
       <div class="lw-filters">
         <button v-for="s in statuses" :key="s" class="lw-fbtn" :class="{ on: status === s }" @click="setStatus(s)">{{ s }}</button>
       </div>
@@ -68,6 +73,13 @@ import { dockets, asOf, type Docket, type DocketStatus } from '../data/lawFixtur
 const statuses = ['all', 'comment', 'pending', 'enacted', 'open'] as const;
 const status = ref<(typeof statuses)[number]>('all');
 const selectedId = ref<string>(dockets[0]!.id);
+const cmd = ref('');
+function runCmd() {
+  const q = cmd.value.trim().toLowerCase();
+  if (!q) return;
+  const hit = dockets.find((d) => d.cite.toLowerCase() === q) ?? dockets.find((d) => d.cite.toLowerCase().includes(q) || d.title.toLowerCase().includes(q));
+  if (hit) { status.value = 'all'; selectedId.value = hit.id; cmd.value = ''; }
+}
 
 const results = computed<Docket[]>(() => (status.value === 'all' ? dockets : dockets.filter((d) => d.status === (status.value as DocketStatus))));
 const selected = computed<Docket | undefined>(() => dockets.find((d) => d.id === selectedId.value));
@@ -85,19 +97,19 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 </script>
 
 <style scoped>
-.lw { height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; background: #0d1117; color: rgba(255, 255, 255, 0.92); }
+.lw { height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: #05070a; color: rgba(255, 255, 255, 0.9); }
 .lw-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.lw-title { display: flex; align-items: baseline; gap: 0.6rem; } .lw-title h1 { margin: 0; font-size: 1.3rem; }
+.lw-title { display: flex; align-items: baseline; gap: 0.6rem; } .lw-title h1 { margin: 0; font-size: 1rem; letter-spacing: 0.06em; color: #ffa028; font-weight: 700; font-family: 'Roboto Mono', ui-monospace, monospace; text-transform: uppercase; }
 .lw-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .lw-filters { display: flex; gap: 0.25rem; }
-.lw-fbtn { border: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.74rem; text-transform: capitalize; cursor: pointer; } .lw-fbtn.on { border-color: #58a6ff; color: #58a6ff; background: rgba(88, 166, 255, 0.12); }
+.lw-fbtn { border: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.74rem; text-transform: capitalize; cursor: pointer; } .lw-fbtn.on { border-color: #ffa028; color: #ffa028; background: rgba(255, 160, 40, 0.12); }
 
 .lw-body { min-height: 0; display: grid; grid-template-columns: minmax(340px, 1fr) minmax(400px, 1.3fr); gap: 0.75rem; }
 @media (max-width: 1080px) { .lw-body { grid-template-columns: 1fr; } .lw-detail { display: none; } }
 
 .lw-list { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; }
 .lw-count { margin: 0; padding: 0.5rem 0.85rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid #161b22; }
-.lw-row { width: 100%; display: grid; gap: 0.25rem; border: none; border-bottom: 1px solid #161b22; background: transparent; color: inherit; padding: 0.65rem 0.85rem; cursor: pointer; text-align: left; } .lw-row:hover { background: rgba(255, 255, 255, 0.03); } .lw-row.on { background: rgba(88, 166, 255, 0.1); box-shadow: inset 3px 0 0 #58a6ff; }
+.lw-row { width: 100%; display: grid; gap: 0.25rem; border: none; border-bottom: 1px solid #161b22; background: transparent; color: inherit; padding: 0.65rem 0.85rem; cursor: pointer; text-align: left; } .lw-row:hover { background: rgba(255, 255, 255, 0.03); } .lw-row.on { background: rgba(255, 160, 40, 0.1); box-shadow: inset 3px 0 0 #ffa028; }
 .lw-row-top { display: flex; align-items: center; gap: 0.5rem; }
 .lw-cite { font-size: 0.68rem; color: rgba(255, 255, 255, 0.45); font-family: ui-monospace, monospace; }
 .lw-row-title { font-size: 0.9rem; font-weight: 600; } .lw-row-meta { font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); }
@@ -108,8 +120,8 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 
 .lw-detail { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; padding: 0 1.1rem 1.1rem; }
 .lw-detail.empty { display: grid; place-items: center; color: rgba(255, 255, 255, 0.35); font-size: 0.85rem; padding: 1.1rem; }
-.lw-ribbon { display: flex; align-items: center; gap: 0.6rem; margin: 0 -1.1rem 0.9rem; padding: 0.4rem 1.1rem; background: rgba(88, 166, 255, 0.06); border-bottom: 1px solid #21262d; font-size: 0.7rem; }
-.lw-ribbon-k { text-transform: uppercase; letter-spacing: 0.08em; color: #58a6ff; font-weight: 700; font-size: 0.6rem; } .lw-ribbon code { color: rgba(255, 255, 255, 0.6); font-family: ui-monospace, monospace; } .lw-ribbon-as { margin-left: auto; color: rgba(255, 255, 255, 0.4); }
+.lw-ribbon { display: flex; align-items: center; gap: 0.6rem; margin: 0 -1.1rem 0.9rem; padding: 0.4rem 1.1rem; background: rgba(255, 160, 40, 0.07); border-bottom: 1px solid #21262d; font-size: 0.7rem; }
+.lw-ribbon-k { text-transform: uppercase; letter-spacing: 0.08em; color: #ffa028; font-weight: 700; font-size: 0.6rem; } .lw-ribbon code { color: rgba(255, 255, 255, 0.6); font-family: ui-monospace, monospace; } .lw-ribbon-as { margin-left: auto; color: rgba(255, 255, 255, 0.4); }
 .lw-d-head { display: flex; gap: 0.5rem; margin-top: 1rem; }
 .lw-d-head .lw-status { margin-left: 0; }
 .lw-d-title { margin: 0.5rem 0 0.3rem; font-size: 1.35rem; line-height: 1.25; }
