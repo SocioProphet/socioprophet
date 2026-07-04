@@ -65,6 +65,42 @@
           </svg>
         </div>
 
+        <!-- OSINT: social accounts -->
+        <div class="pd-block">
+          <div class="pd-block-h">Social accounts <span class="pd-scope">open sources · scope-governed</span></div>
+          <div class="pd-accounts">
+            <a v-for="(a, i) in selected.accounts" :key="i" class="pd-acct" :href="a.url" target="_blank" rel="noreferrer">
+              <span class="pd-plat" :style="{ color: platform(a.platform).color, borderColor: platform(a.platform).color }">{{ platform(a.platform).label }}</span>
+              <span class="pd-handle">{{ a.handle }}<span v-if="a.verified" class="pd-verified" title="verified">✓</span></span>
+              <span v-if="a.followers" class="pd-followers">{{ fmtNum(a.followers) }}</span>
+              <span v-if="a.lastActive" class="pd-active">· {{ a.lastActive }}</span>
+              <span class="pd-open">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- OSINT: selectors (pivots) -->
+        <div class="pd-block">
+          <div class="pd-block-h">Selectors <span class="pd-scope">pivots · masked withheld</span></div>
+          <div class="pd-selectors">
+            <span v-for="(s, i) in selected.selectors" :key="i" class="pd-sel" :class="{ masked: s.masked }">
+              <span class="pd-sel-k">{{ s.kind }}</span>{{ s.value }}<span v-if="s.masked" class="pd-sel-tag">scope</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- OSINT: corroborating sources -->
+        <div class="pd-block">
+          <div class="pd-block-h">Sources</div>
+          <div class="pd-osint">
+            <div v-for="(o, i) in selected.osint" :key="i" class="pd-src">
+              <span class="pd-src-kind" :class="o.kind">{{ o.kind }}</span>
+              <span class="pd-src-name">{{ o.name }}</span>
+              <span class="pd-src-conf">{{ (o.confidence * 100).toFixed(0) }}%</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Resolution -->
         <div class="pd-block">
           <div class="pd-block-h">Identity resolution</div>
@@ -87,7 +123,18 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { entities, asOf, type Entity, type EntityKind } from '../data/peopleFixture';
+import { entities, asOf, type Entity, type EntityKind, type Platform } from '../data/peopleFixture';
+
+const PLATFORM: Record<Platform, { label: string; color: string }> = {
+  x: { label: 'X', color: '#e7e9ea' },
+  linkedin: { label: 'in', color: '#4aa3ff' },
+  github: { label: 'GH', color: '#f0f6fc' },
+  mastodon: { label: 'M', color: '#8b8cff' },
+  telegram: { label: 'TG', color: '#3aa0e0' },
+  web: { label: '@', color: '#8b949e' },
+};
+const platform = (p: Platform) => PLATFORM[p];
+function fmtNum(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(n); }
 
 const kinds = ['All', 'person', 'org', 'gov'] as const;
 const kind = ref<(typeof kinds)[number]>('All');
@@ -176,5 +223,22 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .pd-ego-init { fill: #04121f; font-size: 9px; font-weight: 800; } .pd-ego-init.self { fill: #04121f; font-size: 11px; }
 .pd-ego-lbl { fill: rgba(255, 255, 255, 0.7); font-size: 8px; } .pd-ego-rel { fill: rgba(255, 255, 255, 0.4); font-size: 7px; text-transform: uppercase; letter-spacing: 0.04em; }
 .pd-res { display: grid; gap: 0.4rem; } .pd-res-bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; } .pd-res-fill { height: 100%; border-radius: 4px; } .pd-res-cap { font-size: 0.74rem; color: rgba(255, 255, 255, 0.55); }
+
+/* OSINT */
+.pd-scope { text-transform: none; letter-spacing: 0; font-size: 0.58rem; color: rgba(255, 160, 40, 0.7); margin-left: 0.5rem; }
+.pd-accounts { display: grid; gap: 0.3rem; }
+.pd-acct { display: flex; align-items: center; gap: 0.55rem; padding: 0.35rem 0.5rem; border: 1px solid #21262d; border-radius: 8px; text-decoration: none; color: inherit; } .pd-acct:hover { border-color: rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.03); }
+.pd-plat { flex: 0 0 auto; width: 1.8rem; text-align: center; font-size: 0.6rem; font-weight: 800; border: 1px solid; border-radius: 5px; padding: 0.1rem 0; font-family: 'Roboto Mono', ui-monospace, monospace; }
+.pd-handle { flex: 1; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pd-verified { color: #4aa3ff; margin-left: 0.25rem; font-size: 0.72rem; }
+.pd-followers { font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); font-variant-numeric: tabular-nums; } .pd-active { font-size: 0.66rem; color: rgba(255, 255, 255, 0.35); } .pd-open { color: rgba(255, 255, 255, 0.35); font-size: 0.72rem; }
+.pd-selectors { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.pd-sel { font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.72rem; color: rgba(255, 255, 255, 0.82); background: rgba(255, 255, 255, 0.05); border: 1px solid #21262d; border-radius: 6px; padding: 0.12rem 0.45rem; display: inline-flex; align-items: center; gap: 0.4rem; } .pd-sel.masked { color: rgba(255, 255, 255, 0.4); border-style: dashed; }
+.pd-sel-k { font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(255, 160, 40, 0.85); }
+.pd-sel-tag { font-size: 0.52rem; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 3px; padding: 0 0.2rem; }
+.pd-osint { display: grid; gap: 0.28rem; }
+.pd-src { display: flex; align-items: center; gap: 0.5rem; font-size: 0.76rem; }
+.pd-src-kind { flex: 0 0 auto; width: 4.4rem; font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; border-radius: 4px; padding: 0.06rem 0.3rem; text-align: center; }
+.pd-src-kind.news { color: #4aa3ff; background: rgba(74, 163, 255, 0.14); } .pd-src-kind.registry { color: #3fb950; background: rgba(63, 185, 80, 0.14); } .pd-src-kind.social { color: #c58af9; background: rgba(197, 138, 249, 0.14); } .pd-src-kind.leak { color: #f85149; background: rgba(248, 81, 73, 0.14); } .pd-src-kind.domain { color: #e3b341; background: rgba(227, 179, 65, 0.14); } .pd-src-kind.filing { color: #8b949e; background: rgba(139, 148, 158, 0.16); }
+.pd-src-name { flex: 1; color: rgba(255, 255, 255, 0.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pd-src-conf { font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); font-variant-numeric: tabular-nums; }
 .pd-kv { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; font-size: 0.8rem; padding: 0.2rem 0; } .pd-kv span { color: rgba(255, 255, 255, 0.45); } .pd-kv code { color: rgba(255, 255, 255, 0.7); font-family: ui-monospace, monospace; font-size: 0.72rem; }
 </style>
