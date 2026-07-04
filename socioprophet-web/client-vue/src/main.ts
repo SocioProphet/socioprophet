@@ -41,6 +41,7 @@ import NlpExtractionBench from './pages/NlpExtractionBench.vue';
 import ExperimentsBoard from './pages/ExperimentsBoard.vue';
 import BehavioralAnalytics from './pages/BehavioralAnalytics.vue';
 import AppBuildBoard from './pages/AppBuildBoard.vue';
+import AnalyticsStudio from './pages/AnalyticsStudio.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -59,6 +60,11 @@ const explicitRoutes = [
   { path: '/capability/experiments-simulations', component: ExperimentsBoard },
   { path: '/capability/behavioral-analytics', component: BehavioralAnalytics },
   { path: '/capability/mobile-app-development', component: AppBuildBoard },
+  // Maps & Analytics — the analytics trio (Maps itself is MapPage) shares one
+  // Analytics Studio that charts the platform's existing fixtures.
+  { path: '/analytics/trending-infographics', component: AnalyticsStudio },
+  { path: '/analytics/charts-graphs', component: AnalyticsStudio },
+  { path: '/analytics', component: AnalyticsStudio },
   { path: '/capability/entity-analytics', component: PeopleDirectory },
   { path: '/capability/sentiment-analytics', component: SocialSignals },
   { path: '/capability/ontology-epistemology', component: KnowledgeGraph },
