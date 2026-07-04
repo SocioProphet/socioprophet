@@ -60,6 +60,7 @@
         ref="inputEl"
         v-model="draft"
         rows="1"
+        aria-label="Message Noetica"
         placeholder="Ask Noetica…  (⏎ to send · ⇧⏎ for a new line)"
         @keydown="onKey"
       />

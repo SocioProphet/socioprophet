@@ -18,8 +18,8 @@ const register = async () => { err.value=""; busy.value=true; try { await auth.r
     <h2>Sign in to build SourceOS</h2>
     <p class="muted">Compose your own image from a SourceOS flavor and we'll build it for you.</p>
     <button class="btn" style="width:100%;margin:8px 0" :disabled="busy" @click="google">Continue with Google</button>
-    <label>Email</label><input v-model="email" type="email" autocomplete="email" />
-    <label>Password</label><input v-model="pw" type="password" autocomplete="current-password" />
+    <label for="login-email">Email</label><input id="login-email" v-model="email" type="email" autocomplete="email" />
+    <label for="login-pw">Password</label><input id="login-pw" v-model="pw" type="password" autocomplete="current-password" />
     <div class="row" style="margin-top:14px">
       <button class="btn alt" :disabled="busy" @click="signin">Sign in</button>
       <button class="btn alt" :disabled="busy" @click="register">Create account</button>

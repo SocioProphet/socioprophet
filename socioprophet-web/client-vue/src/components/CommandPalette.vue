@@ -9,6 +9,7 @@
             v-model="q"
             type="text"
             spellcheck="false"
+            aria-label="Search, jump to a screen, or ask Noetica"
             placeholder="Search, jump to a screen, or ask Noetica…"
             @keydown="onKey"
           />
