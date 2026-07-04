@@ -67,12 +67,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { dockets, asOf, type Docket, type DocketStatus } from '../data/lawFixture';
 
 const statuses = ['all', 'comment', 'pending', 'enacted', 'open'] as const;
 const status = ref<(typeof statuses)[number]>('all');
 const selectedId = ref<string>(dockets[0]!.id);
+const route = useRoute();
+onMounted(() => { const d = typeof route.query.d === 'string' ? route.query.d : ''; if (d && dockets.some((x) => x.id === d)) { status.value = 'all'; selectedId.value = d; } });
 const cmd = ref('');
 function runCmd() {
   const q = cmd.value.trim().toLowerCase();

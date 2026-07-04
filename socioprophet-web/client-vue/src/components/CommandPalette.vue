@@ -43,6 +43,10 @@ import { useRouter, type RouteLocationRaw } from 'vue-router';
 import { routeRegistry } from '../config/routeRegistry';
 import { newsItems, newsSources } from '../data/newsFeedFixture';
 import { entities } from '../data/peopleFixture';
+import { indices, watchlist } from '../data/marketsFixture';
+import { dockets } from '../data/lawFixture';
+import { regions } from '../data/weatherFixture';
+import { indicators, sectors } from '../data/economyFixture';
 import { useNoeticaChat } from '../composables/useNoeticaChat';
 
 const props = defineProps<{ open: boolean }>();
@@ -68,7 +72,7 @@ const destinations: Dest[] = (() => {
   return out;
 })();
 
-type Kind = 'nav' | 'article' | 'entity' | 'chat';
+type Kind = 'nav' | 'article' | 'entity' | 'market' | 'docket' | 'region' | 'econ' | 'chat';
 interface Result { id: string; kind: Kind; icon: string; label: string; sub?: string; hint: string; route?: RouteLocationRaw; idx: number }
 
 const srcTitle = new Map(newsSources.map((s) => [s.id, s.title]));
@@ -94,16 +98,48 @@ const flat = computed<Result[]>(() => {
         .map((e) => ({ id: 'ent:' + e.id, kind: 'entity' as Kind, icon: '◉', label: e.name, sub: `${e.role} · ${e.affiliation}`, hint: 'Open', route: { path: '/people/search', query: { id: e.id } } }))
     : [];
 
+  const markets = ql
+    ? [...indices, ...watchlist]
+        .filter((i) => i.symbol.toLowerCase().includes(ql) || i.name.toLowerCase().includes(ql))
+        .slice(0, 4)
+        .map((i) => ({ id: 'mkt:' + i.symbol, kind: 'market' as Kind, icon: '▤', label: i.symbol, sub: i.name, hint: 'Markets', route: { path: '/markets/indices-funds', query: { sym: i.symbol } } }))
+    : [];
+
+  const law = ql
+    ? dockets
+        .filter((d) => d.title.toLowerCase().includes(ql) || d.cite.toLowerCase().includes(ql))
+        .slice(0, 4)
+        .map((d) => ({ id: 'law:' + d.id, kind: 'docket' as Kind, icon: '§', label: d.title, sub: d.cite, hint: 'Docket', route: { path: '/law/international-law', query: { d: d.id } } }))
+    : [];
+
+  const weather = ql
+    ? regions
+        .filter((r) => r.name.toLowerCase().includes(ql) || r.country.toLowerCase().includes(ql))
+        .slice(0, 4)
+        .map((r) => ({ id: 'wx:' + r.id, kind: 'region' as Kind, icon: '☁', label: r.name, sub: r.country, hint: 'Weather', route: { path: '/weather/forecast', query: { r: r.id } } }))
+    : [];
+
+  const econ = ql
+    ? [...indicators.map((k) => ({ t: 'indicator', id: k.id, name: k.name })), ...sectors.map((s) => ({ t: 'sector', id: s.id, name: s.name }))]
+        .filter((x) => x.name.toLowerCase().includes(ql))
+        .slice(0, 4)
+        .map((x) => ({ id: 'ec:' + x.id, kind: 'econ' as Kind, icon: '⌁', label: x.name, sub: x.t, hint: 'Economy', route: { path: '/economy/macro-economics', query: { k: x.id, kind: x.t } } }))
+    : [];
+
   const actions: Omit<Result, 'idx'>[] = q.value.trim()
     ? [{ id: 'chat', kind: 'chat', icon: '◇', label: `Ask Noetica`, sub: `“${q.value.trim()}”`, hint: 'Chat' }]
     : [];
-  return [...navs, ...articles, ...ents, ...actions].map((r, i) => ({ ...r, idx: i }));
+  return [...navs, ...articles, ...ents, ...markets, ...law, ...weather, ...econ, ...actions].map((r, i) => ({ ...r, idx: i }));
 });
 
 const grouped = computed(() => [
   { title: 'Go to', items: flat.value.filter((r) => r.kind === 'nav') },
   { title: 'Articles', items: flat.value.filter((r) => r.kind === 'article') },
   { title: 'People', items: flat.value.filter((r) => r.kind === 'entity') },
+  { title: 'Markets', items: flat.value.filter((r) => r.kind === 'market') },
+  { title: 'Dockets', items: flat.value.filter((r) => r.kind === 'docket') },
+  { title: 'Weather', items: flat.value.filter((r) => r.kind === 'region') },
+  { title: 'Economy', items: flat.value.filter((r) => r.kind === 'econ') },
   { title: 'Assistant', items: flat.value.filter((r) => r.kind === 'chat') },
 ]);
 

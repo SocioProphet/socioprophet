@@ -103,7 +103,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { indicators, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 
@@ -112,6 +113,12 @@ const ar = areaPoints;
 
 const sel = ref<{ kind: 'sector' | 'indicator'; id: string }>({ kind: 'sector', id: sectors[0]!.id });
 const cmd = ref('');
+const route = useRoute();
+onMounted(() => {
+  const id = typeof route.query.k === 'string' ? route.query.k : '';
+  const kind = route.query.kind === 'indicator' ? 'indicator' : 'sector';
+  if (id && (kind === 'indicator' ? indicators : sectors).some((x) => x.id === id)) sel.value = { kind, id };
+});
 function pickSector(s: Sector) { sel.value = { kind: 'sector', id: s.id }; }
 function pickIndicator(k: Indicator) { sel.value = { kind: 'indicator', id: k.id }; }
 function runCmd() {

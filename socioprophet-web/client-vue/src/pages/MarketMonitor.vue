@@ -112,6 +112,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { indices, watchlist, asOf, type Instrument, type AssetClass } from '../data/marketsFixture';
 
 const classes = ['All', 'equity', 'crypto', 'fx', 'commodity'] as const;
@@ -120,6 +121,8 @@ const selected = ref<Instrument>(indices[0]!);
 const listEl = ref<HTMLElement | null>(null);
 const cmd = ref('');
 const tape = [...indices, ...watchlist];
+const route = useRoute();
+onMounted(() => { const sym = typeof route.query.sym === 'string' ? route.query.sym.toUpperCase() : ''; if (sym) { const hit = tape.find((i) => i.symbol === sym); if (hit) selected.value = hit; } });
 
 const rows = computed<Instrument[]>(() => (klass.value === 'All' ? watchlist : watchlist.filter((i) => i.klass === klass.value)));
 

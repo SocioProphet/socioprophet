@@ -81,12 +81,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { regions, alerts, asOf, type Region, type Condition } from '../data/weatherFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 
 const selected = ref<Region>(regions[0]!);
 const cmd = ref('');
+const route = useRoute();
+onMounted(() => { const r = typeof route.query.r === 'string' ? route.query.r : ''; const hit = regions.find((x) => x.id === r); if (hit) selected.value = hit; });
 
 const hiSeries = computed(() => selected.value.forecast.map((d) => d.hi));
 const regionAlerts = computed(() => alerts.filter((a) => a.regionId === selected.value.id));
