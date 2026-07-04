@@ -98,6 +98,13 @@
             </div>
           </template>
 
+          <div class="ec-block" v-if="chainNodes.length">
+            <div class="ec-block-h">Supply chain</div>
+            <div class="ec-sc">
+              <button v-for="n in chainNodes" :key="n.id" class="ec-sc-link" @click="openChain(n.id)">⛓ {{ chainName(n.chain) }} chain · {{ n.name }} →</button>
+            </div>
+          </div>
+
           <div class="ec-block">
             <div class="ec-block-h">Provenance</div>
             <div class="ec-kv wide"><span>Source</span><code>fixture · deterministic series</code></div>
@@ -111,11 +118,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { indicators, indicatorsForPath, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
+import { nodesForSector, nodesForIndicator, chains } from '../data/supplyChainFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
+
+const router = useRouter();
 
 const sp = sparkPoints;
 const ar = areaPoints;
@@ -148,6 +158,11 @@ function runCmd() {
 const selectedSector = computed(() => (sel.value.kind === 'sector' ? sectors.find((s) => s.id === sel.value.id) : undefined));
 const selectedIndicator = computed(() => (sel.value.kind === 'indicator' ? indicators.find((k) => k.id === sel.value.id) : undefined));
 const detail = computed<Sector | Indicator | undefined>(() => selectedSector.value ?? selectedIndicator.value);
+
+// Supply-chain integration: sectors/indicators that sit on a modeled supply chain.
+const chainNodes = computed(() => (sel.value.kind === 'sector' ? nodesForSector(sel.value.id) : nodesForIndicator(sel.value.id)));
+function chainName(cid: string): string { return chains.find((c) => c.id === cid)?.name ?? cid; }
+function openChain(id: string) { router.push({ path: '/analytics/supply-chain', query: { node: id } }); }
 
 const up = 'var(--up)'; const down = 'var(--down)'; const flat = '#8b949e';
 function dir(pct: number): 'up' | 'down' | 'flat' { return pct > 0.05 ? 'up' : pct < -0.05 ? 'down' : 'flat'; }
@@ -207,6 +222,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .ec-block-h { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.5rem; }
 .ec-breadth-cap { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); margin-top: 0.4rem; }
 .ec-note { margin: 0 0 0.5rem; font-size: 0.85rem; line-height: 1.55; color: rgba(255, 255, 255, 0.8); }
+.ec-sc { display: flex; flex-direction: column; gap: 0.4rem; } .ec-sc-link { text-align: left; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text-2); border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.78rem; cursor: pointer; } .ec-sc-link:hover { border-color: var(--accent); color: var(--accent); }
 .ec-sigs { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .ec-sig { font-size: 0.72rem; border-radius: 6px; padding: 0.15rem 0.5rem; border: 1px solid var(--line-2); color: rgba(255, 255, 255, 0.75); } .ec-sig.up { color: var(--up); border-color: rgba(63, 185, 80, 0.4); } .ec-sig.down { color: var(--down); border-color: rgba(248, 81, 73, 0.4); }
 .ec-kv { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; font-size: 0.8rem; padding: 0.2rem 0; } .ec-kv span { color: rgba(255, 255, 255, 0.45); } .ec-kv.wide code { color: rgba(255, 255, 255, 0.7); font-family: ui-monospace, monospace; font-size: 0.72rem; }

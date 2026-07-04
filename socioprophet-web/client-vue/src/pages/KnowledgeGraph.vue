@@ -66,6 +66,9 @@ async function load() {
 function reRoot(id: string) { root.value = id; load(); }
 
 onMounted(async () => {
+  // Deep-link: other surfaces (e.g. Supply Chain) re-root the graph on a node.
+  const r = typeof route.query.root === 'string' ? route.query.root : '';
+  if (r) root.value = r;
   void load();
   try { health.value = await graphHealth(); } catch { /* health is best-effort */ }
 });

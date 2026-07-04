@@ -106,6 +106,13 @@
           </div>
         </div>
 
+        <div class="mk-block" v-if="chainNodes.length">
+          <div class="mk-block-h">Supply chain</div>
+          <div class="mk-sc">
+            <button v-for="n in chainNodes" :key="n.id" class="mk-sc-link" @click="openChain(n.id)">⛓ {{ chainName(n.chain) }} chain · {{ n.name }} →</button>
+          </div>
+        </div>
+
         <div class="mk-block">
           <div class="mk-block-h">Provenance</div>
           <div class="mk-kv wide"><span>Source</span><code>fixture · deterministic series</code></div>
@@ -118,12 +125,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
 import { indices, watchlist, instrumentsForPath, asOf, type Instrument } from '../data/marketsFixture';
+import { nodesForMarketSymbol, chains } from '../data/supplyChainFixture';
 import { arrowRove } from '../utils/listKeys';
 
 const route = useRoute();
+const router = useRouter();
 // Active DOMAIN-axis sub-domain → the real slice of instruments it surfaces
 // (Equities & Preferreds → equities/preferreds, Crypto/Digital → crypto, …).
 const scope = computed(() => navScopeForPath(route.path));
@@ -150,6 +159,12 @@ function runCmd() {
   if (hit) { pick(hit); cmd.value = ''; }
 }
 function setKlass(c: string) { klass.value = c; if (!rows.value.some((r) => r.symbol === selected.value.symbol) && rows.value[0]) pick(rows.value[0]); }
+
+// Supply-chain integration: instruments that sit on a modeled supply chain link
+// into the Supply Chain surface (which links on to the graph / map / twin).
+const chainNodes = computed(() => nodesForMarketSymbol(selected.value.symbol));
+function chainName(cid: string): string { return chains.find((c) => c.id === cid)?.name ?? cid; }
+function openChain(id: string) { router.push({ path: '/analytics/supply-chain', query: { node: id } }); }
 
 // SVG sparkline / area point strings.
 function scale(series: number[], w: number, h: number): Array<[number, number]> {
@@ -231,4 +246,5 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .mk-block-h { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.5rem; }
 .mk-sigs { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .mk-sig { font-size: 0.72rem; border-radius: 6px; padding: 0.15rem 0.5rem; border: 1px solid var(--line-2); color: rgba(255, 255, 255, 0.75); } .mk-sig.up { color: var(--up); border-color: rgba(63, 185, 80, 0.4); } .mk-sig.down { color: var(--down); border-color: rgba(248, 81, 73, 0.4); }
+.mk-sc { display: flex; flex-direction: column; gap: 0.4rem; } .mk-sc-link { text-align: left; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text-2); border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.78rem; cursor: pointer; } .mk-sc-link:hover { border-color: var(--accent); color: var(--accent); }
 </style>

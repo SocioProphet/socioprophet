@@ -42,6 +42,7 @@ import ExperimentsBoard from './pages/ExperimentsBoard.vue';
 import BehavioralAnalytics from './pages/BehavioralAnalytics.vue';
 import AppBuildBoard from './pages/AppBuildBoard.vue';
 import AnalyticsStudio from './pages/AnalyticsStudio.vue';
+import SupplyChainMap from './pages/SupplyChainMap.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -62,6 +63,7 @@ const explicitRoutes = [
   { path: '/capability/mobile-app-development', component: AppBuildBoard },
   // Maps & Analytics — the analytics trio (Maps itself is MapPage) shares one
   // Analytics Studio that charts the platform's existing fixtures.
+  { path: '/analytics/supply-chain', component: SupplyChainMap },
   { path: '/analytics/trending-infographics', component: AnalyticsStudio },
   { path: '/analytics/charts-graphs', component: AnalyticsStudio },
   { path: '/analytics', component: AnalyticsStudio },

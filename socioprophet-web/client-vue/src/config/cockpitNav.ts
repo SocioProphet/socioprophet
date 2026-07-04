@@ -97,6 +97,7 @@ export const DOMAIN_MENU: NavGroup[] = [
     label: 'Maps & Analytics',
     to: '/map',
     items: [
+      { label: 'Supply Chain', to: '/analytics/supply-chain' },
       { label: 'Trending Infographics', to: '/analytics/trending-infographics' },
       { label: 'Charts & Graphs', to: '/analytics/charts-graphs' },
       { label: 'Maps & Interactives', to: '/map' },
