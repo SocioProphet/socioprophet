@@ -46,6 +46,7 @@ export const DOMAIN_MENU: NavGroup[] = [
     to: '/people/search',
     items: [
       { label: 'People Search', to: '/people/search' },
+      { label: 'Labor Market', to: '/people/labor-market' },
       { label: 'Government & Politics', to: '/people/government-politics' },
       { label: 'Population & Demographics', to: '/people/demographics' },
       { label: 'Polls & Opinion', to: '/people/polls-opinion' },
