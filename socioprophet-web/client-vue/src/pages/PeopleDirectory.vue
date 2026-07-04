@@ -2,9 +2,9 @@
   <section class="pd" aria-label="People directory">
     <header class="pd-toolbar">
       <div class="pd-title"><h1>Directory</h1><span class="pd-pill">fixture</span></div>
-      <form class="pd-search" @submit.prevent>
+      <form class="pd-search" @submit.prevent="jump">
         <span class="pd-search-ic">⌕</span>
-        <input v-model="query" type="text" placeholder="Search people, orgs, roles, tags…" spellcheck="false" />
+        <input v-model="query" type="text" placeholder="Search or type a name + ⏎ to open…" spellcheck="false" />
       </form>
       <div class="pd-kinds">
         <button v-for="k in kinds" :key="k" class="pd-kbtn" :class="{ on: kind === k }" @click="setKind(k)">{{ k }}</button>
@@ -105,9 +105,12 @@
         <div class="pd-block">
           <div class="pd-block-h">Selectors <span class="pd-scope">pivots · masked withheld</span></div>
           <div class="pd-selectors">
-            <span v-for="(s, i) in selected.selectors" :key="i" class="pd-sel" :class="{ masked: s.masked }">
-              <span class="pd-sel-k">{{ s.kind }}</span>{{ s.value }}<span v-if="s.masked" class="pd-sel-tag">scope</span>
-            </span>
+            <template v-for="(s, i) in selected.selectors" :key="i">
+              <button v-if="!s.masked" class="pd-sel pivot" :title="`Pivot — find entities sharing ${s.value}`" @click="pivot(s.value)">
+                <span class="pd-sel-k">{{ s.kind }}</span>{{ s.value }}<span class="pd-sel-pivot">⤳</span>
+              </button>
+              <span v-else class="pd-sel masked"><span class="pd-sel-k">{{ s.kind }}</span>{{ s.value }}<span class="pd-sel-tag">scope</span></span>
+            </template>
           </div>
         </div>
 
@@ -189,9 +192,14 @@ const results = computed<Entity[]>(() => {
   return entities.filter((e) => {
     if (kind.value !== 'All' && e.kind !== kind.value) return false;
     if (!q) return true;
-    return [e.name, e.role, e.affiliation, e.location, ...e.tags].some((f) => f.toLowerCase().includes(q));
+    return [e.name, e.role, e.affiliation, e.location, ...e.tags, ...e.selectors.map((s) => s.value), ...e.accounts.map((a) => a.handle)]
+      .some((f) => f.toLowerCase().includes(q));
   });
 });
+// Command-line jump: ⏎ opens the top match's dossier.
+function jump() { if (results.value[0]) selectedId.value = results.value[0].id; }
+// OSINT pivot: re-query the directory on a selector (finds entities sharing it).
+function pivot(value: string) { kind.value = 'All'; query.value = value; }
 const selected = computed<Entity | undefined>(() => byId.get(selectedId.value));
 const career = computed(() => careers[selectedId.value] ?? []);
 const edu = computed(() => eduMap[selectedId.value] ?? []);
@@ -292,6 +300,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .pd-selectors { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .pd-sel { font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.72rem; color: rgba(255, 255, 255, 0.82); background: rgba(255, 255, 255, 0.05); border: 1px solid #21262d; border-radius: 6px; padding: 0.12rem 0.45rem; display: inline-flex; align-items: center; gap: 0.4rem; } .pd-sel.masked { color: rgba(255, 255, 255, 0.4); border-style: dashed; }
 .pd-sel-k { font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(255, 160, 40, 0.85); }
+.pd-sel.pivot { cursor: pointer; } .pd-sel.pivot:hover { border-color: #ffa028; color: #fff; } .pd-sel-pivot { color: rgba(255, 160, 40, 0.7); font-size: 0.7rem; }
 .pd-sel-tag { font-size: 0.52rem; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 3px; padding: 0 0.2rem; }
 .pd-osint { display: grid; gap: 0.28rem; }
 .pd-src { display: flex; align-items: center; gap: 0.5rem; font-size: 0.76rem; }

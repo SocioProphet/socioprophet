@@ -21,6 +21,7 @@ import NewsFeed from './pages/NewsFeed.vue';
 import MarketMonitor from './pages/MarketMonitor.vue';
 import EconomySectorBoard from './pages/EconomySectorBoard.vue';
 import PeopleDirectory from './pages/PeopleDirectory.vue';
+import SocialSignals from './pages/SocialSignals.vue';
 import LawDocket from './pages/LawDocket.vue';
 import NoeticaChat from './pages/NoeticaChat.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
@@ -68,6 +69,7 @@ const routes = [
   { path: '/markets/indices-funds', component: MarketMonitor },
   { path: '/economy/macro-economics', component: EconomySectorBoard },
   { path: '/people/search', component: PeopleDirectory },
+  { path: '/people/social-networks', component: SocialSignals },
   { path: '/law/international-law', component: LawDocket },
   { path: '/noetica', component: NoeticaChat },
   ...mockedSurfaceRoutes,
