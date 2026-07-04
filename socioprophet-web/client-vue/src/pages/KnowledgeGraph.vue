@@ -2,7 +2,8 @@
   <section class="surface" aria-label="Knowledge Graph">
     <header class="head">
       <div>
-        <h1>Knowledge Graph</h1>
+        <p v-if="scope && !scope.isPrimary" class="kg-eyebrow">{{ scope.domain }}</p>
+        <h1>{{ scope && !scope.isPrimary ? scope.label : 'Knowledge Graph' }}</h1>
         <p>Live HellGraph subgraph — view-scoped, degree-ranked. Click a node to re-root.</p>
       </div>
       <div class="views">
@@ -40,7 +41,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { graphSurface, graphHealth, type SurfaceResult, type GraphHealth } from '../services/agentMachineApi';
+import { navScopeForPath } from '../config/cockpitNav';
+
+const route = useRoute();
+// Active lens — e.g. the Ontology & Epistemology capability realized here.
+const scope = computed(() => navScopeForPath(route.path));
 
 const views = ['all', 'knowledge', 'tech', 'people'] as const;
 const view = ref<(typeof views)[number]>('all');
@@ -108,6 +115,7 @@ const trim = (s: string) => (s.length > 18 ? s.slice(0, 17) + '…' : s);
 .surface { display: grid; gap: 1rem; max-width: 900px; margin: 1rem auto; padding: 1.5rem 1.75rem; background: var(--bg); color: rgba(255, 255, 255, 0.92); border: 1px solid var(--line-2); border-radius: 16px; }
 .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 h1 { margin: 0; font-size: 1.25rem; } .head p { margin: 0.25rem 0 0; color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }
+.head .kg-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .views { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .vbtn { border: 1px solid rgba(255, 255, 255, 0.16); background: transparent; color: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 0.25rem 0.6rem; font-size: 0.75rem; text-transform: capitalize; cursor: pointer; } .vbtn.on { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: transparent; }
 .btn { border: 1px solid rgba(255, 255, 255, 0.18); background: transparent; color: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 0.25rem 0.6rem; font-size: 0.75rem; cursor: pointer; }

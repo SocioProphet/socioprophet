@@ -123,6 +123,12 @@ export function navScopeForPath(path: string): NavScope | undefined {
       return { domain: group.label, label: leaf.label, domainTo: group.to, isPrimary: leaf.to === group.to };
     }
   }
+  // CAPABILITY axis: a rail capability realized through an existing surface
+  // (e.g. Portfolios via the market watchlist, Entity Analytics via the People
+  // directory) shows its capability label as the lens — never 'primary', so the
+  // host screen swaps its own title for the capability it's standing in for.
+  const cap = CAPABILITY_RAIL.find((group) => group.to === path);
+  if (cap) return { domain: 'Capabilities', label: cap.label, domainTo: cap.to, isPrimary: false };
   return undefined;
 }
 

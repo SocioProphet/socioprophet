@@ -1,7 +1,13 @@
 <template>
   <section class="ss" aria-label="Social signals">
     <header class="ss-toolbar">
-      <div class="ss-title"><h1>Social Signals</h1><span class="ss-pill">fixture</span></div>
+      <div class="ss-title">
+        <div>
+          <p v-if="scope && !scope.isPrimary" class="ss-eyebrow">{{ scope.domain }}</p>
+          <h1>{{ scope && !scope.isPrimary ? scope.label : 'Social Signals' }}</h1>
+        </div>
+        <span class="ss-pill">fixture</span>
+      </div>
       <form class="term-cmd" @submit.prevent>
         <span class="term-cmd-prompt">›</span>
         <input v-model="query" spellcheck="false" placeholder="Filter by @handle, name or #topic" />
@@ -62,8 +68,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { socialSignals, trends, asOf, type SocialSignal, type Sentiment } from '../data/socialFixture';
 import { entities, type EntityKind, type Platform } from '../data/peopleFixture';
+import { navScopeForPath } from '../config/cockpitNav';
+
+const route = useRoute();
+// Active lens — a domain sub-domain or a capability (e.g. Sentiment Analytics)
+// realized through this board.
+const scope = computed(() => navScopeForPath(route.path));
 
 const platforms = ['all', 'x', 'linkedin', 'mastodon', 'telegram'] as const;
 const sentiments = ['all', 'pos', 'neu', 'neg'] as const;
@@ -108,6 +121,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .ss { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.6rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: rgba(255, 255, 255, 0.9); }
 .ss-toolbar { display: flex; align-items: center; gap: 1rem; }
 .ss-title { display: flex; align-items: baseline; gap: 0.5rem; } .ss-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
+.ss-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .ss-pill { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 4px; padding: 0.08rem 0.3rem; }
 .ss-asof { margin-left: auto; font-size: 0.72rem; color: rgba(255, 255, 255, 0.4); }
 .ss-filters { display: flex; gap: 1rem; }

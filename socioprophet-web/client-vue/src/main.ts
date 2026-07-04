@@ -45,6 +45,14 @@ const explicitRoutes = [
   { path: '/', redirect: '/capability/dashboard' },
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/capability/dashboard', component: OperatorDashboard },
+  // Capability-rail cells that are realized through an existing surface — the
+  // capability keeps its own /capability/* URL + rail highlight, and the host
+  // screen shows the capability as its header lens (via navScopeForPath).
+  { path: '/capability/portfolios', component: MarketMonitor },
+  { path: '/capability/entity-analytics', component: PeopleDirectory },
+  { path: '/capability/sentiment-analytics', component: SocialSignals },
+  { path: '/capability/ontology-epistemology', component: KnowledgeGraph },
+  { path: '/capability/economic-prophet', component: EconomySectorBoard },
   { path: '/research', component: ResearchList },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },
