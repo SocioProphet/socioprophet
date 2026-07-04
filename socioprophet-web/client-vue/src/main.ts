@@ -18,6 +18,7 @@ import DataSearch from './pages/DataSearch.vue';
 import KnowledgeGraph from './pages/KnowledgeGraph.vue';
 import ForgeImport from './pages/ForgeImport.vue';
 import NewsFeed from './pages/NewsFeed.vue';
+import MarketMonitor from './pages/MarketMonitor.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
@@ -60,6 +61,7 @@ const routes = [
   { path: '/knowledge/graph', component: KnowledgeGraph },
   { path: '/forge/import', component: ForgeImport },
   { path: '/news', component: NewsFeed },
+  { path: '/markets/indices-funds', component: MarketMonitor },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];
