@@ -133,6 +133,9 @@
           <span :class="['decision-pill', item.membraneDecision]">{{ item.membraneDecision }}</span>
           <strong>{{ item.title }}</strong>
           <p>{{ item.summary }}</p>
+          <span v-if="item.claims.length" class="item-claims">
+            <span v-for="claim in item.claims" :key="claim" class="item-claim">{{ claim }}</span>
+          </span>
           <small>{{ item.topicScope }} · {{ item.provenanceHash }}</small>
         </button>
       </section>
@@ -252,7 +255,10 @@ import {
 import { feedIntelligenceState as state } from '../features/feed-intelligence/state';
 import type { StoragePolicy } from '../features/feed-intelligence/types';
 
-const selectedSourceId = ref(state.sources[0]?.id ?? '');
+// Default to the whole canonical stream (no source pre-selected); picking a
+// source in the rail filters it. This keeps every item — including the local
+// BearBrowser handoff fixture — visible in the stream by default.
+const selectedSourceId = ref('');
 const selectedItemId = ref(state.items[0]?.id ?? '');
 
 const selectedSource = computed(() => state.sources.find((source) => source.id === selectedSourceId.value));
@@ -305,6 +311,8 @@ p { color: var(--text-2); }
 .panel-heading { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: .75rem; margin-bottom: .75rem; border-bottom: 1px solid var(--line); color: var(--text-2); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
 .source-card, .item-card { width: 100%; display: grid; gap: .45rem; padding: 1rem; border-bottom: 1px solid var(--line); }
 .item-card p { margin: 0; }
+.item-claims { display: flex; flex-wrap: wrap; gap: .3rem; }
+.item-claim { font-size: .68rem; color: var(--accent); background: rgba(216, 162, 80, 0.1); border: 1px solid var(--accent-soft); border-radius: 5px; padding: .05rem .35rem; }
 .detail-panel h2 { font-size: 1.55rem; letter-spacing: -.03em; color: var(--text); }
 .detail-list { display: grid; gap: .5rem; }
 .detail-list div { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: .75rem; padding: .5rem 0; border-bottom: 1px solid var(--line); }
