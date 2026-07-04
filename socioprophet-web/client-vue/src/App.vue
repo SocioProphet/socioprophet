@@ -99,8 +99,15 @@
 
     <footer class="sp-agent-shell">
       <div class="sp-agent-search">
-        <span>⌕</span>
-        <input type="search" placeholder="Search or command…" />
+        <button type="button" class="sp-cmd-glyph" title="Open terminal (Ctrl+`)" @click="toggleTerm()">›_</button>
+        <input
+          v-model="cmdBar"
+          type="text"
+          placeholder="Type a command, ⏎ to run in the terminal…"
+          spellcheck="false"
+          autocomplete="off"
+          @keyup.enter="submitCmd()"
+        />
       </div>
       <div class="sp-capture-actions">
         <button
@@ -155,6 +162,7 @@ import { useAuth } from './stores/auth';
 import { useResearch } from './stores/research';
 import RuntimeAdapterStatusBadge from './components/RuntimeAdapterStatusBadge.vue';
 import QuakeTerminal from './components/QuakeTerminal.vue';
+import { useOperatorTerminal } from './composables/useOperatorTerminal';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
 import { AGENT_COCKPIT, CAPABILITY_RAIL, DOMAIN_MENU, OPERATOR_SHORTCUTS } from './config/cockpitNav';
 import {
@@ -184,7 +192,20 @@ const navOpen = ref(false);
 // Quake drop-down terminal — shell-wide, toggled by the footer button or Ctrl+`.
 const termOpen = ref(false);
 const termPopout = ref(false);
+const term = useOperatorTerminal();
+const cmdBar = ref('');
 function toggleTerm() { termOpen.value = !termOpen.value; }
+// Footer command bar → the shared terminal session: open the drop-down, hand it
+// the command, and run it. One session, so it also shows in the docked/pop-out view.
+async function submitCmd() {
+  const v = cmdBar.value.trim();
+  if (!v) return;
+  termOpen.value = true;
+  cmdBar.value = '';
+  await term.loadStatus();
+  term.input.value = v;
+  await term.run();
+}
 function onTermHotkey(e: KeyboardEvent) {
   // Ctrl+`  (backquote) — the classic Quake / VS Code terminal toggle.
   if (e.ctrlKey && (e.key === '`' || e.code === 'Backquote')) {
