@@ -35,14 +35,16 @@ import NLBootEvidence from './pages/NLBootEvidence.vue';
 import PersonGraph from './pages/PersonGraph.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import Reader from './pages/Reader.vue';
+import OperatorDashboard from './pages/OperatorDashboard.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
 import './components/workbench/primitives.css';
 
 const explicitRoutes = [
-  { path: '/', redirect: '/news' },
+  { path: '/', redirect: '/capability/dashboard' },
   { path: '/login', component: Login, meta: { public: true } },
+  { path: '/capability/dashboard', component: OperatorDashboard },
   { path: '/research', component: ResearchList },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },
