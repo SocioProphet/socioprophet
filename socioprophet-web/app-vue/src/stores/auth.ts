@@ -1,39 +1,16 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { auth, googleProvider } from "../firebase";
+import { socbase } from "../socbase";
 
-// Local-dev auth bypass: active ONLY under Vite dev AND when no real Firebase
-// project is configured (empty apiKey). Lets the authenticated shell (/builder,
-// etc.) render without a live Firebase project. Can never activate in a prod
-// build (import.meta.env.DEV === false) or once a real apiKey is injected.
-const _cfg = (typeof window !== "undefined" && window.__FIREBASE_CONFIG__) || {};
-const DEV_AUTH_BYPASS = import.meta.env.DEV && !_cfg.apiKey;
-
-// Auth store: tracks the Firebase user + the caller's tier (read from the API).
+// Auth store: tracks the Socbase (Supabase) session + the caller's tier (read
+// from the API). Google sign-in is a full-page redirect (Supabase's default
+// OAuth flow) — the router's auth guard picks up the session on return, so
+// Login.vue's post-await navigation is a harmless no-op in that path.
 export const useAuth = defineStore("auth", () => {
   const user = ref<any>(null);
   const ready = ref(false);
   const tier = ref<string>("free");
   const policy = ref<any>(null);
-
-  if (DEV_AUTH_BYPASS) {
-    // Stub a signed-in user so the router guard passes through to /builder.
-    user.value = {
-      uid: "dev-local",
-      email: "dev@localhost",
-      displayName: "Local Dev",
-      getIdToken: async () => "dev-local-token",
-    };
-    tier.value = "pro";
-    ready.value = true;
-    console.warn("[auth] DEV_AUTH_BYPASS active — stub user; no Firebase project configured.");
-  } else {
-    auth.onAuthStateChanged(async (u: any) => {
-      user.value = u;
-      ready.value = true;
-      if (u) { loadProfile().catch(() => {}); } else { tier.value = "free"; policy.value = null; }
-    });
-  }
 
   // Load the caller's tier + policy from the backend (server is source of truth).
   const loadProfile = async () => {
@@ -43,16 +20,30 @@ export const useAuth = defineStore("auth", () => {
     policy.value = me.policy || null;
   };
 
-  const signInGoogle = () => auth.signInWithPopup(googleProvider);
-  const signInEmail = (email: string, pw: string) =>
-    auth.signInWithEmailAndPassword(email, pw);
-  const registerEmail = (email: string, pw: string) =>
-    auth.createUserWithEmailAndPassword(email, pw);
-  const signOut = () => auth.signOut();
+  const applySession = (session: any) => {
+    user.value = session?.user ?? null;
+    ready.value = true;
+    if (user.value) { loadProfile().catch(() => {}); } else { tier.value = "free"; policy.value = null; }
+  };
+
+  socbase.auth.getSession().then(({ data }: any) => applySession(data.session));
+  socbase.auth.onAuthStateChange((_event: string, session: any) => applySession(session));
+
+  const signInGoogle = () => socbase.auth.signInWithOAuth({ provider: "google" });
+  const signInEmail = async (email: string, pw: string) => {
+    const { error } = await socbase.auth.signInWithPassword({ email, password: pw });
+    if (error) throw error;
+  };
+  const registerEmail = async (email: string, pw: string) => {
+    const { error } = await socbase.auth.signUp({ email, password: pw });
+    if (error) throw error;
+  };
+  const signOut = () => socbase.auth.signOut();
 
   const idToken = async (): Promise<string> => {
-    if (!user.value) throw new Error("not signed in");
-    return user.value.getIdToken();
+    const { data } = await socbase.auth.getSession();
+    if (!data.session) throw new Error("not signed in");
+    return data.session.access_token;
   };
 
   return { user, ready, tier, policy, loadProfile, signInGoogle, signInEmail, registerEmail, signOut, idToken };

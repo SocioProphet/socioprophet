@@ -44,7 +44,7 @@ app.use("/api/builds", apiLimiter, requireAuth, buildsRouter);
 app.use("/api/fleet", apiLimiter, requireAuth, fleetRouter);
 app.use("/api/procybernetica", apiLimiter, proCyberneticaRouter);
 // Device provisioning is UNAUTHENTICATED (claim-code authorized) — nlboot devices
-// have no Firebase token; rate-limited at the HTTP layer.
+// have no Socbase token; rate-limited at the HTTP layer.
 app.use("/boot", bootLimiter, bootRouter);
 
 const server = app.listen(port, () =>
