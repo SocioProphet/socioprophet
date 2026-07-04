@@ -11,7 +11,7 @@
     </header>
 
     <!-- KPI indicator tiles -->
-    <div class="ec-kpis" aria-label="Macro indicators">
+    <div class="ec-kpis" aria-label="Macro indicators" @keydown="arrowRove($event, $event.currentTarget, '.ec-kpi', 'h')">
       <button v-for="k in indicators" :key="k.id" class="ec-kpi" :class="{ on: sel.kind === 'indicator' && sel.id === k.id }" @click="pickIndicator(k)">
         <div class="ec-kpi-top">
           <span class="ec-kpi-name">{{ k.name }}</span>
@@ -26,7 +26,7 @@
     <div class="ec-body">
       <div class="ec-board">
         <div class="ec-board-head">Sector board <span>breadth · momentum</span></div>
-        <div class="ec-grid">
+        <div class="ec-grid" @keydown="arrowRove($event, $event.currentTarget, '.ec-sector', 'both')">
           <button
             v-for="s in sectors"
             :key="s.id"
@@ -107,6 +107,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { indicators, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
+import { arrowRove } from '../utils/listKeys';
 
 const sp = sparkPoints;
 const ar = areaPoints;

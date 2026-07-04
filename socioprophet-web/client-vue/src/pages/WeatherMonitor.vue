@@ -11,7 +11,7 @@
     </header>
 
     <!-- Region tiles -->
-    <div class="wx-tiles" aria-label="Regions">
+    <div class="wx-tiles" aria-label="Regions" @keydown="arrowRove($event, $event.currentTarget, '.wx-tile', 'h')">
       <button v-for="r in regions" :key="r.id" class="wx-tile" :class="{ on: selected.id === r.id }" @click="selected = r">
         <div class="wx-tile-top"><span class="wx-glyph" :style="{ color: cm(r.cond).color }">{{ cm(r.cond).glyph }}</span><span class="wx-tile-name">{{ r.name }}</span></div>
         <div class="wx-tile-temp">{{ r.tempF }}°<span class="wx-chg" :class="r.changeF >= 0 ? 'up' : 'down'">{{ r.changeF >= 0 ? '+' : '' }}{{ r.changeF }}°</span></div>
@@ -63,7 +63,7 @@
       <!-- Alerts board -->
       <aside class="wx-alerts" aria-label="Alerts">
         <div class="wx-alerts-h">Active alerts <span>{{ alerts.length }}</span></div>
-        <div class="wx-alert-list">
+        <div class="wx-alert-list" @keydown="arrowRove($event, $event.currentTarget, '.wx-alert', 'v')">
           <button v-for="a in sortedAlerts" :key="a.id" class="wx-alert" :class="{ on: a.regionId === selected.id }" @click="jumpTo(a.regionId)">
             <div class="wx-alert-top">
               <span class="wx-sev" :class="a.severity">{{ a.severity }}</span>
@@ -85,6 +85,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { regions, alerts, asOf, type Region, type Condition } from '../data/weatherFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
+import { arrowRove } from '../utils/listKeys';
 
 const selected = ref<Region>(regions[0]!);
 const cmd = ref('');
