@@ -58,8 +58,14 @@ export interface SurfaceLink { source: string; target: string; primary: boolean;
 export interface SurfaceResult { nodes: SurfaceNode[]; links: SurfaceLink[]; total: { nodes: number; edges: number }; error?: string }
 export const graphSurface = (view = 'all', limit = 34, root = '') =>
   get<SurfaceResult>(`/api/graph/surface?view=${encodeURIComponent(view)}&limit=${limit}${root ? `&root=${encodeURIComponent(root)}` : ''}`);
-export interface GraphHealth { ok: boolean; nodes?: number; edges?: number; walPath?: string; error?: string }
-export const graphHealth = () => get<GraphHealth>('/api/graph/health');
+export interface GraphHealth { ok: boolean; nodes?: number; edges?: number; walPath?: string; vectorIndex?: string; error?: string }
+// The endpoint returns { graph: { status, nodeCount, edgeCount, walPath, vectorIndexStatus }, time: {...} };
+// normalize it to the flat shape the UI reads.
+export async function graphHealth(): Promise<GraphHealth> {
+  const raw = await get<{ graph?: { status?: string; nodeCount?: number; edgeCount?: number; walPath?: string; vectorIndexStatus?: string }; error?: string }>('/api/graph/health');
+  const g = raw.graph;
+  return { ok: g?.status === 'ok', nodes: g?.nodeCount, edges: g?.edgeCount, walPath: g?.walPath, vectorIndex: g?.vectorIndexStatus, error: raw.error };
+}
 
 // ---- Forge → Local git import (folder picker + SSE push into sovereign Gitea) ----
 export interface BrowseEntry { name: string; path: string; isGitRepo: boolean }
