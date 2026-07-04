@@ -1,7 +1,13 @@
 <template>
   <section class="lw" aria-label="Legal docket">
     <header class="lw-toolbar">
-      <div class="lw-title"><h1>Docket</h1><span class="lw-pill">fixture</span></div>
+      <div class="lw-title">
+        <div>
+          <p v-if="scope" class="lw-eyebrow">{{ scope.domain }}</p>
+          <h1>{{ scope?.label ?? 'Docket' }}</h1>
+        </div>
+        <span class="lw-pill">fixture</span>
+      </div>
       <form class="term-cmd" @submit.prevent="runCmd">
         <span class="term-cmd-prompt">›</span>
         <input v-model="cmd" spellcheck="false" placeholder="Jump to a cite or title (e.g. HR-2026-882)" />
@@ -31,7 +37,7 @@
           <div class="lw-row-title">{{ d.title }}</div>
           <div class="lw-row-meta">{{ d.jurisdiction }} · updated {{ relative(d.updated) }}</div>
         </button>
-        <p v-if="results.length === 0" class="lw-empty">No items with that status.</p>
+        <p v-if="results.length === 0" class="lw-empty">No items in this scope.</p>
       </div>
 
       <!-- Detail + redline -->
@@ -70,6 +76,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { dockets, asOf, type Docket, type DocketStatus } from '../data/lawFixture';
+import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
 
 const statuses = ['all', 'comment', 'pending', 'enacted', 'open'] as const;
@@ -77,7 +84,25 @@ const status = ref<(typeof statuses)[number]>('all');
 const selectedId = ref<string>(dockets[0]!.id);
 const listEl = ref<HTMLElement | null>(null);
 const route = useRoute();
-onMounted(() => { const d = typeof route.query.d === 'string' ? route.query.d : ''; if (d && dockets.some((x) => x.id === d)) { status.value = 'all'; selectedId.value = d; } });
+
+// Sub-domain scope: each Law nav leaf narrows the docket set by jurisdiction or
+// instrument type, so /law/federal-law, /law/case-law, etc. are real slices of
+// the corpus rather than identical boards. A specific ?d= deep-link bypasses the
+// scope so palette jumps always resolve, whatever slice the item belongs to.
+const scope = computed(() => navScopeForPath(route.path));
+const deepLinked = ref(false);
+function inScope(d: Docket): boolean {
+  if (deepLinked.value) return true;
+  switch (route.path) {
+    case '/law/federal-law': return d.jurisdiction === 'Federal';
+    case '/law/state-local-law': return ['Regional', 'State', 'Local'].includes(d.jurisdiction);
+    case '/law/statutory-law': return d.type === 'bill';
+    case '/law/case-law': return d.type === 'case';
+    case '/law/international-law': return d.jurisdiction === 'International';
+    default: return true;
+  }
+}
+onMounted(() => { const d = typeof route.query.d === 'string' ? route.query.d : ''; if (d && dockets.some((x) => x.id === d)) { deepLinked.value = true; status.value = 'all'; selectedId.value = d; } });
 const cmd = ref('');
 function runCmd() {
   const q = cmd.value.trim().toLowerCase();
@@ -86,10 +111,15 @@ function runCmd() {
   if (hit) { status.value = 'all'; selectedId.value = hit.id; cmd.value = ''; }
 }
 
-const results = computed<Docket[]>(() => (status.value === 'all' ? dockets : dockets.filter((d) => d.status === (status.value as DocketStatus))));
+const results = computed<Docket[]>(() =>
+  dockets.filter((d) => inScope(d) && (status.value === 'all' || d.status === (status.value as DocketStatus))),
+);
 const selected = computed<Docket | undefined>(() => dockets.find((d) => d.id === selectedId.value));
-function setStatus(s: (typeof statuses)[number]) { status.value = s; if (!results.value.some((d) => d.id === selectedId.value) && results.value[0]) selectedId.value = results.value[0].id; }
-watch(status, () => { /* keep selection valid handled in setStatus */ });
+function setStatus(s: (typeof statuses)[number]) { status.value = s; }
+// Keep a valid selection as the scope/status narrows the visible set.
+watch(results, (r) => { if (!r.some((d) => d.id === selectedId.value) && r[0]) selectedId.value = r[0].id; }, { immediate: true });
+// Moving between sub-domains resumes scope filtering (deep-link was one-shot).
+watch(() => route.path, () => { deepLinked.value = false; });
 
 const NOW = new Date('2026-07-03T14:00:00-04:00').getTime();
 function relative(iso: string): string {
@@ -105,6 +135,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .lw { height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: rgba(255, 255, 255, 0.9); }
 .lw-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .lw-title { display: flex; align-items: baseline; gap: 0.6rem; } .lw-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
+.lw-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .lw-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .lw-filters { display: flex; gap: 0.25rem; }
 .lw-fbtn { border: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.74rem; text-transform: capitalize; cursor: pointer; } .lw-fbtn.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }

@@ -5,6 +5,7 @@ import App from './App.vue';
 import { useAuth } from './stores/auth';
 import { useResearch } from './stores/research';
 import { domainSurfaces, surfaceForRoute } from './config/domainRoutes';
+import { DOMAIN_MENU } from './config/cockpitNav';
 import { registryEntryForPath } from './config/routeRegistry';
 import Login from './pages/Login.vue';
 import ResearchList from './pages/ResearchList.vue';
@@ -39,11 +40,7 @@ import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
 import './components/workbench/primitives.css';
 
-const mockedSurfaceRoutes = domainSurfaces
-  .filter((surface) => surface.route !== '/map')
-  .map((surface) => ({ path: surface.route, component: DomainSurfacePage }));
-
-const routes = [
+const explicitRoutes = [
   { path: '/', redirect: '/news' },
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/research', component: ResearchList },
@@ -74,6 +71,45 @@ const routes = [
   { path: '/law/international-law', component: LawDocket },
   { path: '/noetica', component: NoeticaChat },
   { path: '/weather/forecast', component: WeatherMonitor },
+];
+
+// Integration: every DOMAIN-axis sub-domain lands on its family's real flagship
+// surface (scoped to that sub-domain in the header), instead of dead-ending on a
+// generic mocked placeholder. A sub-domain with its own dedicated surface
+// (e.g. Social Networks) is pinned via LEAF_OVERRIDE; the rest inherit the
+// flagship keyed by their leading path segment.
+const DOMAIN_FLAGSHIP: Record<string, unknown> = {
+  news: NewsFeed,
+  law: LawDocket,
+  people: PeopleDirectory,
+  economy: EconomySectorBoard,
+  markets: MarketMonitor,
+  weather: WeatherMonitor,
+};
+const LEAF_OVERRIDE: Record<string, unknown> = {
+  '/people/social-networks': SocialSignals,
+  '/map': MapPage,
+};
+const explicitPaths = new Set(explicitRoutes.map((r) => r.path));
+const domainLeafRoutes = DOMAIN_MENU.flatMap((group) => group.items)
+  .filter((leaf) => !explicitPaths.has(leaf.to))
+  .map((leaf) => {
+    const segment = leaf.to.split('/')[1];
+    const component = LEAF_OVERRIDE[leaf.to] ?? DOMAIN_FLAGSHIP[segment];
+    return component ? { path: leaf.to, component: component as never } : null;
+  })
+  .filter((r): r is { path: string; component: never } => r !== null);
+const flagshipPaths = new Set(domainLeafRoutes.map((r) => r.path));
+
+// Remaining not-yet-built cells (capability rail, analytics) keep the mocked
+// surface — but only where a real flagship hasn't claimed the path.
+const mockedSurfaceRoutes = domainSurfaces
+  .filter((surface) => surface.route !== '/map' && !explicitPaths.has(surface.route) && !flagshipPaths.has(surface.route))
+  .map((surface) => ({ path: surface.route, component: DomainSurfacePage }));
+
+const routes = [
+  ...explicitRoutes,
+  ...domainLeafRoutes,
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];

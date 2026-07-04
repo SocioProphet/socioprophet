@@ -105,6 +105,27 @@ export const DOMAIN_MENU: NavGroup[] = [
   },
 ];
 
+// Resolve the DOMAIN-axis scope for a route path — the parent domain plus the
+// active sub-domain leaf label — so a flagship surface can show which lens the
+// operator is in (e.g. Capital & Markets · Equities & Preferreds) and scope its
+// data to that sub-domain instead of every sibling rendering an identical board.
+export interface NavScope {
+  domain: string; // parent domain label, e.g. "Capital & Markets"
+  label: string; // active leaf label, e.g. "Equities & Preferreds"
+  domainTo: string; // the domain's landing route
+  isPrimary: boolean; // true when this leaf is the domain's landing route
+}
+
+export function navScopeForPath(path: string): NavScope | undefined {
+  for (const group of DOMAIN_MENU) {
+    const leaf = group.items.find((item) => item.to === path);
+    if (leaf) {
+      return { domain: group.label, label: leaf.label, domainTo: group.to, isPrimary: leaf.to === group.to };
+    }
+  }
+  return undefined;
+}
+
 // --- CAPABILITY axis (left rail) ---------------------------------------------
 // Will's 11 capabilities. Sub-items were `sub-heading1/2/3` stubs in the
 // reference; left as capability landings until the operator screens land.

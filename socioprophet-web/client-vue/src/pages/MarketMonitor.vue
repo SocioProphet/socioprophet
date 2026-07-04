@@ -2,7 +2,13 @@
   <section class="mk" aria-label="Market monitor">
     <!-- Toolbar + command line -->
     <header class="mk-toolbar">
-      <div class="mk-title"><h1>Market Monitor</h1><span class="mk-pill">fixture</span></div>
+      <div class="mk-title">
+        <div>
+          <p v-if="scope && !scope.isPrimary" class="mk-eyebrow">{{ scope.domain }}</p>
+          <h1>{{ scope && !scope.isPrimary ? scope.label : 'Market Monitor' }}</h1>
+        </div>
+        <span class="mk-pill">fixture</span>
+      </div>
       <form class="mk-cmd" @submit.prevent="runCmd">
         <span class="mk-cmd-prompt">›</span>
         <input v-model="cmd" spellcheck="false" placeholder="Type a ticker  (e.g. NVDA)" />
@@ -113,6 +119,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { navScopeForPath } from '../config/cockpitNav';
 import { indices, watchlist, asOf, type Instrument, type AssetClass } from '../data/marketsFixture';
 import { arrowRove } from '../utils/listKeys';
 
@@ -123,6 +130,9 @@ const listEl = ref<HTMLElement | null>(null);
 const cmd = ref('');
 const tape = [...indices, ...watchlist];
 const route = useRoute();
+// Active DOMAIN-axis sub-domain (e.g. Equities & Preferreds) shown as the board's
+// lens; the monitor is the shared Capital & Markets surface at this stage.
+const scope = computed(() => navScopeForPath(route.path));
 onMounted(() => { const sym = typeof route.query.sym === 'string' ? route.query.sym.toUpperCase() : ''; if (sym) { const hit = tape.find((i) => i.symbol === sym); if (hit) selected.value = hit; } });
 
 const rows = computed<Instrument[]>(() => (klass.value === 'All' ? watchlist : watchlist.filter((i) => i.klass === klass.value)));
@@ -172,6 +182,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .mk { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto auto 1fr; gap: 0.6rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: var(--text); }
 .mk-toolbar { display: flex; align-items: center; gap: 1rem; }
 .mk-title { display: flex; align-items: baseline; gap: 0.5rem; } .mk-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
+.mk-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .mk-pill { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 4px; padding: 0.08rem 0.3rem; }
 .mk-asof { margin-left: auto; font-size: 0.72rem; color: rgba(255, 255, 255, 0.4); }
 /* command line */

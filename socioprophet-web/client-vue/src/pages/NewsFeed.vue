@@ -2,7 +2,13 @@
   <section class="news" aria-label="News feed">
     <!-- Toolbar -->
     <header class="nf-toolbar">
-      <div class="nf-title"><h1>News</h1><span class="nf-pill">fixture</span></div>
+      <div class="nf-title">
+        <div>
+          <p v-if="scope && !scope.isPrimary" class="nf-eyebrow">{{ scope.domain }}</p>
+          <h1>{{ scope && !scope.isPrimary ? scope.label : 'News' }}</h1>
+        </div>
+        <span class="nf-pill">fixture</span>
+      </div>
       <div class="nf-tools">
         <span class="nf-count">{{ totalUnread }} unread</span>
         <div class="nf-seg">
@@ -133,6 +139,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { navScopeForPath } from '../config/cockpitNav';
 import { newsSources, newsItems } from '../data/newsFeedFixture';
 import type { FeedItem } from '../features/feed-intelligence/types';
 import { useResearch } from '../stores/research';
@@ -241,6 +248,8 @@ function onKey(e: KeyboardEvent) {
 watch(selectedId, async () => { await nextTick(); listEl.value?.querySelector('.nf-row.on')?.scrollIntoView({ block: 'nearest' }); });
 
 const route = useRoute();
+// Active News & Events sub-domain shown as the feed's lens.
+const scope = computed(() => navScopeForPath(route.path));
 onMounted(() => {
   const deep = typeof route.query.item === 'string' ? route.query.item : '';
   if (deep && all.some((i) => i.id === deep)) openReader(deep);
@@ -254,6 +263,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .news { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; background: var(--bg); color: rgba(255, 255, 255, 0.92); }
 .nf-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .nf-title { display: flex; align-items: baseline; gap: 0.6rem; } .nf-title h1 { margin: 0; font-size: 1.3rem; }
+.nf-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .nf-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .nf-tools { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .nf-count { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }

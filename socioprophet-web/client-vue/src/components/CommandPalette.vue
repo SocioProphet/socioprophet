@@ -185,7 +185,7 @@ async function askNoetica(text: string) {
 .cp-item.on { background: var(--accent-soft); }
 .cp-icon { flex: 0 0 auto; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; border-radius: 8px; background: rgba(255, 255, 255, 0.05); color: var(--text-2); font-size: 0.85rem; }
 .cp-item.on .cp-icon { color: var(--accent); }
-.cp-icon.chat { color: #c58af9; }
+.cp-icon.chat { color: var(--accent); }
 .cp-text { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0.5rem; }
 .cp-label { font-size: 0.9rem; color: var(--text); white-space: nowrap; }
 .cp-sub { font-size: 0.78rem; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

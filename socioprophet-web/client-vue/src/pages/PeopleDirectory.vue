@@ -1,7 +1,13 @@
 <template>
   <section class="pd" aria-label="People directory">
     <header class="pd-toolbar">
-      <div class="pd-title"><h1>Directory</h1><span class="pd-pill">fixture</span></div>
+      <div class="pd-title">
+        <div>
+          <p v-if="scope && !scope.isPrimary" class="pd-eyebrow">{{ scope.domain }}</p>
+          <h1>{{ scope && !scope.isPrimary ? scope.label : 'Directory' }}</h1>
+        </div>
+        <span class="pd-pill">fixture</span>
+      </div>
       <form class="pd-search" @submit.prevent="jump">
         <span class="pd-search-ic">⌕</span>
         <input v-model="query" type="text" placeholder="Search or type a name + ⏎ to open…" spellcheck="false" />
@@ -163,6 +169,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { entities, asOf, careers, education as eduMap, newsRefs, type Entity, type EntityKind, type Platform } from '../data/peopleFixture';
 import { newsItems, newsSources } from '../data/newsFeedFixture';
+import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
 
 const router = useRouter();
@@ -186,13 +193,33 @@ const kind = ref<(typeof kinds)[number]>('All');
 const query = ref('');
 const selectedId = ref<string>(entities[0]!.id);
 const route = useRoute();
-onMounted(() => { const id = typeof route.query.id === 'string' ? route.query.id : ''; if (id && entities.some((e) => e.id === id)) selectedId.value = id; });
+const deepLinked = ref(false);
+onMounted(() => { const id = typeof route.query.id === 'string' ? route.query.id : ''; if (id && entities.some((e) => e.id === id)) { deepLinked.value = true; selectedId.value = id; } });
 const listEl = ref<HTMLElement | null>(null);
 
+// Sub-domain scope: the person-typed People leaves narrow the directory to the
+// relevant cohort by role/tag/affiliation keyword (a real slice of the corpus);
+// the aggregate leaves (search/demographics/polls) show the full directory. A
+// ?id= deep-link bypasses scope for that landing so palette jumps always resolve.
+const scope = computed(() => navScopeForPath(route.path));
+const SCOPE_KEYWORDS: Record<string, string[]> = {
+  '/people/government-politics': ['gov', 'govern', 'politic', 'policy', 'regulat', 'senate', 'congress', 'minister', 'parliament', 'legislat', 'diplomat', 'agency'],
+  '/people/health-medicine': ['health', 'medic', 'clinic', 'hospital', 'bio', 'pharma', 'epidemi', 'doctor', 'physician', 'patient', 'vaccine'],
+  '/people/art-culture': ['art', 'culture', 'music', 'film', 'media', 'design', 'creativ', 'author', 'artist', 'journalis', 'writer'],
+};
+function inScope(e: Entity): boolean {
+  if (deepLinked.value) return true;
+  const kws = SCOPE_KEYWORDS[route.path];
+  if (!kws) return true;
+  if (route.path === '/people/government-politics' && e.kind === 'gov') return true;
+  const hay = [e.role, e.affiliation, e.summary, ...e.tags].join(' ').toLowerCase();
+  return kws.some((k) => hay.includes(k));
+}
 const byId = new Map(entities.map((e) => [e.id, e]));
 const results = computed<Entity[]>(() => {
   const q = query.value.trim().toLowerCase();
   return entities.filter((e) => {
+    if (!inScope(e)) return false;
     if (kind.value !== 'All' && e.kind !== kind.value) return false;
     if (!q) return true;
     return [e.name, e.role, e.affiliation, e.location, ...e.tags, ...e.selectors.map((s) => s.value), ...e.accounts.map((a) => a.handle)]
@@ -207,8 +234,11 @@ const selected = computed<Entity | undefined>(() => byId.get(selectedId.value));
 const career = computed(() => careers[selectedId.value] ?? []);
 const edu = computed(() => eduMap[selectedId.value] ?? []);
 const relatedNews = computed(() => (newsRefs[selectedId.value] ?? []).map((id) => newsItems.find((n) => n.id === id)).filter((x): x is NonNullable<typeof x> => !!x));
-function setKind(k: (typeof kinds)[number]) { kind.value = k; if (!results.value.some((r) => r.id === selectedId.value) && results.value[0]) selectedId.value = results.value[0].id; }
-watch(query, () => { if (!results.value.some((r) => r.id === selectedId.value) && results.value[0]) selectedId.value = results.value[0].id; });
+function setKind(k: (typeof kinds)[number]) { kind.value = k; }
+// Keep a valid selection as the scope / type filter / search narrows the set.
+watch(results, (r) => { if (!r.some((x) => x.id === selectedId.value) && r[0]) selectedId.value = r[0].id; }, { immediate: true });
+// Moving between sub-domains resumes scope filtering (deep-link was one-shot).
+watch(() => route.path, () => { deepLinked.value = false; });
 
 const KIND_COLORS: Record<EntityKind, string> = { person: '#58a6ff', org: '#c58af9', gov: '#e3b341', place: 'var(--up)' };
 const kindColor = (k: EntityKind) => KIND_COLORS[k];
@@ -243,6 +273,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .pd { height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: rgba(255, 255, 255, 0.9); }
 .pd-toolbar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .pd-title { display: flex; align-items: baseline; gap: 0.6rem; } .pd-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
+.pd-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .pd-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .pd-search { flex: 1 1 260px; display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); padding: 0.4rem 0.7rem; } .pd-search:focus-within { border-color: var(--accent); } .pd-search-ic { color: rgba(255, 255, 255, 0.4); }
 .pd-search input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #fff; font-size: 0.9rem; }

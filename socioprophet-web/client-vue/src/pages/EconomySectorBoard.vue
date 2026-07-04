@@ -1,7 +1,14 @@
 <template>
   <section class="ec" aria-label="Economy sector board">
     <header class="ec-toolbar">
-      <div class="ec-title"><h1>Macro &amp; Sectors</h1><span class="ec-pill">fixture</span></div>
+      <div class="ec-title">
+        <div>
+          <p v-if="scope && !scope.isPrimary" class="ec-eyebrow">{{ scope.domain }}</p>
+          <h1 v-if="scope && !scope.isPrimary">{{ scope.label }}</h1>
+          <h1 v-else>Macro &amp; Sectors</h1>
+        </div>
+        <span class="ec-pill">fixture</span>
+      </div>
       <form class="term-cmd" @submit.prevent="runCmd">
         <span class="term-cmd-prompt">›</span>
         <input v-model="cmd" spellcheck="false" placeholder="Jump to indicator or sector (e.g. CPI, Energy)" />
@@ -107,6 +114,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { indicators, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
+import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
 
 const sp = sparkPoints;
@@ -115,6 +123,8 @@ const ar = areaPoints;
 const sel = ref<{ kind: 'sector' | 'indicator'; id: string }>({ kind: 'sector', id: sectors[0]!.id });
 const cmd = ref('');
 const route = useRoute();
+// Active Economy & Industry sub-domain shown as the board's lens.
+const scope = computed(() => navScopeForPath(route.path));
 onMounted(() => {
   const id = typeof route.query.k === 'string' ? route.query.k : '';
   const kind = route.query.kind === 'indicator' ? 'indicator' : 'sector';
@@ -161,6 +171,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .ec { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: rgba(255, 255, 255, 0.9); }
 .ec-toolbar { display: flex; align-items: center; justify-content: space-between; }
 .ec-title { display: flex; align-items: baseline; gap: 0.6rem; } .ec-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
+.ec-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .ec-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .ec-asof { font-size: 0.74rem; color: rgba(255, 255, 255, 0.45); }
 

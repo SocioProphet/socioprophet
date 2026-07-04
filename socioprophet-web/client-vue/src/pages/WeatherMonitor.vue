@@ -1,7 +1,14 @@
 <template>
   <section class="wx" aria-label="Weather monitor">
     <header class="wx-toolbar">
-      <div class="wx-title"><h1>Weather &amp; Resources</h1><span class="wx-pill">fixture</span></div>
+      <div class="wx-title">
+        <div>
+          <p v-if="scope && !scope.isPrimary" class="wx-eyebrow">{{ scope.domain }}</p>
+          <h1 v-if="scope && !scope.isPrimary">{{ scope.label }}</h1>
+          <h1 v-else>Weather &amp; Resources</h1>
+        </div>
+        <span class="wx-pill">fixture</span>
+      </div>
       <form class="term-cmd" @submit.prevent="runCmd">
         <span class="term-cmd-prompt">›</span>
         <input v-model="cmd" spellcheck="false" placeholder="Jump to a region (e.g. Stockholm)" />
@@ -85,11 +92,14 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { regions, alerts, asOf, type Region, type Condition } from '../data/weatherFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
+import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
 
 const selected = ref<Region>(regions[0]!);
 const cmd = ref('');
 const route = useRoute();
+// Active Weather & Natural Resources sub-domain shown as the monitor's lens.
+const scope = computed(() => navScopeForPath(route.path));
 onMounted(() => { const r = typeof route.query.r === 'string' ? route.query.r : ''; const hit = regions.find((x) => x.id === r); if (hit) selected.value = hit; });
 
 const hiSeries = computed(() => selected.value.forecast.map((d) => d.hi));
@@ -123,6 +133,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .wx { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.6rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: rgba(255, 255, 255, 0.9); }
 .wx-toolbar { display: flex; align-items: center; gap: 1rem; }
 .wx-title { display: flex; align-items: baseline; gap: 0.5rem; } .wx-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
+.wx-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .wx-pill { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 4px; padding: 0.08rem 0.3rem; }
 .wx-asof { margin-left: auto; font-size: 0.72rem; color: rgba(255, 255, 255, 0.4); }
 
