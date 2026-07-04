@@ -6,10 +6,12 @@
       <div class="nf-tools">
         <span class="nf-count">{{ totalUnread }} unread</span>
         <div class="nf-seg">
-          <button :class="{ on: view === 'cards' }" @click="view = 'cards'">Cards</button>
           <button :class="{ on: view === 'titles' }" @click="view = 'titles'">Titles</button>
+          <button :class="{ on: view === 'cards' }" @click="view = 'cards'">Cards</button>
+          <button :class="{ on: view === 'magazine' }" @click="view = 'magazine'">Magazine</button>
         </div>
         <button class="nf-btn" :class="{ on: unreadOnly }" @click="unreadOnly = !unreadOnly">Unread only</button>
+        <button class="nf-btn" :class="{ on: governedOnly }" title="Only items the membrane held / quarantined / rejected" @click="governedOnly = !governedOnly">Governed</button>
         <button class="nf-btn" @click="markAllRead">Mark all read</button>
       </div>
     </header>
@@ -43,25 +45,51 @@
 
       <!-- Stream -->
       <div ref="listEl" class="nf-list" :class="view" aria-label="Articles">
-        <p v-if="items.length === 0" class="nf-empty">Nothing here — try “All feeds” or turn off “Unread only”.</p>
-        <article
-          v-for="it in items"
-          :key="it.id"
-          class="nf-row"
-          :class="{ on: it.id === selectedId, unread: !isRead(it.id) }"
-          @click="select(it.id)"
-        >
-          <span class="nf-unread-dot" :title="isRead(it.id) ? 'read' : 'unread'" />
-          <div class="nf-row-main">
-            <div class="nf-row-meta">
-              <span class="nf-src-tag" :style="{ color: sourceColor(it.sourceId) }">{{ sourceOf(it)?.title }}</span>
-              <span class="nf-time">{{ relative(it.publishedAt) }}</span>
+        <p v-if="items.length === 0" class="nf-empty">Nothing here — try “All feeds” or turn off the filters.</p>
+
+        <!-- Titles / Cards -->
+        <template v-if="view !== 'magazine'">
+          <article
+            v-for="it in items"
+            :key="it.id"
+            class="nf-row"
+            :class="{ on: it.id === selectedId, unread: !isRead(it.id) }"
+            @click="select(it.id)"
+          >
+            <span class="nf-unread-dot" :title="isRead(it.id) ? 'read' : 'unread'" />
+            <div class="nf-row-main">
+              <div class="nf-row-meta">
+                <span class="nf-src-tag" :style="{ color: sourceColor(it.sourceId) }">{{ sourceOf(it)?.title }}</span>
+                <span class="nf-time">{{ relative(it.publishedAt) }}</span>
+                <span v-if="it.membraneDecision !== 'admit'" class="nf-mem" :class="it.membraneDecision">{{ it.membraneDecision }}</span>
+                <span v-if="saved.has(it.id)" class="nf-saved">saved</span>
+              </div>
+              <h3 class="nf-row-title">{{ it.title }}</h3>
+              <p v-if="view === 'cards'" class="nf-row-dek">{{ it.summary }}</p>
+            </div>
+          </article>
+        </template>
+
+        <!-- Magazine (cover images) -->
+        <template v-else>
+          <article
+            v-for="it in items"
+            :key="it.id"
+            class="nf-mag"
+            :class="{ on: it.id === selectedId, unread: !isRead(it.id) }"
+            @click="select(it.id)"
+          >
+            <div class="nf-cover" :style="{ backgroundImage: cover(it) }">
+              <span class="nf-cover-src" :style="{ color: sourceColor(it.sourceId) }">{{ sourceOf(it)?.title }}</span>
               <span v-if="it.membraneDecision !== 'admit'" class="nf-mem" :class="it.membraneDecision">{{ it.membraneDecision }}</span>
             </div>
-            <h3 class="nf-row-title">{{ it.title }}</h3>
-            <p v-if="view === 'cards'" class="nf-row-dek">{{ it.summary }}</p>
-          </div>
-        </article>
+            <div class="nf-mag-b">
+              <div class="nf-row-meta"><span class="nf-time">{{ relative(it.publishedAt) }}</span><span v-if="saved.has(it.id)" class="nf-saved">saved</span></div>
+              <h3 class="nf-row-title">{{ it.title }}</h3>
+              <p class="nf-row-dek">{{ it.summary }}</p>
+            </div>
+          </article>
+        </template>
       </div>
 
       <!-- Reader -->
@@ -92,7 +120,7 @@
         <div class="nf-actions">
           <a class="nf-act primary" :href="selected.canonicalUrl" target="_blank" rel="noreferrer">Open ↗</a>
           <button class="nf-act" @click="toggleRead(selected.id)">{{ isRead(selected.id) ? 'Mark unread' : 'Mark read' }}</button>
-          <button class="nf-act" title="Capture into research" @click="noop">Save</button>
+          <button class="nf-act" :class="{ done: saved.has(selected.id) }" :disabled="saved.has(selected.id)" title="Capture into the Research list" @click="save(selected)">{{ saved.has(selected.id) ? 'Saved ✓' : 'Save' }}</button>
         </div>
       </article>
       <div v-else class="nf-reader empty">Select an article</div>
@@ -104,14 +132,18 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { newsSources, newsItems } from '../data/newsFeedFixture';
 import type { FeedItem } from '../features/feed-intelligence/types';
+import { useResearch } from '../stores/research';
 
 const sources = newsSources;
 const all = newsItems;
+const research = useResearch();
 
 const read = ref<Set<string>>(new Set());
+const saved = ref<Set<string>>(new Set());
 const activeSourceId = ref<'all' | string>('all');
 const unreadOnly = ref(false);
-const view = ref<'cards' | 'titles'>('cards');
+const governedOnly = ref(false);
+const view = ref<'cards' | 'magazine' | 'titles'>('cards');
 const selectedId = ref<string>('');
 const listEl = ref<HTMLElement | null>(null);
 
@@ -119,6 +151,7 @@ const items = computed<FeedItem[]>(() => {
   let list = all;
   if (activeSourceId.value !== 'all') list = list.filter((i) => i.sourceId === activeSourceId.value);
   if (unreadOnly.value) list = list.filter((i) => !read.value.has(i.id));
+  if (governedOnly.value) list = list.filter((i) => i.membraneDecision !== 'admit');
   return list;
 });
 const selected = computed<FeedItem | undefined>(() => all.find((i) => i.id === selectedId.value) ?? items.value[0]);
@@ -138,7 +171,27 @@ function select(id: string) { selectedId.value = id; read.value.add(id); }
 function toggleRead(id?: string) { if (!id) return; if (read.value.has(id)) read.value.delete(id); else read.value.add(id); }
 function setSource(sid: 'all' | string) { activeSourceId.value = sid; if (!items.value.some((i) => i.id === selectedId.value)) selectedId.value = items.value[0]?.id ?? ''; }
 function markAllRead() { for (const i of all) read.value.add(i.id); }
-function noop() { /* Save → capture spine (pending adapter) */ }
+
+// Save → the durable Research capture list (source: manual). Same store the
+// footer "Snapshot" and /research page read, so saved articles land there.
+function save(it?: FeedItem) {
+  if (!it || saved.value.has(it.id)) return;
+  research.capture({ path: it.canonicalUrl, title: it.title, domain: 'News & Events', openedAt: Date.now() }, 'manual');
+  saved.value.add(it.id);
+}
+
+// Deterministic gradient "cover" for magazine view — no external images (offline/CSP-safe).
+function hashOf(s: string): number { let h = 0; for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
+function darken(hex: string, f: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.round(((n >> 16) & 255) * f), g = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);
+  return `rgb(${r},${g},${b})`;
+}
+function cover(it: FeedItem): string {
+  const c = sourceColor(it.sourceId);
+  const a = (hashOf(it.id) % 90) + 25;
+  return `radial-gradient(circle at ${20 + (hashOf(it.id) % 60)}% 20%, ${c}66, transparent 60%), linear-gradient(${a}deg, ${c}, ${darken(c, 0.3)} 55%, #0d1117 100%)`;
+}
 
 // Deterministic "time ago" against the fixture's afternoon "now".
 const NOW = new Date('2026-07-03T14:00:00-04:00').getTime();
@@ -209,6 +262,17 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-row-title { margin: 0.2rem 0 0; font-size: 0.9rem; font-weight: 600; line-height: 1.35; color: rgba(255, 255, 255, 0.7); } .nf-row.unread .nf-row-title { color: #fff; }
 .nf-list.titles .nf-row-title { font-size: 0.84rem; }
 .nf-row-dek { margin: 0.25rem 0 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nf-saved { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: #3fb950; background: rgba(63, 185, 80, 0.14); border-radius: 4px; padding: 0.03rem 0.3rem; }
+
+/* Magazine view — cover-image cards in a responsive grid */
+.nf-list.magazine { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.7rem; padding: 0.7rem; align-content: start; align-items: start; }
+.nf-mag { border: 1px solid #21262d; border-radius: 10px; cursor: pointer; background: #010409; display: flex; flex-direction: column; } .nf-mag:hover { border-color: rgba(255, 255, 255, 0.2); } .nf-mag.on { border-color: #58a6ff; box-shadow: 0 0 0 1px #58a6ff; }
+.nf-cover { position: relative; height: 96px; border-radius: 10px 10px 0 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.45rem 0.55rem; }
+.nf-cover-src { font-size: 0.66rem; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.nf-mag-b { padding: 0.55rem 0.65rem 0.7rem; display: grid; gap: 0.2rem; }
+.nf-mag .nf-row-title { margin: 0.1rem 0 0; font-size: 0.86rem; }
+.nf-mag.unread .nf-row-title { color: #fff; }
+.nf-mag .nf-row-dek { -webkit-line-clamp: 3; }
 
 .nf-reader { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; padding: 1.1rem 1.25rem; }
 .nf-reader.empty { display: grid; place-items: center; color: rgba(255, 255, 255, 0.35); font-size: 0.85rem; }
@@ -223,4 +287,5 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-kv { display: grid; grid-template-columns: 6rem 1fr; gap: 0.5rem; font-size: 0.76rem; padding: 0.15rem 0; } .nf-kv span { color: rgba(255, 255, 255, 0.4); } .nf-kv code { color: rgba(255, 255, 255, 0.75); font-family: ui-monospace, monospace; overflow-wrap: anywhere; } .nf-hash { color: rgba(255, 255, 255, 0.5) !important; font-size: 0.68rem; }
 .nf-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
 .nf-act { border: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.8); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; text-decoration: none; } .nf-act:hover { border-color: rgba(255, 255, 255, 0.3); } .nf-act.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+.nf-act.done { color: #3fb950; border-color: rgba(63, 185, 80, 0.4); cursor: default; }
 </style>
