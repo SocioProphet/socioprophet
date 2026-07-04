@@ -14,7 +14,7 @@
 
     <div class="lw-body">
       <!-- Docket list -->
-      <div class="lw-list" aria-label="Dockets">
+      <div ref="listEl" class="lw-list" aria-label="Dockets" @keydown="arrowRove($event, listEl, '.lw-row')">
         <p class="lw-count">{{ results.length }} item{{ results.length === 1 ? '' : 's' }}</p>
         <button
           v-for="d in results"
@@ -70,10 +70,12 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { dockets, asOf, type Docket, type DocketStatus } from '../data/lawFixture';
+import { arrowRove } from '../utils/listKeys';
 
 const statuses = ['all', 'comment', 'pending', 'enacted', 'open'] as const;
 const status = ref<(typeof statuses)[number]>('all');
 const selectedId = ref<string>(dockets[0]!.id);
+const listEl = ref<HTMLElement | null>(null);
 const route = useRoute();
 onMounted(() => { const d = typeof route.query.d === 'string' ? route.query.d : ''; if (d && dockets.some((x) => x.id === d)) { status.value = 'all'; selectedId.value = d; } });
 const cmd = ref('');

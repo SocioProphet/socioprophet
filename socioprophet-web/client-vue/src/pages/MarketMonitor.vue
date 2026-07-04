@@ -44,7 +44,7 @@
             <button v-for="c in classes" :key="c" class="mk-fbtn" :class="{ on: klass === c }" @click="setKlass(c)">{{ c }}</button>
           </div>
         </div>
-        <div ref="listEl" class="mk-rows">
+        <div ref="listEl" class="mk-rows" @keydown="arrowRove($event, listEl, '.mk-row')">
           <button
             v-for="it in rows"
             :key="it.symbol"
@@ -114,6 +114,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { indices, watchlist, asOf, type Instrument, type AssetClass } from '../data/marketsFixture';
+import { arrowRove } from '../utils/listKeys';
 
 const classes = ['All', 'equity', 'crypto', 'fx', 'commodity'] as const;
 const klass = ref<(typeof classes)[number]>('All');

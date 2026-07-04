@@ -13,7 +13,7 @@
 
     <div class="pd-body">
       <!-- Directory list -->
-      <div ref="listEl" class="pd-list" aria-label="Results">
+      <div ref="listEl" class="pd-list" aria-label="Results" @keydown="arrowRove($event, listEl, '.pd-row')">
         <p class="pd-count">{{ results.length }} result{{ results.length === 1 ? '' : 's' }}</p>
         <button
           v-for="e in results"
@@ -163,6 +163,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { entities, asOf, careers, education as eduMap, newsRefs, type Entity, type EntityKind, type Platform } from '../data/peopleFixture';
 import { newsItems, newsSources } from '../data/newsFeedFixture';
+import { arrowRove } from '../utils/listKeys';
 
 const router = useRouter();
 const newsSrcTitle = new Map(newsSources.map((s) => [s.id, s.title]));
