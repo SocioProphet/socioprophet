@@ -43,6 +43,13 @@
           <div class="wx-kv"><span>Alerts</span><b :class="{ warn: regionAlerts.length }">{{ regionAlerts.length }}</b></div>
         </div>
 
+        <div class="wx-block" v-if="chainNodes.length">
+          <div class="wx-block-h">Supply-chain exposure</div>
+          <div class="wx-sc">
+            <button v-for="n in chainNodes" :key="n.id" class="wx-sc-link" @click="openChain(n.id)">⛓ {{ chainName(n.chain) }} chain · {{ n.name }} →</button>
+          </div>
+        </div>
+
         <div class="wx-block">
           <div class="wx-block-h">7-day high <span class="wx-legend">°F</span></div>
           <svg class="wx-area" viewBox="0 0 320 80" preserveAspectRatio="none" role="img" aria-label="forecast">
@@ -89,8 +96,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { regions, alerts, asOf, type Region, type Condition } from '../data/weatherFixture';
+import { nodesForWeatherRegion, chains } from '../data/supplyChainFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
@@ -98,8 +106,13 @@ import { arrowRove } from '../utils/listKeys';
 const selected = ref<Region>(regions[0]!);
 const cmd = ref('');
 const route = useRoute();
+const router = useRouter();
 // Active Weather & Natural Resources sub-domain shown as the monitor's lens.
 const scope = computed(() => navScopeForPath(route.path));
+// Supply-chain exposure: nodes (mines/fabs/ports) sitting in this weather region.
+const chainNodes = computed(() => nodesForWeatherRegion(selected.value.id));
+function chainName(cid: string): string { return chains.find((c) => c.id === cid)?.name ?? cid; }
+function openChain(id: string) { router.push({ path: '/analytics/supply-chain', query: { node: id } }); }
 onMounted(() => { const r = typeof route.query.r === 'string' ? route.query.r : ''; const hit = regions.find((x) => x.id === r); if (hit) selected.value = hit; });
 
 const hiSeries = computed(() => selected.value.forecast.map((d) => d.hi));
@@ -157,6 +170,7 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .wx-kv { display: flex; align-items: baseline; justify-content: space-between; gap: 0.4rem; font-size: 0.8rem; border-bottom: 1px solid var(--line); padding: 0.3rem 0; } .wx-kv span { color: rgba(255, 255, 255, 0.45); } .wx-kv b { font-variant-numeric: tabular-nums; } .wx-kv b.warn { color: #f0883e; }
 .wx-block { margin-top: 0.9rem; border-top: 1px solid var(--line-2); padding-top: 0.8rem; }
 .wx-block-h { display: flex; justify-content: space-between; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.5rem; } .wx-legend { color: rgba(255, 255, 255, 0.3); }
+.wx-sc { display: flex; flex-direction: column; gap: 0.4rem; } .wx-sc-link { text-align: left; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text-2); border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.78rem; cursor: pointer; } .wx-sc-link:hover { border-color: var(--accent); color: var(--accent); }
 .wx-area { width: 100%; height: 90px; }
 .wx-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem; }
 .wx-day { display: grid; justify-items: center; gap: 0.2rem; padding: 0.4rem 0.15rem; border: 1px solid var(--line); border-radius: 8px; }

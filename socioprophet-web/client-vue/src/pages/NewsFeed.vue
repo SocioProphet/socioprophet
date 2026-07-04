@@ -144,6 +144,13 @@
           <div class="nf-kv"><span>Provenance</span><code class="nf-hash">{{ selected.provenanceHash }}</code></div>
         </div>
 
+        <div v-if="articleChains.length" class="nf-block">
+          <div class="nf-block-h">Supply chain</div>
+          <div class="nf-sc">
+            <button v-for="n in articleChains" :key="n.id" class="nf-sc-link" @click="openChain(n.id)">⛓ {{ chainName(n.chain) }} chain · {{ n.name }} →</button>
+          </div>
+        </div>
+
         <div class="nf-actions">
           <a class="nf-act primary" :href="selected.canonicalUrl" target="_blank" rel="noreferrer">Open ↗</a>
           <button class="nf-act" @click="toggleRead(selected.id)">{{ isRead(selected.id) ? 'Mark unread' : 'Mark read' }}</button>
@@ -157,8 +164,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
+import { nodesForNews, chains } from '../data/supplyChainFixture';
 import { newsSources, newsItems } from '../data/newsFeedFixture';
 import type { FeedItem } from '../features/feed-intelligence/types';
 import { useResearch } from '../stores/research';
@@ -269,8 +277,13 @@ function onKey(e: KeyboardEvent) {
 watch(selectedId, async () => { await nextTick(); listEl.value?.querySelector('.nf-row.on')?.scrollIntoView({ block: 'nearest' }); });
 
 const route = useRoute();
+const router = useRouter();
 // Active News & Events sub-domain shown as the feed's lens.
 const scope = computed(() => navScopeForPath(route.path));
+// Supply-chain relevance: chain nodes the open article touches (keyword join).
+const articleChains = computed(() => (selected.value ? nodesForNews(selected.value.title, selected.value.entities) : []));
+function chainName(cid: string): string { return chains.find((c) => c.id === cid)?.name ?? cid; }
+function openChain(id: string) { router.push({ path: '/analytics/supply-chain', query: { node: id } }); }
 // Sub-domain view: All feed · Recent Events (recency list) · Event Calendar (by day).
 const mode = computed<'all' | 'recent' | 'calendar'>(() =>
   route.path.endsWith('/recent') ? 'recent' : route.path.endsWith('/calendar') ? 'calendar' : 'all',
@@ -377,6 +390,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-chip { font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line-2); border-radius: 6px; padding: 0.12rem 0.45rem; }
 .nf-claims { margin: 0; padding-left: 1.1rem; color: rgba(255, 255, 255, 0.72); font-size: 0.82rem; line-height: 1.6; }
 .nf-kv { display: grid; grid-template-columns: 6rem 1fr; gap: 0.5rem; font-size: 0.76rem; padding: 0.15rem 0; } .nf-kv span { color: rgba(255, 255, 255, 0.4); } .nf-kv code { color: rgba(255, 255, 255, 0.75); font-family: ui-monospace, monospace; overflow-wrap: anywhere; } .nf-hash { color: rgba(255, 255, 255, 0.5) !important; font-size: 0.68rem; }
+.nf-sc { display: flex; flex-direction: column; gap: 0.4rem; } .nf-sc-link { text-align: left; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text-2); border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.78rem; cursor: pointer; } .nf-sc-link:hover { border-color: var(--accent); color: var(--accent); }
 .nf-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
 .nf-act { border: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.8); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; text-decoration: none; } .nf-act:hover { border-color: rgba(255, 255, 255, 0.3); } .nf-act.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
 .nf-act.done { color: var(--up); border-color: rgba(63, 185, 80, 0.4); cursor: default; }

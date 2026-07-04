@@ -42,6 +42,10 @@ export const regions: Region[] = [
   build('sto', 'Stockholm', 'SE', 61, 'cloud', 22, 64, ['cloud', 'sun', 'cloud', 'rain', 'sun', 'sun', 'cloud']),
   build('amm', 'Amman', 'JO', 97, 'sun', 9, 22, ['sun', 'heat', 'sun', 'sun', 'heat', 'sun', 'sun']),
   build('sin', 'Singapore', 'SG', 88, 'storm', 8, 84, ['storm', 'rain', 'storm', 'rain', 'cloud', 'storm', 'rain']),
+  // Supply-chain-relevant hubs (mines, fabs, ports) so weather ties to the chains.
+  build('anf', 'Antofagasta', 'CL', 63, 'sun', 14, 42, ['sun', 'cloud', 'sun', 'sun', 'cloud', 'sun', 'sun']),
+  build('tpe', 'Hsinchu / Taipei', 'TW', 84, 'storm', 12, 82, ['storm', 'rain', 'cloud', 'sun', 'storm', 'rain', 'cloud']),
+  build('sha', 'Shanghai', 'CN', 86, 'cloud', 10, 76, ['cloud', 'storm', 'rain', 'sun', 'cloud', 'sun', 'rain']),
 ];
 
 export const alerts: Alert[] = [

@@ -56,28 +56,28 @@ export const nodes: SCNode[] = [
   {
     id: 'escondida', name: 'Escondida Mine', type: 'facility', facility: 'mine', chain: 'copper', graphId: 'hg:facility/escondida',
     geo: { lat: -24.27, lon: -69.07, place: 'Antofagasta Region', country: 'Chile' },
-    economyIndicators: ['oreoutput', 'extractcost'], weatherRegions: [], newsKeywords: ['copper', 'mining'],
+    economyIndicators: ['oreoutput', 'extractcost'], weatherRegions: ['anf'], newsKeywords: ['copper', 'mining'],
     status: 'nominal', note: "World's largest copper mine (~5% of global supply). Water/energy costs are the swing factor.",
   },
   {
     id: 'chuqui-smelter', name: 'Chuquicamata Smelter', type: 'facility', facility: 'smelter', chain: 'copper', graphId: 'hg:facility/chuqui-smelter',
     geo: { lat: -22.32, lon: -68.9, place: 'Calama', country: 'Chile' },
-    economyIndicators: ['smelter', 'refutil'], status: 'nominal', note: 'Refines concentrate to cathode; power costs pressure output.',
+    economyIndicators: ['smelter', 'refutil'], weatherRegions: ['anf'], status: 'nominal', note: 'Refines concentrate to cathode; power costs pressure output.',
   },
   {
     id: 'antofagasta-port', name: 'Port of Antofagasta', type: 'port', chain: 'copper', graphId: 'hg:port/antofagasta',
     geo: { lat: -23.65, lon: -70.4, place: 'Antofagasta', country: 'Chile' },
-    economyIndicators: ['ports'], status: 'nominal', note: 'Primary copper-cathode export gateway for northern Chile.',
+    economyIndicators: ['ports'], weatherRegions: ['anf'], status: 'nominal', note: 'Primary copper-cathode export gateway for northern Chile.',
   },
   {
     id: 'route-anf-sha', name: 'Antofagasta → Shanghai', type: 'route', chain: 'copper', graphId: 'hg:route/anf-sha',
-    economyIndicators: ['freight', 'containers'], newsKeywords: ['shipping', 'logistics', 'freight'],
+    economyIndicators: ['freight', 'containers'], weatherRegions: ['sin'], newsKeywords: ['shipping', 'logistics', 'freight'],
     status: 'watch', note: 'Trans-Pacific bulk route; container-rate spikes lift landed cost.',
   },
   {
     id: 'shanghai-port', name: 'Port of Shanghai', type: 'port', chain: 'copper', graphId: 'hg:port/shanghai',
     geo: { lat: 31.23, lon: 121.47, place: 'Shanghai', country: 'China' },
-    economyIndicators: ['ports', 'tonnage'], status: 'nominal', note: 'Largest container port; entry to Chinese refined-metal demand.',
+    economyIndicators: ['ports', 'tonnage'], weatherRegions: ['sha'], status: 'nominal', note: 'Largest container port; entry to Chinese refined-metal demand.',
   },
 
   // ── Semiconductor chain ─────────────────────────────────────────
@@ -89,17 +89,17 @@ export const nodes: SCNode[] = [
   {
     id: 'tsmc-fab', name: 'TSMC Fab 18 (Hsinchu)', type: 'facility', facility: 'fab', chain: 'semis', graphId: 'hg:facility/tsmc-fab18',
     geo: { lat: 24.81, lon: 120.97, place: 'Hsinchu', country: 'Taiwan' },
-    marketSymbols: ['NVDA'], economySectors: ['tech'], economyIndicators: ['semis', 'dccapex'], newsKeywords: ['semiconductors', 'nvidia', 'on-device ai'],
+    marketSymbols: ['NVDA'], economySectors: ['tech'], economyIndicators: ['semis', 'dccapex'], weatherRegions: ['tpe'], newsKeywords: ['semiconductors', 'nvidia', 'on-device ai'],
     status: 'watch', note: 'Leading-edge fab; single-point Taiwan concentration is the chain risk.',
   },
   {
     id: 'kaohsiung-port', name: 'Port of Kaohsiung', type: 'port', chain: 'semis', graphId: 'hg:port/kaohsiung',
     geo: { lat: 22.6, lon: 120.3, place: 'Kaohsiung', country: 'Taiwan' },
-    economyIndicators: ['ports'], status: 'nominal', note: 'Primary export port for finished wafers/chips.',
+    economyIndicators: ['ports'], weatherRegions: ['tpe'], status: 'nominal', note: 'Primary export port for finished wafers/chips.',
   },
   {
     id: 'route-khh-lax', name: 'Kaohsiung → Los Angeles', type: 'route', chain: 'semis', graphId: 'hg:route/khh-lax',
-    economyIndicators: ['freight', 'containers'], newsKeywords: ['shipping', 'logistics'],
+    economyIndicators: ['freight', 'containers'], weatherRegions: ['sin'], newsKeywords: ['shipping', 'logistics'],
     status: 'watch', note: 'Trans-Pacific chip lane; air-freight fallback for high-value parts.',
   },
   {
@@ -143,4 +143,11 @@ export function nodeById(id: string): SCNode | undefined { return nodes.find((n)
 export function nodesForMarketSymbol(sym: string): SCNode[] { return nodes.filter((n) => n.marketSymbols?.includes(sym)); }
 export function nodesForSector(sectorId: string): SCNode[] { return nodes.filter((n) => n.economySectors?.includes(sectorId)); }
 export function nodesForIndicator(indicatorId: string): SCNode[] { return nodes.filter((n) => n.economyIndicators?.includes(indicatorId)); }
+export function nodesForWeatherRegion(regionId: string): SCNode[] { return nodes.filter((n) => n.weatherRegions?.includes(regionId)); }
+// Supply-chain nodes an article touches — matched on the node's newsKeywords
+// against the article's title/entities (the same loose join the surface uses).
+export function nodesForNews(title: string, entities: string[]): SCNode[] {
+  const hay = [title, ...entities].join(' ').toLowerCase();
+  return nodes.filter((n) => n.newsKeywords?.some((k) => hay.includes(k)));
+}
 export function chainForNode(id: string): Chain | undefined { const n = nodeById(id); return n ? chains.find((c) => c.id === n.chain) : undefined; }

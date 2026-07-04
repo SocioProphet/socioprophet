@@ -6,7 +6,7 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { createRouter, createWebHashHistory } from 'vue-router';
-import { nodesForChain, edgesForChain, nodesForMarketSymbol, nodesForSector } from '../data/supplyChainFixture';
+import { nodesForChain, edgesForChain, nodesForMarketSymbol, nodesForSector, nodesForWeatherRegion, nodesForNews } from '../data/supplyChainFixture';
 import SupplyChainMap from '../pages/SupplyChainMap.vue';
 import MarketMonitor from '../pages/MarketMonitor.vue';
 
@@ -17,6 +17,15 @@ describe('supply-chain spine', () => {
     // NVDA appears on the semis chain (fab + OEM); copper carries the Materials sector.
     expect(nodesForMarketSymbol('NVDA').map((n) => n.id)).toContain('nvda-oem');
     expect(nodesForSector('materials').map((n) => n.id)).toContain('copper');
+  });
+
+  it('closes the loop: weather regions and news articles resolve to chain nodes', () => {
+    // Antofagasta weather covers the copper mine + smelter + port.
+    expect(nodesForWeatherRegion('anf').map((n) => n.id)).toContain('escondida');
+    // A copper/mining headline surfaces the copper chain.
+    expect(nodesForNews('Copper mining output rises', ['Copper']).length).toBeGreaterThan(0);
+    // A semis headline surfaces the semiconductor chain.
+    expect(nodesForNews('Semiconductors lead the tape', ['NVIDIA']).some((n) => n.chain === 'semis')).toBe(true);
   });
 
   it('renders the copper chain flow with a node detail', async () => {
