@@ -47,6 +47,28 @@
         <p class="pd-p-summary">{{ selected.summary }}</p>
         <div class="pd-tags"><span v-for="t in selected.tags" :key="t" class="pd-tag">{{ t }}</span></div>
 
+        <!-- Career (Bloomberg BIO) -->
+        <div v-if="career.length" class="pd-block">
+          <div class="pd-block-h">Career</div>
+          <div class="pd-career">
+            <div v-for="(c, i) in career" :key="i" class="pd-stint" :class="{ current: i === 0 }">
+              <span class="pd-stint-dot" />
+              <div class="pd-stint-b">
+                <div class="pd-stint-title">{{ c.title }}</div>
+                <div class="pd-stint-org">{{ c.org }}</div>
+              </div>
+              <span class="pd-stint-period">{{ c.period }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="edu.length" class="pd-block">
+          <div class="pd-block-h">Education</div>
+          <div class="pd-edu">
+            <div v-for="(e, i) in edu" :key="i" class="pd-edu-row"><b>{{ e.school }}</b><span>{{ e.detail }}</span></div>
+          </div>
+        </div>
+
         <!-- Ego graph -->
         <div class="pd-block">
           <div class="pd-block-h">Relationships</div>
@@ -101,6 +123,18 @@
           </div>
         </div>
 
+        <!-- Coverage (cross-link into the news feed) -->
+        <div v-if="relatedNews.length" class="pd-block">
+          <div class="pd-block-h">In the news</div>
+          <div class="pd-news">
+            <button v-for="n in relatedNews" :key="n.id" class="pd-news-row" @click="router.push('/news')">
+              <span class="pd-news-src">{{ newsSrcTitle.get(n.sourceId) }}</span>
+              <span class="pd-news-title">{{ n.title }}</span>
+              <span class="pd-news-time">{{ newsRel(n.publishedAt) }}</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Resolution -->
         <div class="pd-block">
           <div class="pd-block-h">Identity resolution</div>
@@ -123,7 +157,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { entities, asOf, type Entity, type EntityKind, type Platform } from '../data/peopleFixture';
+import { useRouter } from 'vue-router';
+import { entities, asOf, careers, education as eduMap, newsRefs, type Entity, type EntityKind, type Platform } from '../data/peopleFixture';
+import { newsItems, newsSources } from '../data/newsFeedFixture';
+
+const router = useRouter();
+const newsSrcTitle = new Map(newsSources.map((s) => [s.id, s.title]));
+const NEWS_NOW = new Date('2026-07-03T14:00:00-04:00').getTime();
+function newsRel(iso: string): string { const m = Math.max(0, Math.round((NEWS_NOW - new Date(iso).getTime()) / 60000)); return m < 60 ? `${m}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`; }
 
 const PLATFORM: Record<Platform, { label: string; color: string }> = {
   x: { label: 'X', color: '#e7e9ea' },
@@ -152,6 +193,9 @@ const results = computed<Entity[]>(() => {
   });
 });
 const selected = computed<Entity | undefined>(() => byId.get(selectedId.value));
+const career = computed(() => careers[selectedId.value] ?? []);
+const edu = computed(() => eduMap[selectedId.value] ?? []);
+const relatedNews = computed(() => (newsRefs[selectedId.value] ?? []).map((id) => newsItems.find((n) => n.id === id)).filter((x): x is NonNullable<typeof x> => !!x));
 function setKind(k: (typeof kinds)[number]) { kind.value = k; if (!results.value.some((r) => r.id === selectedId.value) && results.value[0]) selectedId.value = results.value[0].id; }
 watch(query, () => { if (!results.value.some((r) => r.id === selectedId.value) && results.value[0]) selectedId.value = results.value[0].id; });
 
@@ -223,6 +267,20 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 .pd-ego-init { fill: #04121f; font-size: 9px; font-weight: 800; } .pd-ego-init.self { fill: #04121f; font-size: 11px; }
 .pd-ego-lbl { fill: rgba(255, 255, 255, 0.7); font-size: 8px; } .pd-ego-rel { fill: rgba(255, 255, 255, 0.4); font-size: 7px; text-transform: uppercase; letter-spacing: 0.04em; }
 .pd-res { display: grid; gap: 0.4rem; } .pd-res-bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; } .pd-res-fill { height: 100%; border-radius: 4px; } .pd-res-cap { font-size: 0.74rem; color: rgba(255, 255, 255, 0.55); }
+
+/* Career / education (Bloomberg BIO) */
+.pd-career { display: grid; gap: 0; }
+.pd-stint { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.35rem 0; position: relative; }
+.pd-stint-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; margin-top: 0.35rem; background: rgba(255, 255, 255, 0.3); box-shadow: 0 12px 0 -3.5px rgba(255, 255, 255, 0.12); } .pd-stint:last-child .pd-stint-dot { box-shadow: none; } .pd-stint.current .pd-stint-dot { background: #ffa028; }
+.pd-stint-b { flex: 1; min-width: 0; } .pd-stint-title { font-size: 0.82rem; font-weight: 600; } .pd-stint-org { font-size: 0.74rem; color: rgba(255, 255, 255, 0.55); }
+.pd-stint-period { font-size: 0.68rem; color: rgba(255, 255, 255, 0.4); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pd-edu { display: grid; gap: 0.25rem; }
+.pd-edu-row { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.78rem; } .pd-edu-row b { font-weight: 600; } .pd-edu-row span { color: rgba(255, 255, 255, 0.55); text-align: right; }
+/* In the news (cross-link) */
+.pd-news { display: grid; gap: 0.15rem; }
+.pd-news-row { display: flex; align-items: baseline; gap: 0.55rem; border: none; background: transparent; color: inherit; padding: 0.3rem 0.4rem; border-radius: 6px; cursor: pointer; text-align: left; } .pd-news-row:hover { background: rgba(255, 255, 255, 0.04); }
+.pd-news-src { flex: 0 0 auto; font-size: 0.64rem; color: #4aa3ff; font-weight: 600; width: 5.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-news-title { flex: 1; font-size: 0.76rem; color: rgba(255, 255, 255, 0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pd-news-time { font-size: 0.66rem; color: rgba(255, 255, 255, 0.35); }
 
 /* OSINT */
 .pd-scope { text-transform: none; letter-spacing: 0; font-size: 0.58rem; color: rgba(255, 160, 40, 0.7); margin-left: 0.5rem; }

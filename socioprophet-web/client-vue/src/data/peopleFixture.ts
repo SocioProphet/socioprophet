@@ -143,4 +143,53 @@ export const entities: Entity[] = [
   },
 ];
 
+// Bloomberg-BIO-style dossier facts, keyed by entity id (kept out of the entity
+// objects so the core Entity shape stays lean). Career newest-first.
+export interface CareerStint { org: string; title: string; period: string }
+export interface Education { school: string; detail: string }
+
+export const careers: Record<string, CareerStint[]> = {
+  'p-avery': [
+    { org: 'Meridian Institute', title: 'Chief Economist', period: '2021 — present' },
+    { org: 'Central Bank', title: 'Senior Economist', period: '2015 — 2021' },
+    { org: 'State University', title: 'Lecturer, Economics', period: '2012 — 2015' },
+  ],
+  'p-rao': [
+    { org: 'Northwind Capital', title: 'Portfolio Manager', period: '2019 — present' },
+    { org: 'Global Bank', title: 'Rates Strategist', period: '2014 — 2019' },
+  ],
+  'p-okafor': [
+    { org: 'Office of Data Governance', title: 'Regulatory Counsel', period: '2022 — present' },
+    { org: 'Hale & Ward', title: 'Associate, Tech & Privacy', period: '2017 — 2022' },
+  ],
+  'p-lindqvist': [
+    { org: 'Interconnect Council', title: 'Grid Policy Lead', period: '2020 — present' },
+    { org: 'National Grid Operator', title: 'Policy Analyst', period: '2016 — 2020' },
+  ],
+  'p-mercer': [
+    { org: 'Relief Corridor', title: 'Field Coordinator', period: '2023 — present' },
+    { org: 'Aid Network', title: 'Logistics Officer', period: '2019 — 2023' },
+  ],
+};
+
+export const education: Record<string, Education[]> = {
+  'p-avery': [{ school: 'State University', detail: 'Ph.D. Economics' }],
+  'p-rao': [{ school: 'City College', detail: 'M.S. Financial Engineering' }],
+  'p-okafor': [{ school: 'KU Leuven', detail: 'LL.M. Technology Law' }],
+  'p-lindqvist': [{ school: 'KTH', detail: 'M.Sc. Energy Systems' }],
+  'p-mercer': [{ school: 'Field Academy', detail: 'B.A. International Relations' }],
+};
+
+// Cross-links into the news feed fixture (news-NNN ids) — "coverage about this entity".
+export const newsRefs: Record<string, string[]> = {
+  'p-avery': ['news-001', 'news-004'],
+  'p-rao': ['news-003', 'news-008'],
+  'p-okafor': ['news-004', 'news-010'],
+  'p-lindqvist': ['news-006'],
+  'p-mercer': ['news-011'],
+  'o-meridian': ['news-001', 'news-004'],
+  'g-fed': ['news-003'],
+  'g-odg': ['news-004', 'news-010'],
+};
+
 export const asOf = '2026-07-03T14:00:00-04:00';
