@@ -97,40 +97,40 @@ const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 
 </script>
 
 <style scoped>
-.lw { height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: #05070a; color: rgba(255, 255, 255, 0.9); }
+.lw { height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: 0.75rem; padding: 0.85rem 1rem 1rem; background: var(--bg); color: rgba(255, 255, 255, 0.9); }
 .lw-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.lw-title { display: flex; align-items: baseline; gap: 0.6rem; } .lw-title h1 { margin: 0; font-size: 1rem; letter-spacing: 0.06em; color: #ffa028; font-weight: 700; font-family: 'Roboto Mono', ui-monospace, monospace; text-transform: uppercase; }
+.lw-title { display: flex; align-items: baseline; gap: 0.6rem; } .lw-title h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; color: var(--text); font-weight: 640; }
 .lw-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .lw-filters { display: flex; gap: 0.25rem; }
-.lw-fbtn { border: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.74rem; text-transform: capitalize; cursor: pointer; } .lw-fbtn.on { border-color: #ffa028; color: #ffa028; background: rgba(255, 160, 40, 0.12); }
+.lw-fbtn { border: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.74rem; text-transform: capitalize; cursor: pointer; } .lw-fbtn.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
 .lw-body { min-height: 0; display: grid; grid-template-columns: minmax(340px, 1fr) minmax(400px, 1.3fr); gap: 0.75rem; }
 @media (max-width: 1080px) { .lw-body { grid-template-columns: 1fr; } .lw-detail { display: none; } }
 
-.lw-list { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; }
-.lw-count { margin: 0; padding: 0.5rem 0.85rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid #161b22; }
-.lw-row { width: 100%; display: grid; gap: 0.25rem; border: none; border-bottom: 1px solid #161b22; background: transparent; color: inherit; padding: 0.65rem 0.85rem; cursor: pointer; text-align: left; } .lw-row:hover { background: rgba(255, 255, 255, 0.03); } .lw-row.on { background: rgba(255, 160, 40, 0.1); box-shadow: inset 3px 0 0 #ffa028; }
+.lw-list { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; }
+.lw-count { margin: 0; padding: 0.5rem 0.85rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid var(--line); }
+.lw-row { width: 100%; display: grid; gap: 0.25rem; border: none; border-bottom: 1px solid var(--line); background: transparent; color: inherit; padding: 0.65rem 0.85rem; cursor: pointer; text-align: left; } .lw-row:hover { background: rgba(255, 255, 255, 0.03); } .lw-row.on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
 .lw-row-top { display: flex; align-items: center; gap: 0.5rem; }
 .lw-cite { font-size: 0.68rem; color: rgba(255, 255, 255, 0.45); font-family: ui-monospace, monospace; }
 .lw-row-title { font-size: 0.9rem; font-weight: 600; } .lw-row-meta { font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); }
 .lw-empty { padding: 1.5rem; color: rgba(255, 255, 255, 0.45); font-size: 0.85rem; }
 
 .lw-type { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; border-radius: 4px; padding: 0.05rem 0.35rem; } .lw-type.rule { color: #58a6ff; background: rgba(88, 166, 255, 0.14); } .lw-type.bill { color: #c58af9; background: rgba(197, 138, 249, 0.14); } .lw-type.case { color: #e3b341; background: rgba(227, 179, 65, 0.14); }
-.lw-status { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; border-radius: 999px; padding: 0.05rem 0.4rem; margin-left: auto; } .lw-status.comment { color: #58a6ff; background: rgba(88, 166, 255, 0.14); } .lw-status.pending { color: #e3b341; background: rgba(227, 179, 65, 0.16); } .lw-status.enacted { color: #3fb950; background: rgba(63, 185, 80, 0.16); } .lw-status.open { color: #8b949e; background: rgba(139, 148, 158, 0.16); }
+.lw-status { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; border-radius: 999px; padding: 0.05rem 0.4rem; margin-left: auto; } .lw-status.comment { color: #58a6ff; background: rgba(88, 166, 255, 0.14); } .lw-status.pending { color: #e3b341; background: rgba(227, 179, 65, 0.16); } .lw-status.enacted { color: var(--up); background: rgba(63, 185, 80, 0.16); } .lw-status.open { color: #8b949e; background: rgba(139, 148, 158, 0.16); }
 
-.lw-detail { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; padding: 0 1.1rem 1.1rem; }
+.lw-detail { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; padding: 0 1.1rem 1.1rem; }
 .lw-detail.empty { display: grid; place-items: center; color: rgba(255, 255, 255, 0.35); font-size: 0.85rem; padding: 1.1rem; }
-.lw-ribbon { display: flex; align-items: center; gap: 0.6rem; margin: 0 -1.1rem 0.9rem; padding: 0.4rem 1.1rem; background: rgba(255, 160, 40, 0.07); border-bottom: 1px solid #21262d; font-size: 0.7rem; }
-.lw-ribbon-k { text-transform: uppercase; letter-spacing: 0.08em; color: #ffa028; font-weight: 700; font-size: 0.6rem; } .lw-ribbon code { color: rgba(255, 255, 255, 0.6); font-family: ui-monospace, monospace; } .lw-ribbon-as { margin-left: auto; color: rgba(255, 255, 255, 0.4); }
+.lw-ribbon { display: flex; align-items: center; gap: 0.6rem; margin: 0 -1.1rem 0.9rem; padding: 0.4rem 1.1rem; background: var(--accent-soft); border-bottom: 1px solid var(--line-2); font-size: 0.7rem; }
+.lw-ribbon-k { text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; font-size: 0.6rem; } .lw-ribbon code { color: rgba(255, 255, 255, 0.6); font-family: ui-monospace, monospace; } .lw-ribbon-as { margin-left: auto; color: rgba(255, 255, 255, 0.4); }
 .lw-d-head { display: flex; gap: 0.5rem; margin-top: 1rem; }
 .lw-d-head .lw-status { margin-left: 0; }
 .lw-d-title { margin: 0.5rem 0 0.3rem; font-size: 1.35rem; line-height: 1.25; }
 .lw-d-meta { font-size: 0.76rem; color: rgba(255, 255, 255, 0.5); font-family: ui-monospace, monospace; }
 .lw-d-summary { margin: 0.7rem 0 0; font-size: 0.9rem; line-height: 1.6; color: rgba(255, 255, 255, 0.8); }
-.lw-block { margin-top: 1rem; border-top: 1px solid #21262d; padding-top: 0.85rem; }
+.lw-block { margin-top: 1rem; border-top: 1px solid var(--line-2); padding-top: 0.85rem; }
 .lw-block-h { display: flex; align-items: center; justify-content: space-between; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.6rem; }
-.lw-legend { display: flex; align-items: center; gap: 0.4rem; text-transform: none; letter-spacing: 0; color: rgba(255, 255, 255, 0.4); } .lw-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 0.2rem; } .lw-legend i.add { background: #3fb950; } .lw-legend i.del { background: #f85149; }
-.lw-redline { border: 1px solid #21262d; border-radius: 8px; overflow: hidden; font-family: ui-monospace, 'SF Mono', monospace; font-size: 0.8rem; }
+.lw-legend { display: flex; align-items: center; gap: 0.4rem; text-transform: none; letter-spacing: 0; color: rgba(255, 255, 255, 0.4); } .lw-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 0.2rem; } .lw-legend i.add { background: var(--up); } .lw-legend i.del { background: var(--down); }
+.lw-redline { border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; font-family: ui-monospace, 'SF Mono', monospace; font-size: 0.8rem; }
 .lw-seg { display: flex; gap: 0.5rem; padding: 0.2rem 0.6rem; line-height: 1.5; white-space: pre-wrap; }
 .lw-seg.ctx { color: rgba(255, 255, 255, 0.6); } .lw-seg.add { background: rgba(63, 185, 80, 0.12); color: #86efac; } .lw-seg.del { background: rgba(248, 81, 73, 0.12); color: #fca5a5; }
 .lw-gutter { width: 0.8rem; flex: 0 0 auto; text-align: center; color: inherit; opacity: 0.7; } .lw-seg-text { flex: 1; }

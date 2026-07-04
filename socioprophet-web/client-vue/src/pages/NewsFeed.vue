@@ -163,7 +163,7 @@ const isRead = (id: string) => read.value.has(id);
 const unreadFor = (sid: string) => all.filter((i) => (sid === 'all' || i.sourceId === sid) && !read.value.has(i.id)).length;
 
 const SRC_COLORS: Record<string, string> = {
-  'src-world': '#58a6ff', 'src-tech': '#c58af9', 'src-markets': '#3fb950', 'src-reg': '#f0883e', 'src-capture': '#e3b341',
+  'src-world': '#58a6ff', 'src-tech': '#c58af9', 'src-markets': 'var(--up)', 'src-reg': '#f0883e', 'src-capture': '#e3b341',
 };
 const sourceColor = (sid: string) => SRC_COLORS[sid] ?? '#8b949e';
 
@@ -190,7 +190,7 @@ function darken(hex: string, f: number): string {
 function cover(it: FeedItem): string {
   const c = sourceColor(it.sourceId);
   const a = (hashOf(it.id) % 90) + 25;
-  return `radial-gradient(circle at ${20 + (hashOf(it.id) % 60)}% 20%, ${c}66, transparent 60%), linear-gradient(${a}deg, ${c}, ${darken(c, 0.3)} 55%, #0d1117 100%)`;
+  return `radial-gradient(circle at ${20 + (hashOf(it.id) % 60)}% 20%, ${c}66, transparent 60%), linear-gradient(${a}deg, ${c}, ${darken(c, 0.3)} 55%, var(--bg) 100%)`;
 }
 
 // Deterministic "time ago" against the fixture's afternoon "now".
@@ -224,25 +224,25 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 </script>
 
 <style scoped>
-.news { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; background: #0d1117; color: rgba(255, 255, 255, 0.92); }
+.news { height: 100%; min-height: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; background: var(--bg); color: rgba(255, 255, 255, 0.92); }
 .nf-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .nf-title { display: flex; align-items: baseline; gap: 0.6rem; } .nf-title h1 { margin: 0; font-size: 1.3rem; }
 .nf-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .nf-tools { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .nf-count { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
-.nf-seg { display: inline-flex; border: 1px solid #21262d; border-radius: 8px; overflow: hidden; }
+.nf-seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }
 .nf-seg button { border: none; background: transparent; color: rgba(255, 255, 255, 0.6); padding: 0.3rem 0.6rem; font-size: 0.76rem; cursor: pointer; } .nf-seg button.on { background: rgba(88, 166, 255, 0.18); color: #58a6ff; }
-.nf-btn { border: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.76rem; cursor: pointer; } .nf-btn.on { border-color: #58a6ff; color: #58a6ff; background: rgba(88, 166, 255, 0.12); }
+.nf-btn { border: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.76rem; cursor: pointer; } .nf-btn.on { border-color: #58a6ff; color: #58a6ff; background: rgba(88, 166, 255, 0.12); }
 
-.nf-ticker { display: flex; align-items: stretch; border: 1px solid #21262d; border-radius: 10px; overflow: hidden; background: #010409; }
-.nf-ticker-label { display: grid; place-items: center; padding: 0 0.8rem; background: #161b22; color: #8b949e; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.nf-ticker { display: flex; align-items: stretch; border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.nf-ticker-label { display: grid; place-items: center; padding: 0 0.8rem; background: var(--line); color: #8b949e; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
 .nf-ticker-track { display: flex; gap: 0; overflow-x: auto; }
-.nf-tick { flex: 0 0 auto; max-width: 30rem; border: none; border-right: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.7); padding: 0.45rem 0.8rem; font-size: 0.74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; } .nf-tick b { color: rgba(255, 255, 255, 0.92); } .nf-tick.active { background: rgba(88, 166, 255, 0.12); }
+.nf-tick { flex: 0 0 auto; max-width: 30rem; border: none; border-right: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.7); padding: 0.45rem 0.8rem; font-size: 0.74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; } .nf-tick b { color: rgba(255, 255, 255, 0.92); } .nf-tick.active { background: rgba(88, 166, 255, 0.12); }
 
 .nf-body { min-height: 0; display: grid; grid-template-columns: 210px minmax(320px, 460px) 1fr; gap: 0.75rem; }
 @media (max-width: 1080px) { .nf-body { grid-template-columns: 180px 1fr; } .nf-reader { display: none; } }
 
-.nf-rail { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.nf-rail { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.15rem; }
 .nf-rail-head { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); padding: 0.3rem 0.5rem; }
 .nf-src { display: flex; align-items: center; gap: 0.5rem; border: none; background: transparent; color: rgba(255, 255, 255, 0.78); border-radius: 8px; padding: 0.4rem 0.5rem; font-size: 0.82rem; cursor: pointer; text-align: left; } .nf-src:hover { background: rgba(255, 255, 255, 0.05); } .nf-src.on { background: rgba(88, 166, 255, 0.14); color: #fff; }
 .nf-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
@@ -250,23 +250,23 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-badge { font-size: 0.66rem; font-weight: 700; color: #58a6ff; background: rgba(88, 166, 255, 0.16); border-radius: 999px; padding: 0.05rem 0.4rem; }
 .nf-rail-hint { margin-top: auto; padding: 0.5rem; font-size: 0.64rem; color: rgba(255, 255, 255, 0.35); line-height: 1.5; }
 
-.nf-list { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; }
+.nf-list { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; }
 .nf-empty { padding: 1.5rem; color: rgba(255, 255, 255, 0.45); font-size: 0.85rem; }
-.nf-row { display: flex; gap: 0.6rem; padding: 0.7rem 0.85rem; border-bottom: 1px solid #161b22; cursor: pointer; } .nf-row:hover { background: rgba(255, 255, 255, 0.03); } .nf-row.on { background: rgba(88, 166, 255, 0.1); box-shadow: inset 3px 0 0 #58a6ff; }
+.nf-row { display: flex; gap: 0.6rem; padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--line); cursor: pointer; } .nf-row:hover { background: rgba(255, 255, 255, 0.03); } .nf-row.on { background: rgba(88, 166, 255, 0.1); box-shadow: inset 3px 0 0 #58a6ff; }
 .nf-unread-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 0.35rem; flex: 0 0 auto; background: transparent; } .nf-row.unread .nf-unread-dot { background: #58a6ff; }
 .nf-row-main { min-width: 0; flex: 1; }
 .nf-row-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; }
 .nf-src-tag { font-weight: 700; } .nf-time { color: rgba(255, 255, 255, 0.4); }
 .nf-mem { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; border-radius: 4px; padding: 0.03rem 0.3rem; font-weight: 700; }
-.nf-mem.admit { color: #3fb950; background: rgba(63, 185, 80, 0.14); } .nf-mem.hold { color: #e3b341; background: rgba(227, 179, 65, 0.16); } .nf-mem.quarantine { color: #f85149; background: rgba(248, 81, 73, 0.16); } .nf-mem.reject { color: #8b949e; background: rgba(139, 148, 158, 0.16); }
+.nf-mem.admit { color: var(--up); background: rgba(63, 185, 80, 0.14); } .nf-mem.hold { color: #e3b341; background: rgba(227, 179, 65, 0.16); } .nf-mem.quarantine { color: var(--down); background: rgba(248, 81, 73, 0.16); } .nf-mem.reject { color: #8b949e; background: rgba(139, 148, 158, 0.16); }
 .nf-row-title { margin: 0.2rem 0 0; font-size: 0.9rem; font-weight: 600; line-height: 1.35; color: rgba(255, 255, 255, 0.7); } .nf-row.unread .nf-row-title { color: #fff; }
 .nf-list.titles .nf-row-title { font-size: 0.84rem; }
 .nf-row-dek { margin: 0.25rem 0 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.nf-saved { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: #3fb950; background: rgba(63, 185, 80, 0.14); border-radius: 4px; padding: 0.03rem 0.3rem; }
+.nf-saved { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: var(--up); background: rgba(63, 185, 80, 0.14); border-radius: 4px; padding: 0.03rem 0.3rem; }
 
 /* Magazine view — cover-image cards in a responsive grid */
 .nf-list.magazine { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.7rem; padding: 0.7rem; align-content: start; align-items: start; }
-.nf-mag { border: 1px solid #21262d; border-radius: 10px; cursor: pointer; background: #010409; display: flex; flex-direction: column; } .nf-mag:hover { border-color: rgba(255, 255, 255, 0.2); } .nf-mag.on { border-color: #58a6ff; box-shadow: 0 0 0 1px #58a6ff; }
+.nf-mag { border: 1px solid var(--line-2); border-radius: 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; } .nf-mag:hover { border-color: rgba(255, 255, 255, 0.2); } .nf-mag.on { border-color: #58a6ff; box-shadow: 0 0 0 1px #58a6ff; }
 .nf-cover { position: relative; height: 96px; border-radius: 10px 10px 0 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.45rem 0.55rem; }
 .nf-cover-src { font-size: 0.66rem; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
 .nf-mag-b { padding: 0.55rem 0.65rem 0.7rem; display: grid; gap: 0.2rem; }
@@ -274,18 +274,18 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-mag.unread .nf-row-title { color: #fff; }
 .nf-mag .nf-row-dek { -webkit-line-clamp: 3; }
 
-.nf-reader { min-height: 0; overflow-y: auto; border: 1px solid #21262d; border-radius: 12px; padding: 1.1rem 1.25rem; }
+.nf-reader { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; padding: 1.1rem 1.25rem; }
 .nf-reader.empty { display: grid; place-items: center; color: rgba(255, 255, 255, 0.35); font-size: 0.85rem; }
 .nf-reader-meta { display: flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; }
 .nf-reader-title { margin: 0.5rem 0 0.7rem; font-size: 1.4rem; line-height: 1.25; letter-spacing: -0.02em; }
 .nf-reader-body { margin: 0 0 1.1rem; font-size: 0.95rem; line-height: 1.6; color: rgba(255, 255, 255, 0.82); }
-.nf-block { border-top: 1px solid #21262d; padding: 0.8rem 0; }
+.nf-block { border-top: 1px solid var(--line-2); padding: 0.8rem 0; }
 .nf-block-h { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.5rem; }
 .nf-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.nf-chip { font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); background: rgba(255, 255, 255, 0.06); border: 1px solid #21262d; border-radius: 6px; padding: 0.12rem 0.45rem; }
+.nf-chip { font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line-2); border-radius: 6px; padding: 0.12rem 0.45rem; }
 .nf-claims { margin: 0; padding-left: 1.1rem; color: rgba(255, 255, 255, 0.72); font-size: 0.82rem; line-height: 1.6; }
 .nf-kv { display: grid; grid-template-columns: 6rem 1fr; gap: 0.5rem; font-size: 0.76rem; padding: 0.15rem 0; } .nf-kv span { color: rgba(255, 255, 255, 0.4); } .nf-kv code { color: rgba(255, 255, 255, 0.75); font-family: ui-monospace, monospace; overflow-wrap: anywhere; } .nf-hash { color: rgba(255, 255, 255, 0.5) !important; font-size: 0.68rem; }
 .nf-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
-.nf-act { border: 1px solid #21262d; background: transparent; color: rgba(255, 255, 255, 0.8); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; text-decoration: none; } .nf-act:hover { border-color: rgba(255, 255, 255, 0.3); } .nf-act.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
-.nf-act.done { color: #3fb950; border-color: rgba(63, 185, 80, 0.4); cursor: default; }
+.nf-act { border: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.8); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; text-decoration: none; } .nf-act:hover { border-color: rgba(255, 255, 255, 0.3); } .nf-act.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+.nf-act.done { color: var(--up); border-color: rgba(63, 185, 80, 0.4); cursor: default; }
 </style>
