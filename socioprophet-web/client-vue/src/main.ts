@@ -24,6 +24,7 @@ import PeopleDirectory from './pages/PeopleDirectory.vue';
 import SocialSignals from './pages/SocialSignals.vue';
 import LawDocket from './pages/LawDocket.vue';
 import NoeticaChat from './pages/NoeticaChat.vue';
+import WeatherMonitor from './pages/WeatherMonitor.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
@@ -72,6 +73,7 @@ const routes = [
   { path: '/people/social-networks', component: SocialSignals },
   { path: '/law/international-law', component: LawDocket },
   { path: '/noetica', component: NoeticaChat },
+  { path: '/weather/forecast', component: WeatherMonitor },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];
