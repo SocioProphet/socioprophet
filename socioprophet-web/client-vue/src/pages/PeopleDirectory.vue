@@ -159,8 +159,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { entities, asOf, careers, education as eduMap, newsRefs, type Entity, type EntityKind, type Platform } from '../data/peopleFixture';
 import { newsItems, newsSources } from '../data/newsFeedFixture';
 
@@ -184,6 +184,8 @@ const kinds = ['All', 'person', 'org', 'gov'] as const;
 const kind = ref<(typeof kinds)[number]>('All');
 const query = ref('');
 const selectedId = ref<string>(entities[0]!.id);
+const route = useRoute();
+onMounted(() => { const id = typeof route.query.id === 'string' ? route.query.id : ''; if (id && entities.some((e) => e.id === id)) selectedId.value = id; });
 const listEl = ref<HTMLElement | null>(null);
 
 const byId = new Map(entities.map((e) => [e.id, e]));

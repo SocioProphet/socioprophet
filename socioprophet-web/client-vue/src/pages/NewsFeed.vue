@@ -132,6 +132,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { newsSources, newsItems } from '../data/newsFeedFixture';
 import type { FeedItem } from '../features/feed-intelligence/types';
 import { useResearch } from '../stores/research';
@@ -191,10 +192,26 @@ function darken(hex: string, f: number): string {
   const r = Math.round(((n >> 16) & 255) * f), g = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);
   return `rgb(${r},${g},${b})`;
 }
+// Deterministic abstract cover art as an inline SVG (no external images / network).
+// Base gradient + a few blurred blobs seeded by the article id → editorial-looking
+// covers. A live feed can override this with a real og:image later.
 function cover(it: FeedItem): string {
   const c = sourceColor(it.sourceId);
-  const a = (hashOf(it.id) % 90) + 25;
-  return `radial-gradient(circle at ${20 + (hashOf(it.id) % 60)}% 20%, ${c}66, transparent 60%), linear-gradient(${a}deg, ${c}, ${darken(c, 0.3)} 55%, var(--bg) 100%)`;
+  const c2 = darken(c, 0.3);
+  let s = hashOf(it.id) || 1;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  const blob = (fill: string) => {
+    const cx = Math.round(rnd() * 320), cy = Math.round(rnd() * 180), r = 55 + Math.round(rnd() * 85), op = (0.12 + rnd() * 0.24).toFixed(2);
+    return `<circle cx='${cx}' cy='${cy}' r='${r}' fill='${fill}' opacity='${op}'/>`;
+  };
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'>` +
+    `<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${c}'/><stop offset='1' stop-color='${c2}'/></linearGradient>` +
+    `<filter id='b'><feGaussianBlur stdDeviation='16'/></filter></defs>` +
+    `<rect width='320' height='180' fill='url(#g)'/>` +
+    `<g filter='url(#b)'>${blob('#ffffff')}${blob(c)}${blob('#ffffff')}${blob(c2)}</g>` +
+    `<rect width='320' height='180' fill='#0b0c10' opacity='0.2'/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
 // Deterministic "time ago" against the fixture's afternoon "now".
@@ -223,7 +240,13 @@ function onKey(e: KeyboardEvent) {
 
 watch(selectedId, async () => { await nextTick(); listEl.value?.querySelector('.nf-row.on')?.scrollIntoView({ block: 'nearest' }); });
 
-onMounted(() => { selectedId.value = items.value[0]?.id ?? ''; window.addEventListener('keydown', onKey); });
+const route = useRoute();
+onMounted(() => {
+  const deep = typeof route.query.item === 'string' ? route.query.item : '';
+  if (deep && all.some((i) => i.id === deep)) openReader(deep);
+  else selectedId.value = items.value[0]?.id ?? '';
+  window.addEventListener('keydown', onKey);
+});
 onUnmounted(() => window.removeEventListener('keydown', onKey));
 </script>
 
@@ -272,7 +295,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 /* Magazine (feed) view — cover-image cards in a wide responsive grid */
 .nf-list.magazine { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; padding: 0.85rem; align-content: start; align-items: start; border: none; }
 .nf-mag { border: 1px solid var(--line-2); border-radius: 12px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; transition: border-color 0.15s ease, transform 0.12s ease; } .nf-mag:hover { border-color: var(--line-2); transform: translateY(-2px); } .nf-mag.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.nf-cover { position: relative; height: 128px; border-radius: 12px 12px 0 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.5rem 0.65rem; }
+.nf-cover { position: relative; height: 128px; border-radius: 12px 12px 0 0; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.5rem 0.65rem; }
 .nf-cover-src { font-size: 0.7rem; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
 .nf-mag-b { padding: 0.7rem 0.8rem 0.85rem; display: grid; gap: 0.3rem; }
 .nf-mag .nf-row-title { margin: 0.1rem 0 0; font-size: 1rem; line-height: 1.3; }

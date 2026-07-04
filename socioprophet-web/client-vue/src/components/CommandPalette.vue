@@ -39,8 +39,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, type RouteLocationRaw } from 'vue-router';
 import { routeRegistry } from '../config/routeRegistry';
+import { newsItems, newsSources } from '../data/newsFeedFixture';
+import { entities } from '../data/peopleFixture';
 import { useNoeticaChat } from '../composables/useNoeticaChat';
 
 const props = defineProps<{ open: boolean }>();
@@ -66,23 +68,42 @@ const destinations: Dest[] = (() => {
   return out;
 })();
 
-type Kind = 'nav' | 'chat';
-interface Result { id: string; kind: Kind; icon: string; label: string; sub?: string; hint: string; to?: string; idx: number }
+type Kind = 'nav' | 'article' | 'entity' | 'chat';
+interface Result { id: string; kind: Kind; icon: string; label: string; sub?: string; hint: string; route?: RouteLocationRaw; idx: number }
+
+const srcTitle = new Map(newsSources.map((s) => [s.id, s.title]));
 
 const flat = computed<Result[]>(() => {
   const ql = q.value.trim().toLowerCase();
   const navs = destinations
     .filter((d) => !ql || d.label.toLowerCase().includes(ql) || d.sub.toLowerCase().includes(ql))
-    .slice(0, 7)
-    .map((d) => ({ id: 'nav:' + d.id, kind: 'nav' as Kind, icon: '→', label: d.label, sub: d.sub, hint: 'Go', to: d.to }));
+    .slice(0, ql ? 5 : 7)
+    .map((d) => ({ id: 'nav:' + d.id, kind: 'nav' as Kind, icon: '→', label: d.label, sub: d.sub, hint: 'Go', route: d.to }));
+
+  const articles = ql
+    ? newsItems
+        .filter((n) => n.title.toLowerCase().includes(ql) || n.summary.toLowerCase().includes(ql) || n.entities.some((e) => e.toLowerCase().includes(ql)))
+        .slice(0, 5)
+        .map((n) => ({ id: 'art:' + n.id, kind: 'article' as Kind, icon: '📰', label: n.title, sub: srcTitle.get(n.sourceId) ?? 'News', hint: 'Read', route: { path: '/news', query: { item: n.id } } }))
+    : [];
+
+  const ents = ql
+    ? entities
+        .filter((e) => e.name.toLowerCase().includes(ql) || e.role.toLowerCase().includes(ql) || e.affiliation.toLowerCase().includes(ql) || e.tags.some((t) => t.toLowerCase().includes(ql)))
+        .slice(0, 5)
+        .map((e) => ({ id: 'ent:' + e.id, kind: 'entity' as Kind, icon: '◉', label: e.name, sub: `${e.role} · ${e.affiliation}`, hint: 'Open', route: { path: '/people/search', query: { id: e.id } } }))
+    : [];
+
   const actions: Omit<Result, 'idx'>[] = q.value.trim()
     ? [{ id: 'chat', kind: 'chat', icon: '◇', label: `Ask Noetica`, sub: `“${q.value.trim()}”`, hint: 'Chat' }]
     : [];
-  return [...navs, ...actions].map((r, i) => ({ ...r, idx: i }));
+  return [...navs, ...articles, ...ents, ...actions].map((r, i) => ({ ...r, idx: i }));
 });
 
 const grouped = computed(() => [
   { title: 'Go to', items: flat.value.filter((r) => r.kind === 'nav') },
+  { title: 'Articles', items: flat.value.filter((r) => r.kind === 'article') },
+  { title: 'People', items: flat.value.filter((r) => r.kind === 'entity') },
   { title: 'Assistant', items: flat.value.filter((r) => r.kind === 'chat') },
 ]);
 
@@ -103,8 +124,8 @@ async function scrollActive() { await nextTick(); listEl.value?.querySelector('.
 
 function run(r: Result) {
   close();
-  if (r.kind === 'nav' && r.to) router.push(r.to);
-  else if (r.kind === 'chat') askNoetica(q.value.trim());
+  if (r.kind === 'chat') askNoetica(q.value.trim());
+  else if (r.route) router.push(r.route);
 }
 async function askNoetica(text: string) {
   if (!text) return;
