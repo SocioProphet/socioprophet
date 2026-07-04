@@ -19,6 +19,8 @@ import KnowledgeGraph from './pages/KnowledgeGraph.vue';
 import ForgeImport from './pages/ForgeImport.vue';
 import NewsFeed from './pages/NewsFeed.vue';
 import MarketMonitor from './pages/MarketMonitor.vue';
+import EconomySectorBoard from './pages/EconomySectorBoard.vue';
+import PeopleDirectory from './pages/PeopleDirectory.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
@@ -62,6 +64,8 @@ const routes = [
   { path: '/forge/import', component: ForgeImport },
   { path: '/news', component: NewsFeed },
   { path: '/markets/indices-funds', component: MarketMonitor },
+  { path: '/economy/macro-economics', component: EconomySectorBoard },
+  { path: '/people/search', component: PeopleDirectory },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];
