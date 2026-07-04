@@ -36,6 +36,7 @@ import PersonGraph from './pages/PersonGraph.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import Reader from './pages/Reader.vue';
 import OperatorDashboard from './pages/OperatorDashboard.vue';
+import AlgoTradingBoard from './pages/AlgoTradingBoard.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -49,6 +50,7 @@ const explicitRoutes = [
   // capability keeps its own /capability/* URL + rail highlight, and the host
   // screen shows the capability as its header lens (via navScopeForPath).
   { path: '/capability/portfolios', component: MarketMonitor },
+  { path: '/capability/algorithmic-trading', component: AlgoTradingBoard },
   { path: '/capability/entity-analytics', component: PeopleDirectory },
   { path: '/capability/sentiment-analytics', component: SocialSignals },
   { path: '/capability/ontology-epistemology', component: KnowledgeGraph },
