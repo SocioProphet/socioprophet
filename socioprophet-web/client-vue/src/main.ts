@@ -44,6 +44,7 @@ import AppBuildBoard from './pages/AppBuildBoard.vue';
 import AnalyticsStudio from './pages/AnalyticsStudio.vue';
 import SupplyChainMap from './pages/SupplyChainMap.vue';
 import LandResources from './pages/LandResources.vue';
+import AgenticOS from './pages/AgenticOS.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -53,6 +54,7 @@ const explicitRoutes = [
   { path: '/', redirect: '/capability/dashboard' },
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/capability/dashboard', component: OperatorDashboard },
+  { path: '/agentic-os', component: AgenticOS },
   // Capability-rail cells that are realized through an existing surface — the
   // capability keeps its own /capability/* URL + rail highlight, and the host
   // screen shows the capability as its header lens (via navScopeForPath).
