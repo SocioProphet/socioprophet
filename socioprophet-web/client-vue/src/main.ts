@@ -37,6 +37,10 @@ import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import Reader from './pages/Reader.vue';
 import OperatorDashboard from './pages/OperatorDashboard.vue';
 import AlgoTradingBoard from './pages/AlgoTradingBoard.vue';
+import NlpExtractionBench from './pages/NlpExtractionBench.vue';
+import ExperimentsBoard from './pages/ExperimentsBoard.vue';
+import BehavioralAnalytics from './pages/BehavioralAnalytics.vue';
+import AppBuildBoard from './pages/AppBuildBoard.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -51,6 +55,10 @@ const explicitRoutes = [
   // screen shows the capability as its header lens (via navScopeForPath).
   { path: '/capability/portfolios', component: MarketMonitor },
   { path: '/capability/algorithmic-trading', component: AlgoTradingBoard },
+  { path: '/capability/nlp-information-extraction', component: NlpExtractionBench },
+  { path: '/capability/experiments-simulations', component: ExperimentsBoard },
+  { path: '/capability/behavioral-analytics', component: BehavioralAnalytics },
+  { path: '/capability/mobile-app-development', component: AppBuildBoard },
   { path: '/capability/entity-analytics', component: PeopleDirectory },
   { path: '/capability/sentiment-analytics', component: SocialSignals },
   { path: '/capability/ontology-epistemology', component: KnowledgeGraph },
