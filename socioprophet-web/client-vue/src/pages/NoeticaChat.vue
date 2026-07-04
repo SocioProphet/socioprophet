@@ -123,7 +123,7 @@ onMounted(() => inputEl.value?.focus());
 .nx-chip { border: 1px solid var(--line-2); background: var(--surface); color: rgba(255, 255, 255, 0.8); border-radius: 10px; padding: 0.55rem 0.8rem; font-size: 0.82rem; cursor: pointer; text-align: left; } .nx-chip:hover { border-color: #c58af9; }
 
 .nx-turn { display: flex; }
-.nx-user { margin-left: auto; max-width: 78%; } .nx-bubble { background: #1f6feb; color: #fff; border-radius: 14px 14px 4px 14px; padding: 0.6rem 0.85rem; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+.nx-user { margin-left: auto; max-width: 78%; } .nx-bubble { background: rgba(216, 162, 80, 0.12); border: 1px solid var(--accent-soft); color: var(--text); border-radius: 14px 14px 4px 14px; padding: 0.6rem 0.85rem; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
 .nx-assistant { max-width: 82%; }
 .nx-a-label { display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; color: #c58af9; margin-bottom: 0.35rem; }
 .nx-trace-toggle { border: none; background: transparent; color: rgba(255, 255, 255, 0.4); font-size: 0.66rem; cursor: pointer; padding: 0 0.2rem; } .nx-trace-toggle:hover { color: rgba(197, 138, 249, 0.9); }
@@ -135,7 +135,7 @@ onMounted(() => inputEl.value?.focus());
 .nx-model { font-size: 0.64rem; font-family: ui-monospace, monospace; color: rgba(255, 255, 255, 0.5); }
 .nx-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--up); background: rgba(63, 185, 80, 0.12); border: 1px solid rgba(63, 185, 80, 0.3); border-radius: 5px; padding: 0.05rem 0.4rem; }
 
-.nx-prompt { display: flex; align-items: flex-end; gap: 0.6rem; padding: 0.85rem 1.1rem; border-top: 1px solid var(--line-2); background: #0b0f14; }
+.nx-prompt { display: flex; align-items: flex-end; gap: 0.6rem; padding: 0.85rem 1.1rem; border-top: 1px solid var(--line-2); background: var(--surface-2); }
 .nx-prompt-glyph { color: #c58af9; font-size: 1.05rem; padding-bottom: 0.4rem; }
 .nx-prompt textarea { flex: 1; resize: none; min-height: 1.4rem; max-height: 160px; background: var(--surface); border: 1px solid var(--line-2); border-radius: 12px; color: #fff; font: inherit; font-size: 0.92rem; line-height: 1.5; padding: 0.55rem 0.8rem; outline: none; } .nx-prompt textarea:focus { border-color: #c58af9; }
 .nx-send { border: none; background: #7c3aed; color: #fff; border-radius: 10px; padding: 0.55rem 1rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; } .nx-send:disabled { opacity: 0.5; }
