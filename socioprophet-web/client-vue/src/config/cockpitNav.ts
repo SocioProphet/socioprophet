@@ -139,6 +139,13 @@ export const OPERATOR_SHORTCUTS: NavLeaf[] = [
 // command-center surfaces: workstation ops, models, knowledge, forge.
 export const AGENT_COCKPIT: NavGroup[] = [
   {
+    label: 'Noetica',
+    to: '/noetica',
+    items: [
+      { label: 'Chat (social surface)', to: '/noetica' },
+    ],
+  },
+  {
     label: 'Workstation',
     to: '/workstation/pipelines',
     items: [

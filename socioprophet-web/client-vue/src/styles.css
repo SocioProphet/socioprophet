@@ -101,6 +101,7 @@ code, pre, .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Men
 .sp-agent-search input { flex: 1; border: 0; outline: none; background: transparent; color: var(--sp-text); font-size: 1rem; }
 .sp-cmd-glyph { border: 0; background: transparent; color: #8ab4f8; font-family: 'Roboto Mono', ui-monospace, monospace; font-weight: 700; font-size: 0.95rem; cursor: pointer; padding: 0 0.15rem; letter-spacing: -1px; }
 .sp-cmd-glyph:hover { color: #aecbfa; }
+.sp-cmd-glyph.chat { color: #c58af9; font-size: 1.05rem; } .sp-cmd-glyph.chat:hover { color: #d8b4fe; }
 .sp-runtime-strip { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.1rem; }
 .sp-runtime-strip__label { color: #c6c6c6; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 

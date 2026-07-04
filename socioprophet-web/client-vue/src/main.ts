@@ -22,6 +22,7 @@ import MarketMonitor from './pages/MarketMonitor.vue';
 import EconomySectorBoard from './pages/EconomySectorBoard.vue';
 import PeopleDirectory from './pages/PeopleDirectory.vue';
 import LawDocket from './pages/LawDocket.vue';
+import NoeticaChat from './pages/NoeticaChat.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
@@ -68,6 +69,7 @@ const routes = [
   { path: '/economy/macro-economics', component: EconomySectorBoard },
   { path: '/people/search', component: PeopleDirectory },
   { path: '/law/international-law', component: LawDocket },
+  { path: '/noetica', component: NoeticaChat },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];

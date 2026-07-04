@@ -99,14 +99,14 @@
 
     <footer class="sp-agent-shell">
       <div class="sp-agent-search">
-        <button type="button" class="sp-cmd-glyph" title="Open terminal (Ctrl+`)" @click="toggleTerm()">›_</button>
+        <button type="button" class="sp-cmd-glyph chat" title="Open Noetica" @click="router.push('/noetica')">◇</button>
         <input
           v-model="cmdBar"
           type="text"
-          placeholder="Type a command, ⏎ to run in the terminal…"
+          placeholder="Ask Noetica…  ⏎"
           spellcheck="false"
           autocomplete="off"
-          @keyup.enter="submitCmd()"
+          @keyup.enter="askNoetica()"
         />
       </div>
       <div class="sp-capture-actions">
@@ -163,6 +163,7 @@ import { useResearch } from './stores/research';
 import RuntimeAdapterStatusBadge from './components/RuntimeAdapterStatusBadge.vue';
 import QuakeTerminal from './components/QuakeTerminal.vue';
 import { useOperatorTerminal } from './composables/useOperatorTerminal';
+import { useNoeticaChat } from './composables/useNoeticaChat';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
 import { AGENT_COCKPIT, CAPABILITY_RAIL, DOMAIN_MENU, OPERATOR_SHORTCUTS } from './config/cockpitNav';
 import {
@@ -192,19 +193,18 @@ const navOpen = ref(false);
 // Quake drop-down terminal — shell-wide, toggled by the footer button or Ctrl+`.
 const termOpen = ref(false);
 const termPopout = ref(false);
-const term = useOperatorTerminal();
+useOperatorTerminal();
+const chat = useNoeticaChat();
 const cmdBar = ref('');
 function toggleTerm() { termOpen.value = !termOpen.value; }
-// Footer command bar → the shared terminal session: open the drop-down, hand it
-// the command, and run it. One session, so it also shows in the docked/pop-out view.
-async function submitCmd() {
+// Footer prompt = the social surface's line into Noetica: navigate to the chat
+// surface and send. The operator terminal stays on the ›_ button / Ctrl+`.
+async function askNoetica() {
   const v = cmdBar.value.trim();
   if (!v) return;
-  termOpen.value = true;
   cmdBar.value = '';
-  await term.loadStatus();
-  term.input.value = v;
-  await term.run();
+  if (route.path !== '/noetica') await router.push('/noetica');
+  chat.send(v);
 }
 function onTermHotkey(e: KeyboardEvent) {
   // Ctrl+`  (backquote) — the classic Quake / VS Code terminal toggle.
