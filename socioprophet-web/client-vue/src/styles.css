@@ -102,6 +102,20 @@ code, pre, .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Men
 .sp-runtime-strip { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.1rem; }
 .sp-runtime-strip__label { color: #c6c6c6; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 
+/* Terminal launcher (footer) + Quake drop-down chrome */
+.sp-term-toggle {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  border: 1px solid var(--sp-border); background: #080b10; color: var(--sp-text);
+  border-radius: 0.6rem; padding: 0.35rem 0.7rem; font-size: 0.8rem; cursor: pointer;
+  font-family: 'Roboto Mono', ui-monospace, monospace; white-space: nowrap;
+}
+.sp-term-toggle:hover { border-color: var(--sp-blue); }
+.sp-term-toggle.on { border-color: var(--sp-blue); background: rgba(15, 98, 254, 0.16); color: #8ab4f8; }
+.sp-term-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1150; }
+/* Drop-down slide from the top edge; pop-out fades. */
+.sp-term-enter-active, .sp-term-leave-active { transition: transform 0.18s ease, opacity 0.18s ease; }
+.sp-term-enter-from, .sp-term-leave-to { transform: translateY(-100%); opacity: 0.4; }
+
 .surface-page, .map-page { min-height: 100%; padding: 1.25rem 1.5rem; }
 .eyebrow { margin: 0 0 0.35rem; color: var(--sp-blue); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
 .status-stack, .tag-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }

@@ -112,6 +112,13 @@
           ⤓ Snapshot ({{ research.openTabs.length }})
         </button>
         <RouterLink class="sp-capture-link" to="/research">Research</RouterLink>
+        <button
+          type="button"
+          class="sp-term-toggle"
+          :class="{ on: termOpen }"
+          title="Toggle terminal (Ctrl+`)"
+          @click="toggleTerm()"
+        >›_ Terminal</button>
       </div>
       <div class="sp-runtime-strip" aria-label="Runtime adapter status">
         <span class="sp-runtime-strip__label">Runtime</span>
@@ -122,15 +129,32 @@
         />
       </div>
     </footer>
+
+    <!-- Quake/Tilix drop-down operator terminal (Cloud Shell styled), shell-wide.
+         Default = drop-down; ⤢ pops it out to a full window. Toggle with Ctrl+` -->
+    <div
+      v-if="termOpen && termPopout"
+      class="sp-term-backdrop"
+      @click="termPopout = false"
+    />
+    <Transition name="sp-term">
+      <QuakeTerminal
+        v-if="termOpen"
+        :variant="termPopout ? 'popout' : 'quake'"
+        @close="termOpen = false"
+        @toggle-popout="termPopout = !termPopout"
+      />
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router';
 import { useAuth } from './stores/auth';
 import { useResearch } from './stores/research';
 import RuntimeAdapterStatusBadge from './components/RuntimeAdapterStatusBadge.vue';
+import QuakeTerminal from './components/QuakeTerminal.vue';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
 import { AGENT_COCKPIT, CAPABILITY_RAIL, DOMAIN_MENU, OPERATOR_SHORTCUTS } from './config/cockpitNav';
 import {
@@ -156,6 +180,23 @@ const capabilityRail = CAPABILITY_RAIL;
 const operatorShortcuts = OPERATOR_SHORTCUTS;
 const agentCockpit = AGENT_COCKPIT;
 const navOpen = ref(false);
+
+// Quake drop-down terminal — shell-wide, toggled by the footer button or Ctrl+`.
+const termOpen = ref(false);
+const termPopout = ref(false);
+function toggleTerm() { termOpen.value = !termOpen.value; }
+function onTermHotkey(e: KeyboardEvent) {
+  // Ctrl+`  (backquote) — the classic Quake / VS Code terminal toggle.
+  if (e.ctrlKey && (e.key === '`' || e.code === 'Backquote')) {
+    e.preventDefault();
+    termOpen.value = !termOpen.value;
+  } else if (e.key === 'Escape' && termOpen.value) {
+    if (termPopout.value) termPopout.value = false;
+    else termOpen.value = false;
+  }
+}
+onMounted(() => window.addEventListener('keydown', onTermHotkey));
+onUnmounted(() => window.removeEventListener('keydown', onTermHotkey));
 
 // Two-letter abbreviation for the collapsed rail (e.g. "Algorithmic Trading" → "AT").
 const abbrev = (label: string): string =>
