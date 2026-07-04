@@ -113,6 +113,9 @@
           </div>
         </div>
 
+        <!-- Cross-cutting human spine (capital / labor / supply) -->
+        <HumanNetworks :entity-id="selected.symbol" />
+
         <div class="mk-block">
           <div class="mk-block-h">Provenance</div>
           <div class="mk-kv wide"><span>Source</span><code>fixture · deterministic series</code></div>
@@ -129,6 +132,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
 import { indices, watchlist, instrumentsForPath, asOf, type Instrument } from '../data/marketsFixture';
 import { nodesForMarketSymbol, chains } from '../data/supplyChainFixture';
+import HumanNetworks from '../components/HumanNetworks.vue';
 import { arrowRove } from '../utils/listKeys';
 
 const route = useRoute();

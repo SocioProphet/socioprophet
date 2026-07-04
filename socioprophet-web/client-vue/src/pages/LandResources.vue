@@ -79,6 +79,10 @@
           <span class="lr-ref-k">Economy</span>
           <button v-for="e in relEcon" :key="e.id" class="lr-chip" @click="openEcon(e)">{{ e.name }}</button>
         </div>
+
+        <!-- Cross-cutting human spine (capital / labor / supply) -->
+        <HumanNetworks :entity-id="selectedId" />
+
         <div class="lr-boundary">Endowments carry a HellGraph ref + geo + twin handle — live land-registry / GAIA / economic-prophet adapters resolve the same identities.</div>
       </article>
       <div v-else class="lr-detail empty">Select an endowment</div>
@@ -90,6 +94,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
+import HumanNetworks from '../components/HumanNetworks.vue';
 import { endowments, endowmentById, kinds, type Endowment, type ResourceKind, type Renewability } from '../data/landResourceFixture';
 import { nodeById } from '../data/supplyChainFixture';
 import { instruments } from '../data/marketsFixture';

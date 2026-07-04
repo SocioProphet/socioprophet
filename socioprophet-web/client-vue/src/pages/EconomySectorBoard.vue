@@ -105,6 +105,9 @@
             </div>
           </div>
 
+          <!-- Cross-cutting human spine (capital / labor / supply) -->
+          <HumanNetworks :entity-id="sel.id" />
+
           <div class="ec-block">
             <div class="ec-block-h">Provenance</div>
             <div class="ec-kv wide"><span>Source</span><code>fixture · deterministic series</code></div>
@@ -121,6 +124,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { indicators, indicatorsForPath, sectors, asOf, type Indicator, type Sector } from '../data/economyFixture';
 import { nodesForSector, nodesForIndicator, chains } from '../data/supplyChainFixture';
+import HumanNetworks from '../components/HumanNetworks.vue';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';

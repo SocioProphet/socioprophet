@@ -71,6 +71,9 @@
           <button v-for="w in relWeather" :key="w.id" class="sc-chip" @click="openWeather(w.id)">{{ w.name }}</button>
         </div>
       </div>
+      <!-- Cross-cutting human spine (capital / labor / supply) -->
+      <HumanNetworks :entity-id="selectedId" />
+
       <div class="sc-boundary">Nodes carry a HellGraph ref + geo + twin handle — a live graph / GAIA / economic-prophet adapter resolves the same identities.</div>
     </article>
   </section>
@@ -80,6 +83,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
+import HumanNetworks from '../components/HumanNetworks.vue';
 import { chains, nodesForChain, edgesForChain, nodeById, type SCNode, type Chain } from '../data/supplyChainFixture';
 import { endowmentsForNode } from '../data/landResourceFixture';
 import { instruments } from '../data/marketsFixture';
