@@ -60,7 +60,7 @@ const visibleCols = computed(() => {
 </script>
 
 <style scoped>
-.surface { display: grid; gap: 1rem; max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+.surface { display: grid; gap: 1rem; max-width: 960px; margin: 1rem auto; padding: 1.5rem 1.75rem; background: #0d1117; color: rgba(255, 255, 255, 0.92); border: 1px solid #21262d; border-radius: 16px; }
 h1 { margin: 0; font-size: 1.25rem; } header p { margin: 0.25rem 0 0; color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }
 .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .bar input { flex: 1 1 240px; min-width: 0; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px; padding: 0.5rem 0.7rem; color: #fff; font-size: 0.9rem; }

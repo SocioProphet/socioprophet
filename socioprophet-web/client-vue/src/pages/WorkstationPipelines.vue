@@ -61,7 +61,7 @@ const healthColor = (h: string) => (h === 'Healthy' ? '#22c55e' : h === 'Degrade
 </script>
 
 <style scoped>
-.pipelines { display: grid; gap: 1rem; max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+.pipelines { display: grid; gap: 1rem; max-width: 900px; margin: 1rem auto; padding: 1.5rem 1.75rem; background: #0d1117; color: rgba(255, 255, 255, 0.92); border: 1px solid #21262d; border-radius: 16px; }
 .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 h1 { margin: 0; font-size: 1.25rem; }
 .head p { margin: 0.25rem 0 0; color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }

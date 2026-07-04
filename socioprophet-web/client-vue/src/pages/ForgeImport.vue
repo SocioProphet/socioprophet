@@ -102,7 +102,7 @@ async function run() {
 </script>
 
 <style scoped>
-.surface { display: grid; gap: 1rem; max-width: 760px; margin: 0 auto; padding: 1.5rem; }
+.surface { display: grid; gap: 1rem; max-width: 760px; margin: 1rem auto; padding: 1.5rem 1.75rem; background: #0d1117; color: rgba(255, 255, 255, 0.92); border: 1px solid #21262d; border-radius: 16px; }
 h1 { margin: 0; font-size: 1.25rem; } header p { margin: 0.25rem 0 0; color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }
 .picker { border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; overflow: hidden; }
 .crumbs { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.7rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); }
