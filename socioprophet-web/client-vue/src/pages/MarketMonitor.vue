@@ -45,8 +45,8 @@
       <!-- Watchlist -->
       <div class="mk-watch">
         <div class="mk-watch-head">
-          <span>Watchlist</span>
-          <div class="mk-filter">
+          <span>{{ scope && !scope.isPrimary ? scope.label : 'Watchlist' }}</span>
+          <div v-if="classes.length > 2" class="mk-filter">
             <button v-for="c in classes" :key="c" class="mk-fbtn" :class="{ on: klass === c }" @click="setKlass(c)">{{ c }}</button>
           </div>
         </div>
@@ -117,25 +117,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
-import { indices, watchlist, asOf, type Instrument, type AssetClass } from '../data/marketsFixture';
+import { indices, watchlist, instrumentsForPath, asOf, type Instrument } from '../data/marketsFixture';
 import { arrowRove } from '../utils/listKeys';
 
-const classes = ['All', 'equity', 'crypto', 'fx', 'commodity'] as const;
-const klass = ref<(typeof classes)[number]>('All');
-const selected = ref<Instrument>(indices[0]!);
+const route = useRoute();
+// Active DOMAIN-axis sub-domain → the real slice of instruments it surfaces
+// (Equities & Preferreds → equities/preferreds, Crypto/Digital → crypto, …).
+const scope = computed(() => navScopeForPath(route.path));
+const subInstruments = computed<Instrument[]>(() => instrumentsForPath(route.path));
+const classes = computed<string[]>(() => ['All', ...Array.from(new Set(subInstruments.value.map((i) => i.klass)))]);
+const klass = ref<string>('All');
+const selected = ref<Instrument>(subInstruments.value[0] ?? indices[0]!);
 const listEl = ref<HTMLElement | null>(null);
 const cmd = ref('');
 const tape = [...indices, ...watchlist];
-const route = useRoute();
-// Active DOMAIN-axis sub-domain (e.g. Equities & Preferreds) shown as the board's
-// lens; the monitor is the shared Capital & Markets surface at this stage.
-const scope = computed(() => navScopeForPath(route.path));
 onMounted(() => { const sym = typeof route.query.sym === 'string' ? route.query.sym.toUpperCase() : ''; if (sym) { const hit = tape.find((i) => i.symbol === sym); if (hit) selected.value = hit; } });
 
-const rows = computed<Instrument[]>(() => (klass.value === 'All' ? watchlist : watchlist.filter((i) => i.klass === klass.value)));
+const rows = computed<Instrument[]>(() => (klass.value === 'All' ? subInstruments.value : subInstruments.value.filter((i) => i.klass === klass.value)));
+// Keep a valid selection + reset the class filter as the sub-domain changes.
+watch(rows, (r) => { if (!r.some((i) => i.symbol === selected.value.symbol) && r[0]) selected.value = r[0]; });
+watch(() => route.path, () => { klass.value = 'All'; });
 
 function pick(it: Instrument) { selected.value = it; }
 // Bloomberg-style command line: type a ticker, <GO> jumps to it.
@@ -145,7 +149,7 @@ function runCmd() {
   const hit = tape.find((i) => i.symbol === q) ?? tape.find((i) => i.symbol.startsWith(q)) ?? tape.find((i) => i.name.toUpperCase().includes(q));
   if (hit) { pick(hit); cmd.value = ''; }
 }
-function setKlass(c: (typeof classes)[number]) { klass.value = c; if (!rows.value.some((r) => r.symbol === selected.value.symbol) && rows.value[0]) pick(rows.value[0]); }
+function setKlass(c: string) { klass.value = c; if (!rows.value.some((r) => r.symbol === selected.value.symbol) && rows.value[0]) pick(rows.value[0]); }
 
 // SVG sparkline / area point strings.
 function scale(series: number[], w: number, h: number): Array<[number, number]> {
