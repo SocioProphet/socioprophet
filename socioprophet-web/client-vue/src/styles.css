@@ -43,6 +43,8 @@ body {
 }
 button, input, select, textarea { font: inherit; }
 a { color: inherit; }
+/* Visible keyboard focus across the shell chrome + palette (mouse clicks stay clean via :focus-visible). */
+.sp-shell a:focus-visible, .sp-shell button:focus-visible, .cp a:focus-visible, .cp button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 6px; }
 code, pre, .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 
 .sp-shell {

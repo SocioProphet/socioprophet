@@ -2,9 +2,14 @@
   <div class="sp-shell">
     <header class="sp-topbar">
       <RouterLink class="sp-brand" to="/news">SocioProphet</RouterLink>
-      <nav class="sp-domain-nav" aria-label="Primary domains">
-        <div v-for="menu in domainMenu" :key="menu.label" class="sp-menu">
-          <RouterLink :to="menu.to" class="sp-menu-trigger">
+      <nav ref="domainNavEl" class="sp-domain-nav" aria-label="Primary domains" @focusout="onDomainFocusOut">
+        <div v-for="(menu, mi) in domainMenu" :key="menu.label" class="sp-menu" :class="{ open: openMenu === mi }">
+          <RouterLink
+            :to="menu.to"
+            class="sp-menu-trigger"
+            :aria-expanded="openMenu === mi"
+            @keydown="onMenuTriggerKey($event, mi)"
+          >
             {{ menu.label }}<span class="sp-caret" aria-hidden="true">▾</span>
           </RouterLink>
           <div class="sp-menu-panel" role="menu">
@@ -14,6 +19,8 @@
               :to="leaf.to"
               class="sp-menu-item"
               role="menuitem"
+              @keydown="onMenuItemKey($event, mi)"
+              @click="openMenu = null"
             >
               {{ leaf.label }}
             </RouterLink>
@@ -28,7 +35,7 @@
       <RouterLink v-else class="sp-signin" to="/login">Sign in</RouterLink>
     </header>
 
-    <nav class="sp-tabbar" aria-label="Workspace tabs">
+    <nav ref="tabbarEl" class="sp-tabbar" aria-label="Workspace tabs" @keydown="onRoveKey($event, tabbarEl, 'h')">
       <button
         class="sp-tab-menu"
         type="button"
@@ -40,7 +47,7 @@
     </nav>
 
     <div class="sp-workspace">
-      <aside class="sp-left-rail" aria-label="Capabilities">
+      <aside ref="railEl" class="sp-left-rail" aria-label="Capabilities" @keydown="onRoveKey($event, railEl, 'v')">
         <RouterLink
           v-for="cap in capabilityRail"
           :key="cap.to"
@@ -54,7 +61,7 @@
       <!-- Expandable named capability panel (Will's SideNav expand), overlay so
            it never disturbs the grid. -->
       <div v-if="navOpen" class="sp-nav-backdrop" @click="navOpen = false" />
-      <nav v-if="navOpen" class="sp-nav-panel" aria-label="Capability navigation">
+      <nav v-if="navOpen" ref="navPanelEl" class="sp-nav-panel" aria-label="Capability navigation" @keydown="onNavPanelKey">
         <div class="sp-nav-section-title">Capabilities</div>
         <RouterLink
           v-for="cap in capabilityRail"
@@ -166,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router';
 import { useAuth } from './stores/auth';
 import { useResearch } from './stores/research';
@@ -200,6 +207,62 @@ const capabilityRail = CAPABILITY_RAIL;
 const operatorShortcuts = OPERATOR_SHORTCUTS;
 const agentCockpit = AGENT_COCKPIT;
 const navOpen = ref(false);
+
+// ── Keyboard navigation for the nav menus ────────────────────────────────────
+const domainNavEl = ref<HTMLElement | null>(null);
+const tabbarEl = ref<HTMLElement | null>(null);
+const railEl = ref<HTMLElement | null>(null);
+const navPanelEl = ref<HTMLElement | null>(null);
+const openMenu = ref<number | null>(null);
+
+function menuEls(): HTMLElement[] { return domainNavEl.value ? Array.from(domainNavEl.value.querySelectorAll<HTMLElement>('.sp-menu')) : []; }
+function focusTrigger(i: number) { menuEls()[i]?.querySelector<HTMLElement>('.sp-menu-trigger')?.focus(); }
+function itemsOf(mi: number): HTMLElement[] { const m = menuEls()[mi]; return m ? Array.from(m.querySelectorAll<HTMLElement>('.sp-menu-item')) : []; }
+function focusItem(mi: number, ii: number) { const items = itemsOf(mi); if (items.length) items[(ii + items.length) % items.length]!.focus(); }
+
+// Top-level menubar item: ArrowDown opens the submenu; Left/Right move between
+// menus; Enter navigates (RouterLink default); Escape closes.
+function onMenuTriggerKey(e: KeyboardEvent, mi: number) {
+  const n = menuEls().length;
+  if (e.key === 'ArrowDown') { e.preventDefault(); openMenu.value = mi; nextTick(() => focusItem(mi, 0)); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); openMenu.value = null; focusTrigger((mi + 1) % n); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); openMenu.value = null; focusTrigger((mi - 1 + n) % n); }
+  else if (e.key === 'Escape') { openMenu.value = null; }
+}
+// Submenu item: Up/Down move; Left/Right jump to the adjacent menu; Escape back
+// to the trigger; Enter navigates.
+function onMenuItemKey(e: KeyboardEvent, mi: number) {
+  const items = itemsOf(mi);
+  const cur = items.indexOf(document.activeElement as HTMLElement);
+  const n = menuEls().length;
+  if (e.key === 'ArrowDown') { e.preventDefault(); focusItem(mi, cur + 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); if (cur <= 0) { openMenu.value = null; focusTrigger(mi); } else focusItem(mi, cur - 1); }
+  else if (e.key === 'Escape') { e.preventDefault(); openMenu.value = null; focusTrigger(mi); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); const t = (mi + 1) % n; openMenu.value = t; nextTick(() => focusItem(t, 0)); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); const t = (mi - 1 + n) % n; openMenu.value = t; nextTick(() => focusItem(t, 0)); }
+}
+// Close the mega-menu when focus leaves the whole nav.
+function onDomainFocusOut() { setTimeout(() => { if (domainNavEl.value && !domainNavEl.value.contains(document.activeElement)) openMenu.value = null; }, 0); }
+
+// Roving arrow-key focus for a link/button strip. dir 'h' = Left/Right, 'v' = Up/Down.
+function onRoveKey(e: KeyboardEvent, container: HTMLElement | null, dir: 'h' | 'v') {
+  const nextKey = dir === 'h' ? 'ArrowRight' : 'ArrowDown';
+  const prevKey = dir === 'h' ? 'ArrowLeft' : 'ArrowUp';
+  if (e.key !== nextKey && e.key !== prevKey) return;
+  const els = container ? Array.from(container.querySelectorAll<HTMLElement>('a, button')) : [];
+  const cur = els.indexOf(document.activeElement as HTMLElement);
+  if (cur < 0 || els.length === 0) return;
+  e.preventDefault();
+  const nx = e.key === nextKey ? (cur + 1) % els.length : (cur - 1 + els.length) % els.length;
+  els[nx]!.focus();
+}
+function onNavPanelKey(e: KeyboardEvent) {
+  if (e.key === 'Escape') { navOpen.value = false; return; }
+  onRoveKey(e, navPanelEl.value, 'v');
+}
+
+// Any navigation closes the open menus.
+watch(() => route.path, () => { openMenu.value = null; navOpen.value = false; });
 
 // Quake drop-down terminal — shell-wide, toggled by the footer button or Ctrl+`.
 const paletteOpen = ref(false);
@@ -399,7 +462,8 @@ const activeRuntimeFeatures = computed<RuntimeAdapterFeature[]>(() => {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
 }
 .sp-menu:hover .sp-menu-panel,
-.sp-menu:focus-within .sp-menu-panel { display: flex; }
+.sp-menu.open .sp-menu-panel { display: flex; }
+.sp-menu-item:focus-visible, .sp-menu-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 .sp-menu-item {
   padding: 0.5rem 1rem;
   color: rgba(255, 255, 255, 0.78);
