@@ -174,6 +174,13 @@ export const AGENT_COCKPIT: NavGroup[] = [
     ],
   },
   {
+    label: 'Marketplace',
+    to: '/marketplace',
+    items: [
+      { label: 'Triparty Netting', to: '/marketplace' },
+    ],
+  },
+  {
     label: 'Noetica',
     to: '/noetica',
     items: [
