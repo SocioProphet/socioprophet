@@ -50,6 +50,10 @@
 
       <!-- Cross-domain references -->
       <div class="sc-refs">
+        <div v-if="resourceBase.length" class="sc-ref">
+          <span class="sc-ref-k">Resource base</span>
+          <button v-for="e in resourceBase" :key="e.id" class="sc-chip" @click="openResource(e.id)">⛰ {{ e.name }} · {{ e.subtype }}</button>
+        </div>
         <div v-if="relMarkets.length" class="sc-ref">
           <span class="sc-ref-k">Markets</span>
           <button v-for="m in relMarkets" :key="m.symbol" class="sc-chip" @click="openMarket(m.symbol)">{{ m.symbol }} · {{ m.name }}</button>
@@ -77,6 +81,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
 import { chains, nodesForChain, edgesForChain, nodeById, type SCNode, type Chain } from '../data/supplyChainFixture';
+import { endowmentsForNode } from '../data/landResourceFixture';
 import { instruments } from '../data/marketsFixture';
 import { sectors, indicators, SUBDOMAIN_GROUP, type EcoGroup } from '../data/economyFixture';
 import { regions } from '../data/weatherFixture';
@@ -126,6 +131,9 @@ const relEcon = computed(() => {
   return [...secs, ...inds];
 });
 const relWeather = computed(() => (selected.value?.weatherRegions ?? []).map((id) => regions.find((r) => r.id === id)).filter((x): x is NonNullable<typeof x> => !!x));
+// Layer 0 down-link: the resource endowments this facility draws on.
+const resourceBase = computed(() => (selected.value ? endowmentsForNode(selected.value.id) : []));
+function openResource(id: string) { router.push({ path: '/weather/natural-resources', query: { e: id } }); }
 const relNews = computed(() => {
   const kws = selected.value?.newsKeywords ?? []; if (!kws.length) return [];
   return newsItems.filter((n) => kws.some((k) => n.title.toLowerCase().includes(k) || n.entities.some((e) => e.toLowerCase().includes(k)))).slice(0, 4);

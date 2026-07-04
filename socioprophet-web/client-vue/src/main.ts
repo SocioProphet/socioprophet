@@ -43,6 +43,7 @@ import BehavioralAnalytics from './pages/BehavioralAnalytics.vue';
 import AppBuildBoard from './pages/AppBuildBoard.vue';
 import AnalyticsStudio from './pages/AnalyticsStudio.vue';
 import SupplyChainMap from './pages/SupplyChainMap.vue';
+import LandResources from './pages/LandResources.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -64,6 +65,9 @@ const explicitRoutes = [
   // Maps & Analytics — the analytics trio (Maps itself is MapPage) shares one
   // Analytics Studio that charts the platform's existing fixtures.
   { path: '/analytics/supply-chain', component: SupplyChainMap },
+  // Layer 0 — Land & Natural Resources (the base of the economic model). Also
+  // gives the Weather domain's "Natural Resources" sub-domain a real surface.
+  { path: '/weather/natural-resources', component: LandResources },
   { path: '/analytics/trending-infographics', component: AnalyticsStudio },
   { path: '/analytics/charts-graphs', component: AnalyticsStudio },
   { path: '/analytics', component: AnalyticsStudio },
