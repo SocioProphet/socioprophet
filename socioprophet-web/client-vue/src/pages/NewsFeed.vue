@@ -26,8 +26,8 @@
       </div>
     </div>
 
-    <!-- Three panes: sources rail · stream · reader -->
-    <div class="nf-body">
+    <!-- Feed: sources rail · stream · reader (reader is a slide-over in magazine) -->
+    <div class="nf-body" :class="{ mag: view === 'magazine' }">
       <!-- Rail -->
       <aside class="nf-rail" aria-label="Sources">
         <div class="nf-rail-head">Feeds</div>
@@ -77,7 +77,7 @@
             :key="it.id"
             class="nf-mag"
             :class="{ on: it.id === selectedId, unread: !isRead(it.id) }"
-            @click="select(it.id)"
+            @click="openReader(it.id)"
           >
             <div class="nf-cover" :style="{ backgroundImage: cover(it) }">
               <span class="nf-cover-src" :style="{ color: sourceColor(it.sourceId) }">{{ sourceOf(it)?.title }}</span>
@@ -92,8 +92,10 @@
         </template>
       </div>
 
-      <!-- Reader -->
-      <article v-if="selected" class="nf-reader" aria-label="Reader">
+      <!-- Reader — inline pane in cards/titles, slide-over overlay in magazine -->
+      <div v-if="view === 'magazine' && readerOpen" class="nf-reader-backdrop" @click="readerOpen = false" />
+      <article v-if="selected && (view !== 'magazine' || readerOpen)" class="nf-reader" :class="{ overlay: view === 'magazine' }" aria-label="Reader">
+        <button v-if="view === 'magazine'" class="nf-reader-close" aria-label="Close" @click="readerOpen = false">✕</button>
         <div class="nf-reader-meta">
           <span class="nf-src-tag" :style="{ color: sourceColor(selected.sourceId) }">{{ sourceOf(selected)?.title }}</span>
           <span class="nf-time">{{ relative(selected.publishedAt) }}</span>
@@ -123,7 +125,7 @@
           <button class="nf-act" :class="{ done: saved.has(selected.id) }" :disabled="saved.has(selected.id)" title="Capture into the Research list" @click="save(selected)">{{ saved.has(selected.id) ? 'Saved ✓' : 'Save' }}</button>
         </div>
       </article>
-      <div v-else class="nf-reader empty">Select an article</div>
+      <div v-else-if="view !== 'magazine'" class="nf-reader empty">Select an article</div>
     </div>
   </section>
 </template>
@@ -143,7 +145,8 @@ const saved = ref<Set<string>>(new Set());
 const activeSourceId = ref<'all' | string>('all');
 const unreadOnly = ref(false);
 const governedOnly = ref(false);
-const view = ref<'cards' | 'magazine' | 'titles'>('cards');
+const view = ref<'cards' | 'magazine' | 'titles'>('magazine');
+const readerOpen = ref(false);
 const selectedId = ref<string>('');
 const listEl = ref<HTMLElement | null>(null);
 
@@ -168,6 +171,7 @@ const SRC_COLORS: Record<string, string> = {
 const sourceColor = (sid: string) => SRC_COLORS[sid] ?? '#8b949e';
 
 function select(id: string) { selectedId.value = id; read.value.add(id); }
+function openReader(id: string) { select(id); readerOpen.value = true; }
 function toggleRead(id?: string) { if (!id) return; if (read.value.has(id)) read.value.delete(id); else read.value.add(id); }
 function setSource(sid: 'all' | string) { activeSourceId.value = sid; if (!items.value.some((i) => i.id === selectedId.value)) selectedId.value = items.value[0]?.id ?? ''; }
 function markAllRead() { for (const i of all) read.value.add(i.id); }
@@ -240,7 +244,8 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-tick { flex: 0 0 auto; max-width: 30rem; border: none; border-right: 1px solid var(--line-2); background: transparent; color: rgba(255, 255, 255, 0.7); padding: 0.45rem 0.8rem; font-size: 0.74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; } .nf-tick b { color: rgba(255, 255, 255, 0.92); } .nf-tick.active { background: rgba(88, 166, 255, 0.12); }
 
 .nf-body { min-height: 0; display: grid; grid-template-columns: 210px minmax(320px, 460px) 1fr; gap: 0.75rem; }
-@media (max-width: 1080px) { .nf-body { grid-template-columns: 180px 1fr; } .nf-reader { display: none; } }
+.nf-body.mag { grid-template-columns: 220px minmax(0, 1fr); }  /* magazine = wide feed, reader is a slide-over */
+@media (max-width: 1080px) { .nf-body { grid-template-columns: 180px 1fr; } .nf-reader:not(.overlay) { display: none; } }
 
 .nf-rail { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.15rem; }
 .nf-rail-head { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); padding: 0.3rem 0.5rem; }
@@ -264,18 +269,22 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 .nf-row-dek { margin: 0.25rem 0 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .nf-saved { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: var(--up); background: rgba(63, 185, 80, 0.14); border-radius: 4px; padding: 0.03rem 0.3rem; }
 
-/* Magazine view — cover-image cards in a responsive grid */
-.nf-list.magazine { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.7rem; padding: 0.7rem; align-content: start; align-items: start; }
-.nf-mag { border: 1px solid var(--line-2); border-radius: 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; } .nf-mag:hover { border-color: rgba(255, 255, 255, 0.2); } .nf-mag.on { border-color: #58a6ff; box-shadow: 0 0 0 1px #58a6ff; }
-.nf-cover { position: relative; height: 96px; border-radius: 10px 10px 0 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.45rem 0.55rem; }
-.nf-cover-src { font-size: 0.66rem; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
-.nf-mag-b { padding: 0.55rem 0.65rem 0.7rem; display: grid; gap: 0.2rem; }
-.nf-mag .nf-row-title { margin: 0.1rem 0 0; font-size: 0.86rem; }
+/* Magazine (feed) view — cover-image cards in a wide responsive grid */
+.nf-list.magazine { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; padding: 0.85rem; align-content: start; align-items: start; border: none; }
+.nf-mag { border: 1px solid var(--line-2); border-radius: 12px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; transition: border-color 0.15s ease, transform 0.12s ease; } .nf-mag:hover { border-color: var(--line-2); transform: translateY(-2px); } .nf-mag.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.nf-cover { position: relative; height: 128px; border-radius: 12px 12px 0 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.5rem 0.65rem; }
+.nf-cover-src { font-size: 0.7rem; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.nf-mag-b { padding: 0.7rem 0.8rem 0.85rem; display: grid; gap: 0.3rem; }
+.nf-mag .nf-row-title { margin: 0.1rem 0 0; font-size: 1rem; line-height: 1.3; }
 .nf-mag.unread .nf-row-title { color: #fff; }
 .nf-mag .nf-row-dek { -webkit-line-clamp: 3; }
 
 .nf-reader { min-height: 0; overflow-y: auto; border: 1px solid var(--line-2); border-radius: 12px; padding: 1.1rem 1.25rem; }
 .nf-reader.empty { display: grid; place-items: center; color: rgba(255, 255, 255, 0.35); font-size: 0.85rem; }
+/* magazine reader = right slide-over */
+.nf-reader-backdrop { position: fixed; inset: 0; z-index: 1240; background: rgba(4, 5, 8, 0.5); backdrop-filter: blur(2px); }
+.nf-reader.overlay { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 94vw); z-index: 1250; border: none; border-left: 1px solid var(--line-2); border-radius: 0; padding: 2rem 1.75rem 1.5rem; box-shadow: -24px 0 70px rgba(0, 0, 0, 0.55); }
+.nf-reader-close { position: absolute; top: 1rem; right: 1.2rem; border: none; background: transparent; color: var(--text-3); font-size: 1.05rem; cursor: pointer; line-height: 1; } .nf-reader-close:hover { color: var(--text); }
 .nf-reader-meta { display: flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; }
 .nf-reader-title { margin: 0.5rem 0 0.7rem; font-size: 1.4rem; line-height: 1.25; letter-spacing: -0.02em; }
 .nf-reader-body { margin: 0 0 1.1rem; font-size: 0.95rem; line-height: 1.6; color: rgba(255, 255, 255, 0.82); }

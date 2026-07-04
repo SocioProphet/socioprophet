@@ -114,6 +114,7 @@
           autocomplete="off"
           @keyup.enter="onPromptSubmit()"
         />
+        <button type="button" class="sp-kbd" title="Command palette" @click="paletteOpen = true">⌘K</button>
       </div>
       <div class="sp-capture-actions">
         <button
@@ -158,6 +159,9 @@
         @toggle-popout="termPopout = !termPopout"
       />
     </Transition>
+
+    <!-- Spotlight-style command palette (⌘K / Ctrl+K) -->
+    <CommandPalette :open="paletteOpen" @close="paletteOpen = false" />
   </div>
 </template>
 
@@ -168,6 +172,7 @@ import { useAuth } from './stores/auth';
 import { useResearch } from './stores/research';
 import RuntimeAdapterStatusBadge from './components/RuntimeAdapterStatusBadge.vue';
 import QuakeTerminal from './components/QuakeTerminal.vue';
+import CommandPalette from './components/CommandPalette.vue';
 import { useOperatorTerminal } from './composables/useOperatorTerminal';
 import { useNoeticaChat } from './composables/useNoeticaChat';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
@@ -197,6 +202,7 @@ const agentCockpit = AGENT_COCKPIT;
 const navOpen = ref(false);
 
 // Quake drop-down terminal — shell-wide, toggled by the footer button or Ctrl+`.
+const paletteOpen = ref(false);
 const termOpen = ref(false);
 const termPopout = ref(false);
 const term = useOperatorTerminal();
@@ -222,6 +228,12 @@ async function onPromptSubmit() {
   }
 }
 function onTermHotkey(e: KeyboardEvent) {
+  // Cmd/Ctrl+K — Spotlight-style command palette (⌘Space is reserved by macOS).
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    paletteOpen.value = !paletteOpen.value;
+    return;
+  }
   // Ctrl+`  (backquote) — the classic Quake / VS Code terminal toggle.
   if (e.ctrlKey && (e.key === '`' || e.code === 'Backquote')) {
     e.preventDefault();

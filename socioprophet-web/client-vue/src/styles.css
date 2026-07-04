@@ -130,6 +130,8 @@ aside.sp-left-rail a.router-link-active, aside.sp-left-rail a:hover { color: var
 .sp-cmd-glyph { border: 0; background: transparent; color: var(--accent); font-weight: 700; font-size: 1rem; cursor: pointer; padding: 0 0.15rem; }
 .sp-cmd-glyph:hover { color: var(--accent-2); }
 .sp-cmd-glyph.chat { color: #b9a6f2; font-size: 1.05rem; } .sp-cmd-glyph.chat:hover { color: #d0c2ff; }
+.sp-kbd { font-size: 0.66rem; color: var(--text-3); border: 1px solid var(--line-2); border-radius: 6px; padding: 0.15rem 0.4rem; background: transparent; cursor: pointer; white-space: nowrap; }
+.sp-kbd:hover { color: var(--text); border-color: var(--accent); }
 
 /* Refined command line, shared across the data screens */
 .term-cmd { flex: 0 1 340px; display: flex; align-items: center; gap: 0.45rem; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); padding: 0.3rem 0.6rem; transition: border-color 0.15s ease; }
