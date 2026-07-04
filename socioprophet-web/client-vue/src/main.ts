@@ -17,6 +17,7 @@ import ModelLabs from './pages/ModelLabs.vue';
 import DataSearch from './pages/DataSearch.vue';
 import KnowledgeGraph from './pages/KnowledgeGraph.vue';
 import ForgeImport from './pages/ForgeImport.vue';
+import NewsFeed from './pages/NewsFeed.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
@@ -58,6 +59,7 @@ const routes = [
   { path: '/data/search', component: DataSearch },
   { path: '/knowledge/graph', component: KnowledgeGraph },
   { path: '/forge/import', component: ForgeImport },
+  { path: '/news', component: NewsFeed },
   ...mockedSurfaceRoutes,
   { path: '/:pathMatch(.*)*', component: DomainSurfacePage },
 ];
