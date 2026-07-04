@@ -14,6 +14,12 @@
     </header>
 
     <p class="sc-note">{{ chain?.note }}</p>
+    <div v-if="chainR" class="sc-chainrisk">
+      <span class="sc-cr-k">Path risk</span><span class="sc-cr-badge" :style="{ color: ratingColor(chainR.rating), borderColor: ratingColor(chainR.rating) }">{{ Math.round(chainR.pathRisk * 100) }} · {{ chainR.rating }}</span>
+      <span class="sc-cr-tol">tolerance {{ chainR.tolerance }}</span>
+      <span v-if="clusterR" class="sc-cr-k">Common-mode</span>
+      <span v-if="clusterR" class="sc-cr-badge" :style="{ color: ratingColor(clusterR.rating), borderColor: ratingColor(clusterR.rating) }" :title="`HHI ${clusterR.hhi} · blast radius ${Math.round(clusterR.blastRadius * 100)}%`">{{ clusterR.name }} · {{ clusterR.rating }}</span>
+    </div>
 
     <!-- Chain flow -->
     <div ref="flowEl" class="sc-flow" aria-label="Chain flow" @keydown="arrowRove($event, flowEl, '.sc-node', 'h')">
@@ -25,6 +31,7 @@
             <span class="sc-node-t">{{ n.facility ?? n.type }}</span>
           </span>
           <span v-if="n.status !== 'nominal'" class="sc-node-s" :class="n.status" />
+          <span v-if="riskForNode(n.id)" class="sc-node-risk" :style="{ background: ratingColor(riskForNode(n.id)!.rating) }" :title="`operational risk · ${riskForNode(n.id)!.rating}`" />
         </button>
         <span v-if="i < flow.length - 1" class="sc-edge">{{ edgeKind(flow[i]!.id, flow[i + 1]!.id) }} →</span>
       </template>
@@ -40,6 +47,22 @@
         <code class="sc-gid">{{ selected.graphId }}</code>
       </div>
       <p class="sc-d-note">{{ selected.note }}</p>
+
+      <!-- Operational risk (BIAN/FICO): inherent factors + controls → residual -->
+      <div v-if="risk" class="sc-risk">
+        <div class="sc-risk-h">
+          <span>Operational risk</span>
+          <span class="sc-risk-rating" :style="{ color: ratingColor(risk.rating), borderColor: ratingColor(risk.rating) }">{{ risk.rating }}</span>
+        </div>
+        <div class="sc-risk-scores">
+          <div class="sc-risk-sc"><span>inherent</span><div class="sc-risk-bar"><div class="sc-risk-fill inh" :style="{ width: risk.inherentScore * 100 + '%' }" /></div><b>{{ Math.round(risk.inherentScore * 100) }}</b></div>
+          <div class="sc-risk-sc"><span>residual</span><div class="sc-risk-bar"><div class="sc-risk-fill res" :style="{ width: risk.residualScore * 100 + '%', background: ratingColor(risk.rating) }" /></div><b>{{ Math.round(risk.residualScore * 100) }}</b></div>
+        </div>
+        <div class="sc-risk-factors">
+          <span v-for="[k, label] in FACTORS" :key="k" class="sc-factor" :title="label"><i :style="{ opacity: 0.25 + risk.inherent[k] * 0.75 }" />{{ k }}</span>
+        </div>
+        <div v-if="risk.controlGaps.length" class="sc-risk-gaps">control gaps: {{ risk.controlGaps.join(', ') }}</div>
+      </div>
 
       <!-- First-class model links -->
       <div class="sc-links">
@@ -90,6 +113,7 @@ import { instruments } from '../data/marketsFixture';
 import { sectors, indicators, SUBDOMAIN_GROUP, type EcoGroup } from '../data/economyFixture';
 import { regions } from '../data/weatherFixture';
 import { newsItems } from '../data/newsFeedFixture';
+import { riskForNode, chainRisk, clusterRisk, ratingColor, FACTORS } from '../data/supplyChainRiskFixture';
 import { arrowRove } from '../utils/listKeys';
 
 const router = useRouter();
@@ -117,6 +141,11 @@ function edgeKind(from: string, to: string): string { return edgesForChain(chain
 
 const selectedId = ref<string>(flow.value[0]?.id ?? '');
 const selected = computed<SCNode | undefined>(() => nodeById(selectedId.value));
+// Operational-risk lens (BIAN/FICO): the selected node's residual risk, plus the
+// chain's accumulated path risk and common-mode cluster.
+const risk = computed(() => riskForNode(selectedId.value));
+const chainR = computed(() => chainRisk[chainId.value]);
+const clusterR = computed(() => clusterRisk[chainId.value]);
 watch(chainId, () => { selectedId.value = flow.value[0]?.id ?? ''; });
 function setChain(id: string) { chainId.value = id; }
 onMounted(() => {
@@ -176,6 +205,10 @@ function openWeather(id: string) { router.push({ path: '/weather/forecast', quer
 .sc-chaintabs { display: flex; gap: 0.3rem; }
 .sc-chain { border: 1px solid var(--line-2); background: transparent; color: var(--text-2); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.78rem; cursor: pointer; } .sc-chain.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 .sc-note { margin: 0; font-size: 0.82rem; color: var(--text-3); max-width: 70ch; }
+.sc-chainrisk { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.6rem; margin-top: 0.5rem; }
+.sc-cr-k { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3); }
+.sc-cr-badge { font-size: 0.68rem; font-weight: 650; border: 1px solid; border-radius: 5px; padding: 0.08rem 0.4rem; }
+.sc-cr-tol { font-size: 0.66rem; color: var(--text-3); font-family: ui-monospace, monospace; }
 
 .sc-flow { display: flex; align-items: center; gap: 0.5rem; overflow-x: auto; padding: 0.6rem 0.1rem; }
 .sc-node { flex: 0 0 auto; display: flex; align-items: center; gap: 0.55rem; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: inherit; padding: 0.55rem 0.7rem; cursor: pointer; text-align: left; min-width: 12rem; position: relative; }
@@ -185,6 +218,7 @@ function openWeather(id: string) { router.push({ path: '/weather/forecast', quer
 .sc-node-ic.commodity { color: var(--accent); } .sc-node-ic.company { color: #58a6ff; } .sc-node-ic.port { color: #4aa3ff; } .sc-node-ic.route { color: var(--text-3); }
 .sc-node-b { display: grid; min-width: 0; } .sc-node-name { font-size: 0.84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .sc-node-t { font-size: 0.66rem; color: var(--text-3); text-transform: capitalize; }
 .sc-node-s { position: absolute; top: 0.5rem; right: 0.5rem; width: 7px; height: 7px; border-radius: 50%; } .sc-node-s.watch { background: var(--accent); } .sc-node-s.disrupted { background: var(--down); }
+.sc-node-risk { position: absolute; bottom: 0.5rem; right: 0.5rem; width: 6px; height: 6px; border-radius: 2px; }
 .sc-edge { flex: 0 0 auto; font-size: 0.64rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
 
 .sc-detail { border: 1px solid var(--line-2); border-radius: 12px; padding: 1rem 1.1rem 1.1rem; background: var(--surface); }
@@ -193,6 +227,19 @@ function openWeather(id: string) { router.push({ path: '/weather/forecast', quer
 .sc-badge { font-size: 0.56rem; text-transform: uppercase; font-weight: 700; border-radius: 4px; padding: 0.05rem 0.35rem; } .sc-badge.nominal { color: var(--up); background: rgba(75,191,115,0.15); } .sc-badge.watch { color: var(--accent); background: rgba(216,162,80,0.16); } .sc-badge.disrupted { color: var(--down); background: rgba(240,101,106,0.16); }
 .sc-gid { font-size: 0.68rem; color: var(--text-3); font-family: ui-monospace, monospace; }
 .sc-d-note { margin: 0.7rem 0 0; font-size: 0.86rem; line-height: 1.6; color: var(--text-2); }
+
+.sc-risk { margin-top: 0.9rem; border: 1px solid var(--line-2); border-radius: 10px; padding: 0.7rem 0.8rem; background: var(--surface-2); }
+.sc-risk-h { display: flex; align-items: center; justify-content: space-between; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+.sc-risk-rating { font-size: 0.6rem; font-weight: 700; border: 1px solid; border-radius: 4px; padding: 0.05rem 0.35rem; letter-spacing: 0.03em; }
+.sc-risk-scores { display: grid; gap: 0.35rem; margin-top: 0.6rem; }
+.sc-risk-sc { display: grid; grid-template-columns: 4rem 1fr 2rem; align-items: center; gap: 0.5rem; font-size: 0.68rem; color: var(--text-3); }
+.sc-risk-sc b { color: var(--text-2); text-align: right; font-variant-numeric: tabular-nums; }
+.sc-risk-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+.sc-risk-fill { height: 100%; border-radius: 3px; } .sc-risk-fill.inh { background: var(--text-3); } .sc-risk-fill.res { background: var(--accent); }
+.sc-risk-factors { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.6rem; }
+.sc-factor { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.6rem; font-family: ui-monospace, monospace; color: var(--text-3); border: 1px solid var(--line-2); border-radius: 4px; padding: 0.05rem 0.3rem; }
+.sc-factor i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.sc-risk-gaps { margin-top: 0.55rem; font-size: 0.66rem; color: #f0883e; }
 
 .sc-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
 .sc-link { display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text); border-radius: 9px; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; } .sc-link:hover { border-color: var(--accent); }
