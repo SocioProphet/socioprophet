@@ -11,7 +11,7 @@
       </div>
       <div class="nf-tools">
         <span class="nf-count">{{ totalUnread }} unread</span>
-        <div class="nf-seg">
+        <div v-if="mode !== 'calendar'" class="nf-seg">
           <button :class="{ on: view === 'titles' }" @click="view = 'titles'">Titles</button>
           <button :class="{ on: view === 'cards' }" @click="view = 'cards'">Cards</button>
           <button :class="{ on: view === 'magazine' }" @click="view = 'magazine'">Magazine</button>
@@ -50,11 +50,30 @@
       </aside>
 
       <!-- Stream -->
-      <div ref="listEl" class="nf-list" :class="view" aria-label="Articles">
+      <div ref="listEl" class="nf-list" :class="mode === 'calendar' ? 'calendar' : view" aria-label="Articles">
         <p v-if="items.length === 0" class="nf-empty">Nothing here — try “All feeds” or turn off the filters.</p>
 
+        <!-- Event Calendar (grouped by day) -->
+        <template v-if="mode === 'calendar'">
+          <section v-for="g in byDay" :key="g.day" class="nf-day">
+            <div class="nf-day-h">{{ g.label }}<span class="nf-day-c">{{ g.items.length }}</span></div>
+            <button
+              v-for="it in g.items"
+              :key="it.id"
+              class="nf-agenda"
+              :class="{ on: it.id === selectedId, unread: !isRead(it.id) }"
+              @click="openReader(it.id)"
+            >
+              <span class="nf-agenda-time">{{ timeLabel(it.publishedAt) }}</span>
+              <span class="nf-agenda-title">{{ it.title }}</span>
+              <span class="nf-agenda-src" :style="{ color: sourceColor(it.sourceId) }">{{ sourceOf(it)?.title }}</span>
+              <span v-if="it.membraneDecision !== 'admit'" class="nf-mem" :class="it.membraneDecision">{{ it.membraneDecision }}</span>
+            </button>
+          </section>
+        </template>
+
         <!-- Titles / Cards -->
-        <template v-if="view !== 'magazine'">
+        <template v-else-if="view !== 'magazine'">
           <article
             v-for="it in items"
             :key="it.id"
@@ -99,9 +118,9 @@
       </div>
 
       <!-- Reader — inline pane in cards/titles, slide-over overlay in magazine -->
-      <div v-if="view === 'magazine' && readerOpen" class="nf-reader-backdrop" @click="readerOpen = false" />
-      <article v-if="selected && (view !== 'magazine' || readerOpen)" class="nf-reader" :class="{ overlay: view === 'magazine' }" aria-label="Reader">
-        <button v-if="view === 'magazine'" class="nf-reader-close" aria-label="Close" @click="readerOpen = false">✕</button>
+      <div v-if="overlayReader && readerOpen" class="nf-reader-backdrop" @click="readerOpen = false" />
+      <article v-if="selected && (!overlayReader || readerOpen)" class="nf-reader" :class="{ overlay: overlayReader }" aria-label="Reader">
+        <button v-if="overlayReader" class="nf-reader-close" aria-label="Close" @click="readerOpen = false">✕</button>
         <div class="nf-reader-meta">
           <span class="nf-src-tag" :style="{ color: sourceColor(selected.sourceId) }">{{ sourceOf(selected)?.title }}</span>
           <span class="nf-time">{{ relative(selected.publishedAt) }}</span>
@@ -131,7 +150,7 @@
           <button class="nf-act" :class="{ done: saved.has(selected.id) }" :disabled="saved.has(selected.id)" title="Capture into the Research list" @click="save(selected)">{{ saved.has(selected.id) ? 'Saved ✓' : 'Save' }}</button>
         </div>
       </article>
-      <div v-else-if="view !== 'magazine'" class="nf-reader empty">Select an article</div>
+      <div v-else-if="!overlayReader" class="nf-reader empty">Select an article</div>
     </div>
   </section>
 </template>
@@ -163,6 +182,8 @@ const items = computed<FeedItem[]>(() => {
   if (activeSourceId.value !== 'all') list = list.filter((i) => i.sourceId === activeSourceId.value);
   if (unreadOnly.value) list = list.filter((i) => !read.value.has(i.id));
   if (governedOnly.value) list = list.filter((i) => i.membraneDecision !== 'admit');
+  // Recent Events + Event Calendar are recency-ordered views of the same feed.
+  if (mode.value !== 'all') list = [...list].sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt));
   return list;
 });
 const selected = computed<FeedItem | undefined>(() => all.find((i) => i.id === selectedId.value) ?? items.value[0]);
@@ -250,6 +271,24 @@ watch(selectedId, async () => { await nextTick(); listEl.value?.querySelector('.
 const route = useRoute();
 // Active News & Events sub-domain shown as the feed's lens.
 const scope = computed(() => navScopeForPath(route.path));
+// Sub-domain view: All feed · Recent Events (recency list) · Event Calendar (by day).
+const mode = computed<'all' | 'recent' | 'calendar'>(() =>
+  route.path.endsWith('/recent') ? 'recent' : route.path.endsWith('/calendar') ? 'calendar' : 'all',
+);
+const overlayReader = computed(() => view.value === 'magazine' || mode.value === 'calendar');
+// Calendar: group the recency-sorted items by day.
+const byDay = computed(() => {
+  const groups: Array<{ day: string; label: string; items: FeedItem[] }> = [];
+  for (const it of items.value) {
+    const day = it.publishedAt.slice(0, 10);
+    let g = groups.find((x) => x.day === day);
+    if (!g) { g = { day, label: dayLabel(it.publishedAt), items: [] }; groups.push(g); }
+    g.items.push(it);
+  }
+  return groups;
+});
+function dayLabel(iso: string): string { return new Date(iso).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); }
+function timeLabel(iso: string): string { return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
 onMounted(() => {
   const deep = typeof route.query.item === 'string' ? route.query.item : '';
   if (deep && all.some((i) => i.id === deep)) openReader(deep);
@@ -304,6 +343,17 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 
 /* Magazine (feed) view — cover-image cards in a wide responsive grid */
 .nf-list.magazine { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; padding: 0.85rem; align-content: start; align-items: start; border: none; }
+
+/* Event Calendar (agenda grouped by day) */
+.nf-list.calendar { padding: 0.35rem 0; }
+.nf-day { border-bottom: 1px solid var(--line); }
+.nf-day:last-child { border-bottom: none; }
+.nf-day-h { position: sticky; top: 0; z-index: 1; display: flex; align-items: baseline; gap: 0.5rem; padding: 0.45rem 0.85rem; background: var(--surface); border-bottom: 1px solid var(--line); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); font-weight: 700; }
+.nf-day-c { font-size: 0.62rem; color: var(--text-3); background: var(--surface-2); border-radius: 999px; padding: 0.02rem 0.4rem; }
+.nf-agenda { width: 100%; display: flex; align-items: baseline; gap: 0.7rem; border: none; border-bottom: 1px solid var(--line); background: transparent; color: inherit; padding: 0.55rem 0.85rem; cursor: pointer; text-align: left; } .nf-agenda:hover { background: var(--surface-2); } .nf-agenda.on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.nf-agenda-time { flex: 0 0 4rem; font-size: 0.72rem; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.nf-agenda-title { flex: 1; min-width: 0; font-size: 0.86rem; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .nf-agenda.unread .nf-agenda-title { color: var(--text); font-weight: 550; }
+.nf-agenda-src { flex: 0 0 auto; font-size: 0.72rem; }
 .nf-mag { border: 1px solid var(--line-2); border-radius: 12px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; transition: border-color 0.15s ease, transform 0.12s ease; } .nf-mag:hover { border-color: var(--line-2); transform: translateY(-2px); } .nf-mag.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .nf-cover { position: relative; height: 128px; border-radius: 12px 12px 0 0; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: space-between; padding: 0.5rem 0.65rem; }
 .nf-cover-src { font-size: 0.7rem; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
