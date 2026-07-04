@@ -1,0 +1,32 @@
+# SocioProphet
+
+> Sovereign, evidence-grounded AI knowledge platform. Public marketing + documentation on
+> socioprophet.com; products exposed across dedicated surfaces (.ai/.dev/.cloud/.academy/.md/.law/.wiki/.live).
+
+## Products
+- [Overview](/documentation/guide/products/overview.html)
+- [AI platform](/documentation/guide/products/ai.html)
+- [Developer platform](/documentation/guide/products/dev.html)
+- [Cloud suite](/documentation/guide/products/cloud.html)
+- [Academy](/documentation/guide/products/academy.html)
+- [Medical](/documentation/guide/products/medical.html)
+- [Law](/documentation/guide/products/law.html)
+- [Knowledge Graph](/documentation/guide/products/kg.html)
+- [Knowledge Representation](/documentation/guide/products/kr.html)
+- [Wiki](/documentation/guide/products/wiki.html)
+- [Live builds](/documentation/guide/products/live.html)
+- [I/O plane](/documentation/guide/products/io.html)
+- [Blog](/documentation/guide/products/blog.html)
+
+## Documentation
+- [Getting started](/documentation/guide/getting-started.html)
+- [Architecture](/documentation/architecture.html)
+- [Trust center](/documentation/guide/trust-center.html)
+
+## About
+- [Investor](/investor/)
+- [Privacy](/privacy/)  - [Terms](/terms/)
+
+## Notes
+- Canonical host is the apex: https://socioprophet.com (www should 301 -> apex).
+- Generated 2026-06-29.

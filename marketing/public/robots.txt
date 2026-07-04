@@ -1,0 +1,7 @@
+# robots.txt - socioprophet.com
+# Allow all crawlers including AI crawlers (AI Search Health: keep bots ALLOWED).
+User-agent: *
+Allow: /
+Disallow: /auth/
+
+Sitemap: https://socioprophet.com/sitemap.xml
