@@ -197,7 +197,7 @@ function icon(n: SCNode): string {
 }
 function openGraph(n: SCNode) { router.push({ path: '/knowledge/graph', query: { root: n.graphId } }); }
 function openMap(n: SCNode) { if (n.geo) router.push({ path: '/map', query: { focus: `${n.geo.lat},${n.geo.lon}` } }); }
-function openTwin(n: SCNode) { router.push({ path: '/capability/economic-prophet', query: { twin: n.twinRef ?? '' } }); }
+function openTwin(n: SCNode) { router.push({ path: '/analytics/digital-twin', query: { chain: n.chain } }); }
 function openMarket(sym: string) { router.push({ path: '/markets/indices-funds', query: { sym } }); }
 function openEcon(e: { id: string; kind: 'sector' | 'indicator'; group?: EcoGroup }) {
   const path = e.kind === 'indicator' && e.group ? (GROUP_PATH[e.group] ?? '/economy/macro-economics') : '/economy/macro-economics';
