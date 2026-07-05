@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Activities</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+thead th{text-align:left;padding:11px 14px;background:var(--page);color:var(--ink-dim);font-weight:600;font-size:11.5px;border-bottom:1px solid var(--line)}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--line)}
+tbody tr:hover{background:#fafbfc}
+.srcapp{display:flex;align-items:center;gap:8px}.srcapp .lg{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:9px;color:#fff;font-weight:700}
+.mono{font-family:"Roboto Mono",monospace}.cbx{width:15px;height:15px;border:1.5px solid var(--line-2);border-radius:4px;display:inline-block}
+.atype{background:var(--page);padding:2px 8px;border-radius:5px;font-size:11px;color:var(--ink-dim)}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item active" href="activities.html"><span class="ic">≣</span>Activities</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › Assets › <b>Activities</b></div><div class="sp"></div>
+<button class="btn">Saved Queries ›</button></div>
+<div class="wrap" style="max-width:none"><div class="page-h"><h1>Activities</h1><p>Usage of SaaS applications by individual users and entities — the audit/event stream across adapters.</p></div>
+<div class="toolbar"><div class="searchbox">⌕ <input placeholder="Search assets or saved queries…"></div><button class="btn primary">Query Wizard</button></div>
+<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px">Total <b style="color:var(--ink);font-family:Roboto Mono">420</b> · Last updated <b class="mono">2025-07-09 15:46:13</b> ↻
+<span style="float:right"><button class="btn" style="padding:5px 9px">⚏ Refine</button> <button class="btn" style="padding:5px 9px">▦ Edit Table</button> <button class="btn" style="padding:5px 9px">⬇ Export CSV</button></span></div>
+<table><thead><tr><th style="width:30px"></th><th>Source Application</th><th>Action: Timestamp ↓</th><th>Actor: Username</th><th>Action: Type</th><th>Action: Name</th><th>Actor Location: Remote IP</th></tr></thead><tbody><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#00a4ef">Mi</span>Microsoft</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-16 04:18:44</td><td class="mono" style="font-size:11.5px">anna.strunk@demo.local</td><td></td><td>User sign in to Microsoft Office 365 Portal</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">4.238.169.30</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#22a565">Se</span>ServiceNow</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-16 03:11:58</td><td class="mono" style="font-size:11.5px">luis.arrington@demo.local</td><td><span class="atype">form</span></td><td>login</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">198.79.242.193</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#2e86ff">Zo</span>Zoom</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-16 02:51:50</td><td class="mono" style="font-size:11.5px">debbie.lockard@demo.local</td><td><span class="atype">Sign in</span></td><td>User Sign in</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">189.95.197.147</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#00a4ef">Mi</span>Microsoft</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-15 20:39:06</td><td class="mono" style="font-size:11.5px">andrew.corriveau@demo.local</td><td></td><td>User sign in to Microsoft Office 365 Portal</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">82.181.100.253</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#2e86ff">Zo</span>Zoom</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-15 19:54:33</td><td class="mono" style="font-size:11.5px">glen.davidson@demo.local</td><td><span class="atype">User</span></td><td>Edit User - Change Type: Licensed to Basic</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">72.22.154.174</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#22a565">Se</span>ServiceNow</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-15 06:09:35</td><td class="mono" style="font-size:11.5px">brendan.illuzzi@demo.local</td><td><span class="atype">form</span></td><td>File Upload</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">175.81.31.0</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#00a1e0">Sa</span>Salesforce</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-15 03:25:21</td><td class="mono" style="font-size:11.5px">tyler.carlin@demo.local</td><td><span class="atype">API Event</span></td><td>API Event</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">168.210.103.102</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#00a4ef">Mi</span>Microsoft</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-14 18:18:03</td><td class="mono" style="font-size:11.5px">william.matin@demo.local</td><td></td><td>User sign in to Microsoft 365 Security Center</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">120.17.53.221</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#2e86ff">Zo</span>Zoom</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-14 11:58:52</td><td class="mono" style="font-size:11.5px">nancy.dahl@demo.local</td><td><span class="atype">User</span></td><td>Update User Role: Member to Admin</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">94.160.125.85</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#00a4ef">Mi</span>Microsoft</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-14 11:57:16</td><td class="mono" style="font-size:11.5px">enrique.childs@demo.local</td><td></td><td>Sign in to Azure KeyVault portal extension</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">39.180.245.51</td></tr><tr><td><span class="cbx"></span></td><td><div class="srcapp"><span class="lg" style="background:#22a565">Se</span>ServiceNow</div></td>
+<td class="mono" style="font-size:11.5px">2024-09-14 10:55:08</td><td class="mono" style="font-size:11.5px">joan.desimone@demo.local</td><td><span class="atype">list</span></td><td>/sys_user_list.do</td><td class="mono" style="font-size:11.5px;color:var(--ink-dim)">194.199.176.254</td></tr></tbody></table>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>Activities = event/audit asset type · SaaS usage provenance</span><span style="margin-left:auto" class="mono">activities</span></div>
+</div></main></div></body></html>

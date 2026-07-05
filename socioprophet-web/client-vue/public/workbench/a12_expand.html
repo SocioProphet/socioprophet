@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore — Devices relationships</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.expandwrap{display:grid;grid-template-columns:230px 1fr;gap:16px;height:calc(100vh - 54px - 44px)}
+.steps{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow-y:auto}
+.steps .sh{padding:13px 14px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;display:flex;justify-content:space-between}
+.steps .sh .n{color:var(--blue)}
+.stepcard{margin:8px;border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;cursor:pointer}
+.stepcard.active{border-color:var(--blue);background:var(--blue-bg)}
+.stepcard .op{display:flex;justify-content:space-between;font-size:12px}.stepcard .op b{color:var(--ink)}
+.stepcard .op .c{font-family:'Roboto Mono',monospace;color:var(--blue);font-size:11px}
+.stepcard .d{font-size:10.5px;color:var(--ink-dim);margin-top:2px}
+.stepcard.start{border-style:dashed;color:var(--ink-dim)}
+.dl{padding:10px 8px;border-top:1px solid var(--line)}
+.dl .dlh{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;padding:4px 6px}
+.dlrow{display:flex;justify-content:space-between;padding:6px 8px;font-size:12px;color:var(--ink-dim);border-radius:6px}
+.dlrow:hover{background:var(--page)}.dlrow .c{font-family:'Roboto Mono',monospace}
+.gcanvas{position:relative;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.gcanvas .gt{position:absolute;top:14px;left:16px;font-size:13px;font-weight:600}
+.gnode{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transform:translate(-50%,-50%);transition:.15s}
+.gnode:hover{z-index:6}.gnode:hover .bub{transform:scale(1.06)}
+.gnode .bub{position:relative;border-radius:50%;display:grid;place-items:center}
+.gnode .bub .cnt{position:absolute;top:-3px;right:-9px;background:#2a3446;color:#fff;font-family:'Roboto Mono',monospace;font-weight:600;padding:2px 6px;border-radius:9px;font-size:10.5px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.gnode .lbl{font-size:11.5px;font-weight:500;white-space:nowrap}
+svg.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.elabel{font-size:10px;fill:var(--ink-faint);font-family:Inter}
+.gctrl{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px}
+.gctrl button{width:30px;height:30px;border:1px solid var(--line-2);border-radius:7px;background:var(--card);color:var(--ink-dim);font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group">
+      <div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item active" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a>
+    </div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb"><a href="dashboard.html">⌂</a> <span>›</span> <a href="a1_start.html">Asset Graph</a> <span>›</span> <b>New Graph</b></div>
+      <div class="sp"></div>
+      <button class="btn">⚏ Filter</button>
+      <button class="btn primary">Save as</button>
+    </div>
+    <div class="wrap" style="max-width:none">
+      <div class="expandwrap">
+        <div class="steps">
+          <div class="sh">Investigation steps <span class="n">3</span></div>
+          <div class="stepcard active"><div class="op"><b>Devices</b><span class="c">31.1K</span></div><div class="d">Explore · All</div></div>
+          <div class="stepcard"><div class="op"><b>Devices</b></div><div class="d">segment removed</div></div>
+          <div class="stepcard start"><div class="op"><b>⑂ Starting Point</b></div></div>
+          <div class="dl">
+            <div class="dlh">Data layers</div>
+            <div class="dlrow"><span>Accounts/Tenants</span><span class="c">3</span></div>
+            <div class="dlrow"><span>Certificates</span><span class="c">3</span></div>
+            <div class="dlrow"><span>Compute Services</span><span class="c">1</span></div>
+            <div class="dlrow"><span>Devices</span><span class="c">31,134</span></div>
+            <div class="dlrow"><span>Disks</span><span class="c">208</span></div>
+            <div class="dlrow"><span>Firewall Rules</span><span class="c">12</span></div>
+            <div class="dlrow"><span>Groups</span><span class="c">30</span></div>
+            <div class="dlrow"><span>Software</span><span class="c">145</span></div>
+            <div class="dlrow"><span>Users</span><span class="c">1K</span></div>
+            <div class="dlrow"><span>Vulnerabilities</span><span class="c">12K</span></div>
+          </div>
+        </div>
+        <div class="gcanvas">
+          <div class="gt">Devices (31.1K) · relationship expand</div>
+          <svg class="edges" id="edges"></svg>
+          <div id="nodes"></div>
+          <div class="gctrl"><button>↻</button><button>❋</button><button>⊡</button><button>＋</button><button>－</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const CX=52,CY=50; // hub % position
+const HUB={n:'Devices',g:'⬒',c:'31.1K',fg:'#7c5cff',bg:'#efeaff',r:52};
+/* satellites: label, glyph, count, color, bg, x%, y%, edge-verb */
+const SAT=[
+ ['Vulnerabilities','⛨','12K','#12b3a6','#e0f6f3',72,14,'Has'],
+ ['Users','☖','1K','#3b82f6','#eaf1fe',26,18,'Multiple Relationships'],
+ ['Software','❮❯','145','#ff7a3c','#ffeee4',80,74,'Has'],
+ ['Disks','◎','208','#3b82f6','#eaf1fe',88,44,'Has'],
+ ['Firewall Rules','▤','12','#5b2be2','#efeaff',86,26,'Has'],
+ ['Accounts/Tenants','⚭','3','#22a565','#e4f6ee',74,88,'On'],
+ ['Groups','⬖','30','#f5a623','#fdf3e3',20,40,'Multiple Relationships'],
+ ['Networks','⇆','11','#12b3a6','#e0f6f3',16,62,'Related to (Subnets)'],
+ ['Object Storage','⛁','3','#f5a623','#fdf3e3',26,30,'Has'],
+ ['Certificates','◈','3','#ff7a3c','#ffeee4',66,80,'Validated By'],
+ ['Tickets','❏','16','#3b82f6','#eaf1fe',44,86,'Relates to'],
+ ['Compute Service','▥','1','#3b82f6','#eaf1fe',30,80,'Is Used By'],
+ ['SaaS App','⬢','1','#12b3a6','#e0f6f3',44,14,'Has (Installed SW)'],
+];
+const el=document.getElementById('nodes'),svg=document.getElementById('edges');
+const W=()=>svg.clientWidth,H=()=>svg.clientHeight;
+function place(){
+  el.innerHTML='';svg.innerHTML='';
+  const cx=CX/100*W(),cy=CY/100*H();
+  // edges first
+  SAT.forEach(([n,g,c,fg,bg,x,y,verb])=>{
+    const sx=x/100*W(),sy=y/100*H();
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx);line.setAttribute('y1',cy);line.setAttribute('x2',sx);line.setAttribute('y2',sy);
+    line.setAttribute('stroke','#c9d2de');line.setAttribute('stroke-width','1.3');svg.appendChild(line);
+    const mx=(cx+sx)/2,my=(cy+sy)/2;
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',mx);t.setAttribute('y',my-3);t.setAttribute('text-anchor','middle');t.setAttribute('class','elabel');t.textContent=verb;
+    const bb=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    svg.appendChild(t);
+  });
+  // hub
+  el.insertAdjacentHTML('beforeend',node(HUB.n,HUB.g,HUB.c,HUB.fg,HUB.bg,CX,CY,HUB.r,true));
+  SAT.forEach(([n,g,c,fg,bg,x,y])=>{
+    const r=Math.max(20,Math.min(38,18+ (c.includes('K')?18:Math.sqrt(parseInt(c))*2)));
+    el.insertAdjacentHTML('beforeend',node(n,g,c,fg,bg,x,y,r,false));
+  });
+}
+function node(n,g,c,fg,bg,x,y,r,hub){
+  return `<div class="gnode" style="left:${x}%;top:${y}%" onclick="location.href='a4_context.html'">
+    <div class="bub" style="width:${r*2}px;height:${r*2}px;background:${bg};border:${hub?3:2.5}px solid ${fg}">
+      <span style="font-size:${r*0.72}px;color:${fg};font-weight:700">${g}</span>
+      <span class="cnt">${c}</span></div>
+    <div class="lbl">${n}</div></div>`;
+}
+window.addEventListener('load',()=>setTimeout(place,100));
+window.addEventListener('resize',place);
+</script>
+</body>
+</html>

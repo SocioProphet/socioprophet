@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operator Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.console{display:grid;grid-template-rows:auto 1fr auto;height:calc(100vh - 54px);gap:0}
+/* posture bar */
+.posture{display:flex;align-items:stretch;gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.pcell{background:var(--card);padding:12px 18px;flex:1;display:flex;flex-direction:column;gap:3px}
+.pcell .l{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.pcell .v{font-size:22px;font-weight:700;font-family:"Roboto Mono",monospace}
+.pcell .s{font-size:11px;color:var(--ink-dim)}
+.pcell.gate{background:var(--green-bg)}.pcell.gate .v{color:var(--green);font-size:15px}
+.pcell.held{background:var(--amber-bg)}.pcell.held .v{color:#b9791a}
+.pcell.block{background:var(--red-bg)}.pcell.block .v{color:var(--red)}
+/* three-pane middle */
+.panes{display:grid;grid-template-columns:260px 1fr 340px;gap:0;overflow:hidden;min-height:0}
+.pane{border-right:1px solid var(--line);overflow-y:auto}
+.pane:last-child{border-right:0;border-left:1px solid var(--line)}
+.paneh{padding:12px 16px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;display:flex;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:2}
+/* workflow inventory */
+.wfi{padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.wfi:hover{background:var(--page)}
+.wfi .n{font-size:12.5px;font-weight:500}
+.wfi .m{display:flex;gap:10px;margin-top:4px;font-size:10.5px;color:var(--ink-faint);font-family:"Roboto Mono",monospace}
+.wfi .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+/* live run stream */
+.runstream{padding:0}
+.runrow{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.runrow:hover{background:var(--page)}
+.runrow.sel{background:var(--blue-bg)}
+.runrow .rid{font-family:"Roboto Mono",monospace;font-size:11px;color:var(--ink-faint)}
+.runrow .wf{font-size:12.5px;font-weight:500}
+.runrow .tgt{font-size:11px;color:var(--ink-dim);font-family:"Roboto Mono",monospace;margin-top:2px;display:flex;align-items:center;gap:5px}
+.runrow .st{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.stbadge{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:5px}
+.st-prog{background:var(--blue-bg);color:var(--blue)}.st-done{background:var(--green-bg);color:var(--green)}
+.st-held{background:var(--amber-bg);color:#b9791a}.st-block{background:var(--red-bg);color:var(--red)}
+.vmini{font-size:9.5px;color:var(--ink-faint);font-family:"Roboto Mono",monospace}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin 1.4s linear infinite}
+/* asset context pane */
+.ctxcard{padding:16px}
+.ctxcard .ah{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.ctxcard .ah .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--user-bg);color:var(--user)}
+.ctxcard .ah h3{margin:0;font-size:14px}
+.ctxcard .asub{font-size:10.5px;color:var(--ink-faint);font-family:"Roboto Mono",monospace;margin-bottom:14px}
+.miniverdict{border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px}
+.miniverdict .mh{padding:8px 12px;background:var(--nav);color:#fff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.miniverdict .mr{display:flex;justify-content:space-between;padding:7px 12px;font-size:11px;border-bottom:1px solid var(--line)}
+.miniverdict .mr:last-child{border-bottom:0}.miniverdict .mr .k{color:var(--ink-dim);font-family:"Roboto Mono",monospace;font-size:10px}
+.v-pos{color:var(--green)}.v-neg{color:var(--red)}.v-zero{color:var(--ink-faint)}
+.pipeline{margin-top:6px}
+.pipeline .pn{display:flex;align-items:center;gap:9px;padding:7px 0;font-size:11.5px}
+.pipeline .pn .d{width:8px;height:8px;border-radius:50%;flex:none}
+.pipeline .pn .lbl{color:var(--ink-dim)}
+.pipeline .pn .lbl b{color:var(--ink)}
+/* dispatch control bar */
+.dispatch{display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--line);background:var(--card)}
+.dispatch .lbl{font-size:12px;color:var(--ink-dim)}
+.dispatch .heldcount{background:var(--amber-bg);color:#b9791a;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600}
+.dispatch .actbtn{padding:8px 16px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid}
+.dispatch .approve{background:var(--green);border-color:var(--green);color:#fff}
+.dispatch .hold{background:var(--card);border-color:var(--line-2);color:var(--ink-dim)}
+.dispatch .abort{background:var(--card);border-color:#ffccd4;color:var(--red)}
+.dispatch .egate{margin-left:auto;font-size:11px;color:var(--ink-faint)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  Ctrl+Y"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item" href="activities.html"><span class="ic">≣</span>Activities</a>
+      <div class="glabel">Operate</div>
+      <a class="item active" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller · operator</small></div></div>
+  </aside>
+  <main class="main" style="overflow:hidden">
+    <div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › Operate › <b>Operator Console</b></div><div class="sp"></div>
+      <span class="chip green"><span class="dot" style="background:var(--green)"></span>fabric operational</span>
+      <button class="btn">↻ live · 15s</button></div>
+    <div class="console">
+      <!-- POSTURE BAR (OC-3) -->
+      <div class="posture">
+        <div class="pcell gate"><div class="l">SCOPE-D gate</div><div class="v">✓ E4/E5/E6 clear</div><div class="s">collector policy lane</div></div>
+        <div class="pcell"><div class="l">Runs in flight</div><div class="v" style="color:var(--blue)">41</div><div class="s">across 9 workflows</div></div>
+        <div class="pcell"><div class="l">Admissible / 24h</div><div class="v" style="color:var(--green)">3,912</div><div class="s">dispatched · logged</div></div>
+        <div class="pcell held"><div class="l">Held (E-gate)</div><div class="v">3</div><div class="s">indeterminate verdict</div></div>
+        <div class="pcell block"><div class="l">Blocked / 24h</div><div class="v">17</div><div class="s">refused · evidence kept</div></div>
+        <div class="pcell"><div class="l">Target tier mix</div><div class="v" style="font-size:14px">T1 <span style="color:var(--green)">88%</span></div><div class="s">T2 10% · INF 2%</div></div>
+      </div>
+      <!-- THREE PANES -->
+      <div class="panes">
+        <!-- workflow inventory (EC1 health) -->
+        <div class="pane">
+          <div class="paneh">Workflow inventory <span>9</span></div>
+          <div id="wfi"></div>
+        </div>
+        <!-- live run stream (EC5) -->
+        <div class="pane">
+          <div class="paneh">Live run stream <span>streaming ●</span></div>
+          <div class="runstream" id="runs"></div>
+        </div>
+        <!-- asset context (graph/map of triggered_on) -->
+        <div class="pane">
+          <div class="paneh">Selected run · asset context</div>
+          <div class="ctxcard" id="ctx"></div>
+        </div>
+      </div>
+      <!-- DISPATCH CONTROL (OC-1) -->
+      <div class="dispatch">
+        <span class="lbl">Held runs require operator adjudication</span>
+        <span class="heldcount">3 held</span>
+        <button class="actbtn approve">✓ Approve dispatch</button>
+        <button class="actbtn hold">⏸ Keep held</button>
+        <button class="actbtn abort">⊘ Abort</button>
+        <span class="egate">E-gate · Michael-only (SCOPE-D PR#5 pattern) · every decision → evidence ledger</span>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const WF=[
+ ['User Termination Workflow','#22a565',12,'Event'],['New Hire Workflow','#22a565',8,'Event'],
+ ['isolate with approval','#f5a623',2,'Manual'],['Alert Received Workflow','#22a565',5,'Event'],
+ ['New Workflow c85f10','#3b82f6',41,'Scheduled'],['Copy of Test gal','#22a565',0,'Event'],
+ ['New Workflow [Disabled]','#8a99ad',0,'Event'],['Asset added/removed wf','#22a565',2252,'Event'],
+ ['Teams Response wf','#22a565',0,'Event']];
+document.getElementById('wfi').innerHTML=WF.map(([n,c,r,t])=>`<div class="wfi"><div class="n">${n}</div><div class="m"><span><span class="dot" style="background:${c}"></span>${t}</span><span>${r} runs</span></div></div>`).join('');
+
+const RUNS=[
+ [92387,'New Workflow c85f10','svc_it_aws@demo.local','prog','In Progress','admissible','t1'],
+ [92386,'New Workflow c85f10','9f6049fee48fb9f1058d9b6…','prog','In Progress','admissible','t1'],
+ [92385,'New Workflow c85f10','svc_it_azuread@demo.local','prog','In Progress','admissible','t1'],
+ [92384,'New Workflow c85f10','Test','held','Held','indeterminate','inferred'],
+ [92383,'New Workflow c85f10','svc_it_okta@demo.local','prog','In Progress','admissible','t1'],
+ [92382,'New Workflow c85f10','svc_it_googlemdm@demo.local','block','Blocked','blocked · tier','inferred'],
+ [92381,'User Termination Workflow','betsy.martin@demo.local','done','Completed','admissible','t1'],
+ [92380,'isolate with approval','WIN-RUTHD.demo.local','done','Completed','admissible','t2'],
+ [92379,'New Hire Workflow','nancy.dahl@demo.local','done','Completed','admissible','t1'],
+];
+const stc={prog:'st-prog',done:'st-done',held:'st-held',block:'st-block'};
+const sti={prog:'<span class="spin">◐</span>',done:'✓',held:'⏸',block:'⊘'};
+function renderRuns(sel=92384){
+ document.getElementById('runs').innerHTML=RUNS.map(([id,wf,tgt,sc,sl,vm,tier])=>`
+  <div class="runrow ${id===sel?'sel':''}" onclick="pick(${id})">
+   <span class="rid">#${id}</span>
+   <div><div class="wf">${wf}</div><div class="tgt">☖ ${tgt}</div></div>
+   <div class="st"><span class="stbadge ${stc[sc]}">${sti[sc]} ${sl}</span><span class="vmini">${vm}</span></div>
+  </div>`).join('');
+}
+const CTX={
+ 92387:['svc_it_aws','svc://aws/demo.local','t1','AS7922','admissible'],
+ 92384:['Test','asset://test/unresolved','inferred','—','indeterminate'],
+ 92382:['svc_it_googlemdm','svc://gmdm/demo.local','inferred','AS-unreg','blocked'],
+ 92381:['betsy.martin','user://demo.local/bmartin','t1','AS3320','admissible'],
+};
+function pick(id){
+ renderRuns(id);
+ const c=CTX[id]||CTX[92387];
+ const [nm,uri,tier,asn,verdict]=c;
+ const inf=tier==='inferred';
+ const tlabel=tier==='inferred'?'INFERRED':tier.toUpperCase();
+ const tcol=tier==='t1'?'var(--green)':tier==='t2'?'var(--blue)':'var(--red)';
+ document.getElementById('ctx').innerHTML=`
+  <div class="ah"><span class="ic" style="background:${inf?'#fdeced':'var(--user-bg)'};color:${tcol}">${inf?'⚠':'☖'}</span><h3>${nm}</h3></div>
+  <div class="asub">${uri}</div>
+  <div style="margin-bottom:14px"><span class="chip" style="background:${inf?'var(--red-bg)':'var(--green-bg)'};color:${tcol}">${tlabel}</span> <span class="chip grey">${asn}</span></div>
+  <div class="miniverdict"><div class="mh">Mellumwork verdict · run #${id}</div>
+   <div class="mr"><span class="k">provenance continuity</span><span class="${inf?'v-zero':'v-pos'}">${inf?'ZERO':'POS'}</span></div>
+   <div class="mr"><span class="k">unregistered path</span><span class="${inf?'v-neg':'v-zero'}">${inf?'NEG':'ZERO'}</span></div>
+   <div class="mr"><span class="k">target tier ≥ T2</span><span class="${inf?'v-neg':'v-pos'}">${inf?'FAIL (P-3)':'PASS'}</span></div>
+   <div class="mr"><span class="k">resolver</span><span class="${verdict==='admissible'?'v-pos':verdict==='blocked'?'v-neg':'v-zero'}">${verdict}</span></div>
+  </div>
+  <div style="font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:6px">Dispatch pipeline</div>
+  <div class="pipeline">
+   <div class="pn"><span class="d" style="background:var(--green)"></span><span class="lbl"><b>Trigger</b> · BambooHR status</span></div>
+   <div class="pn"><span class="d" style="background:var(--green)"></span><span class="lbl"><b>Condition</b> · Status = Terminated</span></div>
+   <div class="pn"><span class="d" style="background:${verdict==='admissible'?'var(--green)':verdict==='blocked'?'var(--red)':'var(--amber)'}"></span><span class="lbl"><b>Action</b> · Salesforce Deactivate → PEP</span></div>
+   <div class="pn"><span class="d" style="background:${inf?'var(--ink-faint)':'var(--green)'}"></span><span class="lbl"><b>Effect</b> · ${inf?'held / refused':'dispatched · logged'}</span></div>
+  </div>`;
+}
+renderRuns();pick(92384);
+</script>
+</body>
+</html>

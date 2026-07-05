@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Segment — Users by status</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.canvas{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;min-height:560px;overflow:hidden;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+.gnode{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transform:translate(-50%,-50%)}
+.gnode:hover .bub{transform:scale(1.05)}
+.gnode .bub{position:relative;border-radius:50%;display:grid;place-items:center;transition:.15s}
+.gnode .bub .cnt{position:absolute;top:-3px;right:-9px;background:#2a3446;color:#fff;font-family:"Roboto Mono",monospace;font-weight:600;padding:2px 7px;border-radius:9px;font-size:10.5px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.gnode .lbl{font-size:12px;font-weight:500}
+.hint{position:absolute;top:14px;left:16px;font-size:11px;color:var(--ink-faint)}
+.gctrl{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px}
+.gctrl button{width:30px;height:30px;border:1px solid var(--line-2);border-radius:7px;background:var(--card);color:var(--ink-dim);font-size:13px}</style></head><body><div class="app">  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group">
+      <div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item active" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a>
+    </div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div>
+  </aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <a href="a1_start.html">Asset Graph</a> › <b>Users</b> › Segment by status</div><div class="sp"></div>
+<span class="chip grey">Segment by status ▾</span> <button class="btn primary" onclick="location.href='a12_expand.html'">Explore connections</button></div>
+<div class="wrap"><div class="page-h"><h1>Users · segmented by account status</h1><p>Case-variant buckets preserved (ACTIVE vs active come from different adapters) · size scales with count.</p></div>
+<div class="canvas"><div class="hint">Organic · 9 buckets · 3,725 users</div><div class="gnode" style="left:58%;top:62%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:99px;height:99px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:35px;color:var(--user)">☖</span><span class="cnt">1.4K</span></div>
+<div class="lbl">active</div></div><div class="gnode" style="left:72%;top:30%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:99px;height:99px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:35px;color:var(--user)">☖</span><span class="cnt">1.4K</span></div>
+<div class="lbl">ACTIVE</div></div><div class="gnode" style="left:20%;top:44%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:47px;height:47px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:17px;color:var(--user)">☖</span><span class="cnt">71</span></div>
+<div class="lbl">suspended</div></div><div class="gnode" style="left:26%;top:20%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:45px;height:45px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:16px;color:var(--user)">☖</span><span class="cnt">54</span></div>
+<div class="lbl">SUSPENDED</div></div><div class="gnode" style="left:46%;top:14%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:49px;height:49px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:17px;color:var(--user)">☖</span><span class="cnt">90</span></div>
+<div class="lbl">recovery</div></div><div class="gnode" style="left:50%;top:32%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:47px;height:47px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:16px;color:var(--user)">☖</span><span class="cnt">70</span></div>
+<div class="lbl">RECOVERY</div></div><div class="gnode" style="left:70%;top:40%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:39px;height:39px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:14px;color:var(--user)">☖</span><span class="cnt">16</span></div>
+<div class="lbl">staged</div></div><div class="gnode" style="left:50%;top:72%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:39px;height:39px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:14px;color:var(--user)">☖</span><span class="cnt">14</span></div>
+<div class="lbl">STAGED</div></div><div class="gnode" style="left:66%;top:80%" onclick="location.href='a12_expand.html'">
+<div class="bub" style="width:37px;height:37px;background:var(--user-bg);border:2.5px solid var(--user)">
+<span style="font-size:13px;color:var(--user)">☖</span><span class="cnt">8</span></div>
+<div class="lbl">No Value</div></div>
+<div class="gctrl"><button>✥</button><button>⊡</button><button>＋</button><button>－</button></div></div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>segment: user.account_status</span><span style="margin-left:auto" class="mono">a2 · segment-users</span></div>
+</div></main></div></body></html>

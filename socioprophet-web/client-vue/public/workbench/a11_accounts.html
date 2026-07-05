@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Accounts/Tenants</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.qbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.qbar .f{padding:8px 12px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);font-size:12px;color:var(--ink-dim);min-width:150px}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.hbars .r{display:grid;grid-template-columns:130px 1fr;align-items:center;gap:10px;padding:5px 0;font-size:12px}
+.hbars .r .bn{color:var(--ink-dim);font-size:11px}
+.hbars .r .track{height:18px;position:relative;display:flex;align-items:center}
+.hbars .r .track i{border-radius:4px;height:100%}
+.hbars .r .track span{position:absolute;right:-26px;font-family:"Roboto Mono",monospace;font-size:11px}
+.cleg{display:flex;gap:14px;font-size:11px;color:var(--ink-dim);margin-top:10px}.cleg .cb{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:5px}
+.ctot{font-size:11px;color:var(--ink-faint);margin-top:8px}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item active" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item " href="activities.html"><span class="ic">≣</span>Activities</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <b>Accounts/Tenants</b></div><div class="sp"></div>
+<button class="btn">Asset Investigation ›</button><button class="btn">Saved Queries ›</button><button class="btn">Hide charts</button></div>
+<div class="wrap" style="max-width:none"><div class="page-h"><h1>Accounts/Tenants</h1><p>Discovered accounts and tenants for SaaS, cloud, or on-premises services and applications.</p></div>
+<div class="qbar"><div class="f">Adapter Connections ▾</div><div class="f">Name</div><div class="f">Created Date ▾</div><div class="f">Status</div><button class="btn">＋ Filter</button>
+<div style="margin-left:auto"><span class="chip grey">Wizard</span> <span class="chip blue">Basic</span></div></div>
+<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:10px">Overview</div>
+<div class="cgrid">
+<div class="card"><div class="ch"><h3 style="font-size:13px">Active vs Inactive Admins per Account</h3></div><div class="cb hbars"><div class="r"><span class="bn">Microsoft/active_directory-demo</span><div class="track"><i style="width:86%;background:#22c55e"></i><span>86</span></div></div><div class="r"><span class="bn">Zoom/zoom-demo</span><div class="track"><i style="width:44%;background:#22c55e"></i><span>44</span></div></div><div class="r"><span class="bn">Google Workspace/google_m…</span><div class="track"><i style="width:40%;background:#22c55e"></i><span>40</span></div></div><div class="r"><span class="bn">Okta/okta-demo</span><div class="track"><i style="width:37%;background:#22c55e"></i><span>37</span></div></div><div class="r"><span class="bn">ServiceNow/servicenow-dev</span><div class="track"><i style="width:31%;background:#22c55e"></i><span>31</span></div></div>
+<div class="cleg"><span><span class="cb" style="background:#22c55e"></span>Admin Operational Active</span><span><span class="cb" style="background:#e5484d"></span>Admin Operational Inactive</span></div><div class="ctot">Total 368 (97 items)</div></div></div>
+<div class="card"><div class="ch"><h3 style="font-size:13px">Orphaned vs Unlinked Users per Application</h3></div><div class="cb hbars">
+<div class="r"><span class="bn">Salesforce</span><div class="track"><i style="width:62%;background:#7c5cff"></i><i style="width:38%;background:#5ed0e8;position:absolute;left:62%"></i><span>375</span></div></div>
+<div class="cleg"><span><span class="cb" style="background:#7c5cff"></span>Direct Not SSO</span><span><span class="cb" style="background:#5ed0e8"></span>SSO Not Direct</span></div><div class="ctot">Total 375 (1 item)</div></div></div>
+<div class="card"><div class="ch"><h3 style="font-size:13px">Accounts per SaaS Application</h3></div><div class="cb hbars"><div class="r"><span class="bn">AWS</span><div class="track"><i style="width:80%;background:#f5a623"></i><span>4</span></div></div><div class="r"><span class="bn">Google Workspace</span><div class="track"><i style="width:60%;background:#f5a623"></i><span>3</span></div></div><div class="r"><span class="bn">Openpath</span><div class="track"><i style="width:60%;background:#f5a623"></i><span>3</span></div></div><div class="r"><span class="bn">Cloudflare</span><div class="track"><i style="width:60%;background:#f5a623"></i><span>3</span></div></div><div class="r"><span class="bn">VMware</span><div class="track"><i style="width:60%;background:#f5a623"></i><span>3</span></div></div><div class="ctot">Total 93 (62 items)</div></div></div>
+</div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>Basic-mode query bar + embedded chart overview</span><span style="margin-left:auto" class="mono">a11-acct · accounts-tenants</span></div>
+</div></main></div></body></html>

@@ -4,13 +4,12 @@ export {};
 //   GET  /api/builds        list the caller's builds
 //   GET  /api/builds/:id    one build + live status (reflected from GCS)
 const express = require("express");
-const { admin } = require("../../middleware/auth");
+const { socbaseAdmin } = require("../../middleware/auth");
 const { dispatchBuild, readBuildStatus } = require("../../services/buildOrchestrator");
 const contracts = require("../../contracts");
 const { emitEvent } = require("../../services/events");
 
 const router = express.Router();
-const db = () => admin.firestore();
 
 // Tier policy: what each tier may customize. Enforced server-side.
 const TIER_POLICY: any = {
@@ -20,8 +19,8 @@ const TIER_POLICY: any = {
 };
 
 const getTier = async (uid: string): Promise<string> => {
-  const snap = await db().collection("users").doc(uid).get();
-  return (snap.exists && snap.data()?.tier) || "free";
+  const { data } = await socbaseAdmin.from("profiles").select("tier").eq("uid", uid).maybeSingle();
+  return data?.tier || "free";
 };
 
 // Validate a spec against the caller's tier policy. Returns [ok, errorOrSpec].
@@ -52,9 +51,9 @@ router.post("/", async (req: any, res: any) => {
 
     // Rate limit (builds today).
     const since = new Date(); since.setHours(0, 0, 0, 0);
-    const todays = await db().collection("users").doc(uid).collection("builds")
-      .where("createdAt", ">=", since).get();
-    if (todays.size >= policy.dailyBuilds) {
+    const { count } = await socbaseAdmin.from("builds").select("id", { count: "exact", head: true })
+      .eq("uid", uid).gte("createdAt", since.toISOString());
+    if ((count || 0) >= policy.dailyBuilds) {
       return res.status(429).json({ error: `daily build limit reached (${policy.dailyBuilds})` });
     }
 
@@ -63,32 +62,32 @@ router.post("/", async (req: any, res: any) => {
     const spec = result;
     const target = spec.target === "netboot" ? "netboot" : "iso";
 
-    const doc = await db().collection("users").doc(uid).collection("builds").add({
-      spec, tier, status: "queued",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    const { data: doc, error: insertErr } = await socbaseAdmin.from("builds")
+      .insert({ uid, spec, tier, status: "queued" }).select().single();
+    if (insertErr || !doc) return res.status(500).json({ error: "internal: build insert failed" });
+    const update = (patch: any) => socbaseAdmin.from("builds").update(patch).eq("id", doc.id);
 
     // Conform: persist a canonical sourceos-spec BuildRequest alongside the build.
     const buildRequest = contracts.buildRequest(doc.id, uid, spec, target);
     const reqErrors = contracts.validate("BuildRequest", buildRequest);
     if (reqErrors.length) {
-      await doc.update({ status: "error", error: "BuildRequest not spec-conformant: " + reqErrors.join("; ") });
+      await update({ status: "error", error: "BuildRequest not spec-conformant: " + reqErrors.join("; ") });
       return res.status(500).json({ error: "internal: non-conformant BuildRequest", details: reqErrors });
     }
-    await doc.update({ buildRequest });
+    await update({ buildRequest });
 
     // Conform: the build is a fog WorkOrder (billable compute work).
     const wo = contracts.workOrder(doc.id, uid, spec.edition || "desktop");
     const woErrors = contracts.validate("WorkOrder", wo);
-    if (!woErrors.length) await doc.update({ workOrder: wo });
+    if (!woErrors.length) await update({ workOrder: wo });
 
     try {
       const dispatch = await dispatchBuild(uid, doc.id, spec, tier);
-      await doc.update({ status: "dispatched", lane: dispatch.lane });
+      await update({ status: "dispatched", lane: dispatch.lane });
       await emitEvent("srcos.builder.build.dispatched", `urn:srcos:user:${uid}`,
         buildRequest.id, { tier, lane: dispatch.lane, edition: spec.edition }, "fog");
     } catch (err: any) {
-      await doc.update({ status: "error", error: String(err?.message || err) });
+      await update({ status: "error", error: String(err?.message || err) });
       return res.status(502).json({ error: "build dispatch failed", buildId: doc.id });
     }
     return res.status(201).json({ buildId: doc.id, status: "dispatched" });
@@ -99,10 +98,8 @@ router.post("/", async (req: any, res: any) => {
 
 router.get("/", async (req: any, res: any) => {
   const uid = req.uid;
-  const snap = await db().collection("users").doc(uid).collection("builds")
-    .orderBy("createdAt", "desc").limit(50).get();
-  const builds = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
-  return res.json({ builds });
+  const { data } = await socbaseAdmin.from("builds").select("*").eq("uid", uid).order("createdAt", { ascending: false }).limit(50);
+  return res.json({ builds: data || [] });
 });
 
 // Edition catalog: the canonical ContentSpec (+ DesktopProfile) each edition
@@ -139,19 +136,18 @@ router.get("/whoami", async (req: any, res: any) => {
 
 router.get("/:id", async (req: any, res: any) => {
   const uid = req.uid;
-  const ref = db().collection("users").doc(uid).collection("builds").doc(req.params.id);
-  const snap = await ref.get();
-  if (!snap.exists) return res.status(404).json({ error: "not found" });
+  const { data: snap } = await socbaseAdmin.from("builds").select("*").eq("id", req.params.id).eq("uid", uid).maybeSingle();
+  if (!snap) return res.status(404).json({ error: "not found" });
 
   // Reflect live status from the build's GCS status.json.
   const live = await readBuildStatus(uid, req.params.id);
-  if (live?.status && live.status !== snap.data()?.status) {
+  if (live?.status && live.status !== snap.status) {
     const update: any = { status: live.status };
     if (live.artifact) update.artifact = live.artifact;
     // On a terminal status, emit a spec-conformant BuildValidationEvidenceBundle
     // — "validated" now means an evidence record exists, not a bucket glance.
     if (live.status === "complete" || live.status === "error") {
-      const data = snap.data() || {};
+      const data = snap;
       const edition = data.spec?.edition || "desktop";
       const ok = live.status === "complete";
       const errs: string[] = [];
@@ -176,7 +172,7 @@ router.get("/:id", async (req: any, res: any) => {
       if (!be.length) update.evidence = bundle; else errs.push("evidence: " + be.join("; "));
 
       // Fog usage receipt for the consumed compute (+ settlement for paid/premium).
-      const started = data.createdAt?._seconds ? new Date(data.createdAt._seconds * 1000) : new Date();
+      const started = data.createdAt ? new Date(data.createdAt) : new Date();
       const endedAt = new Date();
       const cpuSeconds = (endedAt.getTime() - started.getTime()) / 1000;
       const receipt = contracts.usageReceipt(req.params.id, started.toISOString(), endedAt.toISOString(), cpuSeconds);
@@ -196,10 +192,10 @@ router.get("/:id", async (req: any, res: any) => {
         `urn:srcos:user:${uid}`, `urn:srcos:build-request:${req.params.id}`,
         { status: live.status, artifactRef, tier: data.tier }, "ops-history");
     }
-    await ref.update(update);
+    await socbaseAdmin.from("builds").update(update).eq("id", req.params.id);
   }
-  const fresh = await ref.get();
-  return res.json({ id: fresh.id, ...fresh.data() });
+  const { data: fresh } = await socbaseAdmin.from("builds").select("*").eq("id", req.params.id).maybeSingle();
+  return res.json(fresh);
 });
 
 module.exports = router;

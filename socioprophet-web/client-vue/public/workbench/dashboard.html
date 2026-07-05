@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SocioProphet — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#f7f8fa;--card:#ffffff;--line:#e8ebf0;--line-2:#dde2ea;
+  --nav:#101827;--nav-2:#1b2434;--nav-ink:#8a97a8;--nav-ink-hi:#ffffff;
+  --ink:#1a2230;--ink-dim:#5a6b82;--ink-faint:#8a99ad;
+  --red:#e5484d;--amber:#f5a623;--blue:#3b82f6;--green:#22a565;--violet:#7c5cff;
+  --red-bg:#fdeced;--amber-bg:#fdf3e3;--blue-bg:#eaf1fe;--green-bg:#e4f6ee;--violet-bg:#efeaff;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--page);color:var(--ink);font-family:'Inter',ui-sans-serif,system-ui,'Segoe UI',sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace}
+button{font:inherit;cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+.app{display:grid;grid-template-columns:204px 1fr;height:100vh}
+
+/* NAV */
+.nav{background:var(--nav);color:var(--nav-ink);display:flex;flex-direction:column;padding:0;overflow-y:auto}
+.nav .brand{display:flex;align-items:center;gap:9px;padding:18px 18px 16px;color:#fff;font-weight:800;font-size:17px;letter-spacing:.02em}
+.nav .brand .mk{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--violet),var(--blue))}
+.nav .search{margin:0 14px 12px;display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a111d;color:var(--nav-ink);font-size:12px}
+.nav .search input{border:0;background:transparent;color:#cfd8e3;outline:none;width:100%;font-size:12px}
+.nav .group{padding:2px 10px}
+.nav .item{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:7px;color:var(--nav-ink);font-size:12.5px;font-weight:500}
+.nav .item .ic{width:16px;text-align:center;opacity:.85}
+.nav .item .chev{margin-left:auto;font-size:10px;opacity:.5}
+.nav .item:hover{background:#161f2e;color:#cfd8e3}
+.nav .item.active{background:var(--nav-2);color:#fff}
+.nav .sub{padding-left:12px}
+.nav .sub .item{font-size:12px;padding:6px 11px}
+.nav .sub .item.on{color:#fff}
+.nav .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid #1b2434}
+.nav .foot .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c5cff,#2e86ff);flex:none}
+.nav .foot .who{font-size:12px;color:#cfd8e3;line-height:1.3}
+.nav .foot .who small{color:var(--nav-ink);font-size:10.5px}
+
+/* MAIN */
+.main{overflow-y:auto}
+.topbar{display:flex;align-items:center;gap:10px;padding:0 26px;height:56px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5}
+.crumb{color:var(--ink-faint);font-size:13px;display:flex;align-items:center;gap:8px}
+.crumb b{color:var(--ink);font-weight:600}
+.topbar .sp{flex:1}
+.topbar .refreshed{font-size:11.5px;color:var(--ink-faint)}
+.topbar .btn{display:flex;align-items:center;gap:7px;padding:7px 13px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);color:var(--ink);font-size:12px}
+.topbar .btn:hover{background:var(--page)}
+.topbar .ic-btn{width:34px;height:34px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);color:var(--ink-dim)}
+
+.wrap{padding:22px 26px;max-width:1500px}
+
+/* insight tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr) 1.4fr;gap:16px;margin-bottom:18px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+.tile .th{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-dim);font-weight:500}
+.tile .th .ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px}
+.tile .th .drill{margin-left:auto;color:var(--ink-faint);font-size:13px}
+.tile .num{font-size:34px;font-weight:700;margin-top:10px;letter-spacing:-.02em}
+.tile.tot .top{display:flex;justify-content:space-between;align-items:baseline}
+.tile.tot .scanned{font-size:11.5px;color:var(--ink-faint)}
+.tile .sevbar{display:flex;height:7px;border-radius:4px;overflow:hidden;margin-top:14px;gap:2px}
+.tile .sevbar i{display:block;border-radius:3px}
+
+/* row of cards */
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+.card .ch{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.card .ch h3{margin:0;font-size:14px;font-weight:600}
+.card .ch .link{font-size:12px;color:var(--blue)}
+.card .ch .warnchip{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--amber)}
+.card .cb{padding:14px 16px}
+.statusrow{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;border:1px solid var(--line);margin-bottom:8px}
+.statusrow:last-child{margin-bottom:0}
+.statusrow .lab{font-size:12.5px}
+.statusrow.warn{background:var(--amber-bg);border-color:#f6e2c0}
+.statusrow.ok{background:var(--green-bg);border-color:#c6ecd8}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600}
+.chip.green{background:var(--green-bg);color:var(--green)}
+.chip.amber{background:var(--amber-bg);color:#b9791a}
+.chip.grey{background:#eef1f5;color:var(--ink-dim)}
+.chip.blue{background:var(--blue-bg);color:var(--blue)}
+.chip.red{background:var(--red-bg);color:var(--red)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* donut card */
+.donutwrap{display:flex;align-items:center;gap:20px;padding:6px 4px}
+.donut{width:130px;height:130px;flex:none;position:relative}
+.donut .ctr{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.donut .ctr .n{font-size:26px;font-weight:700}
+.donut .ctr .l{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em}
+.legendcol{display:flex;flex-direction:column;gap:14px;font-size:12px}
+.legendcol .lg .h{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.legendcol .lg .r{display:flex;align-items:center;gap:8px;margin:3px 0;color:var(--ink-dim)}
+
+/* cert / list rows */
+.listrow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)}
+.listrow:last-child{border-bottom:0}
+.listrow .nm{font-size:12.5px}.listrow .nm small{display:block;color:var(--ink-faint);font-size:11px;font-family:'Roboto Mono',monospace}
+.listrow .rt{font-size:11.5px;color:var(--ink-dim);text-align:right}
+
+/* wide cards row */
+.grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.bars .brow{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:12px;padding:7px 0}
+.bars .brow .bn{font-size:12px;color:var(--ink-dim)}
+.bars .brow .track{height:8px;border-radius:5px;background:#eef1f5;overflow:hidden}
+.bars .brow .track i{display:block;height:100%;border-radius:5px}
+.bars .brow .bv{font-size:11.5px;font-family:'Roboto Mono',monospace;color:var(--ink);min-width:56px;text-align:right}
+
+.foot-note{font-size:11px;color:var(--ink-faint);margin-top:16px;display:flex;gap:16px;align-items:center}
+.foot-note .live{display:flex;align-items:center;gap:6px;color:var(--green)}
+.foot-note .live i{width:6px;height:6px;border-radius:50%;background:var(--green)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- NAV -->
+  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search"></div>
+    <div class="group">
+      <div class="item active"><span class="ic">▤</span>Dashboard</div>
+      <div class="item"><span class="ic">⬡</span>Inventory<span class="chev">▾</span></div>
+      <div class="item"><span class="ic">⇄</span>Traffic<span class="chev">▾</span></div>
+      <div class="item"><span class="ic">◇</span>Agents &amp; APIs<span class="chev">▾</span></div>
+      <div class="item"><span class="ic">⛨</span>Security<span class="chev">▾</span></div>
+      <div class="item"><span class="ic">▦</span>Resources<span class="chev">▾</span></div>
+      <div class="item active" style="background:transparent;color:var(--nav-ink)"><span class="ic">◉</span>Observability<span class="chev">▴</span></div>
+      <div class="sub">
+        <div class="item on">Graph</div>
+        <div class="item">Asset Map</div>
+        <div class="item">Notifications</div>
+        <div class="item">Analytics</div>
+      </div>
+    </div>
+    <div class="foot">
+      <div class="av"></div>
+      <div class="who">Michael Heller<br><small>mdheller</small></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb">⌂ <span>›</span> <b>Dashboard</b></div>
+      <div class="sp"></div>
+      <div class="refreshed">Last refreshed 2m 14s ago</div>
+      <button class="btn">↻ Refresh</button>
+      <button class="ic-btn">⚙</button>
+    </div>
+
+    <div class="wrap">
+      <!-- INSIGHT TILES -->
+      <div class="tiles">
+        <div class="tile">
+          <div class="th"><span class="ic" style="background:var(--red-bg);color:var(--red)">◉</span>Errors<span class="drill">↗</span></div>
+          <div class="num" style="color:var(--red)">3</div>
+        </div>
+        <div class="tile">
+          <div class="th"><span class="ic" style="background:var(--amber-bg);color:var(--amber)">⚠</span>Warnings<span class="drill">↗</span></div>
+          <div class="num" style="color:#b9791a">7</div>
+        </div>
+        <div class="tile">
+          <div class="th"><span class="ic" style="background:var(--blue-bg);color:var(--blue)">ⓘ</span>Information<span class="drill">↗</span></div>
+          <div class="num" style="color:var(--blue)">24</div>
+        </div>
+        <div class="tile tot">
+          <div class="top"><div class="th" style="gap:0">Total insights</div><span class="scanned">Scanned: 47,412 assets</span></div>
+          <div class="num">34</div>
+          <div class="sevbar"><i style="background:var(--red);width:9%"></i><i style="background:var(--amber);width:21%"></i><i style="background:var(--blue);flex:1"></i></div>
+        </div>
+      </div>
+
+      <!-- STATUS CARDS ROW -->
+      <div class="grid">
+        <div class="card">
+          <div class="ch"><h3>Governance fabric</h3><span class="chip green"><span class="dot" style="background:var(--green)"></span>Operational</span></div>
+          <div class="cb">
+            <div class="statusrow ok"><span class="lab">SCOPE-D collector gate</span><span class="chip green">E4/E5/E6 clear</span></div>
+            <div class="statusrow"><span class="lab">PEP gateway (policy-fabric)</span><span class="chip green">admissible</span></div>
+            <div class="statusrow warn"><span class="lab">AgentPlane SHACL threshold #245</span><span class="chip amber">1 blocker</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Mesh</h3><span class="chip amber">⚠ 2 warnings</span></div>
+          <div class="cb">
+            <div class="statusrow ok"><span class="lab">hellgraph kernel</span><span class="chip green">Healthy</span></div>
+            <div class="statusrow warn"><span class="lab">GAIA world model · data plane</span><span class="chip amber">2 warnings</span></div>
+            <div class="statusrow"><span class="lab">TriTRPC transport</span><span class="chip green">byte-parity ok</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Mellumwork evidence tiers</h3><a class="link">See all ›</a></div>
+          <div class="cb">
+            <div class="listrow"><span class="nm">T1 · direct artifact<small>cryptographic root-of-trust</small></span><span class="rt"><b style="color:var(--green)">6</b> facilities</span></div>
+            <div class="listrow"><span class="nm">T2 · corroborating<small>cross-source attestation</small></span><span class="rt"><b style="color:var(--blue)">2</b> facilities</span></div>
+            <div class="listrow"><span class="nm">INFERRED · unpromoted<small>enforcement blocked (P-3)</small></span><span class="rt"><b style="color:var(--red)">1</b> facility</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DONUT + ADAPTERS -->
+      <div class="grid2" style="margin-bottom:18px">
+        <div class="card">
+          <div class="ch"><h3>Estate coverage</h3><a class="link">Details ›</a></div>
+          <div class="cb">
+            <div class="donutwrap">
+              <div class="donut" id="donut">
+                <div class="ctr"><div class="n">9</div><div class="l">Facilities</div></div>
+              </div>
+              <div class="legendcol">
+                <div class="lg"><div class="h">In governed mesh</div>
+                  <div class="r"><span class="dot" style="background:var(--green)"></span>6 · T1 attested</div>
+                  <div class="r"><span class="dot" style="background:var(--blue)"></span>2 · T2 corroborated</div>
+                </div>
+                <div class="lg"><div class="h">Outside floor</div>
+                  <div class="r"><span class="dot" style="background:var(--red)"></span>1 · inferred / unregistered</div>
+                  <div class="r"><span class="dot" style="background:#cfd6e0"></span>32.5K devices projected</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Adapter connections</h3><span class="chip grey">59 configured</span></div>
+          <div class="cb bars" id="adapters"></div>
+        </div>
+      </div>
+
+      <!-- DISCOVERY + POSTURE -->
+      <div class="grid2">
+        <div class="card">
+          <div class="ch"><h3>Discovery log</h3><a class="link">History ›</a></div>
+          <div class="cb bars">
+            <div class="brow"><span class="bn">Frankfurt DC-1</span><div class="track"><i style="width:100%;background:var(--violet)"></i></div><span class="bv">6.2K</span></div>
+            <div class="brow"><span class="bn">Ashburn DC-2</span><div class="track"><i style="width:100%;background:var(--violet)"></i></div><span class="bv">9.9K</span></div>
+            <div class="brow"><span class="bn">London DC</span><div class="track"><i style="width:71%;background:var(--violet)"></i></div><span class="bv">4.4K</span></div>
+            <div class="brow"><span class="bn">Tokyo DC</span><div class="track"><i style="width:36%;background:var(--violet)"></i></div><span class="bv">2.2K</span></div>
+            <div class="brow"><span class="bn">Johannesburg</span><div class="track"><i style="width:10%;background:var(--red)"></i></div><span class="bv" style="color:var(--red)">610</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Zero-trust posture</h3><a class="link">Docs ›</a></div>
+          <div class="cb">
+            <div class="statusrow ok"><span class="lab">BYOK · keys at node</span><span class="chip green">enforced</span></div>
+            <div class="statusrow ok"><span class="lab">Author holds nothing</span><span class="chip green">verified</span></div>
+            <div class="statusrow"><span class="lab">Observational symmetry (INV-24)</span><span class="chip blue">draft</span></div>
+            <div class="statusrow"><span class="lab">Coercion resistance</span><span class="chip green">no privileged node</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot-note">
+        <span class="live"><i></i>mesh live</span>
+        <span>hellgraph ⇄ GAIA co-registered</span>
+        <span>SCOPE-D gate clear · read-only demo</span>
+        <span style="margin-left:auto" class="mono">dashboard · gloo-theme v1</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* donut ring */
+(function(){
+  const el=document.getElementById('donut');
+  const segs=[['#22a565',6],['#3b82f6',2],['#e5484d',1]]; // green/blue/red by tier
+  const total=segs.reduce((s,x)=>s+x[1],0); let a0=-90;
+  const R=58,cx=65,cy=65,sw=13,ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');svg.setAttribute('width','130');svg.setAttribute('height','130');
+  const track=document.createElementNS(ns,'circle');track.setAttribute('cx',cx);track.setAttribute('cy',cy);track.setAttribute('r',R);track.setAttribute('fill','none');track.setAttribute('stroke','#eef1f5');track.setAttribute('stroke-width',sw);svg.appendChild(track);
+  segs.forEach(([col,v])=>{
+    const frac=v/total,len=frac*2*Math.PI*R,circ=2*Math.PI*R;
+    const c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',R);c.setAttribute('fill','none');
+    c.setAttribute('stroke',col);c.setAttribute('stroke-width',sw);c.setAttribute('stroke-linecap','round');
+    c.setAttribute('stroke-dasharray',`${len-4} ${circ-len+4}`);
+    c.setAttribute('stroke-dashoffset',`${-(a0+90)/360*circ}`);
+    c.setAttribute('transform',`rotate(-90 ${cx} ${cy})`);
+    svg.appendChild(c); a0+=frac*360;
+  });
+  el.insertBefore(svg,el.firstChild);
+})();
+
+/* adapter bars */
+const ADP=[['Microsoft AD',1975,'#2e86ff'],['CrowdStrike Falcon',1724,'#e5484d'],['McAfee ePO',1690,'#5b2be2'],['Tenable VM',1608,'#22a565'],['ServiceNow',1069,'#22a565'],['AWS',842,'#f5a623']];
+const mx=Math.max(...ADP.map(a=>a[1]));
+document.getElementById('adapters').innerHTML=ADP.map(([n,v,c])=>`<div class="brow"><span class="bn">${n}</span><div class="track"><i style="width:${v/mx*100}%;background:${c}"></i></div><span class="bv">${v.toLocaleString()}</span></div>`).join('');
+</script>
+</body>
+</html>

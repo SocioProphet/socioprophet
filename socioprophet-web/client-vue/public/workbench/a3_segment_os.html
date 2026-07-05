@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Segment — Devices by OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.seg-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.seg-toolbar .step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-dim)}
+.seg-toolbar .step b{color:var(--ink)}
+.canvas{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;min-height:560px;overflow:hidden;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+.canvas .hint{position:absolute;top:14px;left:16px;font-size:11px;color:var(--ink-faint)}
+.bubblefield{position:absolute;inset:0;padding:40px}
+/* the Axonius node object */
+.gnode{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.15s}
+.gnode:hover{transform:scale(1.05);z-index:5}
+.gnode .bub{position:relative;border-radius:50%;display:grid;place-items:center}
+.gnode .bub .cnt{position:absolute;top:-3px;right:-9px;background:#2a3446;color:#fff;font-family:'Roboto Mono',monospace;font-weight:600;padding:2px 7px;border-radius:9px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.gnode .lbl{font-size:12px;font-weight:500}
+.gctrl{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px}
+.gctrl button{width:30px;height:30px;border:1px solid var(--line-2);border-radius:7px;background:var(--card);color:var(--ink-dim);font-size:13px}
+.layoutmenu{position:absolute;left:14px;bottom:180px;background:var(--card);border:1px solid var(--line-2);border-radius:9px;box-shadow:0 8px 24px rgba(20,30,50,.12);overflow:hidden;font-size:12px}
+.layoutmenu button{display:flex;align-items:center;gap:9px;width:150px;padding:9px 12px;border:0;background:transparent;color:var(--ink)}
+.layoutmenu button.on{background:var(--blue-bg);color:var(--blue)}
+.filterchip{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid var(--line-2);border-radius:7px;background:var(--card);font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group">
+      <div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item active" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item" href="a14_table.html"><span class="ic">▦</span>Inventory<span class="chev">▾</span></a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a>
+    </div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb"><a href="dashboard.html">⌂</a> <span>›</span> <a href="a1_start.html">Asset Graph</a> <span>›</span> <b>Devices</b> <span>›</span> Segment by OS</div>
+      <div class="sp"></div>
+      <span class="filterchip">Segment by <b style="color:var(--ink)">OS: Type ▾</b></span>
+      <button class="btn primary" onclick="location.href='a12_expand.html'">Explore connections</button>
+    </div>
+    <div class="wrap">
+      <div class="page-h">
+        <h1>Devices · segmented by OS Type</h1>
+        <p>13 value buckets · bubble size scales with device count · click a bucket to expand its relationships or drill to inventory.</p>
+      </div>
+      <div class="canvas">
+        <div class="hint">Organic layout · 13 buckets · 31,134 devices</div>
+        <div class="bubblefield" id="field"></div>
+        <div class="layoutmenu">
+          <button class="on">❋ Organic ✓</button>
+          <button>⋔ Hierarchy</button>
+        </div>
+        <div class="gctrl"><button>✥</button><button>⊡</button><button>＋</button><button>－</button></div>
+      </div>
+      <div class="foot-note">
+        <span class="live"><i></i>mesh live</span>
+        <span>segment: specific_data.data.os.type</span>
+        <span style="margin-left:auto" class="mono">a3 · segment-by-os</span>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+/* Devices by OS — the grouping (icons + size-by-count) */
+const OS=[
+ ['Linux','🐧',2800,'#f5a623','#fdf3e3',54,42],
+ ['Windows','⊞',1200,'#2e86ff','#eaf1fe',40,58],
+ ['OS X','',785,'#8a8f98','#eef1f5',22,30],
+ ['Android','🤖',210,'#3ddc84','#e4f6ee',34,74],
+ ['Group 2 Devices','⬒',1100,'#7c5cff','#efeaff',20,20],
+ ['No Value','⬒',158,'#7c5cff','#efeaff',48,15],
+ ['Cisco','||||',14,'#1ba0d7','#e7f5fb',72,10],
+ ['iOS','',334,'#8a8f98','#eef1f5',68,44],
+ ['Printer','⎙',18,'#f5a623','#fdf3e3',88,26],
+ ['VMWare','vm',8,'#607d8b','#eceff1',62,60],
+ ['Solaris','◯',8,'#e5484d','#fdeced',78,52],
+ ['FreeBSD','◉',14,'#e5484d','#fdeced',52,74],
+ ['AIX','AIX',28,'#5b8c00','#eef5e2',72,74],
+];
+const R=v=>Math.max(18,Math.min(52,16+Math.sqrt(v)*1.0));
+const fmt=n=>n>=1000?(n/1000).toFixed(1)+'K':''+n;
+document.getElementById('field').innerHTML=OS.map(([n,g,v,fg,bg,x,y])=>{
+  const r=R(v);
+  return `<div class="gnode" style="left:${x}%;top:${y}%" onclick="location.href='a12_expand.html'">
+    <div class="bub" style="width:${r*2}px;height:${r*2}px;background:${bg};border:2.5px solid ${fg}">
+      <span style="font-size:${r*0.7}px;color:${fg};font-weight:700">${g||'⊞'}</span>
+      <span class="cnt">${fmt(v)}</span>
+    </div>
+    <div class="lbl">${n}</div>
+  </div>`;
+}).join('');
+</script>
+</body>
+</html>

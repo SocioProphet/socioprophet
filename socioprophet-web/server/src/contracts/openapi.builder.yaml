@@ -16,7 +16,7 @@ paths:
     post:
       tags: [builds]
       summary: Submit a build (persists a BuildRequest + WorkOrder, dispatches by tier)
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       responses:
         "201": { description: Dispatched; returns the buildId. }
         "400": { description: Spec not allowed by tier policy. }
@@ -24,13 +24,13 @@ paths:
     get:
       tags: [builds]
       summary: List the caller's builds
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       responses: { "200": { description: Builds list. } }
   /api/builds/{id}:
     get:
       tags: [builds]
       summary: One build + live status; on completion emits OSImage, CatalogEntry, evidence, UsageReceipt
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       responses:
         "200":
@@ -55,27 +55,27 @@ paths:
     get:
       tags: [builds]
       summary: Caller tier + policy
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       responses: { "200": { description: tier + policy. } }
 
   /api/fleet/devices:
     post:
       tags: [fleet]
       summary: Register a device (emits a DeviceIdentity) and return its claim code
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       responses:
         "201": { description: deviceId + claimCode + DeviceIdentity ref. }
         "403": { description: Fleet is premium-only. }
     get:
       tags: [fleet]
       summary: List the caller's devices
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       responses: { "200": { description: Devices. } }
   /api/fleet/devices/{id}/assign:
     post:
       tags: [fleet]
       summary: Assign a completed build to a device
-      security: [{ firebaseIdToken: [] }]
+      security: [{ socbaseAccessToken: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       responses: { "200": { description: Assigned. } }
 
@@ -100,10 +100,10 @@ paths:
 
 components:
   securitySchemes:
-    firebaseIdToken:
+    socbaseAccessToken:
       type: http
       scheme: bearer
-      bearerFormat: Firebase ID token
+      bearerFormat: Supabase access token
   schemas:
     BuildRequest: { $ref: "https://schemas.srcos.ai/v2/BuildRequest.json" }
     OSImage: { $ref: "https://schemas.srcos.ai/v2/OSImage.json" }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.buildwrap{display:grid;grid-template-columns:1fr 400px;gap:0;height:calc(100vh - 54px)}
+.canvas{position:relative;background:var(--page);overflow:auto;padding:30px 40px}
+.canvas .flowtitle{font-size:14px;font-weight:600;margin-bottom:24px;display:flex;align-items:center;gap:8px}
+.wfnode{background:var(--card);border:1px solid var(--line-2);border-radius:10px;padding:11px 14px;width:340px;margin:0 auto 0;position:relative;box-shadow:0 1px 3px rgba(20,30,50,.05)}
+.wfnode.sel{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-bg)}
+.wfnode .nh{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--ink-faint)}
+.wfnode .nh .ic{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:12px;color:#fff}
+.wfnode .nbody{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12.5px;font-weight:500}
+.wfnode .runson{margin-left:auto;font-size:10.5px;color:var(--ink-faint);font-weight:400;background:var(--page);padding:2px 7px;border-radius:5px}
+.connector{width:2px;height:22px;background:var(--line-2);margin:0 auto}
+.branch{display:flex;gap:40px;justify-content:center;margin-top:0}
+.branchcol{display:flex;flex-direction:column;align-items:center;gap:0}
+.branchlabel{font-size:10px;color:var(--ink-faint);margin:4px 0}
+.addnode{width:26px;height:26px;border:1px dashed var(--line-2);border-radius:7px;background:var(--card);color:var(--ink-faint);margin:8px auto 0;display:grid;place-items:center}
+/* action setup panel */
+.setup{background:var(--card);border-left:1px solid var(--line);overflow-y:auto;padding:18px 20px}
+.setup .sh{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;margin-bottom:4px}
+.setup .sh .ic{width:26px;height:26px;border-radius:8px;background:#00a1e0;color:#fff;display:grid;place-items:center;font-size:12px}
+.setup .runs{font-size:12px;color:var(--ink-dim);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.setup .runs .chip{background:var(--green-bg);color:var(--green);padding:2px 8px;border-radius:5px;font-size:11px}
+.stabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.stabs button{padding:9px 12px;border:0;background:transparent;color:var(--ink-dim);font-size:12.5px;border-bottom:2px solid transparent}
+.stabs button.on{color:var(--ink);border-bottom-color:var(--blue)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11.5px;font-weight:500;color:var(--ink-dim);margin-bottom:6px}
+.field label .req{color:var(--red)}
+.field input,.field .sel{width:100%;padding:9px 11px;border:1px solid var(--line-2);border-radius:8px;font-size:12.5px;background:var(--card);color:var(--ink)}
+.field .sel{display:flex;justify-content:space-between;align-items:center;color:var(--ink)}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:12.5px;color:var(--ink-dim)}
+.tg{width:34px;height:19px;border-radius:11px;background:var(--line-2);position:relative;flex:none}
+.tg.on{background:var(--blue)}.tg::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.15s}
+.tg.on::after{left:17px}
+/* PEP gate preview — the SocioProphet addition */
+.pepbox{margin-top:18px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.pepbox .ph{padding:9px 13px;background:var(--nav);color:#fff;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:8px}
+.pepbox .pr{display:flex;justify-content:space-between;padding:9px 13px;font-size:11.5px;border-bottom:1px solid var(--line)}
+.pepbox .pr:last-child{border-bottom:0}.pepbox .pr .k{color:var(--ink-dim);font-family:"Roboto Mono",monospace;font-size:10.5px}
+.pepbox .pr .v{font-weight:600;font-size:10.5px}.v-pos{color:var(--green)}.v-zero{color:var(--ink-faint)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  Ctrl+Y"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item" href="activities.html"><span class="ic">≣</span>Activities</a>
+      <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item active" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller · operator</small></div></div>
+  </aside>
+  <main class="main" style="overflow:hidden">
+    <div class="topbar"><div class="crumb"><a href="ec1_workflows.html">Enforcement Center</a> › <b>User Termination Workflow</b> ⚙</div><div class="sp"></div>
+      <button class="btn">Test Run</button><button class="btn primary">Save</button></div>
+    <div class="buildwrap">
+      <div class="canvas">
+        <div class="wfnode"><div class="nh"><span class="ic" style="background:#7c5cff">⚑</span>Trigger By #eeb</div><div class="nbody">⚡ Event · BambooHR Status Change <span class="runson">Retrieves Users</span></div></div>
+        <div class="connector"></div>
+        <div class="wfnode"><div class="nh"><span class="ic" style="background:#f5a623">⌥</span>Event Conditions</div><div class="nbody">⎇ Status Equals Terminated</div></div>
+        <div class="connector"></div>
+        <div class="branchlabel">true ↓</div>
+        <div class="wfnode sel"><div class="nh"><span class="ic" style="background:#e5484d">⚡</span>Action #7e7</div><div class="nbody">◆ Salesforce · Suspend User <span class="runson">Event[eeb].user</span></div></div>
+        <div class="connector"></div>
+        <div class="wfnode"><div class="nh"><span class="ic" style="background:#e5484d">⚡</span>Action #5b3</div><div class="nbody">◆ Slack · Suspend User <span class="runson">Event[eeb].user</span></div></div>
+        <div class="connector"></div>
+        <div class="wfnode"><div class="nh"><span class="ic" style="background:#12b3a6">◷</span>Delay #648</div><div class="nbody">⧗ Delay for 1 day</div></div>
+        <div class="connector"></div>
+        <div class="wfnode"><div class="nh"><span class="ic" style="background:#e5484d">⚡</span>Action #8db</div><div class="nbody">◆ Google Workspace · Suspend <span class="runson">Event[eeb].user</span></div></div>
+        <div class="connector"></div>
+        <div class="wfnode"><div class="nh"><span class="ic" style="background:#e5484d">⚡</span>Action #3c5</div><div class="nbody">✉ Axonius · Send Email <span class="runson">Event[eeb].user</span></div></div>
+        <div class="addnode">＋</div>
+      </div>
+      <div class="setup">
+        <div class="sh"><span class="ic">◆</span>Salesforce — Suspend User</div>
+        <div class="runs">Runs on <span class="chip">☖ Event[eeb].user</span> ✎</div>
+        <div class="stabs"><button class="on">Required Fields</button><button>Additional Fields</button></div>
+        <div class="field"><label><span class="req">*</span> Action name</label><input value="workflow_salesforce_suspend_user"></div>
+        <div class="toggle-row"><span class="tg"></span>Configure Dynamic Values ⓘ</div>
+        <div class="toggle-row"><span class="tg on"></span>Use stored credentials from Salesforce adapter</div>
+        <div class="field"><label>Select Adapter Connection ⓘ</label><div class="sel">salesforce-dev <span>▾</span></div></div>
+        <div class="field"><label><span class="req">*</span> EC Action</label><div class="sel">Deactivate <span>▾</span></div></div>
+        <div class="field"><label><span class="req">*</span> Compute Node</label><div class="sel">Primary <span>▾</span></div></div>
+        <div class="pepbox">
+          <div class="ph">⛨ PEP gateway · pre-dispatch verdict</div>
+          <div class="pr"><span class="k">action</span><span class="v v-zero">Deactivate</span></div>
+          <div class="pr"><span class="k">target tier</span><span class="v v-pos">T1 (≥ T2 required ✓)</span></div>
+          <div class="pr"><span class="k">provenance continuity</span><span class="v v-pos">POS</span></div>
+          <div class="pr"><span class="k">compute node</span><span class="v v-pos">Primary · attested</span></div>
+          <div class="pr"><span class="k">verdict</span><span class="v v-pos">admissible</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -7,7 +7,11 @@ export {};
 // prefix. readBuildStatus() reflects that GCS status back to the API/UI.
 //
 // Phase 2 will add a GCP build-VM lane here, selected by tier.
-const admin = require("firebase-admin");
+const { GoogleAuth } = require("google-auth-library");
+const { Storage } = require("@google-cloud/storage");
+
+const storage = new Storage();
+const gcpAuth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
 
 const GH_OWNER = process.env.SOURCEOS_GH_OWNER || "SourceOS-Linux";
 const GH_REPO = process.env.SOURCEOS_GH_REPO || "source-os";
@@ -50,12 +54,12 @@ const dispatchGithubBuild = async (uid: string, buildId: string, spec: any) => {
   return { lane: "github-actions", ref: GH_REF };
 };
 
-// Mint a GCP access token from the firebase-admin app credential (the SA must
-// have compute.instanceAdmin on the project).
+// Mint a GCP access token from the ambient application-default credential (the
+// SA must have compute.instanceAdmin on the project).
 const gcpToken = async (): Promise<string> => {
-  const cred = admin.app().options.credential;
-  const t = await cred.getAccessToken();
-  return t.access_token;
+  const client = await gcpAuth.getClient();
+  const t = await client.getAccessToken();
+  return t.token as string;
 };
 
 // Paid/premium lane: create an ephemeral build VM via the Compute API. The
@@ -109,7 +113,7 @@ const dispatchBuild = async (uid: string, buildId: string, spec: any, tier: stri
 const readBuildStatus = async (uid: string, buildId: string) => {
   const path = `user-builds/${uid}/${buildId}/status.json`;
   try {
-    const file = admin.storage().bucket(GCS_BUCKET).file(path);
+    const file = storage.bucket(GCS_BUCKET).file(path);
     const [buf] = await file.download();
     return JSON.parse(buf.toString());
   } catch (err) {
