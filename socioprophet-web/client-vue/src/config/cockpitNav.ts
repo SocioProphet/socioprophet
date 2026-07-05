@@ -63,6 +63,7 @@ export const DOMAIN_MENU: NavGroup[] = [
       { label: 'Micro Economics', to: '/economy/micro-economics' },
       { label: 'Labor Economics', to: '/economy/labor-economics' },
       { label: 'Industry & Commerce', to: '/economy/industry-commerce' },
+      { label: 'Value Drivers', to: '/economy/value-drivers' },
       { label: 'Farming & Agriculture', to: '/economy/farming-agriculture' },
       { label: 'Mining & Extraction', to: '/economy/mining-extraction' },
       { label: 'Processing & Refinement', to: '/economy/processing-refinement' },

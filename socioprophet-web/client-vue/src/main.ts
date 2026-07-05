@@ -21,6 +21,7 @@ import ForgeImport from './pages/ForgeImport.vue';
 import NewsFeed from './pages/NewsFeed.vue';
 import MarketMonitor from './pages/MarketMonitor.vue';
 import EconomySectorBoard from './pages/EconomySectorBoard.vue';
+import ValueDriverTree from './pages/ValueDriverTree.vue';
 import PeopleDirectory from './pages/PeopleDirectory.vue';
 import SocialSignals from './pages/SocialSignals.vue';
 import LawDocket from './pages/LawDocket.vue';
@@ -104,6 +105,7 @@ const explicitRoutes = [
   { path: '/news', component: NewsFeed },
   { path: '/markets/indices-funds', component: MarketMonitor },
   { path: '/economy/macro-economics', component: EconomySectorBoard },
+  { path: '/economy/value-drivers', component: ValueDriverTree },
   { path: '/people/search', component: PeopleDirectory },
   { path: '/people/social-networks', component: SocialSignals },
   { path: '/law/international-law', component: LawDocket },
