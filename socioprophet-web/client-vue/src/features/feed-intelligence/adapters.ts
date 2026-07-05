@@ -17,7 +17,7 @@ export const feedIntelligenceAdapters: FeedIntelligenceAdapterBoundary[] = [
     name: 'BearBrowser reader bridge',
     status: 'disabled',
     owningArtifact: 'SourceOS-Linux/BearBrowser:docs/reader-bridge.md',
-    disabledReason: 'No live browser bridge adapter is wired in client-vue.',
+    disabledReason: 'No live native browser bridge adapter is wired in client-vue.',
     forbiddenSideEffects: ['browser capture', 'feed subscription', 'publication'],
   },
   {

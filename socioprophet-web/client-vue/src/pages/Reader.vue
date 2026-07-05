@@ -96,6 +96,9 @@
       >
         <strong>{{ item.title }}</strong>
         <span>{{ item.topicScope }} · {{ item.membraneDecision }}</span>
+        <small v-if="item.claims?.length" class="ticker-claims">
+          <span v-for="claim in item.claims" :key="claim">{{ claim }}</span>
+        </small>
       </button>
     </section>
 
