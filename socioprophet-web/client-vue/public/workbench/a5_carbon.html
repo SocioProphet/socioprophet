@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Asset Graph · Carbon</title></head><body><div id="root"></div><script>/* SP-PRIMITIVES-002 — Carbon-correct object library.
+   Retinted to the REAL client-vue/src/styles.css tokens (IBM Carbon).
+   Self-injecting <style> (never renders unstyled). Pure spec->DOMString fns.
+   Corrects the Gloo drift: dark framed shell + light stage, Carbon Blue 60,
+   angular (no soft radius) tags, flat cards, radial-gradient body. */
+(function(){
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
+:root{
+  --sp-bg:#05070a; --sp-border:#2d333b; --sp-text:#f4f4f4;
+  --sp-canvas:#f7f7f5; --sp-canvas-text:#161616;
+  --sp-blue:#0f62fe; --sp-green:#24a148; --sp-red:#fa4d56;
+  /* carbon extended for data viz (kept minimal, angular, flat) */
+  --sp-blue-70:#0043ce; --sp-blue-10:#edf5ff;
+  --sp-green-70:#0e6027; --sp-green-10:#defbe6;
+  --sp-red-70:#a2191f; --sp-red-10:#fff1f1;
+  --sp-amber:#f1c21b; --sp-amber-70:#684e00; --sp-amber-10:#fcf4d6;
+  --sp-purple:#8a3ffc; --sp-purple-10:#f6f2ff;
+  --sp-teal:#009d9a; --sp-teal-10:#d9fbfb;
+  --sp-gray-10:#f4f4f4; --sp-gray-20:#e0e0e0; --sp-gray-60:#525252; --sp-gray-70:#393939;
+  /* asset-type semantic mapped onto carbon data-viz palette */
+  --device:#8a3ffc;--device-bg:#f6f2ff;--user:#0f62fe;--user-bg:#edf5ff;
+  --vuln:#009d9a;--vuln-bg:#d9fbfb;--software:#ff832b;--software-bg:#fff2e8;
+  --facility:#f1c21b;--facility-bg:#fcf4d6;--net:#009d9a;--net-bg:#d9fbfb;
+  --group:#fa4d56;--group-bg:#fff1f1;
+}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{
+  background:
+    radial-gradient(900px 650px at 72% 55%, rgba(40,120,255,.28), transparent 60%),
+    radial-gradient(900px 650px at 35% 45%, rgba(0,0,0,.78), transparent 62%),
+    linear-gradient(180deg, var(--sp-bg), #080b10);
+  color:var(--sp-text);
+  font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace}
+button,input,select{font:inherit}a{color:inherit;text-decoration:none}
+/* framed shell */
+.sp-shell{min-height:calc(100vh - 2.8rem);display:grid;grid-template-rows:4.25rem 4.25rem minmax(0,1fr) 5.5rem;margin:1.4rem;border:1px solid rgba(255,255,255,.12);border-radius:.75rem;overflow:hidden;background:var(--sp-bg);box-shadow:0 28px 85px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.07)}
+.sp-topbar{display:grid;grid-template-columns:auto minmax(0,1fr) 2rem;align-items:center;gap:2rem;padding:0 1.75rem;border-bottom:1px solid var(--sp-border);background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.32));backdrop-filter:blur(10px)}
+.sp-brand{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;color:#fff}
+.sp-domain-nav{display:flex;justify-content:space-around;gap:1.25rem;overflow:hidden;white-space:nowrap}
+.sp-domain-nav a{color:var(--sp-text);font-size:1rem;opacity:.95}
+.sp-domain-nav a.active{color:#fff;font-weight:700}
+.sp-profile-indicator{width:1.25rem;height:1.25rem;border:2px solid var(--sp-text);border-radius:999px;opacity:.9}
+.sp-tabbar{display:flex;align-items:stretch;border-bottom:1px solid var(--sp-border);background:linear-gradient(180deg,#0e1319,#070a0e);overflow-x:auto}
+.sp-tab-menu{min-width:4.5rem;display:flex;align-items:center;justify-content:center;border:0;border-right:1px solid var(--sp-border);background:transparent;color:var(--sp-text);font-size:1.4rem}
+.sp-tabbar a{min-width:8rem;display:flex;align-items:center;justify-content:center;padding:0 1rem;border-right:1px solid var(--sp-border);color:var(--sp-text);font-weight:600;white-space:nowrap;font-size:.95rem}
+.sp-tabbar a.active{background:rgba(255,255,255,.04);box-shadow:inset 0 -2px 0 #fff}
+.sp-workspace{min-height:0;display:grid;grid-template-columns:4.5rem minmax(0,1fr)}
+.sp-left-rail{display:flex;flex-direction:column;align-items:center;gap:1.2rem;padding-top:1rem;border-right:1px solid var(--sp-border);background:#05070a}
+.sp-left-rail a{width:2rem;height:2rem;display:grid;place-items:center;color:#c6c6c6;border-radius:.25rem;font-size:1.05rem}
+.sp-left-rail a.active,.sp-left-rail a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.sp-stage{min-width:0;min-height:0;display:grid;grid-template-rows:3.75rem minmax(0,1fr);background:var(--sp-canvas);color:var(--sp-canvas-text)}
+.sp-breadcrumbs{display:flex;align-items:center;gap:.65rem;padding:0 2rem;border-bottom:1px solid #d9d9d4;background:#fff;font-size:1.05rem}
+.sp-crumb-sep{color:#6f6f6f}
+.sp-route-badge{margin-left:auto;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sp-blue);border:1px solid var(--sp-blue);padding:2px 8px}
+.sp-stage-body{min-height:0;overflow-y:auto;padding:1.25rem 1.5rem}
+.sp-agent-shell{display:grid;grid-template-columns:minmax(16rem,32rem) minmax(0,1fr);gap:1rem;align-items:center;border-top:1px solid var(--sp-border);background:linear-gradient(180deg,#070a0e,#05070a);padding:0 1.25rem}
+.sp-agent-search{width:100%;display:flex;align-items:center;gap:.75rem;padding:.65rem .9rem;border:1px solid var(--sp-border);border-radius:.75rem;background:#080b10;color:var(--sp-text)}
+.sp-agent-search input{flex:1;border:0;outline:none;background:transparent;color:var(--sp-text);font-size:1rem}
+.sp-runtime-strip{display:flex;align-items:center;justify-content:flex-end;gap:.5rem;overflow-x:auto}
+.sp-runtime-strip__label{color:#c6c6c6;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.sp-runtime-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .6rem;border:1px solid var(--sp-border);background:#080b10;color:#c6c6c6;font-size:.72rem}
+.sp-runtime-badge i{width:6px;height:6px;border-radius:999px;background:var(--sp-green)}
+/* stage content */
+.eyebrow{margin:0 0 .35rem;color:var(--sp-blue);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.surface-header{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:1rem}
+.surface-header h1{margin:0;font-size:1.65rem;letter-spacing:-.03em}
+.surface-summary{margin:.4rem 0 0;max-width:56rem;color:var(--sp-gray-60)}
+.section-title{margin-bottom:.75rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sp-gray-60)}
+/* Carbon tags — ANGULAR, flat, no radius */
+.tag{display:inline-flex;align-items:center;min-height:1.5rem;padding:.15rem .55rem;border:1px solid #c6c6c6;background:#f4f4f4;color:#161616;font-size:.75rem;font-weight:500}
+.tag-green{border-color:var(--sp-green);color:var(--sp-green-70);background:var(--sp-green-10)}
+.tag-blue{border-color:var(--sp-blue);color:var(--sp-blue-70);background:var(--sp-blue-10)}
+.tag-red{border-color:var(--sp-red);color:var(--sp-red-70);background:var(--sp-red-10)}
+.tag-amber{border-color:var(--sp-amber);color:var(--sp-amber-70);background:var(--sp-amber-10)}
+.tag-purple{border-color:var(--sp-purple);color:#491d8b;background:var(--sp-purple-10)}
+.tag-grey{border-color:#c6c6c6;color:#525252;background:#f4f4f4}
+/* Carbon cards — flat, 1px border, NO radius, NO shadow */
+.carbon-card{background:#fff;border:1px solid var(--sp-gray-20)}
+.carbon-card .ch{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px solid var(--sp-gray-20)}
+.carbon-card .ch h3{margin:0;font-size:.95rem;font-weight:600}
+.carbon-card .cb{padding:1rem}
+.metric .th{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:var(--sp-gray-60);font-weight:500}
+.metric .th .ic{width:1.4rem;height:1.4rem;display:grid;place-items:center;font-size:.8rem}
+.metric .num{font-size:2.1rem;font-weight:600;margin-top:.5rem;letter-spacing:-.02em}
+/* Carbon button */
+.cbtn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border:1px solid var(--sp-gray-20);background:#fff;color:#161616;font-size:.8rem;font-weight:500}
+.cbtn.primary{background:var(--sp-blue);border-color:var(--sp-blue);color:#fff}
+/* node object — angular-friendly but circle is the reference object */
+.pnode{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transform:translate(-50%,-50%);transition:transform .15s}
+.pnode:hover{z-index:6}.pnode:hover .bub{transform:scale(1.06)}
+.pnode .bub{position:relative;border-radius:50%;display:grid;place-items:center;transition:transform .15s}
+.pnode .bub .cnt{position:absolute;top:-3px;right:-9px;background:#161616;color:#fff;font-family:'Roboto Mono',monospace;font-weight:600;padding:2px 7px;font-size:10.5px}
+.pnode .lbl{font-size:12px;font-weight:500;white-space:nowrap;color:#161616}
+.canvas{position:relative;background:#fff;border:1px solid var(--sp-gray-20);overflow:hidden}
+.canvas .hint{position:absolute;top:14px;left:16px;font-size:11px;color:var(--sp-gray-60);z-index:2}
+.canvas svg.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.elabel{font-size:10px;fill:var(--sp-gray-60);font-family:Inter}
+.gtoolbar{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:0;z-index:3;border:1px solid var(--sp-gray-20)}
+.gtoolbar button{width:30px;height:30px;border:0;border-bottom:1px solid var(--sp-gray-20);background:#fff;color:var(--sp-gray-60);font-size:13px}
+.gtoolbar button:last-child{border-bottom:0}
+/* verdict — angular */
+.pverdict{border:1px solid var(--sp-gray-20);background:#fff}
+.pverdict .vh{padding:8px 12px;background:#161616;color:#fff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.pverdict .vr{display:flex;justify-content:space-between;padding:8px 12px;font-size:11.5px;border-bottom:1px solid var(--sp-gray-20)}
+.pverdict .vr:last-child{border-bottom:0}.pverdict .vr .k{color:var(--sp-gray-60);font-family:'Roboto Mono',monospace;font-size:10.5px}
+.pverdict .vr .v{font-weight:600;font-size:10.5px}
+.v-pos{color:var(--sp-green-70)}.v-neg{color:var(--sp-red-70)}.v-zero{color:var(--sp-gray-60)}
+.pverdict .note{margin:10px 12px;padding:9px 11px;background:var(--sp-red-10);border:1px solid var(--sp-red);color:var(--sp-red-70);font-size:10.5px;line-height:1.5}
+/* bars */
+.pbars .brow{display:grid;grid-template-columns:150px 1fr auto;align-items:center;gap:10px;padding:6px 0;font-size:12px}
+.pbars .brow .bn{color:var(--sp-gray-60);font-size:11.5px}
+.pbars .brow .track{height:18px;background:#e0e0e0;overflow:hidden}
+.pbars .brow .track i{display:block;height:100%}
+.pbars .brow .bv{font-family:'Roboto Mono',monospace;font-size:11px;text-align:right}
+/* steps */
+.psteps .step{border:1px solid var(--sp-gray-20);padding:8px 10px;margin-bottom:6px;background:#fff}
+.psteps .step.active{border-color:var(--sp-blue);background:var(--sp-blue-10)}
+.psteps .step .op{display:flex;justify-content:space-between;font-size:12px}.psteps .step .op b{color:#161616}
+.psteps .step .op .c{font-family:'Roboto Mono',monospace;color:var(--sp-blue);font-size:11px}
+.psteps .step .d{font-size:10.5px;color:var(--sp-gray-60);margin-top:2px}
+.psteps .step.start{border-style:dashed;color:var(--sp-gray-60)}
+`;
+if(!document.getElementById('sp-prim-style')){
+  const s=document.createElement('style');s.id='sp-prim-style';s.textContent=CSS;document.head.appendChild(s);
+}
+const PAL={device:['var(--device)','var(--device-bg)'],user:['var(--user)','var(--user-bg)'],
+ vuln:['var(--vuln)','var(--vuln-bg)'],software:['var(--software)','var(--software-bg)'],
+ facility:['var(--facility)','var(--facility-bg)'],net:['var(--net)','var(--net-bg)'],
+ group:['var(--group)','var(--group-bg)'],blue:['var(--user)','var(--user-bg)'],
+ green:['var(--sp-green)','var(--sp-green-10)'],amber:['var(--sp-amber)','var(--sp-amber-10)'],
+ red:['var(--sp-red)','var(--sp-red-10)'],violet:['var(--device)','var(--device-bg)']};
+const fmt=n=>{if(n==null)return'';n=(''+n);if(n.includes('K'))return n;const v=parseInt(n.replace(/,/g,''));return v>=1000?(v/1000).toFixed(v>=10000?0:1)+'K':''+v;};
+const rOf=c=>{const v=typeof c==='string'?(c.includes('K')?parseFloat(c)*1000:parseInt(c)):c;return Math.max(18,Math.min(52,16+Math.sqrt(v||1)));};
+const SP={
+  node(s){const[fg,bg]=PAL[s.type]||PAL.device;const r=s.size||rOf(s.count);const pos=(s.x!=null)?`left:${s.x}%;top:${s.y}%`:'';
+    return `<div class="pnode${s.x==null?' static':''}" style="${pos}">
+      <div class="bub" style="width:${r*2}px;height:${r*2}px;background:${bg};border:${s.tier==='inferred'?3:2.5}px solid ${fg}">
+      <span style="font-size:${r*0.72}px;color:${fg};font-weight:700">${s.icon||'▦'}</span>${s.count!=null?`<span class="cnt">${fmt(s.count)}</span>`:''}</div><div class="lbl">${s.label}</div></div>`;},
+  metric(s){const[fg,bg]=PAL[s.sev||'blue'];return `<div class="carbon-card metric"><div class="cb"><div class="th">${s.icon?`<span class="ic" style="background:${bg};color:${fg}">${s.icon}</span>`:''}${s.label}${s.drill?'<span style="margin-left:auto;color:#525252">↗</span>':''}</div><div class="num" style="color:${s.color||'inherit'}">${s.value}</div></div></div>`;},
+  card(s){return `<div class="carbon-card"><div class="ch"><h3>${s.title}</h3>${s.right||''}</div><div class="cb">${s.body||''}</div></div>`;},
+  tag(text,kind){return `<span class="tag tag-${kind||'grey'}">${text}</span>`;},
+  tier(t){const m={t1:['green','T1'],t2:['blue','T2'],inferred:['red','INFERRED']};const[k,l]=m[t]||m.t1;return SP.tag(l,k);},
+  verdict(rows,note){const vc=v=>['POS','admissible','PASS'].includes(v)?'v-pos':['NEG','blocked','FAIL'].some(x=>String(v).includes(x))?'v-neg':'v-zero';
+    return `<div class="pverdict"><div class="vh">${rows.title||'verdict'}</div>${rows.items.map(([k,v])=>`<div class="vr"><span class="k">${k}</span><span class="v ${vc(v)}">${v}</span></div>`).join('')}${note?`<div class="note">⊘ ${note}</div>`:''}</div>`;},
+  bars(rows,opts){const mx=opts&&opts.max||Math.max(...rows.map(r=>r.value));return `<div class="pbars">${rows.map(r=>`<div class="brow"><span class="bn">${r.label}</span><div class="track"><i style="width:${r.value/mx*100}%;background:${r.color||'var(--device)'}"></i></div><span class="bv">${typeof r.value==='number'?r.value.toLocaleString():r.value}</span></div>`).join('')}</div>`;},
+  pie(segs,opts){opts=opts||{};const R=opts.r||58,cx=R+7,cy=R+7,sw=opts.donut?13:R,S=(R+7)*2,tot=segs.reduce((s,x)=>s+x.value,0);let a0=-90,out='';
+    const tr=opts.donut?`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e0e0e0" stroke-width="${sw}"/>`:'';
+    segs.forEach(sg=>{const f=sg.value/tot,len=f*2*Math.PI*R,circ=2*Math.PI*R;
+      if(opts.donut)out+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${sg.color}" stroke-width="${sw}" stroke-dasharray="${len-3} ${circ-len+3}" stroke-dashoffset="${-(a0+90)/360*circ}" transform="rotate(-90 ${cx} ${cy})"/>`;
+      else{const x1=cx+R*Math.cos(a0*Math.PI/180),y1=cy+R*Math.sin(a0*Math.PI/180),a1=a0+f*360,x2=cx+R*Math.cos(a1*Math.PI/180),y2=cy+R*Math.sin(a1*Math.PI/180),la=f>.5?1:0;out+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${la} 1 ${x2},${y2} Z" fill="${sg.color}"/>`;}a0+=f*360;});
+    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${tr}${out}</svg>`;},
+  steps(list){return `<div class="psteps">${list.map(s=>s.start?`<div class="step start"><div class="op"><b>⑂ ${s.op}</b></div></div>`:`<div class="step${s.active?' active':''}"><div class="op"><b>${s.op}</b>${s.count!=null?`<span class="c">${s.count}</span>`:''}</div>${s.desc?`<div class="d">${s.desc}</div>`:''}</div>`).join('')}</div>`;},
+  edge(x1,y1,x2,y2,o){o=o||{};const col=o.kind==='signal'?'var(--sp-red)':o.kind==='flow'?'var(--sp-green)':'#a8a8a8';const mx=(x1+x2)/2,my=(y1+y2)/2;const path=o.curve?`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`:`M${x1},${y1} L${x2},${y2}`;return `<path d="${path}" fill="none" stroke="${col}" stroke-width="${o.w||1.3}" ${o.dash?'stroke-dasharray="3 3"':''}/>`+(o.verb?`<text x="${mx}" y="${my-4}" text-anchor="middle" class="elabel">${o.verb}</text>`:'');},
+  toolbar(){return `<div class="gtoolbar"><button>✥</button><button>❋</button><button>⊡</button><button>＋</button><button>－</button></div>`;},
+  /* the REAL sp-shell frame (topbar + tabbar + workspace + agent-shell) */
+  shell(o){
+    const domains=['News','Assets','Enforce','Domains','Observe'];
+    const tabs=o.tabs||['Overview','Graph','Table','Runs'];
+    const rail=o.rail||['AG','IN','EC','SD','OR','WG','MP'];
+    return `<div class="sp-shell">
+      <header class="sp-topbar"><a class="sp-brand">SocioProphet</a>
+        <nav class="sp-domain-nav">${domains.map((d,i)=>`<a class="${i===(o.domainIdx||1)?'active':''}">${d}</a>`).join('')}</nav>
+        <div class="sp-profile-indicator"></div></header>
+      <nav class="sp-tabbar"><button class="sp-tab-menu">☷</button>${tabs.map((t,i)=>`<a class="${i===(o.tabIdx||0)?'active':''}">${t}</a>`).join('')}</nav>
+      <div class="sp-workspace">
+        <aside class="sp-left-rail">${rail.map((r,i)=>`<a class="${i===(o.railIdx||0)?'active':''}">${r}</a>`).join('')}</aside>
+        <section class="sp-stage">
+          <div class="sp-breadcrumbs">${(o.crumbs||['Home','Surface']).map((c,i,a)=>`<span>${c}</span>${i<a.length-1?'<span class="sp-crumb-sep">/</span>':''}`).join('')}<span class="sp-route-badge">${o.maturity||'prototype · demo'}</span></div>
+          <div class="sp-stage-body">${o.body||''}</div>
+        </section>
+      </div>
+      <footer class="sp-agent-shell">
+        <div class="sp-agent-search"><span>⌕</span><input placeholder="Search or command…"></div>
+        <div class="sp-runtime-strip"><span class="sp-runtime-strip__label">Runtime</span>
+          ${(o.runtime||['hellgraph','GAIA','PEP','SCOPE-D']).map(r=>`<span class="sp-runtime-badge"><i></i>${r}</span>`).join('')}</div>
+      </footer></div>`;
+  },
+};
+window.SP=SP;
+})();
+</script><script>
+const HUB={label:'Devices',icon:'\u2b12',count:'5.4K',type:'device'};
+const SAT=[{label:'Accounts',icon:'\u26ad',count:2,type:'group',x:32,y:20,verb:'On'},
+ {label:'SaaS Applications',icon:'\u2b22',count:5,type:'net',x:50,y:16,verb:'Has (Installed SW)'},
+ {label:'Users',icon:'\u2616',count:896,type:'user',x:80,y:38,verb:null},
+ {label:'Vulnerabilities',icon:'\u26e8',count:'1.5K',type:'vuln',x:62,y:62,verb:'Has'},
+ {label:'Containers',icon:'\u25a5',count:72,type:'software',x:40,y:82,verb:'Hosting'},
+ {label:'Software',icon:'\u276e\u276f',count:557,type:'software',x:16,y:60,verb:'Has'},
+ {label:'Networks',icon:'\u21c6',count:4,type:'net',x:20,y:34,verb:'On'}];
+function domainCanvas(){var CX=42,CY=48;var edges="";SAT.forEach(function(s){edges+=SP.edge(CX,CY,s.x,s.y,{verb:s.verb,w:1.2,curve:s.curve,kind:s.kind});});var nodes=SP.node(Object.assign({},HUB,{x:CX,y:CY}))+SAT.map(function(s){return SP.node(s);}).join("");return '<div class="canvas" style="height:520px"><div class="hint">Multiple asset type filters added</div>'+'<svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" style="overflow:visible">'+edges+'</svg>'+nodes+SP.toolbar()+'</div>';}
+const body='<div class="surface-header"><div><div class="eyebrow">Asset graph</div><h1>Devices · relationship expand</h1><p class="surface-summary">The canonical Axonius node object rendered in Carbon: soft-fill circle + centered glyph + dark shoulder count-chip + label + size-by-count. Every domain reuses this exact object.</p></div><div>'+SP.tag('Organic','grey')+' <button class="cbtn primary">Explore connections</button></div></div>'
+ +'<div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">'+SP.tag('Devices: Adapter connections x','blue')+SP.tag('Vulnerabilities: Software version x','blue')+SP.tag('Users: Assigned permissions: is admin x','blue')+'</div>'
+ +domainCanvas();
+document.getElementById('root').innerHTML=SP.shell({domainIdx:1,tabs:['Overview','Graph','Table','Wizard'],tabIdx:1,railIdx:0,crumbs:['Asset Graph','Devices','Expand'],maturity:'prototype · demo',runtime:['hellgraph','GAIA','PEP'],body:body});
+</script></body></html>

@@ -17,7 +17,9 @@
     "@carbon/styles": "^1.89.0",
     "@carbon/vue": "^3.0.27",
     "d3": "^7.9.0",
+    "firebase": "10.14.1",
     "maplibre-gl": "^5.7.1",
+    "pinia": "2.3.1",
     "rxjs": "^7.8.2",
     "vue": "^3.4.0",
     "vue-router": "^4.3.0"

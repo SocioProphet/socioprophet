@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Adapters</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.acard{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:15px;box-shadow:0 1px 2px rgba(20,30,50,.03)}
+.acard:hover{border-color:var(--blue)}
+.acard .top{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.acard .logo{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
+.acard .nm{font-weight:600;font-size:13.5px}
+.acard .types{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--ink-dim);margin-bottom:10px}
+.acard .types span{display:inline-flex;align-items:center;gap:4px}
+.acard .foot{display:flex;align-items:center;justify-content:space-between}
+.acard .cat{font-size:11px;color:var(--ink-dim);background:var(--page);padding:2px 8px;border-radius:5px}
+.acard .cnt{font-size:11px;color:var(--green);font-weight:600}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item active" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <b>Adapters</b></div><div class="sp"></div>
+<button class="btn">Adapters Fetch History ›</button><button class="btn">Adapter Connections ›</button><button class="btn primary">Create New Adapter</button></div>
+<div class="wrap" style="max-width:none"><div class="page-h"><h1>Adapters</h1><p>Configured connectors that contribute asset data. 59 of 1,169 available adapters are connected.</p></div>
+<div class="toolbar"><div class="searchbox">⌕ <input placeholder="Search adapters…"></div><div class="select">Category ▾</div><div class="select">Asset Type ▾</div>
+<span class="chip grey" style="margin-left:auto">59 of 1169 configured</span></div>
+<div class="agrid"><div class="acard"><div class="top"><div class="logo" style="background:#e8590c">1E</div><div class="nm">1E Tachyon</div></div>
+<div class="types"><span>▪ Devices</span></div>
+<div class="foot"><span class="cat">UEM</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#fcb400">At</div><div class="nm">Airtable</div></div>
+<div class="types"><span>▪ Users</span></div>
+<div class="foot"><span class="cat">Collaboration</span><span class="cnt">✓ 2 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#ff9900">aws</div><div class="nm">Amazon Web Services</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Vulns</span><span>▪ +24</span></div>
+<div class="foot"><span class="cat">Cloud Infra</span><span class="cnt">✓ 4 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#2b2b52">Ax</div><div class="nm">Axonius Users</div></div>
+<div class="types"><span>▪ Users</span><span>▪ Roles</span></div>
+<div class="foot"><span class="cat">ITAM/ITSM</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#22c55e">B</div><div class="nm">Bionic</div></div>
+<div class="types"><span>▪ Devices</span></div>
+<div class="foot"><span class="cat">AppSec</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#e5484d">BH</div><div class="nm">BloodHound</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Users</span><span>▪ Groups</span></div>
+<div class="foot"><span class="cat">EASM</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#e0359e">CG</div><div class="nm">Check Point CloudGuard</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Users</span><span>▪ +4</span></div>
+<div class="foot"><span class="cat">Cloud Security</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#e0359e">∞</div><div class="nm">Check Point Infinity</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Users</span><span>▪ +1</span></div>
+<div class="foot"><span class="cat">Firewall</span><span class="cnt">✓ 2 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#f0a30a">Ch</div><div class="nm">Chef</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Users</span><span>▪ +1</span></div>
+<div class="foot"><span class="cat">Config/Patch</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#1ba0d7">cis</div><div class="nm">Cisco</div></div>
+<div class="types"><span>▪ Devices</span></div>
+<div class="foot"><span class="cat">Networking</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#1ba0d7">ISE</div><div class="nm">Cisco ISE</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Users</span></div>
+<div class="foot"><span class="cat">IAM</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#39b54a">M</div><div class="nm">Cisco Meraki</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ SW</span><span>▪ +5</span></div>
+<div class="foot"><span class="cat">Networking</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#e0359e">Cl</div><div class="nm">Claroty CTD</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Vulns</span><span>▪ +1</span></div>
+<div class="foot"><span class="cat">OT Security</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#e5484d">CS</div><div class="nm">CrowdStrike Falcon</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Vulns</span><span>▪ +5</span></div>
+<div class="foot"><span class="cat">EDR/EPP</span><span class="cnt">✓ 1 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#7c5cff">csv</div><div class="nm">CSV</div></div>
+<div class="types"><span>▪ Devices</span><span>▪ Vulns</span><span>▪ +5</span></div>
+<div class="foot"><span class="cat">File</span><span class="cnt">✓ 2 connected</span></div></div><div class="acard"><div class="top"><div class="logo" style="background:#0a7d3f">DC</div><div class="nm">DigiCert PKI</div></div>
+<div class="types"><span>▪ Certificates</span></div>
+<div class="foot"><span class="cat">PKI</span><span class="cnt">✓ 1 connected</span></div></div></div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>each adapter = a provenance source in hellgraph</span><span style="margin-left:auto" class="mono">a20 · adapters</span></div>
+</div></main></div></body></html>

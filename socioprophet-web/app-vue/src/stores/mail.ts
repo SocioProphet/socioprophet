@@ -13,6 +13,7 @@ export const useMail = defineStore("mail", {
     aiSummary: "",
     paletteOpen: false,
     screenerOpen: false,
+    composeOpen: false,
   }),
   getters: {
     replyLaterCount: (s) => s.threads.filter((t) => t.replyLaterAt).length,
@@ -74,6 +75,44 @@ export const useMail = defineStore("mail", {
         await mailApi.screenerDecision(id, decision);
         this.screener = this.screener.filter((s) => s.id !== id);
       } catch (e: any) { this.error = e?.message ?? "screener action failed"; }
+    },
+    // Reply to the open thread. Optimistically appends the sent message so the
+    // pane updates immediately — the bridge is the source of truth on reload.
+    async replyToCurrent(body: string): Promise<void> {
+      const thread = this.current;
+      if (!thread || !body.trim()) return;
+      try {
+        await mailApi.sendMail({ to: thread.fromEmail, subject: `Re: ${thread.subject}`, body, inReplyTo: thread.id });
+        this.error = "";
+        thread.messages = [...(thread.messages ?? []), { id: `local-${Date.now()}`, from: "You", fromEmail: "", ts: "now", bodyText: body }];
+      } catch (e: any) {
+        this.error = e?.message ?? "reply failed";
+        throw e;
+      }
+    },
+    // Send a new (non-reply) message from the Compose modal. Returns success so
+    // the caller can decide whether to close the modal or keep the draft.
+    async sendNew(p: { to: string; subject: string; body: string }): Promise<boolean> {
+      if (!p.to.trim() || !p.subject.trim()) { this.error = "to and subject are required"; return false; }
+      try {
+        await mailApi.sendMail(p);
+        this.error = "";
+        return true;
+      } catch (e: any) {
+        this.error = e?.message ?? "send failed";
+        return false;
+      }
+    },
+    // AI draft for the open thread — sovereign choir, not a vendor assistant.
+    async draftReply(intent: string): Promise<string> {
+      const thread = this.current;
+      if (!thread) return "";
+      try {
+        return await mailApi.aiDraft(thread.id, intent);
+      } catch (e: any) {
+        this.error = e?.message ?? "draft failed";
+        return "";
+      }
     },
   },
 });

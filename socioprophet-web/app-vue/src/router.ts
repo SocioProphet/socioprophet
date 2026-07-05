@@ -17,7 +17,7 @@ const routes = [
 
 export const router = createRouter({ history: createWebHistory(), routes });
 
-// Auth guard: wait for Firebase to resolve, then gate non-public routes.
+// Auth guard: wait for Socbase (Supabase) to resolve, then gate non-public routes.
 router.beforeEach(async (to) => {
   const auth = useAuth();
   if (!auth.ready) {

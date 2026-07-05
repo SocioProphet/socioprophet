@@ -1,5 +1,5 @@
 export {};
-// /boot — UNAUTHENTICATED nlboot provisioning endpoint. Devices have no Firebase
+// /boot — UNAUTHENTICATED nlboot provisioning endpoint. Devices have no Socbase
 // token; they authenticate with the claim code on their boot drive. Mounted
 // WITHOUT requireAuth (see server.ts).
 const express = require("express");

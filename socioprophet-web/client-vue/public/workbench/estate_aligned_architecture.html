@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocioProphet Estate — Aligned Architecture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#07090d; --surface:#0f1218; --surface2:#141822; --border:#1c2230; --muted:#232a3a;
+  --text:#e6ecf5; --dim:#7482980; --dim2:#8a94a6; --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
+  --o-sp:#f472b6; --o-src:#38bdf8; --o-soc:#34d399; --o-md:#fbbf24;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1200px 600px at 50% -10%, #10151f 0%, var(--bg) 60%);color:var(--text);font-family:var(--sans);padding:40px 24px 80px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto}
+header.top{text-align:center;margin-bottom:36px}
+header.top .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+header.top h1{font-size:clamp(24px,3.4vw,40px);font-weight:700;letter-spacing:-.025em;margin-top:12px}
+header.top h1 b{background:linear-gradient(90deg,#818cf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header.top p{margin:14px auto 0;max-width:720px;color:var(--dim2);font-size:14px}
+.statbar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 8px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-align:center}
+.stat .num{font-family:var(--mono);font-size:22px;font-weight:700}
+.stat .lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim2);margin-top:2px}
+.ownerkey{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:18px 0 34px;font-family:var(--mono);font-size:11px;color:var(--dim2)}
+.ownerkey span{display:inline-flex;align-items:center;gap:6px}
+.ownerkey i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.band{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;overflow:hidden}
+.band-rail{flex:0 0 96px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,transparent),transparent);padding:16px 12px;display:flex;flex-direction:column;gap:4px;align-items:flex-start;justify-content:center;border-right:1px solid var(--border)}
+.band-idx{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent)}
+.band-short{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.band-count{font-family:var(--mono);font-size:10px;color:var(--dim2);margin-top:4px}
+.band-body{flex:1;padding:16px 18px}
+.band-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.band-head h2{font-size:16px;font-weight:600;letter-spacing:-.01em}
+.srcnote{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.06em;opacity:.8}
+.band-desc{font-size:12.5px;color:var(--dim2);margin:7px 0 12px;max-width:860px}
+.repos{display:flex;flex-wrap:wrap;gap:5px}
+.repo{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:6px;background:var(--muted);border-left:2px solid var(--border);color:var(--text);cursor:default;transition:transform .08s,border-color .12s}
+.repo:hover{transform:translateY(-1px)}
+.repo.o-sp{border-color:var(--o-sp)} .repo.o-src{border-color:var(--o-src)}
+.repo.o-soc{border-color:var(--o-soc)} .repo.o-md{border-color:var(--o-md)}
+.flow{display:flex;justify-content:center;padding:3px 0}
+.flow-line{width:2px;height:20px;background:linear-gradient(180deg,var(--border),transparent);position:relative}
+.flow-line::after{content:'';position:absolute;bottom:0;left:-3px;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--border)}
+.spine-wrap{margin-top:40px}
+.spine-wrap > .sec-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim2);text-align:center;margin-bottom:16px}
+.spines{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.spine{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:12px;padding:14px 16px}
+.spine-head{display:flex;align-items:center;gap:8px}
+.spine-pip{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.spine-head h3{font-size:13px;font-weight:600;flex:1}
+.spine-count{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.spine-desc{font-size:11.5px;color:var(--dim2);margin:6px 0 10px}
+.footer-note{margin-top:44px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:18px 22px}
+.footer-note h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim2);margin-bottom:10px}
+.footer-note p{font-size:12.5px;color:var(--dim2);margin-bottom:8px}
+.footer-note code{font-family:var(--mono);color:#818cf8;background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px}
+.thesis{border-left:2px solid #f472b6;padding-left:14px;margin:10px 0;font-size:13px;color:var(--text)}
+@media(max-width:640px){.band{flex-direction:column}.band-rail{flex-direction:row;flex:auto;border-right:none;border-bottom:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Estate Alignment · since 2025-11-01 · author:mdheller</div>
+  <h1>The Sovereign Stack, <b>Mapped to the Estate</b></h1>
+  <p>146 owner/repo entries reconciled against the unified cognitive-systems architecture. Each repo is placed in the one layer it primarily implements, so the abstract bands become concrete hardening-and-validation targets on the path to production/demo readiness.</p>
+</header>
+
+<div class="statbar">
+  <div class="stat"><div class="num">146</div><div class="lbl">Owner/repo entries</div></div>
+  <div class="stat"><div class="num" style="color:var(--o-sp)">102</div><div class="lbl">SocioProphet</div></div>
+  <div class="stat"><div class="num" style="color:var(--o-soc)">26</div><div class="lbl">SociOS-Linux</div></div>
+  <div class="stat"><div class="num" style="color:var(--o-src)">14</div><div class="lbl">SourceOS-Linux</div></div>
+  <div class="stat"><div class="num" style="color:var(--o-md)">4</div><div class="lbl">mdheller</div></div>
+  <div class="stat"><div class="num">7+3</div><div class="lbl">Layers + spines</div></div>
+</div>
+
+<div class="ownerkey">
+  <span><i style="background:var(--o-sp)"></i>SocioProphet</span>
+  <span><i style="background:var(--o-soc)"></i>SociOS-Linux</span>
+  <span><i style="background:var(--o-src)"></i>SourceOS-Linux</span>
+  <span><i style="background:var(--o-md)"></i>mdheller</span>
+</div>
+
+<div class="thesis">Dispositive facts — consent, purpose, authorization — are bound at <b>capture</b> as cryptographic receipts enforced at the <b>substrate</b>, not asserted in renegotiable prose. The estate below is that thesis, decomposed into runnable repos. Flow reads top→down: capture → fabric → cognition → coordination → governance → adaptation → output, with the receipt chain owned at L3 and enforced at L4.</div>
+
+
+  <section class="band" style="--accent:#00d4ff">
+    <div class="band-rail">
+      <div class="band-idx">L0</div>
+      <div class="band-short">Capture</div>
+      <div class="band-count">9 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Environment & Capture</h2>
+        <span class="srcnote">Work Stream · Acquisition</span>
+      </div>
+      <p class="band-desc">Signal capture at the substrate. Every sensor/OCR/voice/browser surface is where authorization receipts must be bound at capture — post-hoc audit cannot recover purpose.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/browser-use — browser automation capture">browser-use</span>
+        <span class="repo o-soc" title="SociOS-Linux/imagelab — image capture/processing">imagelab</span>
+        <span class="repo o-soc" title="SociOS-Linux/ocrlab — OCR capture (Work Stream / RAG OCR analog)">ocrlab</span>
+        <span class="repo o-soc" title="SociOS-Linux/speechlab — speech capture (mirror)">speechlab</span>
+        <span class="repo o-soc" title="SociOS-Linux/videolab — video capture/processing">videolab</span>
+        <span class="repo o-sp" title="SocioProphet/OmniVoice — voice/audio capture">OmniVoice</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-ingest — ingestion (Work Stream acquisition stage)">prophet-core-ingest</span>
+        <span class="repo o-sp" title="SocioProphet/speechlab — speech capture/processing">speechlab</span>
+        <span class="repo o-src" title="SourceOS-Linux/BearBrowser — browsing agent surface">BearBrowser</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+  <section class="band" style="--accent:#38bdf8">
+    <div class="band-rail">
+      <div class="band-idx">L1</div>
+      <div class="band-short">Data Fabric</div>
+      <div class="band-count">25 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Data Fabric · Twin · Memory Stores</h2>
+        <span class="srcnote">OCCO · Memini · Our Solution</span>
+      </div>
+      <p class="band-desc">Preprocessing, digital-twin sync, KG/vector/associative memory. Fast/slow coupled edge dynamics (Memini) live here; federated query builder (OCCO) resolves across spheres.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/embeddinglab — embedding pipeline">embeddinglab</span>
+        <span class="repo o-soc" title="SociOS-Linux/graphlab — graph processing (Our Solution analog)">graphlab</span>
+        <span class="repo o-soc" title="SociOS-Linux/nlplab — NLP pipeline">nlplab</span>
+        <span class="repo o-soc" title="SociOS-Linux/timeserieslab — timeseries pipeline (Hawkes inference)">timeserieslab</span>
+        <span class="repo o-soc" title="SociOS-Linux/translationlab — translation pipeline">translationlab</span>
+        <span class="repo o-sp" title="SocioProphet/cairnpath-mesh — path/mesh data fabric">cairnpath-mesh</span>
+        <span class="repo o-sp" title="SocioProphet/Fun-DDPS — distributed data processing system">Fun-DDPS</span>
+        <span class="repo o-sp" title="SocioProphet/FunDPS — data processing system">FunDPS</span>
+        <span class="repo o-sp" title="SocioProphet/gaia-world-model — world model / twin substrate">gaia-world-model</span>
+        <span class="repo o-sp" title="SocioProphet/hellgraph — graph DB / KG substrate (Our Solution analog)">hellgraph</span>
+        <span class="repo o-sp" title="SocioProphet/HolographMe — holographic representation store">HolographMe</span>
+        <span class="repo o-sp" title="SocioProphet/human-digital-twin — human digital twin (DT sync)">human-digital-twin</span>
+        <span class="repo o-sp" title="SocioProphet/memory-mesh — associative memory store (Memini analog)">memory-mesh</span>
+        <span class="repo o-sp" title="SocioProphet/memory-mesh-upstream — upstream memory mesh">memory-mesh-upstream</span>
+        <span class="repo o-sp" title="SocioProphet/mempalace — memory palace store">mempalace</span>
+        <span class="repo o-sp" title="SocioProphet/meshrush — mesh transport">meshrush</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-query — federated query builder (OCCO analog)">prophet-core-query</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-domain-gaia-curation-vault — curation vault">prophet-domain-gaia-curation-vault</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-domain-gaia-ontology — domain ontology">prophet-domain-gaia-ontology</span>
+        <span class="repo o-sp" title="SocioProphet/regis-entity-graph — entity graph / KG enrichment (Our Solution analog)">regis-entity-graph</span>
+        <span class="repo o-sp" title="SocioProphet/semantic-serdes — semantic serialization">semantic-serdes</span>
+        <span class="repo o-sp" title="SocioProphet/sherlock-search — search/retrieval">sherlock-search</span>
+        <span class="repo o-sp" title="SocioProphet/smart-tree — tree/index structure">smart-tree</span>
+        <span class="repo o-src" title="SourceOS-Linux/sourceos-model-carry — on-device model carry / delegation">sourceos-model-carry</span>
+        <span class="repo o-src" title="SourceOS-Linux/sourceos-syncd — receipt-chain sync daemon">sourceos-syncd</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+  <section class="band" style="--accent:#818cf8">
+    <div class="band-rail">
+      <div class="band-idx">L2</div>
+      <div class="band-short">Cognition</div>
+      <div class="band-count">8 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Single-Agent Cognition Loop</h2>
+        <span class="srcnote">Agent ER · MAPE-K L1</span>
+      </div>
+      <p class="band-desc">Observe → reason → act. DECISION_CYCLE, symbolic/LLM reasoning, ReAct/Reflexion/BDI. Cognition is auditable by construction — each step emits a provenance record.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/albert — reasoning assistant">albert</span>
+        <span class="repo o-sp" title="SocioProphet/cascade — cascaded reasoning / decision flow">cascade</span>
+        <span class="repo o-sp" title="SocioProphet/hermes-agent — messaging/reasoning agent">hermes-agent</span>
+        <span class="repo o-sp" title="SocioProphet/holmes — inference/deduction agent">holmes</span>
+        <span class="repo o-sp" title="SocioProphet/liminal_backrooms — exploratory agent environment">liminal_backrooms</span>
+        <span class="repo o-sp" title="SocioProphet/superconscious — higher-order reasoning">superconscious</span>
+        <span class="repo o-sp" title="SocioProphet/synapseiq — reasoning engine">synapseiq</span>
+        <span class="repo o-src" title="SourceOS-Linux/agent-machine — agent execution machine">agent-machine</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+  <section class="band" style="--accent:#a78bfa">
+    <div class="band-rail">
+      <div class="band-idx">L3</div>
+      <div class="band-short">Multi-Agent</div>
+      <div class="band-count">13 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Coordination & Orchestration Substrate</h2>
+        <span class="srcnote">Hypernetwork · MAPPACS · C1–C5</span>
+      </div>
+      <p class="band-desc">User owns the receipt chain and delegates to stateless inference servers. agentplane inverts the ownership of the orchestration state machine; model-router stitches receipts locally.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/agentos-spine — agent OS spine">agentos-spine</span>
+        <span class="repo o-soc" title="SociOS-Linux/agentos-starter — agent OS starter">agentos-starter</span>
+        <span class="repo o-sp" title="SocioProphet/agent-inbox — agent message intake / routing queue">agent-inbox</span>
+        <span class="repo o-sp" title="SocioProphet/agent-registry — registry of agent identities & capabilities">agent-registry</span>
+        <span class="repo o-sp" title="SocioProphet/AgenticaForge — agent construction / forge tooling">AgenticaForge</span>
+        <span class="repo o-sp" title="SocioProphet/agentplane — sovereign device-side agent runtime / orchestration state machine">agentplane</span>
+        <span class="repo o-sp" title="SocioProphet/atlas_master_bundle_autopilot_fullorchestration — full-orchestration bundle">atlas_master_bundle_autopilot_fullorchestration</span>
+        <span class="repo o-sp" title="SocioProphet/atlas_master_bundle_complete — orchestration master bundle">atlas_master_bundle_complete</span>
+        <span class="repo o-sp" title="SocioProphet/hyperswarm-agent-composable-cluster-scaleup — composable agent swarm scaleup">hyperswarm-agent-composable-cluster-scaleup</span>
+        <span class="repo o-sp" title="SocioProphet/model-router — routes to stateless inference servers">model-router</span>
+        <span class="repo o-sp" title="SocioProphet/OrchestraOS — orchestration OS">OrchestraOS</span>
+        <span class="repo o-sp" title="SocioProphet/sourceos-a2a-mcp-bootstrap — a2a/mcp bootstrap">sourceos-a2a-mcp-bootstrap</span>
+        <span class="repo o-sp" title="SocioProphet/TriTRPC — typed RPC transport for agents">TriTRPC</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+  <section class="band" style="--accent:#f472b6">
+    <div class="band-rail">
+      <div class="band-idx">L4</div>
+      <div class="band-short">Governance</div>
+      <div class="band-count">14 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Policy · Governance · Provenance · Receipts</h2>
+        <span class="srcnote">Trusted Data Spheres · SCOPE-D</span>
+      </div>
+      <p class="band-desc">The dispositive facts — consent, purpose, authorization — are bound as cryptographic receipts enforced at the substrate, not asserted in renegotiable prose. Policy→primitive translation (Trusted Data Spheres); token-gated workloads; SCOPE-D machine-checkable contracts.</p>
+      <div class="repos">
+        <span class="repo o-sp" title="SocioProphet/contractforge — machine-checkable contract generation (SCOPE-D adjacent)">contractforge</span>
+        <span class="repo o-sp" title="SocioProphet/global-devsecops-intelligence — devsecops intelligence / defensive security">global-devsecops-intelligence</span>
+        <span class="repo o-sp" title="SocioProphet/graphbrain-contract — graph contract binding">graphbrain-contract</span>
+        <span class="repo o-sp" title="SocioProphet/guardrail-fabric — guardrail enforcement fabric (Trusted Data Spheres analog)">guardrail-fabric</span>
+        <span class="repo o-sp" title="SocioProphet/identity-is-prime-reference — identity primitive (capture-time binding)">identity-is-prime-reference</span>
+        <span class="repo o-sp" title="SocioProphet/mcp-a2a-zero-trust — MCP agent-to-agent zero-trust transport">mcp-a2a-zero-trust</span>
+        <span class="repo o-sp" title="SocioProphet/model-governance-ledger — model governance ledger (receipts/provenance)">model-governance-ledger</span>
+        <span class="repo o-sp" title="SocioProphet/policy-fabric — policy fabric: high-level policy -> low-level primitive">policy-fabric</span>
+        <span class="repo o-sp" title="SocioProphet/presidio — PII detection / redaction (Work Stream scan stage)">presidio</span>
+        <span class="repo o-sp" title="SocioProphet/ProCybernetica — civic argument hygiene + governed AI (flagship)">ProCybernetica</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-catalog — data catalog (Work Stream catalog stage)">prophet-core-catalog</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-ledger — receipt/audit ledger">prophet-core-ledger</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-policy — core policy engine">prophet-core-policy</span>
+        <span class="repo o-sp" title="SocioProphet/SCOPE-D — machine-checkable contract governance (flagship)">SCOPE-D</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+  <section class="band" style="--accent:#34d399">
+    <div class="band-rail">
+      <div class="band-idx">L5</div>
+      <div class="band-short">Meta-Learning</div>
+      <div class="band-count">6 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Adaptation · Evaluation · Optimization</h2>
+        <span class="srcnote">Meta-loop · PSO · Genetic</span>
+      </div>
+      <p class="band-desc">Learns how to learn across task distributions; pushes updated θ back to inner loops. MLOps fabric, neural operators, economic/MPCC optimization, learning-loop systems (MAPE-K L2 architectural self-adaptation).</p>
+      <div class="repos">
+        <span class="repo o-sp" title="SocioProphet/neuraloperator — neural operator learning">neuraloperator</span>
+        <span class="repo o-sp" title="SocioProphet/ontogenesis — developmental/adaptive learning">ontogenesis</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-platform-fabric-mlops-ts-suite — mlops fabric suite">prophet-platform-fabric-mlops-ts-suite</span>
+        <span class="repo o-sp" title="SocioProphet/systems-learning-loops — learning-loop systems (MAPE-K analog)">systems-learning-loops</span>
+        <span class="repo o-md" title="mdheller/economic-prophet — economic forecasting model">economic-prophet</span>
+        <span class="repo o-md" title="mdheller/profit-mpcc — MPCC optimization">profit-mpcc</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+  <section class="band" style="--accent:#fb923c">
+    <div class="band-rail">
+      <div class="band-idx">L6</div>
+      <div class="band-short">Output</div>
+      <div class="band-count">18 repos</div>
+    </div>
+    <div class="band-body">
+      <div class="band-head">
+        <h2>Delivery · Surfaces · Downstream Actions</h2>
+        <span class="srcnote">Delivery · Reporting</span>
+      </div>
+      <p class="band-desc">Everything the estate does to the world: CLIs, web surfaces, delivery-excellence ops, civic-scale sociosphere, educational literacy exposing reversibility distance as a civic primitive.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/shortcut-overlay — UX overlay">shortcut-overlay</span>
+        <span class="repo o-soc" title="SociOS-Linux/socioslinux-web — web surface">socioslinux-web</span>
+        <span class="repo o-sp" title="SocioProphet/ai-writing-guide — authored output style / literacy layer">ai-writing-guide</span>
+        <span class="repo o-sp" title="SocioProphet/alexandrian-academy — educational literacy layer">alexandrian-academy</span>
+        <span class="repo o-sp" title="SocioProphet/delivery-excellence — delivery ops">delivery-excellence</span>
+        <span class="repo o-sp" title="SocioProphet/delivery-excellence-automation — delivery automation">delivery-excellence-automation</span>
+        <span class="repo o-sp" title="SocioProphet/delivery-excellence-boards — delivery boards">delivery-excellence-boards</span>
+        <span class="repo o-sp" title="SocioProphet/delivery-excellence-bounties — delivery bounties">delivery-excellence-bounties</span>
+        <span class="repo o-sp" title="SocioProphet/delivery-excellence-innersource — innersource delivery">delivery-excellence-innersource</span>
+        <span class="repo o-sp" title="SocioProphet/generate — generation output">generate</span>
+        <span class="repo o-sp" title="SocioProphet/lampstand — surfacing / exposure">lampstand</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-cli — CLI surface">prophet-cli</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-ops-brief — ops briefing output">prophet-core-ops-brief</span>
+        <span class="repo o-sp" title="SocioProphet/slash-topics — topic commands">slash-topics</span>
+        <span class="repo o-sp" title="SocioProphet/socioprophet — org meta / landing">socioprophet</span>
+        <span class="repo o-sp" title="SocioProphet/sociosphere — civic-scale surface">sociosphere</span>
+        <span class="repo o-src" title="SourceOS-Linux/agent-term — agent terminal UX">agent-term</span>
+        <span class="repo o-md" title="mdheller/socioprophet-web — web surface">socioprophet-web</span>
+      </div>
+    </div>
+  </section>
+  <div class="flow"><div class="flow-line"></div></div>
+
+<div class="spine-wrap">
+  <div class="sec-label">Cross-cutting spines · run through every layer</div>
+  <div class="spines">
+    
+    <section class="spine" style="--accent:#c084fc">
+      <div class="spine-head">
+        <div class="spine-pip"></div>
+        <h3>Formal Proof & Math Foundations</h3>
+        <span class="spine-count">14</span>
+      </div>
+      <p class="spine-desc">Operator-algebraic semantics, Grothendieck fibration, lattice/zeta, and the millennium-problem programs. These underwrite the theorem-status taxonomy and the substrate-enforcement claims.</p>
+      <div class="repos">
+        <span class="repo o-sp" title="SocioProphet/bsd-proof-program — BSD (Birch-Swinnerton-Dyer) proof program">bsd-proof-program</span>
+        <span class="repo o-sp" title="SocioProphet/functional-model-surfaces — functional model surfaces (operator-algebraic semantics)">functional-model-surfaces</span>
+        <span class="repo o-sp" title="SocioProphet/Heller-Dirac — Dirac formalism proof">Heller-Dirac</span>
+        <span class="repo o-sp" title="SocioProphet/Heller-Einstein — Einstein formalism proof">Heller-Einstein</span>
+        <span class="repo o-sp" title="SocioProphet/Heller-Godel — Godel formalism proof">Heller-Godel</span>
+        <span class="repo o-sp" title="SocioProphet/Heller-Winters-Theorem — theorem proof">Heller-Winters-Theorem</span>
+        <span class="repo o-sp" title="SocioProphet/hodge-program-proof — Hodge conjecture program">hodge-program-proof</span>
+        <span class="repo o-sp" title="SocioProphet/hphd-zeta-mirror-lattice — zeta / lattice math">hphd-zeta-mirror-lattice</span>
+        <span class="repo o-sp" title="SocioProphet/lattice-forge — lattice construction">lattice-forge</span>
+        <span class="repo o-sp" title="SocioProphet/np-program — P vs NP program">np-program</span>
+        <span class="repo o-sp" title="SocioProphet/ns-program — Navier-Stokes program">ns-program</span>
+        <span class="repo o-sp" title="SocioProphet/WoS-NO — well-ordering / set-theoretic proof note">WoS-NO</span>
+        <span class="repo o-sp" title="SocioProphet/yang-mills — Yang-Mills mass gap program">yang-mills</span>
+        <span class="repo o-src" title="SourceOS-Linux/bsd-proof-program — BSD proof (mirror)">bsd-proof-program</span>
+      </div>
+    </section>
+    <section class="spine" style="--accent:#64748b">
+      <div class="spine-head">
+        <div class="spine-pip"></div>
+        <h3>Platform · Infra · OS · Build</h3>
+        <span class="spine-count">30</span>
+      </div>
+      <p class="spine-desc">SourceOS/SociOS runtime, boot, shell, installers, packaging, scaffolding. The sovereign device-side substrate everything else runs on.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/asahi-installer — apple-silicon installer">asahi-installer</span>
+        <span class="repo o-soc" title="SociOS-Linux/cloudshell-fog — fog compute shell (mirror)">cloudshell-fog</span>
+        <span class="repo o-soc" title="SociOS-Linux/enhancements — enhancement proposals">enhancements</span>
+        <span class="repo o-soc" title="SociOS-Linux/kinto — input/config sync">kinto</span>
+        <span class="repo o-soc" title="SociOS-Linux/nlboot — NL boot layer">nlboot</span>
+        <span class="repo o-soc" title="SociOS-Linux/socios — OS core">socios</span>
+        <span class="repo o-soc" title="SociOS-Linux/socios-ignition — ignition/boot">socios-ignition</span>
+        <span class="repo o-soc" title="SociOS-Linux/socios-installer — installer">socios-installer</span>
+        <span class="repo o-soc" title="SociOS-Linux/source-os — OS core">source-os</span>
+        <span class="repo o-soc" title="SociOS-Linux/SourceOS — OS core">SourceOS</span>
+        <span class="repo o-sp" title="SocioProphet/atlas_os_service_full — atlas OS service layer">atlas_os_service_full</span>
+        <span class="repo o-sp" title="SocioProphet/cloudshell-fog — fog/edge compute shell">cloudshell-fog</span>
+        <span class="repo o-sp" title="SocioProphet/exodus — migration / bootstrap">exodus</span>
+        <span class="repo o-sp" title="SocioProphet/homebrew-prophet — packaging tap">homebrew-prophet</span>
+        <span class="repo o-sp" title="SocioProphet/new-hope — bootstrap/experimental">new-hope</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-infra — core infra">prophet-core-infra</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-libs — shared libs">prophet-core-libs</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-scaffolder — scaffolding">prophet-core-scaffolder</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-platform — platform core">prophet-platform</span>
+        <span class="repo o-sp" title="SocioProphet/Shining-Apple — apple/macos target">Shining-Apple</span>
+        <span class="repo o-sp" title="SocioProphet/sourceos-workspace — workspace">sourceos-workspace</span>
+        <span class="repo o-sp" title="SocioProphet/workspace-inventory — inventory tooling">workspace-inventory</span>
+        <span class="repo o-src" title="SourceOS-Linux/demo-repository — demo scaffold">demo-repository</span>
+        <span class="repo o-src" title="SourceOS-Linux/homebrew-tap — packaging tap">homebrew-tap</span>
+        <span class="repo o-src" title="SourceOS-Linux/nix-openclaw — nix build of openclaw">nix-openclaw</span>
+        <span class="repo o-src" title="SourceOS-Linux/openclaw — OS component">openclaw</span>
+        <span class="repo o-src" title="SourceOS-Linux/sourceos-boot — boot layer">sourceos-boot</span>
+        <span class="repo o-src" title="SourceOS-Linux/sourceos-devtools — devtools">sourceos-devtools</span>
+        <span class="repo o-src" title="SourceOS-Linux/sourceos-shell — OS shell">sourceos-shell</span>
+        <span class="repo o-md" title="mdheller/m2-env-bootstrap — M2 env bootstrap">m2-env-bootstrap</span>
+      </div>
+    </section>
+    <section class="spine" style="--accent:#94a3b8">
+      <div class="spine-head">
+        <div class="spine-pip"></div>
+        <h3>Standards & Contract Specs</h3>
+        <span class="spine-count">9</span>
+      </div>
+      <p class="spine-desc">api-contracts, prophet-*-standards, agent/knowledge/storage standards, OS/workstation specs. Where legal-prose gaps get promoted into machine-enforceable schema fields.</p>
+      <div class="repos">
+        <span class="repo o-soc" title="SociOS-Linux/workstation-contracts — workstation contracts">workstation-contracts</span>
+        <span class="repo o-sp" title="SocioProphet/api-contracts — interface contracts across services">api-contracts</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-core-contracts — core contract specs">prophet-core-contracts</span>
+        <span class="repo o-sp" title="SocioProphet/prophet-platform-standards — platform standards">prophet-platform-standards</span>
+        <span class="repo o-sp" title="SocioProphet/socioprophet-agent-standards — agent standards">socioprophet-agent-standards</span>
+        <span class="repo o-sp" title="SocioProphet/socioprophet-standards-knowledge — knowledge standards">socioprophet-standards-knowledge</span>
+        <span class="repo o-sp" title="SocioProphet/socioprophet-standards-storage — storage standards">socioprophet-standards-storage</span>
+        <span class="repo o-sp" title="SocioProphet/tritrpc-notes-archive — tritrpc notes">tritrpc-notes-archive</span>
+        <span class="repo o-src" title="SourceOS-Linux/sourceos-spec — OS spec">sourceos-spec</span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="footer-note">
+  <h4>How the new uploads slot in</h4>
+  <p><code>OCCO</code> → L1 federated query builder + social guidance + view manipulation (retrieval/provenance plane; <code>prophet-core-query</code>, <code>sherlock-search</code>).</p>
+  <p><code>Trusted Data Spheres</code> → L4 policy→primitive translation and token-gated workloads (<code>policy-fabric</code>, <code>guardrail-fabric</code>, <code>model-governance-ledger</code>).</p>
+  <p><code>Work Stream Design</code> → the L0→L4 pipeline: acquisition (<code>prophet-core-ingest</code>) → scan/redact (<code>presidio</code>) → catalog (<code>prophet-core-catalog</code>) → compliance/lineage (<code>prophet-core-ledger</code>).</p>
+  <p><code>Memini</code> → L1 fast/slow coupled associative memory (<code>memory-mesh</code>, <code>mempalace</code>).</p>
+  <p><code>Our Solution</code> → L1 KG enrichment + attribute ranking (<code>regis-entity-graph</code>, <code>hellgraph</code>, <code>graphlab</code>).</p>
+  <p style="margin-top:10px;color:var(--dim2)">Count reconciliation: 102+14+26+4 = <b>146</b> entries; 3 repo names (<code>bsd-proof-program</code>, <code>cloudshell-fog</code>, <code>speechlab</code>) appear under two owners each. The 144↔146 delta is the two live-confirmed SocioProphet additions <code>HolographMe</code> + <code>WoS-NO</code>. Hover any repo for its owner and placement rationale.</p>
+</div>
+
+</div>
+</body>
+</html>

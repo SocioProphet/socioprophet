@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Enforcement Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.ectabs{display:flex;gap:20px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.ectabs a{padding:10px 2px;color:var(--ink-dim);font-size:13px;border-bottom:2px solid transparent;font-weight:500}
+.ectabs a.on{color:var(--blue);border-bottom-color:var(--blue)}
+.eclayout{display:grid;grid-template-columns:200px 1fr;gap:16px}
+.folders{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
+.folders .fs{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--line-2);border-radius:8px;color:var(--ink-faint);font-size:12px;margin-bottom:8px}
+.folders .row{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:7px;font-size:12.5px;color:var(--ink-dim)}
+.folders .row.on{background:var(--blue-bg);color:var(--blue);font-weight:500}
+.folders .row .n{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:11px}
+.filterrow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filterrow .f{padding:7px 11px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);color:var(--ink-dim);font-size:12px}
+.filterrow .fsearch{flex:1;min-width:180px;display:flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--line-2);border-radius:8px;color:var(--ink-faint);font-size:12px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+thead th{text-align:left;padding:11px 12px;background:var(--page);color:var(--ink-dim);font-weight:600;font-size:11px;border-bottom:1px solid var(--line)}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover{background:#fafbfc;cursor:pointer}
+.struct{display:flex;gap:2px}.struct .s{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:8px;color:#fff;font-weight:700}
+.struct .more{font-size:10px;color:var(--ink-dim);align-self:center;margin-left:2px}
+.trig{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--line-2);border-radius:6px;font-size:11px;color:var(--ink-dim)}
+.wstat{display:inline-flex;align-items:center;gap:6px;font-size:11.5px}
+.wstat.active{color:var(--green)}.wstat.deact{color:var(--ink-faint)}
+.rstat{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:11.5px}
+.qname{background:var(--page);padding:2px 8px;border-radius:5px;font-size:11px;color:var(--ink-dim)}
+.mono{font-family:"Roboto Mono",monospace;font-size:11px}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  Ctrl+Y"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item " href="activities.html"><span class="ic">≣</span>Activities</a>
+      <div class="glabel">Operate</div>
+      <a class="item " href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item active" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item " href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller · operator</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <b>Enforcement Center</b></div><div class="sp"></div>
+<button class="btn" onclick="location.href='ec5_runs.html'">↻ Run History ›</button><button class="btn primary" onclick="location.href='ec2_builder.html'">＋ Create Workflow</button></div>
+<div class="wrap" style="max-width:none">
+<div class="ectabs"><a>Enforcement Sets</a><a class="on">Workflows</a></div>
+<div class="eclayout">
+<div class="folders"><div class="fs">⌕ Search Folders</div>
+<div class="row on">▦ All Workflows <span class="n">9</span></div><div class="row">▦ Shared Workflows <span class="n">6</span></div><div class="row">▦ Drafts <span class="n">3</span></div></div>
+<div>
+<div class="filterrow"><div class="fsearch">⌕ Search workflow</div><div class="f">Workflow Name ▾</div><div class="f">Trigger Type ▾</div><div class="f">Scheduling Type ▾</div><div class="f">Event Type ▾</div><div class="f">Action Type ▾</div><div class="f">Query ▾</div></div>
+<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:8px">Total <b style="color:var(--ink)">9</b></div>
+<table><thead><tr><th style="width:26px"></th><th>Structure</th><th>Workflow Name</th><th>Trigger Type</th><th>Trigger</th><th>Total Runs</th><th>Last Run</th><th>Last Run Status</th><th>Last Updated ↓</th><th>Status</th><th>Query</th></tr></thead><tbody><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#e5484d">R7</span><span class="s" style="background:#00a1e0">SF</span><span class="s" style="background:#39b54a">ML</span></div></td>
+    <td style="font-weight:500">Alert Received Workflow</td><td><span class="trig">⚡ Event</span></td><td>Rapid7 Alert</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-11-19 17:12:13</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#ea4335">GW</span><span class="s" style="background:#03363d">ZD</span><span class="s" style="background:#0089d6">OK</span><span class="s" style="background:#4a154b">SL</span><span class=more>+2</span></div></td>
+    <td style="font-weight:500">New Hire Workflow</td><td><span class="trig">⚡ Event</span></td><td>Workday New Hire</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-11-19 16:52:16</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#77c043">BH</span><span class="s" style="background:#00a1e0">SF</span><span class="s" style="background:#39b54a">ML</span><span class="s" style="background:#2b2b52">AX</span><span class=more>+2</span></div></td>
+    <td style="font-weight:500">User Termination Workflow</td><td><span class="trig">⚡ Event</span></td><td>BambooHR Status Change</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-11-19 16:45:22</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#2b2b52">AX</span><span class="s" style="background:#39b54a">ML</span></div></td>
+    <td style="font-weight:500">Copy of Test gal</td><td><span class="trig">⚡ Event</span></td><td>Asset value changed</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-09-19 16:09:12</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#4a154b">SL</span></div></td>
+    <td style="font-weight:500">New Workflow [Disabled]</td><td><span class="trig">⚡ Event</span></td><td>Slack Message</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-08-26 19:34:19</td>
+    <td><span class="wstat deact">● Deactivated</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#2b2b52">AX</span><span class="s" style="background:#03363d">ZD</span></div></td>
+    <td style="font-weight:500">New Workflow [08-12-2024]</td><td><span class="trig">⚡ Event</span></td><td>Asset added or removed</td>
+    <td class="mono">2252</td><td class="mono">2024-10-02 03:04:44</td><td><span class="rstat">✓ Completed</span></td><td class="mono" style="color:var(--ink-dim)">2024-08-12 21:16:01</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#39b54a">ML</span><span class="s" style="background:#4a154b">SL</span><span class="s" style="background:#2b2b52">AX</span></div></td>
+    <td style="font-weight:500">isolate with approval</td><td><span class="trig">☝ Manual</span></td><td>On Demand</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-07-23 19:46:18</td>
+    <td><span class="wstat active">● Active</span></td><td><span class=qname>Bad Serials (AX)</span></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#4a154b">SL</span><span class="s" style="background:#39b54a">ML</span></div></td>
+    <td style="font-weight:500">New Workflow [07-22-2024]</td><td><span class="trig">⚡ Event</span></td><td>Slack Message</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-07-22 12:03:40</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr><tr onclick="location.href='ec2_builder.html'"><td><input type="checkbox"></td><td><div class="struct"><span class="s" style="background:#5059c9">TM</span></div></td>
+    <td style="font-weight:500">New Workflow [03-06-2024]</td><td><span class="trig">⚡ Event</span></td><td>Teams Message Response</td>
+    <td class="mono">0</td><td class="mono"></td><td></td><td class="mono" style="color:var(--ink-dim)">2024-04-14 20:53:02</td>
+    <td><span class="wstat active">● Active</span></td><td></td></tr></tbody></table>
+</div></div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>each workflow = a PEP-gated dispatch pipeline (SP-ENFORCE-MODEL-001)</span><span style="margin-left:auto" class="mono">ec1 · workflows</span></div>
+</div></main></div></body></html>

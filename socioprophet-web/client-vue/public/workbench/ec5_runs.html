@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Run History</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+thead th{text-align:left;padding:11px 12px;background:var(--page);color:var(--ink-dim);font-weight:600;font-size:11px;border-bottom:1px solid var(--line)}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line)}tbody tr:hover{background:#fafbfc}
+.filterrow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filterrow .f{padding:7px 11px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);color:var(--ink-dim);font-size:12px}
+.filterrow .fsearch{flex:1;min-width:160px;display:flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--line-2);border-radius:8px;color:var(--ink-faint);font-size:12px}
+.trig{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-dim)}
+.mono{font-family:"Roboto Mono",monospace;font-size:11px}
+.asset{display:inline-flex;align-items:center;gap:6px}.asset .ic{color:var(--ink-faint)}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:11.5px}
+.st.prog{color:var(--blue)}.st.done{color:var(--green)}.st.held{color:var(--amber)}.st.block{color:var(--red)}
+.verdict-mini{font-size:10px;padding:1px 6px;border-radius:5px;font-weight:600}
+.vm-adm{background:var(--green-bg);color:var(--green)}.vm-held{background:var(--amber-bg);color:#b9791a}.vm-block{background:var(--red-bg);color:var(--red)}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  Ctrl+Y"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item " href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item " href="activities.html"><span class="ic">≣</span>Activities</a>
+      <div class="glabel">Operate</div>
+      <a class="item " href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item " href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item active" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller · operator</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › <a href="ec1_workflows.html">Enforcement Center</a> › <b>Run History</b></div><div class="sp"></div></div>
+<div class="wrap" style="max-width:none"><div class="page-h"><h1>Run History</h1><p>Every run carries its verdict log — the AgentPlane evidence/replay record. Blocked and held runs are first-class (Console OC-4).</p></div>
+<div class="filterrow"><div class="fsearch">⌕ Search</div><div class="f">Workflow Name ▾</div><div class="f">Event Type ▾</div><div class="f">Action Type ▾</div><div class="f">Status ▾</div><div class="f">From → To</div></div>
+<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:8px">Total <b style="color:var(--ink);font-family:Roboto Mono">84,254</b></div>
+<table><thead><tr><th style="width:26px"></th><th>Run ID</th><th>Trigger Type</th><th>Workflow Name</th><th>Triggered On</th><th>Structure</th><th>Status · Verdict</th><th>Last Reported Activity</th><th>Start Date ↓</th><th>End Date</th></tr></thead><tbody><tr><td><input type="checkbox"></td><td class="mono">92387</td><td><span class="trig">◷ Scheduled</span></td>
+    <td>New Workflow [07-03-2025] - c85f10</td><td><span class="asset"><span class="ic">☖</span>svc_it_aws@demo.local</span></td><td>✉</td>
+    <td><span class="st prog">◐ In Progress</span> <span class="verdict-mini vm-adm">admissible</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 05:04:51</td><td class="mono">2025-08-20 03:51:45</td><td class="mono"></td></tr><tr><td><input type="checkbox"></td><td class="mono">92386</td><td><span class="trig">◷ Scheduled</span></td>
+    <td>New Workflow [07-03-2025] - c85f10</td><td><span class="asset"><span class="ic">☖</span>9f6049fee48fb9f1058d9b679f04e501</span></td><td>✉</td>
+    <td><span class="st prog">◐ In Progress</span> <span class="verdict-mini vm-adm">admissible</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 05:04:51</td><td class="mono">2025-08-20 03:51:45</td><td class="mono"></td></tr><tr><td><input type="checkbox"></td><td class="mono">92385</td><td><span class="trig">◷ Scheduled</span></td>
+    <td>New Workflow [07-03-2025] - c85f10</td><td><span class="asset"><span class="ic">☖</span>svc_it_azuread@demo.local</span></td><td>✉</td>
+    <td><span class="st prog">◐ In Progress</span> <span class="verdict-mini vm-adm">admissible</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 05:04:50</td><td class="mono">2025-08-20 03:51:45</td><td class="mono"></td></tr><tr><td><input type="checkbox"></td><td class="mono">92384</td><td><span class="trig">◷ Scheduled</span></td>
+    <td>New Workflow [07-03-2025] - c85f10</td><td><span class="asset"><span class="ic">☖</span>Test</span></td><td>✉</td>
+    <td><span class="st held">⏸ Held</span> <span class="verdict-mini vm-held">held</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 05:04:42</td><td class="mono">2025-08-20 03:51:44</td><td class="mono"></td></tr><tr><td><input type="checkbox"></td><td class="mono">92383</td><td><span class="trig">◷ Scheduled</span></td>
+    <td>New Workflow [07-03-2025] - c85f10</td><td><span class="asset"><span class="ic">☖</span>svc_it_okta@demo.local</span></td><td>✉</td>
+    <td><span class="st prog">◐ In Progress</span> <span class="verdict-mini vm-adm">admissible</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 05:04:39</td><td class="mono">2025-08-20 03:51:44</td><td class="mono"></td></tr><tr><td><input type="checkbox"></td><td class="mono">92382</td><td><span class="trig">◷ Scheduled</span></td>
+    <td>New Workflow [07-03-2025] - c85f10</td><td><span class="asset"><span class="ic">☖</span>svc_it_googlemdm@demo.local</span></td><td>✉</td>
+    <td><span class="st block">⊘ Blocked</span> <span class="verdict-mini vm-block">blocked</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 05:04:38</td><td class="mono">2025-08-20 03:51:44</td><td class="mono"></td></tr><tr><td><input type="checkbox"></td><td class="mono">92381</td><td><span class="trig">⚡ Event</span></td>
+    <td>User Termination Workflow</td><td><span class="asset"><span class="ic">☖</span>betsy.martin@demo.local</span></td><td>✉</td>
+    <td><span class="st done">✓ Completed</span> <span class="verdict-mini vm-adm">admissible</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 04:58:12</td><td class="mono">2025-08-20 04:57:03</td><td class="mono">2025-08-20 04:58:12</td></tr><tr><td><input type="checkbox"></td><td class="mono">92380</td><td><span class="trig">☝ Manual</span></td>
+    <td>isolate with approval</td><td><span class="asset"><span class="ic">☖</span>WIN-RUTHD.demo.local</span></td><td>✉</td>
+    <td><span class="st done">✓ Completed</span> <span class="verdict-mini vm-adm">admissible</span></td>
+    <td class="mono" style="color:var(--ink-dim)">2025-08-20 04:41:55</td><td class="mono">2025-08-20 04:40:02</td><td class="mono">2025-08-20 04:41:55</td></tr></tbody></table>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>Run 92384 held (indeterminate → E-gate) · 92382 blocked (Rule P-3)</span><span style="margin-left:auto" class="mono">ec5 · run-history</span></div>
+</div></main></div></body></html>
