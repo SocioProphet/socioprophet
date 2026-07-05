@@ -19,7 +19,14 @@
     <div class="vdt-body">
       <!-- Driver × capability-domain value-attribution tensor -->
       <div class="vdt-panel">
-        <div class="vdt-panel-h">Value attribution — driver × capability domain <span class="vdt-hint">weights sum to 100% of EV · outlined cells carry a KPI lever</span></div>
+        <div class="vdt-panel-h vdt-panel-h-row">
+          <span>Value attribution — driver × capability domain <span class="vdt-hint">share of EV · outlined = KPI lever</span></span>
+          <span class="vdt-scale" aria-hidden="true">
+            <span class="vdt-scale-lo">{{ (minWeight * 100).toFixed(1) }}%</span>
+            <span class="vdt-scale-bar"></span>
+            <span class="vdt-scale-hi">{{ (maxWeight * 100).toFixed(1) }}%</span>
+          </span>
+        </div>
         <div class="vdt-matrix" :style="{ gridTemplateColumns: `minmax(150px, 1.3fr) repeat(${domains.length}, 1fr)` }">
           <div class="vdt-corner"></div>
           <div v-for="d in domains" :key="d" class="vdt-colh" :title="d">{{ short(d) }}</div>
@@ -30,9 +37,9 @@
               :key="drv + d"
               class="vdt-cell"
               :class="{ lever: hasLever(drv, d) }"
-              :style="{ background: cellColor(weightOf(drv, d)) }"
+              :style="cellStyle(weightOf(drv, d))"
               :title="`${drv} × ${d} — ${(weightOf(drv, d) * 100).toFixed(1)}% of EV${hasLever(drv, d) ? ' · KPI: ' + leverOf(drv, d)!.kpi : ''}`"
-            >{{ (weightOf(drv, d) * 100).toFixed(1) }}</div>
+            ><span v-if="hasLever(drv, d)" class="vdt-cell-dot" aria-hidden="true"></span>{{ (weightOf(drv, d) * 100).toFixed(1) }}</div>
           </template>
         </div>
       </div>
@@ -113,10 +120,32 @@ const leverMap = computed(
 const hasLever = (drv: string, d: string) => leverMap.value.has(`${drv}|${d}`);
 const leverOf = (drv: string, d: string) => leverMap.value.get(`${drv}|${d}`);
 
-const maxWeight = computed(() => Math.max(0, ...view.value.weights.map((w) => w.weight)));
-function cellColor(w: number): string {
-  const a = maxWeight.value > 0 ? (w / maxWeight.value) * 0.5 : 0; // 0..0.5 alpha
-  return `rgba(88, 166, 255, ${a.toFixed(3)})`;
+const minWeight = computed(() => Math.min(...view.value.weights.map((w) => w.weight)));
+const maxWeight = computed(() => Math.max(...view.value.weights.map((w) => w.weight)));
+
+// Sequential blue ramp (light → dark) for the attribution heatmap. Replaces the old
+// low-alpha wash, which left small-share cells almost invisible on the dark surface.
+const RAMP: Array<[number, number, number]> = [
+  [230, 241, 251], [133, 183, 235], [55, 138, 221], [24, 95, 165], [4, 44, 83],
+];
+function normWeight(w: number): number {
+  const lo = minWeight.value;
+  const hi = maxWeight.value;
+  return hi > lo ? (w - lo) / (hi - lo) : 0;
+}
+function rampColor(t: number): string {
+  const c = Math.max(0, Math.min(1, t)) * (RAMP.length - 1);
+  const i = Math.floor(c);
+  const f = c - i;
+  const a = RAMP[i];
+  const b = RAMP[Math.min(i + 1, RAMP.length - 1)];
+  const mix = (k: number) => Math.round(a[k] + (b[k] - a[k]) * f);
+  return `rgb(${mix(0)}, ${mix(1)}, ${mix(2)})`;
+}
+// Cell fill by share of EV; text flips to dark ink on the lighter (low-share) cells.
+function cellStyle(w: number): Record<string, string> {
+  const t = normWeight(w);
+  return { background: rampColor(t), color: t < 0.55 ? '#042c53' : '#eaf2fc' };
 }
 
 const driversWithUplift = computed(() => view.value.drivers.filter((d) => (view.value.perDriver[d] ?? 0) !== 0));
@@ -144,13 +173,17 @@ const barPct = (v: number) => Math.max(2, (v / maxDriverUplift.value) * 100);
 .vdt-panel { border: 1px solid var(--line-2); border-radius: 12px; padding: 0.85rem; background: var(--surface); }
 .vdt-panel-h { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255, 255, 255, 0.5); margin-bottom: 0.7rem; }
 .vdt-hint { text-transform: none; letter-spacing: 0; color: var(--text-3); font-size: 0.66rem; }
+.vdt-panel-h-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+.vdt-scale { display: inline-flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; font-size: 0.62rem; color: var(--text-3); }
+.vdt-scale-bar { width: 110px; height: 9px; border-radius: 3px; background: linear-gradient(90deg, rgb(230, 241, 251), rgb(55, 138, 221), rgb(4, 44, 83)); }
 
 .vdt-matrix { display: grid; gap: 3px; }
 .vdt-corner { }
 .vdt-colh { font-size: 0.6rem; color: rgba(255, 255, 255, 0.5); text-align: center; padding: 0.2rem 0; white-space: nowrap; }
 .vdt-rowh { font-size: 0.72rem; color: rgba(255, 255, 255, 0.8); display: flex; align-items: center; padding-right: 0.4rem; }
-.vdt-cell { display: grid; place-items: center; height: 30px; border-radius: 5px; font-size: 0.66rem; color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
-.vdt-cell.lever { outline: 2px solid var(--up); outline-offset: -2px; font-weight: 700; color: #fff; }
+.vdt-cell { position: relative; display: grid; place-items: center; height: 34px; border-radius: 6px; font-size: 0.7rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.vdt-cell.lever { outline: 2px solid #eda100; outline-offset: -2px; font-weight: 700; }
+.vdt-cell-dot { position: absolute; top: 3px; right: 4px; width: 5px; height: 5px; border-radius: 50%; background: #eda100; }
 
 .vdt-bars { display: flex; flex-direction: column; gap: 0.45rem; }
 .vdt-bar-row { display: grid; grid-template-columns: 8.5rem 1fr auto; align-items: center; gap: 0.6rem; }
