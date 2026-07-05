@@ -37,6 +37,15 @@
       </template>
     </div>
 
+    <!-- Geographic view — the same chain on the OSM basemap, nodes at their real coordinates -->
+    <div class="sc-mappanel">
+      <div class="sc-map-h">
+        <span>Geographic view <span class="sc-map-hint">nodes at real coordinates · colored by operational risk · lines = routes · click a pin to select</span></span>
+      </div>
+      <div ref="mapEl" class="sc-map" role="img" aria-label="Supply-chain nodes plotted on an OpenStreetMap basemap"></div>
+      <p v-if="geoFlow.length === 0" class="sc-map-empty">No geocoded nodes in this chain.</p>
+    </div>
+
     <!-- Node detail -->
     <article v-if="selected" class="sc-detail" aria-label="Node detail">
       <div class="sc-d-head">
@@ -103,7 +112,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { useRouter, useRoute } from 'vue-router';
 import { navScopeForPath } from '../config/cockpitNav';
 import HumanNetworks from '../components/HumanNetworks.vue';
@@ -194,6 +205,117 @@ function openEcon(e: { id: string; kind: 'sector' | 'indicator'; group?: EcoGrou
 }
 function openNews(id: string) { router.push({ path: '/news', query: { item: id } }); }
 function openWeather(id: string) { router.push({ path: '/weather/forecast', query: { r: id } }); }
+
+// ── Geographic view — plot the chain's geo-coded nodes + routes on an OSM basemap.
+// The abstract flow above and this map read the SAME chain data; the map adds the
+// spatial lens the fixture's per-node `geo` was always meant for (the GAIA/OSM view).
+const mapEl = ref<HTMLElement | null>(null);
+let map: maplibregl.Map | null = null;
+const markersById: Record<string, maplibregl.Marker> = {};
+
+const geoFlow = computed<SCNode[]>(() => flow.value.filter((n) => n.geo));
+
+function nodeColor(n: SCNode): string {
+  const r = riskForNode(n.id);
+  if (r) return ratingColor(r.rating);
+  return n.status === 'disrupted' ? '#f0656a' : n.status === 'watch' ? '#d8a250' : '#4bbf73';
+}
+
+type RouteFeature = {
+  type: 'Feature';
+  properties: { kind: string };
+  geometry: { type: 'LineString'; coordinates: number[][] };
+};
+type RouteData = { type: 'FeatureCollection'; features: RouteFeature[] };
+type GeoJSONData = Parameters<maplibregl.GeoJSONSource['setData']>[0];
+
+function routeData(): RouteData {
+  const features = edgesForChain(chainId.value).flatMap((e): RouteFeature[] => {
+    const a = nodeById(e.from)?.geo;
+    const b = nodeById(e.to)?.geo;
+    if (!a || !b) return [];
+    return [{
+      type: 'Feature',
+      properties: { kind: e.kind },
+      geometry: { type: 'LineString', coordinates: [[a.lon, a.lat], [b.lon, b.lat]] },
+    }];
+  });
+  return { type: 'FeatureCollection', features };
+}
+
+function clearMarkers(): void {
+  Object.values(markersById).forEach((m) => m.remove());
+  for (const k of Object.keys(markersById)) delete markersById[k];
+}
+
+function renderChainGeo(): void {
+  if (!map) return;
+  const data = routeData() as unknown as GeoJSONData;
+  const src = map.getSource('sc-routes') as maplibregl.GeoJSONSource | undefined;
+  if (src) src.setData(data);
+  else {
+    map.addSource('sc-routes', { type: 'geojson', data });
+    map.addLayer({
+      id: 'sc-routes-line', type: 'line', source: 'sc-routes',
+      paint: { 'line-color': '#4aa3ff', 'line-width': 2, 'line-dasharray': [2, 1.5] },
+    });
+  }
+  clearMarkers();
+  const bounds = new maplibregl.LngLatBounds();
+  for (const n of geoFlow.value) {
+    const el = document.createElement('button');
+    el.className = 'sc-mk' + (n.id === selectedId.value ? ' sel' : '');
+    el.style.setProperty('--mk', nodeColor(n));
+    el.setAttribute('aria-label', n.name);
+    el.addEventListener('click', () => { selectedId.value = n.id; });
+    const m = new maplibregl.Marker({ element: el })
+      .setLngLat([n.geo!.lon, n.geo!.lat])
+      .setPopup(new maplibregl.Popup({ offset: 14 }).setText(`${n.name} · ${n.geo!.place}, ${n.geo!.country} · ${n.status}`))
+      .addTo(map);
+    markersById[n.id] = m;
+    bounds.extend([n.geo!.lon, n.geo!.lat]);
+  }
+  if (geoFlow.value.length && !bounds.isEmpty()) map.fitBounds(bounds, { padding: 56, maxZoom: 6, duration: 500 });
+}
+
+function highlightSelectedMarker(): void {
+  for (const [id, m] of Object.entries(markersById)) {
+    m.getElement().classList.toggle('sel', id === selectedId.value);
+  }
+}
+
+function initMap(): void {
+  if (!mapEl.value || map) return;
+  map = new maplibregl.Map({
+    container: mapEl.value,
+    center: [0, 20],
+    zoom: 1.2,
+    style: {
+      version: 8,
+      sources: {
+        osm: {
+          type: 'raster',
+          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          attribution: '© OpenStreetMap contributors',
+        },
+      },
+      layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+    },
+  });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+  map.on('load', renderChainGeo);
+}
+
+onMounted(async () => { await nextTick(); initMap(); });
+onUnmounted(() => { clearMarkers(); map?.remove(); map = null; });
+
+watch(chainId, () => { if (map) renderChainGeo(); });
+watch(selectedId, (id) => {
+  highlightSelectedMarker();
+  const g = nodeById(id)?.geo;
+  if (map && g) map.flyTo({ center: [g.lon, g.lat], zoom: Math.max(map.getZoom(), 4), duration: 600 });
+});
 </script>
 
 <style scoped>
@@ -250,4 +372,16 @@ function openWeather(id: string) { router.push({ path: '/weather/forecast', quer
 .sc-ref-k { flex: 0 0 4.5rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
 .sc-chip { border: 1px solid var(--line-2); background: transparent; color: var(--text-2); border-radius: 6px; padding: 0.2rem 0.5rem; font-size: 0.74rem; cursor: pointer; max-width: 34ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .sc-chip:hover { border-color: var(--accent); color: var(--accent); }
 .sc-boundary { font-size: 0.72rem; color: var(--text-3); padding-top: 0.9rem; margin-top: 0.9rem; border-top: 1px solid var(--line); line-height: 1.5; }
+
+.sc-mappanel { border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.sc-map-h { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0.8rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); border-bottom: 1px solid var(--line-2); }
+.sc-map-hint { text-transform: none; letter-spacing: 0; color: var(--text-3); font-size: 0.66rem; }
+.sc-map { height: 300px; width: 100%; }
+.sc-map-empty { margin: 0; padding: 0.8rem; font-size: 0.8rem; color: var(--text-3); }
+</style>
+
+<style>
+.sc-mk { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff; background: var(--mk, #4bbf73); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35); cursor: pointer; padding: 0; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.sc-mk:hover { transform: scale(1.25); }
+.sc-mk.sel { width: 19px; height: 19px; box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.9); }
 </style>
