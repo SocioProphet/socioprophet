@@ -147,11 +147,38 @@ export function fixtureView(): VdtView {
   };
 }
 
-export async function fetchVdtWithFallback(): Promise<VdtLoadResult> {
+export async function fetchVdtWithFallback(industry = 'software'): Promise<VdtLoadResult> {
   try {
-    const d = await getJson<VdtResponse>('/v1/vdt');
+    const d = await getJson<VdtResponse>(`/v1/vdt?industry=${encodeURIComponent(industry)}`);
     return { view: fromResponse(d), mode: 'live' };
   } catch (err) {
+    // Fixture only carries the Software tensor; a live backend is needed for other industries.
     return { view: fixtureView(), mode: 'fixture', error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+export interface VdtIndustry {
+  id: string;
+  label: string;
+  industry: string;
+}
+
+interface VdtCatalogResponse {
+  service: string;
+  industries: VdtIndustry[];
+}
+
+// The industry selector's options. Live from /v1/vdt/catalog; offline it degrades to the one
+// industry the client fixture can actually compute (Software).
+const FIXTURE_CATALOG: VdtIndustry[] = [
+  { id: 'software', label: 'Software & Platforms', industry: fxIndustry },
+];
+
+export async function fetchVdtCatalogWithFallback(): Promise<{ industries: VdtIndustry[]; mode: VdtMode }> {
+  try {
+    const d = await getJson<VdtCatalogResponse>('/v1/vdt/catalog');
+    return { industries: d.industries, mode: 'live' };
+  } catch {
+    return { industries: FIXTURE_CATALOG, mode: 'fixture' };
   }
 }

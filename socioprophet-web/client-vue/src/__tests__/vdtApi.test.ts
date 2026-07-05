@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchVdtWithFallback, fixtureView } from '../api/vdtApi';
+import { fetchVdtWithFallback, fetchVdtCatalogWithFallback, fixtureView } from '../api/vdtApi';
 import { computeVdt } from '../data/vdtFixture';
 
 const LIVE_RESPONSE = {
@@ -58,5 +58,32 @@ describe('vdtApi', () => {
     expect(res.mode).toBe('fixture');
     expect(res.error).toContain('connection refused');
     expect(res.view.weights.length).toBe(36);
+  });
+
+  it('requests the selected industry via the query param', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => LIVE_RESPONSE } as Response);
+    vi.stubGlobal('fetch', fetchMock);
+    await fetchVdtWithFallback('banks');
+    expect(fetchMock.mock.calls[0]![0]).toContain('/v1/vdt?industry=banks');
+  });
+
+  it('loads the industry catalog live, and degrades to Software-only offline', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ service: 'dashboard-bff', industries: [
+        { id: 'software', label: 'Software & Platforms', industry: 'GICS45_SoftwarePlatforms' },
+        { id: 'banks', label: 'Banks & Financials', industry: 'GICS40_BanksDiversifiedFinancials' },
+        { id: 'energy', label: 'Energy', industry: 'GICS10_Energy' },
+      ] }),
+    } as Response));
+    const live = await fetchVdtCatalogWithFallback();
+    expect(live.mode).toBe('live');
+    expect(live.industries.map((i) => i.id)).toEqual(['software', 'banks', 'energy']);
+
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
+    const off = await fetchVdtCatalogWithFallback();
+    expect(off.mode).toBe('fixture');
+    expect(off.industries).toHaveLength(1);
+    expect(off.industries[0]!.id).toBe('software');
   });
 });

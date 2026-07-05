@@ -7,7 +7,10 @@
           <h1>Value Drivers</h1>
         </div>
         <span class="vdt-pill" :class="mode" :title="mode === 'live' ? 'Served live from economic-prophet via dashboard-bff /v1/vdt' : 'dashboard-bff unavailable — rendering the local fixture (same engine math)'">{{ mode }}</span>
-        <span class="vdt-ind">{{ industry }}</span>
+        <select v-if="industries.length > 1" v-model="industryId" class="vdt-industry" aria-label="Industry">
+          <option v-for="i in industries" :key="i.id" :value="i.id">{{ i.label }}</option>
+        </select>
+        <span v-else class="vdt-ind">{{ industry }}</span>
       </div>
       <div class="vdt-metrics">
         <div class="vdt-metric"><span class="vdt-m-label">Enterprise value</span><span class="vdt-m-val">{{ money(evBaseline) }}</span></div>
@@ -75,19 +78,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { fetchVdtWithFallback, fixtureView, type VdtView } from '../api/vdtApi';
+import { computed, onMounted, ref, watch } from 'vue';
+import { fetchVdtWithFallback, fetchVdtCatalogWithFallback, fixtureView, type VdtView, type VdtIndustry } from '../api/vdtApi';
 
 // Initialise from the fixture (canonical engine math computed locally) so the surface renders
-// synchronously; on mount, try the live dashboard-bff /v1/vdt and swap in the engine's output.
+// synchronously; on mount, load the industry catalog + the live dashboard-bff /v1/vdt and swap in
+// the engine's output. Fixture mode carries only Software (the client can't compute other tensors).
 const view = ref<VdtView>(fixtureView());
 const mode = ref<'live' | 'fixture'>('fixture');
+const industries = ref<VdtIndustry[]>([{ id: 'software', label: 'Software & Platforms', industry: view.value.industry }]);
+const industryId = ref<string>('software');
 
-onMounted(async () => {
-  const res = await fetchVdtWithFallback();
+async function loadVdt(): Promise<void> {
+  const res = await fetchVdtWithFallback(industryId.value);
   view.value = res.view;
   mode.value = res.mode;
+}
+
+onMounted(async () => {
+  const cat = await fetchVdtCatalogWithFallback();
+  industries.value = cat.industries;
+  if (!industries.value.some((i) => i.id === industryId.value)) industryId.value = industries.value[0]?.id ?? 'software';
+  await loadVdt();
 });
+
+watch(industryId, loadVdt);
 
 const industry = computed(() => view.value.industry);
 const evBaseline = computed(() => view.value.evBaseline);
@@ -161,6 +176,7 @@ const barPct = (v: number) => Math.max(2, (v / maxDriverUplift.value) * 100);
 .vdt-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
 .vdt-pill.live { color: var(--up); background: rgba(63, 185, 80, 0.16); }
 .vdt-ind { font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); }
+.vdt-industry { font-size: 0.78rem; color: var(--text, rgba(255,255,255,0.9)); background: var(--surface, transparent); border: 1px solid var(--line-2, rgba(255,255,255,0.15)); border-radius: 7px; padding: 0.2rem 0.45rem; }
 .vdt-metrics { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .vdt-metric { display: flex; flex-direction: column; border: 1px solid var(--line-2); border-radius: 10px; padding: 0.4rem 0.8rem; min-width: 8rem; }
 .vdt-metric.up { border-color: rgba(63, 185, 80, 0.35); }
