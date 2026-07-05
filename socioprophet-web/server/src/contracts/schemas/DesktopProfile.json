@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/DesktopProfile.json",
+  "title": "DesktopProfile",
+  "description": "A typed desktop-environment profile for workstation realization, including extensions, input posture, and launcher defaults.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "specVersion",
+    "desktopEnvironment"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:desktop-profile:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:desktop-profile:<local-id>."
+    },
+    "type": {
+      "const": "DesktopProfile",
+      "description": "Discriminator constant — always \"DesktopProfile\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.1.0\"."
+    },
+    "desktopEnvironment": {
+      "type": "string",
+      "enum": ["gnome", "kde", "cosmic", "sway", "other"],
+      "description": "Desktop environment or shell family."
+    },
+    "extensionSet": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Pinned shell extension identifiers or package names."
+    },
+    "keybindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "binding", "command"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "binding": { "type": "string", "minLength": 1 },
+          "command": { "type": "string", "minLength": 1 }
+        }
+      },
+      "description": "Declarative desktop keybindings."
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primaryBackend": { "type": "string" },
+        "compatibilityBackends": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "gestures": { "type": "string" }
+      },
+      "description": "Keyboard remap and gesture posture."
+    },
+    "launcherProviderRef": {
+      "type": ["string", "null"],
+      "description": "Optional reference to the primary LauncherProvider."
+    },
+    "macOnLinuxPolish": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional bounded Mac-on-Linux polish metadata. This records active and future workstation polish signals without claiming full macOS parity.",
+      "properties": {
+        "implementationAuthority": {
+          "type": "string",
+          "description": "Repository or authority responsible for concrete realization."
+        },
+        "activeFeatures": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Currently active / implemented polish signals."
+        },
+        "validationBackedFeatures": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Signals backed by helper or CI validation surfaces."
+        },
+        "proposedFeatures": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Future or proposed signals that must not be counted as delivered."
+        },
+        "nonGoals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Explicit non-goals for this desktop profile."
+        }
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Bounded appearance defaults for the desktop environment.",
+      "properties": {
+        "colorScheme": {
+          "type": "string",
+          "enum": ["light", "dark", "follow-system"],
+          "description": "Preferred color scheme."
+        },
+        "accentColor": {
+          "type": ["string", "null"],
+          "description": "Accent color token or hex value."
+        },
+        "fontScaling": {
+          "type": ["number", "null"],
+          "description": "Font scaling factor (1.0 = default)."
+        }
+      }
+    },
+    "sidebarBookmarks": {
+      "type": "array",
+      "description": "Sidebar (e.g., Files/Nautilus) bookmark entries mirroring Mac Finder sidebar conventions.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "path"],
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

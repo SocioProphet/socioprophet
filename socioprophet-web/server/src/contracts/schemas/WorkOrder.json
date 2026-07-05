@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/WorkOrder.json",
+  "title": "WorkOrder",
+  "description": "FogCompute work order: container/image digest + inputs/outputs + verification policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "requestor", "workload"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:workorder:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:workorder:<local-id>"
+    },
+    "type": {
+      "const": "WorkOrder",
+      "description": "Discriminator constant — always \"WorkOrder\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "requestor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subjectId"],
+      "properties": {
+        "subjectId": {"type": "string"}
+      },
+      "description": "Requestor identity."
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image"],
+      "properties": {
+        "image": {
+          "type": "string",
+          "description": "Container image reference (recommended: digest-pinned)."
+        },
+        "command": {
+          "type": ["array", "null"],
+          "items": {"type": "string"},
+          "description": "Optional argv-style command override."
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {"type": "string"},
+          "description": "Optional environment variables."
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {"$ref": "ContentRef.json"},
+      "description": "Input content references."
+    },
+    "outputs": {
+      "type": "array",
+      "items": {"$ref": "ContentRef.json"},
+      "description": "Optional expected output refs (or output policy manifests)."
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {"enum": ["none", "tee", "replicate", "spotcheck", "reputation"]},
+        "replicas": {"type": ["integer", "null"], "minimum": 0}
+      },
+      "description": "Verification policy (TEE or replication-based)."
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requireGpu": {"type": "boolean"},
+        "neighborhood": {"type": ["string", "null"]}
+      },
+      "description": "Optional placement constraints."
+    }
+  }
+}

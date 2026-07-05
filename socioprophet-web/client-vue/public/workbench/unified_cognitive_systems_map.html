@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Cognitive Systems Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:        #0a0c10;
+    --surface:   #111318;
+    --border:    #1e2330;
+    --muted:     #2a3045;
+
+    /* Layer palette — each layer has one pure hue */
+    --c-data:    #00d4ff;   /* cyan   — raw data / environment */
+    --c-twin:    #38bdf8;   /* sky    — digital twin / sync */
+    --c-agent:   #818cf8;   /* indigo — agent cognition */
+    --c-policy:  #f472b6;   /* rose   — policy / governance */
+    --c-meta:    #34d399;   /* emerald— meta-learning / adaptation */
+    --c-output:  #fb923c;   /* amber  — outputs / actions */
+
+    --text:      #e2e8f0;
+    --text-muted:#64748b;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 32px 24px 64px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  header .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  header h1 {
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--text);
+  }
+  header h1 span {
+    background: linear-gradient(90deg, var(--c-agent), var(--c-meta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header p {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  /* ── OUTER WRAPPER: vertical stack of 3 bands ── */
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ── BAND ── */
+  .band {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    position: relative;
+  }
+
+  /* band label on left */
+  .band-label {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    border-right: 1px solid var(--border);
+  }
+
+  /* ── LAYER CARD ── */
+  .layer {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    transition: border-color .2s;
+  }
+  .layer:hover {
+    border-color: var(--c-agent);
+  }
+  .layer-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .layer-pip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .layer-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .layer-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-left: 16px;
+  }
+
+  /* ── NODE GRID inside a layer ── */
+  .node-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .node {
+    background: var(--muted);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text);
+    border-left: 2px solid transparent;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .node.src  { color: var(--c-data);   border-color: var(--c-data); }
+  .node.twin { color: var(--c-twin);   border-color: var(--c-twin); }
+  .node.agt  { color: var(--c-agent);  border-color: var(--c-agent); }
+  .node.pol  { color: var(--c-policy); border-color: var(--c-policy); }
+  .node.meta { color: var(--c-meta);   border-color: var(--c-meta); }
+  .node.out  { color: var(--c-output); border-color: var(--c-output); }
+
+  /* ── FLOW ARROW between bands ── */
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+    gap: 16px;
+  }
+  .arrow-row svg {
+    display: block;
+  }
+  .arrow-label {
+    font-size: 9px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  /* ── CONNECTOR: horizontal linking bar ── */
+  .hlink {
+    height: 2px;
+    background: linear-gradient(90deg, var(--c-data), var(--c-agent), var(--c-meta));
+    border-radius: 1px;
+    margin: 8px 0;
+    opacity: .35;
+  }
+
+  /* ── FRAMEWORK ROW ── */
+  .fw-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .fw-chip {
+    background: var(--muted);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .fw-chip.active {
+    border-color: var(--c-agent);
+    color: var(--c-agent);
+  }
+
+  /* ── EVIDENCE BAND specific ── */
+  .evidence-columns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ev-col {
+    flex: 1;
+    min-width: 140px;
+    background: var(--muted);
+    border-radius: 8px;
+    padding: 10px 12px;
+    border-top: 2px solid var(--border);
+  }
+  .ev-col-title {
+    font-size: 9px;
+    font-family: var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .ev-col .node {
+    margin-bottom: 4px;
+    display: block;
+    white-space: normal;
+  }
+
+  /* ── BOTTOM META BAR ── */
+  .meta-bar {
+    margin-top: 40px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .meta-bar .meta-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .meta-bar .meta-pill {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 10px;
+  }
+
+  /* ── VERTICAL CONNECTOR LINE ── */
+  .vconnect {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 0 2px 30px;
+  }
+  .vconnect-line {
+    width: 2px;
+    height: 24px;
+    background: var(--border);
+    border-radius: 1px;
+    position: relative;
+  }
+  .vconnect-line::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: -4px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--border);
+  }
+  .vconnect-label {
+    font-size: 9px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-left: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .band { flex-direction: column; }
+    .band-label { writing-mode: horizontal-tb; transform: none; border-right: none; border-bottom: 1px solid var(--border); padding: 4px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Synthesized Architecture · 16 Source Diagrams</div>
+  <h1>Unified <span>Cognitive Systems</span> Map</h1>
+  <p>A single reference surface unifying data modalities, digital twin synchronization, agent cognition loops, multi-agent coordination, policy governance, meta-learning adaptation, and provenance infrastructure.</p>
+</header>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--c-data)"></div>Raw Environment / Data</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--c-twin)"></div>Digital Twin / Sync</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--c-agent)"></div>Agent Cognition</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--c-policy)"></div>Policy / Governance</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--c-meta)"></div>Meta-Learning / Adaptation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--c-output)"></div>Action / Output</div>
+</div>
+
+<div class="diagram">
+
+  <!-- ══════════════════════════════════════════════
+       BAND 0 · ENVIRONMENT & DATA SOURCES
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Environment</div>
+
+    <div class="layer" style="border-color:#1a2a3a">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-data)"></div>
+        <div class="layer-title" style="color:var(--c-data)">Physical World &amp; Information Systems</div>
+      </div>
+      <div class="layer-subtitle">Sensors, IoT, process logs, event streams, ERP/MES records, biometrics, video, external APIs</div>
+      <div class="node-grid">
+        <span class="node src">IoT Sensors</span>
+        <span class="node src">Video Surveillance</span>
+        <span class="node src">HRV / Biometrics</span>
+        <span class="node src">Sprint / Kinematics</span>
+        <span class="node src">Event Logs (XES)</span>
+        <span class="node src">Repair Cost APIs</span>
+        <span class="node src">Policy Docs / Regulatory DBs</span>
+        <span class="node src">Manufacturing CAD / PMI</span>
+        <span class="node src">Environmental &amp; Medical Info</span>
+        <span class="node src">Co-Working Space Telemetry</span>
+        <span class="node src">Control Environment (spring-mass)</span>
+      </div>
+    </div>
+
+    <div class="layer" style="border-color:#1a2a3a; flex: 0 0 260px;">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-data)"></div>
+        <div class="layer-title" style="color:var(--c-data)">Data Modality Taxonomy</div>
+      </div>
+      <div class="layer-subtitle">After Image 15 (DT modality tree)</div>
+      <div class="node-grid">
+        <span class="node src">3D Geometry / CAD / Mesh</span>
+        <span class="node src">PMI / Point Cloud</span>
+        <span class="node src">Simulation Timeseries</span>
+        <span class="node src">Sensor / Test Data</span>
+        <span class="node src">xDT Behavioral Models</span>
+        <span class="node src">Explicit Formulae</span>
+        <span class="node src">Knowledge / Text / MES</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── connector ── -->
+  <div class="vconnect">
+    <div class="vconnect-line"></div>
+    <div class="vconnect-label">ingest · pre-process · z-score · one-hot · ICA</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BAND 1 · PRE-PROCESSING & DIGITAL TWIN SYNC
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Data Fabric</div>
+
+    <div class="layer" style="border-color:#152535">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-twin)"></div>
+        <div class="layer-title" style="color:var(--c-twin)">Pre-Processing Pipeline</div>
+      </div>
+      <div class="layer-subtitle">Missing-value handling · noise reduction · normalization · feature extraction</div>
+      <div class="node-grid">
+        <span class="node twin">Missing Value Imputation</span>
+        <span class="node twin">Noise Reduction</span>
+        <span class="node twin">Z-Score Standardization</span>
+        <span class="node twin">One-Hot Encoding</span>
+        <span class="node twin">ICA Feature Extraction</span>
+        <span class="node twin">Fuzzification</span>
+        <span class="node twin">PRISMA Screen / Filter / Clean</span>
+      </div>
+    </div>
+
+    <div class="layer" style="border-color:#152535">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-twin)"></div>
+        <div class="layer-title" style="color:var(--c-twin)">Digital Twin Synchronization</div>
+      </div>
+      <div class="layer-subtitle">Physical ↔ virtual state bridge. Kalman filter state estimation at Δt &lt; 50 ms.</div>
+      <div class="node-grid">
+        <span class="node twin">Physical Sensor Data</span>
+        <span class="node twin">Kalman State Estimation</span>
+        <span class="node twin">DT Sync Pipeline</span>
+        <span class="node twin">Geometry / Layout Data</span>
+        <span class="node twin">Simulation Engine</span>
+        <span class="node twin">Anthropometric Profile [a,b,t,h]</span>
+        <span class="node twin">Event Data Store (XES / Graph)</span>
+      </div>
+    </div>
+
+    <div class="layer" style="border-color:#152535; flex: 0 0 240px;">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-twin)"></div>
+        <div class="layer-title" style="color:var(--c-twin)">Knowledge &amp; Memory Stores</div>
+      </div>
+      <div class="layer-subtitle">Persistent substrate for agent retrieval</div>
+      <div class="node-grid">
+        <span class="node twin">Graph DB (GRAPH_ENTITY / EDGE)</span>
+        <span class="node twin">Vector Store (VECTOR_CHUNK)</span>
+        <span class="node twin">FAIR Object + Metadata</span>
+        <span class="node twin">BELIEF_STATE</span>
+        <span class="node twin">Knowledge Base</span>
+        <span class="node twin">Dataset / Model Versions</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── connector ── -->
+  <div class="vconnect">
+    <div class="vconnect-line"></div>
+    <div class="vconnect-label">observe · retrieve · embed · fuse</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BAND 2 · AGENT COGNITION LOOP
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Cognition</div>
+
+    <!-- OBSERVE -->
+    <div class="layer" style="border-color:#1e1a3a">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-agent)"></div>
+        <div class="layer-title" style="color:var(--c-agent)">Observe</div>
+      </div>
+      <div class="layer-subtitle">Perception + context assembly</div>
+      <div class="node-grid">
+        <span class="node agt">OBSERVATION entity</span>
+        <span class="node agt">Monitor (MAPE-K)</span>
+        <span class="node agt">Identity Vector</span>
+        <span class="node agt">Profile Encoding</span>
+        <span class="node agt">Inquiry Reception Lead</span>
+      </div>
+    </div>
+
+    <!-- REASON / PLAN -->
+    <div class="layer" style="border-color:#1e1a3a">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-agent)"></div>
+        <div class="layer-title" style="color:var(--c-agent)">Reason &amp; Plan</div>
+      </div>
+      <div class="layer-subtitle">Core cognition · DECISION_CYCLE · PLAN selection</div>
+      <div class="node-grid">
+        <span class="node agt">DECISION_CYCLE</span>
+        <span class="node agt">BELIEF_STATE update</span>
+        <span class="node agt">PLAN (selected)</span>
+        <span class="node agt">Layer-1 Analyser → Planner</span>
+        <span class="node agt">Workflow Lead (decompose)</span>
+        <span class="node agt">Dynamic Symbolic Policy tree</span>
+        <span class="node agt">Mamdani FIS (IF-THEN rules)</span>
+        <span class="node agt">ReAct / Reflexion / BDI loop</span>
+        <span class="node agt">Process Discovery (α-alg / Heuristic)</span>
+      </div>
+    </div>
+
+    <!-- ACT -->
+    <div class="layer" style="border-color:#1e1a3a; flex: 0 0 200px;">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-agent)"></div>
+        <div class="layer-title" style="color:var(--c-agent)">Act</div>
+      </div>
+      <div class="layer-subtitle">Gated execution of chosen action</div>
+      <div class="node-grid">
+        <span class="node agt">ACTION entity</span>
+        <span class="node agt">Layer-1 Executor</span>
+        <span class="node agt">Control Signal emission</span>
+        <span class="node agt">Defuzzification output</span>
+        <span class="node agt">Response Lead</span>
+        <span class="node agt">Actuators</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── connector ── -->
+  <div class="vconnect">
+    <div class="vconnect-line"></div>
+    <div class="vconnect-label">coordinate · delegate · communicate</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BAND 3 · MULTI-AGENT COORDINATION
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Multi-Agent</div>
+
+    <div class="layer" style="border-color:#2a1520">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-policy)"></div>
+        <div class="layer-title" style="color:var(--c-policy)">Agent Roles &amp; Frameworks</div>
+      </div>
+      <div class="layer-subtitle">Specialist agents + coordination substrate</div>
+      <div class="node-grid">
+        <span class="node pol">Customer Service (fine-tuned LLM)</span>
+        <span class="node pol">Claims Processor (multimodal LMM)</span>
+        <span class="node pol">Policy Analyst</span>
+        <span class="node pol">Moderator / Workflow Lead</span>
+        <span class="node pol">Inspection / Comparison</span>
+        <span class="node pol">Writing / Analysis / Processing</span>
+      </div>
+      <div class="hlink"></div>
+      <div class="layer-subtitle">Frameworks</div>
+      <div class="fw-row">
+        <span class="fw-chip active">ReAct</span>
+        <span class="fw-chip active">Reflexion</span>
+        <span class="fw-chip active">AutoGen</span>
+        <span class="fw-chip active">CAMEL</span>
+        <span class="fw-chip active">MetaGPT</span>
+        <span class="fw-chip active">LangChain</span>
+        <span class="fw-chip">BDI</span>
+        <span class="fw-chip">AIDE</span>
+        <span class="fw-chip">Generative Agent</span>
+      </div>
+    </div>
+
+    <div class="layer" style="border-color:#2a1520; flex: 0 0 280px;">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-policy)"></div>
+        <div class="layer-title" style="color:var(--c-policy)">MARL Substrate</div>
+      </div>
+      <div class="layer-subtitle">MAPPACS / MAPE-K / Hypernetwork federation</div>
+      <div class="node-grid">
+        <span class="node pol">Multi-Agent RL (MARL)</span>
+        <span class="node pol">PPO per-agent actor-critic</span>
+        <span class="node pol">MAPPACS scheduler</span>
+        <span class="node pol">Hypernetwork (server)</span>
+        <span class="node pol">Client Identity Vector</span>
+        <span class="node pol">Personalized Layer weights</span>
+        <span class="node pol">Genetic Optimization (fitness)</span>
+        <span class="node pol">Symbolic Policy → Control</span>
+        <span class="node pol">Layer-2 Analyser / Planner (arch.)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── connector ── -->
+  <div class="vconnect">
+    <div class="vconnect-line"></div>
+    <div class="vconnect-label">gate · audit · enforce</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BAND 4 · POLICY, GOVERNANCE & PROVENANCE
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Governance</div>
+
+    <div class="layer" style="border-color:#152a20">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-meta)"></div>
+        <div class="layer-title" style="color:var(--c-meta)">Policy Gate &amp; Conformance</div>
+      </div>
+      <div class="layer-subtitle">Every action is checked before execution; every artifact is traced after</div>
+      <div class="evidence-columns">
+        <div class="ev-col">
+          <div class="ev-col-title">Pre-execution</div>
+          <span class="node meta">POLICY_CHECK (gated_by)</span>
+          <span class="node meta">MAPE-K Monitor</span>
+          <span class="node meta">Conformance Replay (process mining)</span>
+          <span class="node meta">Fuzzy Rule Evaluation</span>
+        </div>
+        <div class="ev-col">
+          <div class="ev-col-title">Provenance</div>
+          <span class="node meta">PROVENANCE_RECORD</span>
+          <span class="node meta">FAIR_OBJECT + FAIR_METADATA</span>
+          <span class="node meta">AUDIT_EVENT</span>
+          <span class="node meta">EVIDENCE_BUNDLE</span>
+        </div>
+        <div class="ev-col">
+          <div class="ev-col-title">Versioning</div>
+          <span class="node meta">DATASET_VERSION</span>
+          <span class="node meta">MODEL_VERSION</span>
+          <span class="node meta">INDEXED_AS (vector chunk)</span>
+          <span class="node meta">PRISMA Screening Record</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── connector ── -->
+  <div class="vconnect">
+    <div class="vconnect-line"></div>
+    <div class="vconnect-label">update θ · fine-tune · adapt</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BAND 5 · META-LEARNING & ADAPTATION
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Meta</div>
+
+    <div class="layer" style="border-color:#152535">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-meta)"></div>
+        <div class="layer-title" style="color:var(--c-meta)">Meta-Learning Outer Loop</div>
+      </div>
+      <div class="layer-subtitle">Learns how to learn across task distributions; pushes updated θ back to agent inner loops</div>
+      <div class="node-grid">
+        <span class="node meta">Meta-params θ</span>
+        <span class="node meta">Task Distribution sampling</span>
+        <span class="node meta">Meta-update (MAML-style)</span>
+        <span class="node meta">Hypernetwork gradient aggregation</span>
+        <span class="node meta">PSO optimization loop</span>
+        <span class="node meta">Genetic program evolution</span>
+        <span class="node meta">Prompt Engineering / Fine-Tuning</span>
+        <span class="node meta">Memory Augmentation</span>
+        <span class="node meta">Layer-2 Architectural self-adaptation</span>
+      </div>
+    </div>
+
+    <div class="layer" style="border-color:#152535; flex: 0 0 260px;">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-meta)"></div>
+        <div class="layer-title" style="color:var(--c-meta)">Performance Evaluation</div>
+      </div>
+      <div class="layer-subtitle">Closes the loop: score → update signal</div>
+      <div class="node-grid">
+        <span class="node meta">MSE / RMSE / MAE / R²</span>
+        <span class="node meta">Conformance diagnostics</span>
+        <span class="node meta">Training load classification</span>
+        <span class="node meta">RL reward signal</span>
+        <span class="node meta">Fitness function (genetic)</span>
+        <span class="node meta">Process mining benchmarks</span>
+        <span class="node meta">Agent eval (task, tool, faithfulness)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── connector ── -->
+  <div class="vconnect">
+    <div class="vconnect-line"></div>
+    <div class="vconnect-label">act · display · distribute · transform</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BAND 6 · OUTPUTS & DOWNSTREAM ACTIONS
+  ══════════════════════════════════════════════ -->
+  <div class="band">
+    <div class="band-label">Output</div>
+
+    <div class="layer" style="border-color:#2a1a10">
+      <div class="layer-header">
+        <div class="layer-pip" style="background:var(--c-output)"></div>
+        <div class="layer-title" style="color:var(--c-output)">System Outputs &amp; Downstream Actions</div>
+      </div>
+      <div class="layer-subtitle">Everything the system does to the world — decisions, communications, physical actuation, facility optimization</div>
+      <div class="node-grid">
+        <span class="node out">Training Load Classification (Over / Optimal / Under)</span>
+        <span class="node out">Real-Time Load Recommendations</span>
+        <span class="node out">Optimized Workload Distribution</span>
+        <span class="node out">Facility / Logistic / AGV Design Optimization</span>
+        <span class="node out">Physical Actuator Commands</span>
+        <span class="node out">Insurance Response (drafted email)</span>
+        <span class="node out">Process Improvement Predictions</span>
+        <span class="node out">Urban Command &amp; Dispatch Actions</span>
+        <span class="node out">Scheduled Resource Allocation (co-working)</span>
+        <span class="node out">Symbolic Control Signal</span>
+        <span class="node out">Research Findings + Gap Agenda</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .diagram -->
+
+<!-- META BAR -->
+<div class="meta-bar" style="max-width:1200px; margin: 40px auto 0;">
+  <span class="meta-label">Source images ·</span>
+  <span class="meta-pill">Agent ER / FAIR provenance</span>
+  <span class="meta-pill">Fuzzy FIS / training load</span>
+  <span class="meta-pill">Process mining</span>
+  <span class="meta-pill">Production sim + optimisation</span>
+  <span class="meta-pill">Urban command center</span>
+  <span class="meta-pill">MAPE-K 2-layer</span>
+  <span class="meta-pill">Federated hypernetwork</span>
+  <span class="meta-pill">Insurance multi-agent</span>
+  <span class="meta-pill">MAPPACS co-working RL</span>
+  <span class="meta-pill">Symbolic + genetic control</span>
+  <span class="meta-pill">Digital twin swim / MARL</span>
+  <span class="meta-pill">Meta-learning + Kalman DT</span>
+  <span class="meta-pill">LLM-agent survey mind-map</span>
+  <span class="meta-pill">Agent framework taxonomy</span>
+  <span class="meta-pill">DT data modality tree</span>
+  <span class="meta-pill">PRISMA IoT/ag literature</span>
+</div>
+
+</body>
+</html>

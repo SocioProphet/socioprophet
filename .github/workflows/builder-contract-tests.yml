@@ -1,0 +1,44 @@
+# Enforce sourceos-spec conformance for the image builder. Runs the contract
+# test that validates every canonical object (BuildRequest, OSImage, NLBootPlan,
+# the fog Offer/WorkOrder/UsageReceipt/SettlementEvent, …) against the vendored
+# schemas and asserts malformed inputs are rejected — so a non-conformant change
+# fails the PR instead of shipping ad-hoc shapes.
+name: builder-contract-tests
+
+# Least-privilege: this workflow only reads the repo to run the contract test.
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - "socioprophet-web/server/src/contracts/**"
+      - "socioprophet-web/server/src/routes/api/builds-route.ts"
+      - "socioprophet-web/server/src/routes/boot-route.ts"
+      - "socioprophet-web/server/src/services/bootServer.ts"
+      - "socioprophet-web/server/test/contracts.test.mjs"
+      - ".github/workflows/builder-contract-tests.yml"
+  pull_request:
+    paths:
+      - "socioprophet-web/server/src/contracts/**"
+      - "socioprophet-web/server/src/routes/api/builds-route.ts"
+      - "socioprophet-web/server/src/routes/boot-route.ts"
+      - "socioprophet-web/server/src/services/bootServer.ts"
+      - "socioprophet-web/server/test/contracts.test.mjs"
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: socioprophet-web/server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install deps
+        run: npm ci || npm install
+      - name: Validate builder objects against vendored sourceos-spec schemas
+        run: npm run test:contracts

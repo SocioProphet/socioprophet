@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/ControlNodeProfile.json",
+  "title": "ControlNodeProfile",
+  "description": "Typed profile for an operator-side local-first control node.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "hostRole", "hostPlatform", "containerRuntime", "placementOrder", "workspace"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^urn:srcos:control-node:" },
+    "type": { "const": "ControlNodeProfile" },
+    "specVersion": { "type": "string" },
+    "hostRole": { "enum": ["operator-control-node"] },
+    "hostPlatform": { "type": "string" },
+    "containerRuntime": { "enum": ["podman"] },
+    "nodeCommanderRuntimeRef": { "type": ["string", "null"], "pattern": "^urn:srcos:node-commander:" },
+    "placementOrder": {
+      "type": "array",
+      "items": { "enum": ["local", "trusted-private", "attested-fog", "burst-cloud"] },
+      "minItems": 1
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["configDir", "stateDir", "evidenceDir"],
+      "properties": {
+        "configDir": { "type": "string" },
+        "stateDir": { "type": "string" },
+        "evidenceDir": { "type": "string" }
+      }
+    }
+  }
+}

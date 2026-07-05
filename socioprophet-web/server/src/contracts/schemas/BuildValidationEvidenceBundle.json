@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/BuildValidationEvidenceBundle.json",
+  "title": "BuildValidationEvidenceBundle",
+  "description": "Evidence bundle tying build identity, scenario outcomes, and promotion references together for image validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "buildRef", "profileRef", "artifactRefs", "scenarioResults", "issuedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^urn:srcos:build-evidence:" },
+    "type": { "const": "BuildValidationEvidenceBundle" },
+    "specVersion": { "type": "string" },
+    "buildRef": { "type": "string" },
+    "profileRef": { "type": "string", "pattern": "^urn:srcos:control-node:" },
+    "artifactRefs": { "type": "array", "items": { "type": "string" } },
+    "scenarioResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["scenarioId", "status", "artifactRef"],
+        "properties": {
+          "scenarioId": { "type": "string" },
+          "status": { "enum": ["passed", "failed", "skipped"] },
+          "artifactRef": { "type": "string" }
+        }
+      }
+    },
+    "promotionGateRef": { "type": ["string", "null"], "pattern": "^urn:srcos:image-gate:" },
+    "replayRef": { "type": ["string", "null"] },
+    "issuedAt": { "type": "string", "format": "date-time" }
+  }
+}

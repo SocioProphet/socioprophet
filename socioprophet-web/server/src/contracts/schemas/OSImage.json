@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/OSImage.json",
+  "title": "OSImage",
+  "description": "Immutable host image identity and substrate contract for a SourceOS operating-system artifact.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "specVersion",
+    "shortId",
+    "family",
+    "epoch",
+    "hostProfile",
+    "artifact",
+    "architecture",
+    "osRelease",
+    "ociAnnotations",
+    "substrateCapabilities",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:osimage:[a-z0-9][a-z0-9._-]*$",
+      "description": "Stable URN identifier. Pattern: urn:srcos:osimage:<local-id>."
+    },
+    "type": {
+      "const": "OSImage",
+      "description": "Discriminator constant — always \"OSImage\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.1.0\"."
+    },
+    "shortId": {
+      "type": "string",
+      "pattern": "^so[0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Immutable short substrate identifier. Pattern: so<epoch>-<host-profile>."
+    },
+    "family": {
+      "const": "sourceos",
+      "description": "OS family constant for SourceOS image contracts."
+    },
+    "epoch": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Compatibility epoch for the host image contract."
+    },
+    "hostProfile": {
+      "type": "string",
+      "enum": [
+        "workstation",
+        "edge-appliance",
+        "vm-base",
+        "installer",
+        "recovery",
+        "builder"
+      ],
+      "description": "Coarse substrate persona for the image. This is not a cybernetic runtime role."
+    },
+    "artifact": {
+      "type": "string",
+      "enum": [
+        "oci",
+        "qcow2",
+        "raw",
+        "iso",
+        "ami",
+        "vmdk"
+      ],
+      "description": "Rendered artifact form for the image."
+    },
+    "architecture": {
+      "type": "string",
+      "enum": [
+        "x86_64",
+        "aarch64"
+      ],
+      "description": "Target machine architecture for the rendered image."
+    },
+    "osRelease": {
+      "type": "object",
+      "description": "Rendered os-release identity fields exported by the image.",
+      "additionalProperties": false,
+      "required": [
+        "ID",
+        "VERSION_ID",
+        "IMAGE_ID",
+        "IMAGE_VERSION"
+      ],
+      "properties": {
+        "ID": {
+          "type": "string",
+          "description": "Primary os-release ID value."
+        },
+        "ID_LIKE": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Related upstream distribution identifier."
+          },
+          "description": "Optional list of upstream-compatible distribution identifiers."
+        },
+        "VERSION_ID": {
+          "type": "string",
+          "description": "Primary OS version identifier."
+        },
+        "BUILD_ID": {
+          "type": "string",
+          "description": "Optional build identifier for the original installation image."
+        },
+        "IMAGE_ID": {
+          "type": "string",
+          "description": "Image-family identifier exported through os-release."
+        },
+        "IMAGE_VERSION": {
+          "type": "string",
+          "description": "Image version exported through os-release."
+        },
+        "RELEASE_TYPE": {
+          "type": "string",
+          "description": "Optional release-type hint such as stable or preview."
+        }
+      }
+    },
+    "ociAnnotations": {
+      "type": "object",
+      "description": "OCI metadata carried with the bootable image artifact.",
+      "additionalProperties": true,
+      "required": [
+        "org.opencontainers.image.version",
+        "org.opencontainers.image.revision",
+        "org.opencontainers.image.source"
+      ],
+      "properties": {
+        "org.opencontainers.image.version": {
+          "type": "string",
+          "description": "OCI version annotation for the built image."
+        },
+        "org.opencontainers.image.revision": {
+          "type": "string",
+          "description": "OCI revision annotation referencing the source commit."
+        },
+        "org.opencontainers.image.source": {
+          "type": "string",
+          "description": "OCI source annotation referencing the canonical source repository."
+        },
+        "org.opencontainers.image.created": {
+          "type": "string",
+          "description": "Optional OCI creation timestamp."
+        },
+        "com.socioprophet.os.channel": {
+          "type": "string",
+          "description": "SocioProphet-specific update channel label for the image."
+        },
+        "com.socioprophet.os.capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Declared substrate capability string."
+          },
+          "description": "Optional SocioProphet-specific substrate capability list."
+        }
+      }
+    },
+    "substrateCapabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "description": "Declared substrate capability string."
+      },
+      "description": "Host-level capabilities that affect boot, attestation, extension compatibility, or updates."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Attestation and provenance references for the image artifact.",
+      "additionalProperties": false,
+      "required": [
+        "statementRef",
+        "slsaPredicateRef"
+      ],
+      "properties": {
+        "statementRef": {
+          "type": "string",
+          "pattern": "^urn:srcos:attestation:[a-z0-9][a-z0-9._:-]*$",
+          "description": "URN reference to the in-toto or equivalent attestation statement."
+        },
+        "slsaPredicateRef": {
+          "type": "string",
+          "pattern": "^urn:srcos:slsa:[a-z0-9][a-z0-9._:-]*$",
+          "description": "URN reference to the SLSA provenance predicate artifact."
+        },
+        "sbomRef": {
+          "type": "string",
+          "description": "Optional URN or URL reference to the SBOM for this image."
+        },
+        "signatureRef": {
+          "type": "string",
+          "description": "Optional URN or URL reference to the signature verification material."
+        }
+      }
+    }
+  }
+}

@@ -1,14 +1,16 @@
 export {};
-// Firebase ID-token verification middleware for authenticated API routes.
-// Initializes firebase-admin once (application default credentials in prod;
-// FIREBASE_PROJECT_ID for local). Attaches req.uid on success.
-const admin = require("firebase-admin");
+// Socbase (Supabase) access-token verification middleware for authenticated
+// API routes. Verifies the bearer token against the Supabase auth server
+// (getUser) — no local JWT-secret handling needed — and attaches req.uid.
+// socbaseAdmin (service-role client) is the single shared handle other
+// services/routes use for table access (see db/socbase-schema.sql).
+const { createClient } = require("@supabase/supabase-js");
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    projectId: process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT,
-  });
-}
+const socbaseAdmin = createClient(
+  process.env.SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 const requireAuth = async (req: any, res: any, next: any) => {
   const header = req.headers.authorization || "";
@@ -17,13 +19,14 @@ const requireAuth = async (req: any, res: any, next: any) => {
     return res.status(401).json({ error: "missing-token" });
   }
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.uid = decoded.uid;
-    req.userEmail = decoded.email || null;
+    const { data, error } = await socbaseAdmin.auth.getUser(token);
+    if (error || !data.user) throw error || new Error("no-user");
+    req.uid = data.user.id;
+    req.userEmail = data.user.email || null;
     next();
   } catch (err) {
     return res.status(403).json({ error: "invalid-token" });
   }
 };
 
-module.exports = { requireAuth, admin };
+module.exports = { requireAuth, socbaseAdmin };

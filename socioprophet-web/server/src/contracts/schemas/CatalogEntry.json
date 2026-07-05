@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/CatalogEntry.json",
+  "title": "CatalogEntry",
+  "description": "A searchable index record for a governed object, release, or artifact family without redefining the canonical object itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "objectRef", "objectType", "status", "updatedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:catalog-entry:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:catalog-entry:<local-id>"
+    },
+    "type": {
+      "const": "CatalogEntry",
+      "description": "Discriminator constant — always \"CatalogEntry\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "objectRef": {
+      "type": "string",
+      "description": "Reference to the canonical object represented by this catalog entry."
+    },
+    "objectType": {
+      "type": "string",
+      "description": "Type name of the canonical object, such as ReleaseManifest or EvidenceBundle."
+    },
+    "title": {
+      "type": ["string", "null"],
+      "description": "Optional title for indexing and presentation."
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": {"type": "string"},
+      "description": "Index labels, tags, or dimensions used for discovery."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "frozen", "published", "superseded", "restricted", "archived"],
+      "description": "Catalog-visible lifecycle state."
+    },
+    "evidenceBundleRef": {
+      "type": ["string", "null"],
+      "description": "Optional EvidenceBundle ref associated with the indexed object."
+    },
+    "authorityRef": {
+      "type": ["string", "null"],
+      "description": "Optional ref to the authority or namespace governing this entry."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time when this catalog entry was last updated."
+    }
+  }
+}

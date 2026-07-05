@@ -85,8 +85,8 @@
 
         <section class="panel-section">
           <div class="section-title">Spatial lookup</div>
-          <label class="input-label">H3 cell</label>
-          <input v-model="h3Cell" class="field" type="text" />
+          <label class="input-label" for="h3-cell">H3 cell</label>
+          <input id="h3-cell" v-model="h3Cell" class="field" type="text" />
           <button class="primary" type="button" :disabled="h3Loading" data-testid="h3-inspect-button" @click="refreshH3">
             {{ h3Loading ? 'Inspecting…' : 'Inspect H3' }}
           </button>

@@ -7,11 +7,17 @@ const routes = [
   { path: "/builder", component: () => import("./views/Builder.vue") },
   { path: "/builds", component: () => import("./views/Builds.vue") },
   { path: "/fleet", component: () => import("./views/Fleet.vue") },
+  { path: "/mail", component: () => import("./views/Mail.vue") },
+  { path: "/wiki", component: () => import("./views/Knowledge.vue") },
+  { path: "/notes", component: () => import("./views/Knowledge.vue") },
+  { path: "/cloud", component: () => import("./views/Cloud.vue") },
+  { path: "/code", component: () => import("./views/Code.vue") },
+  { path: "/market", component: () => import("./views/Market.vue") },
 ];
 
 export const router = createRouter({ history: createWebHistory(), routes });
 
-// Auth guard: wait for Firebase to resolve, then gate non-public routes.
+// Auth guard: wait for Socbase (Supabase) to resolve, then gate non-public routes.
 router.beforeEach(async (to) => {
   const auth = useAuth();
   if (!auth.ready) {

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/ContentSpec.json",
+  "title": "ContentSpec",
+  "description": "A canonical desired-content specification that describes a buildable or publishable unit before execution or release.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "name", "kind"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:content-spec:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:content-spec:<local-id>"
+    },
+    "type": {
+      "const": "ContentSpec",
+      "description": "Discriminator constant — always \"ContentSpec\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the content specification."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["os-flavor", "overlay-family", "document-export", "automation-bundle", "workspace-pack", "platform-bundle", "model-release", "other"],
+      "description": "Logical content category."
+    },
+    "sourceRefs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Optional source refs such as git commits, OCI digests, or upstream artifact IDs."
+    },
+    "ownerRef": {
+      "type": ["string", "null"],
+      "description": "Optional owner or authority reference."
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": {"type": "string"},
+      "description": "Human or machine labels for indexing and policy."
+    },
+    "policyTags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Policy and governance tags relevant to this content."
+    },
+    "targetSurfaces": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Named surfaces where this content may be built, installed, published, or consumed."
+    }
+  }
+}

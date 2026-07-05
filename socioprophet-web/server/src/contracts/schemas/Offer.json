@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/v2/Offer.json",
+  "title": "Offer",
+  "description": "FogCompute resource offer published by a provider node/workstation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "specVersion", "provider", "resources"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:srcos:offer:",
+      "description": "Stable URN identifier. Pattern: urn:srcos:offer:<local-id>"
+    },
+    "type": {
+      "const": "Offer",
+      "description": "Discriminator constant — always \"Offer\"."
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "Spec version of this document, e.g. \"2.0.0\"."
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subjectId"],
+      "properties": {
+        "subjectId": {"type": "string", "description": "Provider subject URN."},
+        "nodeId": {"type": ["string", "null"], "description": "Optional provider node identifier."}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpuCores": {"type": "number", "minimum": 0},
+        "memoryBytes": {"type": "integer", "minimum": 0},
+        "gpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "count": {"type": "integer", "minimum": 0},
+            "model": {"type": ["string", "null"]}
+          }
+        },
+        "storageBytes": {"type": "integer", "minimum": 0},
+        "networkMbps": {"type": "number", "minimum": 0}
+      },
+      "description": "Advertised resource caps."
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timeWindow": {"type": ["string", "null"], "description": "Optional ISO-8601 interval window."},
+        "maxJobSeconds": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "pricing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unit": {"type": ["string", "null"], "description": "e.g. credits, token, usd."},
+        "cpuSecond": {"type": ["number", "null"], "minimum": 0},
+        "gpuSecond": {"type": ["number", "null"], "minimum": 0},
+        "gbHour": {"type": ["number", "null"], "minimum": 0}
+      },
+      "description": "Optional pricing schedule."
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional provider constraints (allow/deny workload classes, privacy mode, power caps)."
+    }
+  }
+}

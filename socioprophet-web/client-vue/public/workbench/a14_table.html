@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory — Devices</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.tbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.tstat{font-size:12.5px;color:var(--ink-dim)}
+.tstat b{color:var(--ink);font-family:'Roboto Mono',monospace}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+thead th{text-align:left;padding:11px 14px;background:var(--page);color:var(--ink-dim);font-weight:600;font-size:11.5px;border-bottom:1px solid var(--line)}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--line)}
+tbody tr:hover{background:#fafbfc;cursor:pointer}
+.adp{display:inline-flex;gap:3px;align-items:center}
+.adp .a{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;color:#fff}
+.adp .more{font-size:10px;color:var(--ink-dim);margin-left:2px}
+.mono{font-family:'Roboto Mono',monospace}
+.ip{background:var(--page);padding:1px 6px;border-radius:5px;font-size:11px}
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--ink-dim)}
+.pager .pp{display:flex;gap:6px;align-items:center}
+.pager .pp b{color:var(--blue)}
+.cbx{width:15px;height:15px;border:1.5px solid var(--line-2);border-radius:4px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group">
+      <div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item active" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a>
+    </div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb"><a href="dashboard.html">⌂</a> <span>›</span> Inventory <span>›</span> <b>Devices</b></div>
+      <div class="sp"></div>
+      <button class="btn">Device Inventory Classification ›</button>
+      <button class="btn">Asset Investigation ›</button>
+    </div>
+    <div class="wrap" style="max-width:none">
+      <div class="page-h"><h1>Devices</h1><p>Bare metal and virtual devices — workstations, mobile, servers, VMs. Aggregated across 59 adapter connections.</p></div>
+      <div class="toolbar">
+        <div class="searchbox">⌕ <input placeholder="Search assets or saved queries…"></div>
+        <div class="select">Wizard ▾</div>
+        <button class="btn primary">Query Wizard</button>
+      </div>
+      <div class="tbar">
+        <span class="tstat">Total <b>12,286</b> · Last updated <b>2026-01-27 13:39:48</b> ↻</span>
+        <div class="sp" style="flex:1"></div>
+        <button class="btn">⚏ Refine Data</button>
+        <button class="btn">▦ Edit Table</button>
+        <button class="btn">⬇ Export CSV</button>
+        <button class="btn">＋ Create New Asset</button>
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:30px"><span class="cbx"></span></th>
+          <th>Adapter Connections</th><th>Asset Name</th><th>Host Name</th>
+          <th>Last Seen</th><th>Interfaces: MAC</th><th>Interfaces: IPs</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pager">
+        <span>Results per page: <b>20</b> · 50 · 100</span>
+        <div class="pp">‹‹ ‹ <b>1</b> 2 3 4 5 6 7 › ››</div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const AD={AD:'#2e86ff',CS:'#e5484d',ePO:'#5b2be2',IN:'#e0359e',ACT:'#0a7d3f',ML:'#39b54a',DS:'#e5484d',AWS:'#ff9900',AZ:'#0089d6',G:'#ea4335',W:'#00a4ef'};
+const ROWS=[
+ [['AD','CS','ePO','ACT'],7,'infranginx-5567897-stg','esx-infranginx-5567897-stg.demo.local','2026-01-26 13:43:31','00:0C:29:12:55:38','10.0.63.107'],
+ [['IN','ML','ePO','DS'],7,'external3026786-prd','sepio-external3026786-prd.demo.local','2026-01-26 19:52:58','88:53:2E:12:56:12','10.0.64.36'],
+ [['W','CS','ePO','G'],7,'PC-CURTIS-WILLIAMS','PC-CURTIS-WILLIAMS.DEMO.LOCAL','2026-01-25 23:34:20','88:53:2E:12:45:C4','10.0.49.148'],
+ [['ML','CS','ePO','ACT'],7,'lablb-2918146-beta','esx-lablb-2918146-beta.manufacturing.com','2026-01-26 22:28:44','00:0C:29:12:4C:BF','10.0.56.90'],
+ [['W','AD','CS','ML'],6,'WIN-RUTHD','WIN-RUTHD.DEMO.LOCAL','2026-01-27 00:16:51','88:53:2E:12:44:9B','10.0.48.107'],
+ [['IN','DS','ML','CS'],6,'lab3196359-stg','esx-lab3196359-stg.acme.com','2026-01-26 22:34:16','00:0C:29:12:52:D6','10.0.61.130'],
+ [['IN','ACT','ML','DS'],6,'dbapache-9931083-beta','esx-dbapache-9931083-beta.demo.local','2026-01-25 11:06:26','00:0C:29:12:52:1F','10.0.60.234'],
+ [['ML','CS','ePO','ACT'],6,'db5660037-prod','esx-db5660037-prod.demo.local','2026-01-26 13:35:19','00:0C:29:12:4E:E3','10.0.58.44'],
+ [['IN','ML','CS','ePO'],6,'db6214194-dev','esx-db6214194-dev.demo.local','2026-01-24 21:08:45','00:0C:29:12:4C:05','10.0.55.195'],
+ [['W','CS','IN','DS'],6,'WINDOWS-SERVER-BETSY-MARTIN','WINDOWS-SERVER-BETSY-MARTIN.DEMO.LOCAL','2026-01-26 10:29:19','00:0C:29:12:48:1C','10.0.51.236'],
+ [['AZ','ML','DS','IN'],6,'infra9274676-prd','azure-infra9274676-prd.demo.local','2026-01-25 10:03:31','00:15:5D:12:50:62','10.0.59.111'],
+ [['ePO','ML','ACT','DS'],6,'weblb-1801810-prd','sepio-weblb-1801810-prd.demo.local','2026-01-26 16:37:39','88:53:2E:12:54:2A','10.0.62.147'],
+];
+document.getElementById('rows').innerHTML=ROWS.map(([ad,extra,nm,hn,ls,mac,ip])=>{
+  const chips=ad.map(a=>`<span class="a" style="background:${AD[a]||'#889'}">${a}</span>`).join('');
+  return `<tr onclick="location.href='a15_profile.html'">
+    <td><span class="cbx"></span></td>
+    <td><span class="adp">${chips}<span class="more">+${extra}</span></span></td>
+    <td style="font-weight:500">${nm}</td>
+    <td class="mono" style="font-size:11.5px">${hn}</td>
+    <td class="mono" style="font-size:11.5px;color:var(--ink-dim)">${ls}</td>
+    <td class="mono" style="font-size:11px">${mac}</td>
+    <td><span class="ip mono">${ip}</span></td>
+  </tr>`;
+}).join('');
+</script>
+</body>
+</html>

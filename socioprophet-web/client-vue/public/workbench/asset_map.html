@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asset Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@5.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+.maprow{display:grid;grid-template-columns:1fr 330px;gap:16px;height:calc(100vh - 54px - 44px)}
+.mapcard{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+#map{position:absolute;inset:0}
+.mtl{position:absolute;top:12px;left:12px;z-index:3;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:9px;padding:8px 12px;backdrop-filter:blur(8px)}
+.mtl .t{font-size:12px;font-weight:600}.mtl .s{font-size:10.5px;color:var(--ink-dim)}
+.filterpills{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:8px}
+.fpill{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line-2);border-radius:8px;background:rgba(255,255,255,.92);font-size:12px;backdrop-filter:blur(8px)}
+.fpill .n{background:var(--blue-bg);color:var(--blue);border-radius:5px;padding:0 6px;font-family:'Roboto Mono',monospace;font-size:11px}
+.ins{border:1px solid var(--line);border-radius:10px;background:var(--card);overflow-y:auto;padding:15px}
+.ins .ih{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.ins .ih .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--facility-bg);color:var(--facility)}
+.ins .ih h2{margin:0;font-size:15px}
+.ins .isub{font-size:10.5px;color:var(--ink-faint);font-family:'Roboto Mono',monospace;margin-bottom:14px}
+.statg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--page)}
+.stat .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint)}
+.stat .v{font-size:18px;font-weight:700;font-family:'Roboto Mono',monospace}
+.irow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.irow .k{color:var(--ink-dim)}.irow .v{font-family:'Roboto Mono',monospace}
+.verdict{margin-top:14px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--page)}
+.verdict .vh{padding:8px 12px;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line);background:var(--card)}
+.verdict .vr{display:flex;justify-content:space-between;padding:8px 12px;font-size:11.5px;border-bottom:1px solid var(--line)}
+.verdict .vr:last-child{border-bottom:0}.verdict .vr .k{color:var(--ink-dim);font-family:'Roboto Mono',monospace;font-size:10.5px}
+.v-pos{color:var(--green)}.v-neg{color:var(--red)}.v-zero{color:var(--ink-faint)}
+.blocknote{margin:10px 12px;padding:9px 11px;border-radius:8px;background:var(--red-bg);border:1px solid #ffccd4;color:#c31b38;font-size:10.5px;line-height:1.5}
+.tier{display:inline-flex;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700}
+.tier.t1{background:var(--green-bg);color:var(--green)}.tier.t2{background:var(--blue-bg);color:var(--blue)}.tier.inferred{background:var(--red-bg);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav">
+    <div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group">
+      <div class="glabel">Workbench</div>
+      <a class="item" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item" href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item" href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item" href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item active" href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item" href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item" href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a>
+    </div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb"><a href="dashboard.html">⌂</a> › Observability › <b>Asset Map</b></div>
+      <div class="sp"></div>
+      <span class="chip grey">Region ▾</span>
+      <button class="btn">⬇ Export</button>
+    </div>
+    <div class="wrap" style="max-width:none">
+      <div class="maprow">
+        <div class="mapcard">
+          <div class="mtl"><div class="t">Global asset estate</div><div class="s">facility pins · size = device count · click to inspect</div></div>
+          <div class="filterpills"><span class="fpill">Cluster <span class="n">1</span></span><span class="fpill">Region <span class="n">6</span></span></div>
+          <div id="map"></div>
+        </div>
+        <div class="ins" id="ins"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/maplibre-gl@5.7.1/dist/maplibre-gl.js"></script>
+<script>
+const C={device:'#7c5cff',user:'#3b82f6',vuln:'#12b3a6',software:'#ff7a3c',facility:'#f5a623',signal:'#e5484d'};
+const BG={facility:'#fdf3e3'};
+const fmt=n=>n>=1000?(n/1000).toFixed(1)+'K':''+n;
+const FIX=[
+ {id:'fra-dc-1',name:'Frankfurt DC-1',lon:8.68,lat:50.11,device:6204,user:812,vuln:3110,software:145,asn:'AS3320',tier:'t1'},
+ {id:'iad-dc-2',name:'Ashburn DC-2',lon:-77.49,lat:39.04,device:9880,user:1284,vuln:4021,software:168,asn:'AS7922',tier:'t1'},
+ {id:'sjc-edge',name:'San Jose Edge',lon:-121.89,lat:37.34,device:3120,user:405,vuln:980,software:132,asn:'AS15169',tier:'t1'},
+ {id:'lon-dc',name:'London DC',lon:-0.12,lat:51.5,device:4410,user:573,vuln:2140,software:151,asn:'AS2856',tier:'t1'},
+ {id:'sin-edge',name:'Singapore Edge',lon:103.8,lat:1.35,device:2870,user:373,vuln:1190,software:121,asn:'AS9299',tier:'t2'},
+ {id:'syd-dc',name:'Sydney DC',lon:151.2,lat:-33.87,device:1980,user:257,vuln:640,software:98,asn:'AS1221',tier:'t1'},
+ {id:'gru-edge',name:'São Paulo Edge',lon:-46.63,lat:-23.55,device:1240,user:161,vuln:520,software:87,asn:'AS28573',tier:'t2'},
+ {id:'jnb-node',name:'Johannesburg Node',lon:28.05,lat:-26.2,device:610,user:79,vuln:240,software:54,asn:'AS3741',tier:'inferred'},
+ {id:'nrt-dc',name:'Tokyo DC',lon:139.69,lat:35.68,device:2210,user:287,vuln:870,software:110,asn:'AS2914',tier:'t1'},
+];
+const map=new maplibregl.Map({container:'map',center:[10,28],zoom:1.55,attributionControl:{compact:true},
+  style:'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+function pin(f){
+  const col=f.tier==='inferred'?C.signal:C.facility,bg=f.tier==='inferred'?'#fdeced':BG.facility;
+  const R=Math.max(20,Math.min(30,15+Math.sqrt(f.device)/9)),chip=fmt(f.device),cw=chip.length*7+14,S=R*2+26,cy=R+6;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${cy+R+8}" viewBox="0 0 ${S} ${cy+R+8}"><circle cx="${S/2}" cy="${cy}" r="${R+3}" fill="${col}" opacity="0.13"/><circle cx="${S/2}" cy="${cy}" r="${R}" fill="${bg}" stroke="${col}" stroke-width="2.5"/><text x="${S/2}" y="${cy+6}" text-anchor="middle" font-size="${R*0.85}" fill="${col}" font-weight="700">${f.tier==='inferred'?'⚠':'▦'}</text><g transform="translate(${S/2+R-6},${cy-R-2})"><rect width="${cw}" height="18" rx="9" fill="#2a3446"/><text x="${cw/2}" y="13" text-anchor="middle" font-size="10.5" fill="#fff" font-family="Roboto Mono" font-weight="600">${chip}</text></g></svg>`);
+}
+FIX.forEach(f=>{const el=document.createElement('div');el.style.cssText='cursor:pointer';const img=document.createElement('img');img.src=pin(f);img.style.display='block';el.appendChild(img);el.onclick=()=>ins(f);new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([f.lon,f.lat]).addTo(map);});
+function verdict(f){const i=f.tier==='inferred';return{c:i?'ZERO':'POS',u:i?'NEG':'ZERO',r:i?'indeterminate':'admissible'}}
+function vc(v){return v==='POS'||v==='admissible'?'v-pos':v==='NEG'?'v-neg':'v-zero'}
+function ins(f){
+  const vd=verdict(f),ex=(f.vuln/f.device*0.4).toFixed(2),hot=ex>0.2,col=f.tier==='inferred'?C.signal:C.facility;
+  document.getElementById('ins').innerHTML=`
+   <div class="ih"><span class="ic" style="background:${f.tier==='inferred'?'#fdeced':'#fdf3e3'};color:${col}">▦</span><h2>${f.name}</h2></div>
+   <div class="isub">facility://${f.id} · ${f.asn}</div>
+   <div class="statg">
+     <div class="stat"><div class="k">Devices</div><div class="v">${fmt(f.device)}</div></div>
+     <div class="stat"><div class="k">Vulns</div><div class="v" style="color:${hot?C.signal:'inherit'}">${fmt(f.vuln)}</div></div>
+     <div class="stat"><div class="k">Users</div><div class="v">${fmt(f.user)}</div></div>
+     <div class="stat"><div class="k">Software</div><div class="v">${fmt(f.software)}</div></div>
+   </div>
+   <div style="margin-bottom:12px"><span class="tier ${f.tier}">${f.tier==='inferred'?'INFERRED':f.tier.toUpperCase()}</span> <span class="tier" style="background:var(--blue-bg);color:${hot?C.signal:C.user}">exposure ∇ ${ex}</span></div>
+   <div class="irow"><span class="k">Provider path</span><span class="v">${f.asn}</span></div>
+   <div class="irow"><span class="k">Coordinates</span><span class="v">${f.lon.toFixed(2)}, ${f.lat.toFixed(2)}</span></div>
+   <div class="verdict"><div class="vh">Mellumwork verdict</div>
+     <div class="vr"><span class="k">provenance continuity</span><span class="${vc(vd.c)}">${vd.c}</span></div>
+     <div class="vr"><span class="k">unregistered path</span><span class="${vc(vd.u)}">${vd.u}</span></div>
+     <div class="vr"><span class="k">resolver</span><span class="${vc(vd.r)}">${vd.r}</span></div>
+     ${f.tier==='inferred'?'<div class="blocknote">⊘ Enforcement handoff blocked — INFERRED tier requires T2 promotion (Rule P-3).</div>':''}
+   </div>`;
+}
+map.on('load',()=>{ins(FIX[0]);window.__ready=true;});
+</script>
+</body>
+</html>

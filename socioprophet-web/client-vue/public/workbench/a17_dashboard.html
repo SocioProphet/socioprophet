@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Axonius Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css"><style>.dashwrap{display:grid;grid-template-columns:230px 1fr;gap:16px}
+.favside{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;height:fit-content}
+.favside .cbtn{width:100%;padding:9px;border:1px solid var(--blue);border-radius:8px;background:var(--blue);color:#fff;font-weight:600;font-size:12.5px;margin-bottom:8px}
+.favside .cbtn.g{background:var(--card);color:var(--ink);border-color:var(--line-2)}
+.favside .fsearch{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line-2);border-radius:8px;color:var(--ink-faint);font-size:12px;margin:8px 0}
+.favside .grp{font-size:12px;font-weight:600;padding:8px 6px 4px;display:flex;align-items:center;gap:7px}
+.favside .row{padding:7px 10px;border-radius:7px;font-size:12.5px;color:var(--ink-dim);display:flex;align-items:center;gap:8px}
+.favside .row.on{background:var(--blue-bg);color:var(--blue);font-weight:500}
+.dgrid{display:grid;grid-template-columns:1.1fr 1.4fr;gap:16px}
+.lifecycle{display:flex;flex-direction:column;align-items:center;gap:10px}
+.donut{width:180px;height:180px;position:relative}.donut .ctr{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--ink-dim)}
+.lcmeta{width:100%;font-size:12px;color:var(--ink-dim)}.lcmeta .r{display:flex;justify-content:space-between;padding:4px 0}
+.lcmeta .r .v{font-family:"Roboto Mono",monospace;color:var(--ink)}
+.dlog table{width:100%;border-collapse:collapse;font-size:12px}
+.dlog th{text-align:left;padding:8px 6px;color:var(--ink-dim);font-weight:600;font-size:11px;border-bottom:1px solid var(--line)}
+.dlog td{padding:9px 6px;border-bottom:1px solid var(--line)}
+.dlog .barcode{display:flex;gap:1px;height:14px}.dlog .barcode i{width:2px;border-radius:1px}
+.adpstat{background:var(--card);border:1px solid var(--line);border-radius:10px}
+.adpstat .r{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:12.5px}
+.adpstat .r .lg{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:9px;color:#fff;font-weight:700}
+.adpstat .r .n{margin-left:auto;font-family:"Roboto Mono",monospace;background:var(--page);padding:1px 8px;border-radius:6px;font-size:11px}
+.discbars .brow{display:grid;grid-template-columns:180px 1fr;align-items:center;gap:10px;padding:5px 0;font-size:12px}
+.discbars .brow .bn{display:flex;align-items:center;gap:7px;color:var(--ink-dim)}
+.discbars .brow .bn .lg{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:7px;color:#fff;font-weight:700}
+.discbars .brow .track{background:#eef1f5;border-radius:5px;height:20px;position:relative;display:flex;align-items:center}
+.discbars .brow .track i{background:#dfe4ee;border-radius:5px;height:100%;position:absolute}
+.discbars .brow .track span{position:relative;padding-left:8px;font-family:"Roboto Mono",monospace;font-size:11px}
+.discfoot{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+.discfoot b{font-family:"Roboto Mono",monospace;color:var(--ink)}</style></head><body><div class="app">  <aside class="nav"><div class="brand"><span class="mk"></span>SocioProphet</div>
+    <div class="search">⌕ <input placeholder="Search  ⌘K"></div>
+    <div class="group"><div class="glabel">Workbench</div>
+      <a class="item active" href="dashboard.html"><span class="ic">▤</span>Dashboard</a>
+      <a class="item " href="a1_start.html"><span class="ic">⬡</span>Asset Graph</a>
+      <a class="item " href="a14_table.html"><span class="ic">▦</span>Inventory</a>
+      <a class="item " href="activities.html"><span class="ic">≣</span>Activities</a>
+            <div class="glabel">Operate</div>
+      <a class="item" href="operator_console.html"><span class="ic">◎</span>Operator Console</a>
+      <a class="item" href="ec1_workflows.html"><span class="ic">⚡</span>Enforcement</a>
+      <a class="item" href="ec5_runs.html"><span class="ic">↻</span>Run History</a>
+      <div class="glabel">Observability</div>
+      <a class="item " href="mesh_graph.html"><span class="ic">◉</span>Mesh Graph</a>
+      <a class="item " href="asset_map.html"><span class="ic">◍</span>Asset Map</a>
+      <div class="glabel">Configure</div>
+      <a class="item " href="a20_adapters.html"><span class="ic">⧉</span>Adapters</a>
+      <a class="item " href="a22_queries.html"><span class="ic">❏</span>Saved Queries</a></div>
+    <div class="foot"><div class="av"></div><div class="who">Michael Heller<br><small>mdheller</small></div></div></aside>
+<main class="main"><div class="topbar"><div class="crumb"><a href="dashboard.html">⌂</a> › Dashboards › <b>Axonius Dashboard</b></div><div class="sp"></div>
+<button class="btn">⬒ Add Chart</button><button class="btn">★</button></div>
+<div class="wrap" style="max-width:none">
+<div class="dashwrap">
+<div class="favside">
+<button class="cbtn">＋ Create Dashboard</button><button class="cbtn g">▤ Manage Dashboards</button>
+<div class="fsearch">⌕ Search</div>
+<div class="grp">★ Favorites</div>
+<div class="row on">▤ Axonius Dashboard</div><div class="row">▤ My Dashboard</div><div class="row">▤ FavTest-2-Admin</div>
+<div class="grp">▸ Public</div><div class="grp">▸ Shared</div><div class="grp">▸ Private</div>
+</div>
+<div>
+<div class="dgrid" style="margin-bottom:16px">
+<div class="card"><div class="ch"><h3>System Lifecycle</h3><span>⋮</span></div><div class="cb"><div class="lifecycle">
+<div class="donut" id="donut"><div class="ctr">✓ Completed</div></div>
+<div class="lcmeta"><div class="r"><span>Cycle</span><span class="v">2025-07-07 03:00 – 03:23:42</span></div><div class="r"><span>Duration</span><span class="v">00:23:42</span></div><div class="r"><span>Next Cycle</span><span class="v">2025-07-07 15:00</span></div></div>
+</div></div></div>
+<div class="card"><div class="ch"><h3>Discovery Log</h3><span>⋮</span></div><div class="cb dlog"><table><thead><tr><th>Latest Discoveries</th><th>Started</th><th>Completed</th><th>Duration</th></tr></thead><tbody><tr><td><div class="barcode"><i style="background:#3b82f6;height:14px"></i><i style="background:#3b82f6;height:11px"></i><i style="background:#e5484d;height:13px"></i><i style="background:#22a565;height:7px"></i><i style="background:#e5484d;height:6px"></i><i style="background:#f5a623;height:10px"></i><i style="background:#e5484d;height:9px"></i><i style="background:#3b82f6;height:13px"></i><i style="background:#e5484d;height:14px"></i><i style="background:#f5a623;height:12px"></i><i style="background:#22a565;height:8px"></i><i style="background:#3b82f6;height:8px"></i><i style="background:#e5484d;height:12px"></i><i style="background:#22a565;height:6px"></i><i style="background:#dfe4ee;width:40px"></i></div></td><td class="mono" style="font-size:11px">Jul 7, 03:00</td><td class="mono" style="font-size:11px">Jul 7, 03:23</td><td class="mono" style="font-size:11px">23min 42sec</td></tr><tr><td><div class="barcode"><i style="background:#3b82f6;height:14px"></i><i style="background:#3b82f6;height:11px"></i><i style="background:#e5484d;height:13px"></i><i style="background:#22a565;height:7px"></i><i style="background:#e5484d;height:6px"></i><i style="background:#f5a623;height:10px"></i><i style="background:#e5484d;height:9px"></i><i style="background:#3b82f6;height:13px"></i><i style="background:#e5484d;height:14px"></i><i style="background:#f5a623;height:12px"></i><i style="background:#22a565;height:8px"></i><i style="background:#3b82f6;height:8px"></i><i style="background:#e5484d;height:12px"></i><i style="background:#22a565;height:6px"></i><i style="background:#dfe4ee;width:40px"></i></div></td><td class="mono" style="font-size:11px">Jul 6, 15:00</td><td class="mono" style="font-size:11px">Jul 6, 15:24</td><td class="mono" style="font-size:11px">24min 33sec</td></tr><tr><td><div class="barcode"><i style="background:#3b82f6;height:14px"></i><i style="background:#3b82f6;height:11px"></i><i style="background:#e5484d;height:13px"></i><i style="background:#22a565;height:7px"></i><i style="background:#e5484d;height:6px"></i><i style="background:#f5a623;height:10px"></i><i style="background:#e5484d;height:9px"></i><i style="background:#3b82f6;height:13px"></i><i style="background:#e5484d;height:14px"></i><i style="background:#f5a623;height:12px"></i><i style="background:#22a565;height:8px"></i><i style="background:#3b82f6;height:8px"></i><i style="background:#e5484d;height:12px"></i><i style="background:#22a565;height:6px"></i><i style="background:#dfe4ee;width:40px"></i></div></td><td class="mono" style="font-size:11px">Jul 3, 15:00</td><td class="mono" style="font-size:11px">Jul 6, 07:51</td><td class="mono" style="font-size:11px">64hr 51min</td></tr><tr><td><div class="barcode"><i style="background:#3b82f6;height:14px"></i><i style="background:#3b82f6;height:11px"></i><i style="background:#e5484d;height:13px"></i><i style="background:#22a565;height:7px"></i><i style="background:#e5484d;height:6px"></i><i style="background:#f5a623;height:10px"></i><i style="background:#e5484d;height:9px"></i><i style="background:#3b82f6;height:13px"></i><i style="background:#e5484d;height:14px"></i><i style="background:#f5a623;height:12px"></i><i style="background:#22a565;height:8px"></i><i style="background:#3b82f6;height:8px"></i><i style="background:#e5484d;height:12px"></i><i style="background:#22a565;height:6px"></i><i style="background:#dfe4ee;width:40px"></i></div></td><td class="mono" style="font-size:11px">Jul 3, 03:00</td><td class="mono" style="font-size:11px">Jul 3, 03:30</td><td class="mono" style="font-size:11px">30min 7sec</td></tr><tr><td><div class="barcode"><i style="background:#3b82f6;height:14px"></i><i style="background:#3b82f6;height:11px"></i><i style="background:#e5484d;height:13px"></i><i style="background:#22a565;height:7px"></i><i style="background:#e5484d;height:6px"></i><i style="background:#f5a623;height:10px"></i><i style="background:#e5484d;height:9px"></i><i style="background:#3b82f6;height:13px"></i><i style="background:#e5484d;height:14px"></i><i style="background:#f5a623;height:12px"></i><i style="background:#22a565;height:8px"></i><i style="background:#3b82f6;height:8px"></i><i style="background:#e5484d;height:12px"></i><i style="background:#22a565;height:6px"></i><i style="background:#dfe4ee;width:40px"></i></div></td><td class="mono" style="font-size:11px">Jul 2, 15:00</td><td class="mono" style="font-size:11px">Jul 2, 15:25</td><td class="mono" style="font-size:11px">25min 47sec</td></tr></tbody></table></div></div>
+</div>
+<div class="dgrid" style="grid-template-columns:1.4fr 1fr">
+<div class="card"><div class="ch"><h3>Device Discovery</h3><span>⋮</span></div><div class="cb discbars"><div class="brow"><span class="bn"><span class="lg" style="background:#22a565">SN</span>ServiceNow</span><div class="track"><i style="width:100%"></i><span>1,975 (2,094)</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#e5484d">eP</span>McAfee ePO</span><div class="track"><i style="width:87%"></i><span>1,724</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#f5a623">PA</span>Palo Alto Panorama</span><div class="track"><i style="width:54%"></i><span>1,069</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#ea4335">G</span>Google Workspace</span><div class="track"><i style="width:51%"></i><span>1,001</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#111">Ta</span>Tanium Client</span><div class="track"><i style="width:50%"></i><span>988</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#39b54a">M</span>Cisco Meraki</span><div class="track"><i style="width:48%"></i><span>954</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#e0359e">Cl</span>Claroty CTD</span><div class="track"><i style="width:44%"></i><span>862</span></div></div><div class="brow"><span class="bn"><span class="lg" style="background:#2e86ff">FC</span>ForeScout</span><div class="track"><i style="width:38%"></i><span>758</span></div></div>
+<div class="discfoot"><span>⊗ Total Devices Seen <b>19,643</b></span><span>⊤ Total Unique <b>4,787</b></span></div></div></div>
+<div class="card"><div class="ch"><h3>Adapter Connections Status</h3><span class="chip grey">Total 59 · 72</span></div><div class="adpstat"><div class="r"><span class="lg" style="background:#e8590c">1E</span>1E Tachyon<span class="n">1</span></div><div class="r"><span class="lg" style="background:#fcb400">At</span>Airtable<span class="n">2</span></div><div class="r"><span class="lg" style="background:#ff9900">aws</span>Amazon Web Services<span class="n">4</span></div><div class="r"><span class="lg" style="background:#2b2b52">Ax</span>Axonius Users<span class="n">1</span></div><div class="r"><span class="lg" style="background:#22c55e">B</span>Bionic<span class="n">1</span></div><div class="r"><span class="lg" style="background:#e5484d">BH</span>BloodHound<span class="n">1</span></div><div class="r"><span class="lg" style="background:#7c5cff">csv</span>CSV<span class="n">2</span></div></div></div>
+</div>
+</div>
+</div>
+<div class="foot-note"><span class="live"><i></i>mesh live</span><span>Axonius-native dashboard (favorites tree + lifecycle + discovery)</span><span style="margin-left:auto" class="mono">a17 · axonius-dashboard</span></div>
+</div></main></div>
+<script>
+(function(){const el=document.getElementById('donut');const segs=[['#7c5cff',42],['#a5b4fc',18],['#93c5fd',14],['#ff9a76',12],['#5eead4',8],['#c7d2fe',6]];
+const t=segs.reduce((s,x)=>s+x[1],0);let a0=-90;const R=78,cx=90,cy=90,sw=20,ns='http://www.w3.org/2000/svg';
+const svg=document.createElementNS(ns,'svg');svg.setAttribute('width','180');svg.setAttribute('height','180');
+segs.forEach(([col,v])=>{const f=v/t,len=f*2*Math.PI*R,circ=2*Math.PI*R;const c=document.createElementNS(ns,'circle');
+c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',R);c.setAttribute('fill','none');c.setAttribute('stroke',col);c.setAttribute('stroke-width',sw);
+c.setAttribute('stroke-dasharray',len+' '+(circ-len));c.setAttribute('stroke-dashoffset',-(a0+90)/360*circ);c.setAttribute('transform','rotate(-90 '+cx+' '+cy+')');svg.appendChild(c);a0+=f*360;});
+el.insertBefore(svg,el.firstChild);})();
+</script>
+</body></html>
