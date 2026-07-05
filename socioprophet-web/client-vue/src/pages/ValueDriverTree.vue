@@ -6,7 +6,7 @@
           <p class="vdt-eyebrow">Economy &amp; Industry</p>
           <h1>Value Drivers</h1>
         </div>
-        <span class="vdt-pill">fixture</span>
+        <span class="vdt-pill" :class="mode" :title="mode === 'live' ? 'Served live from economic-prophet via dashboard-bff /v1/vdt' : 'dashboard-bff unavailable — rendering the local fixture (same engine math)'">{{ mode }}</span>
         <span class="vdt-ind">{{ industry }}</span>
       </div>
       <div class="vdt-metrics">
@@ -68,13 +68,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import {
-  industry, enterpriseValueBaseline as evBaseline, drivers, domains,
-  weights, kpis, weightOf, computeVdt,
-} from '../data/vdtFixture';
+import { computed, onMounted, ref } from 'vue';
+import { fetchVdtWithFallback, fixtureView, type VdtView } from '../api/vdtApi';
 
-const c = computeVdt();
+// Initialise from the fixture (canonical engine math computed locally) so the surface renders
+// synchronously; on mount, try the live dashboard-bff /v1/vdt and swap in the engine's output.
+const view = ref<VdtView>(fixtureView());
+const mode = ref<'live' | 'fixture'>('fixture');
+
+onMounted(async () => {
+  const res = await fetchVdtWithFallback();
+  view.value = res.view;
+  mode.value = res.mode;
+});
+
+const industry = computed(() => view.value.industry);
+const evBaseline = computed(() => view.value.evBaseline);
+const drivers = computed(() => view.value.drivers);
+const domains = computed(() => view.value.domains);
+const weights = computed(() => view.value.weights);
+const c = computed(() => view.value);
 
 const money = (n: number): string =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2 }).format(n);
@@ -89,18 +102,25 @@ function short(d: string): string {
     .replace('GovernanceKnowledge', 'Govern');
 }
 
-const leverMap = new Map(kpis.map((k) => [`${k.driver}|${k.domain}`, k] as const));
-const hasLever = (drv: string, d: string) => leverMap.has(`${drv}|${d}`);
-const leverOf = (drv: string, d: string) => leverMap.get(`${drv}|${d}`);
+const weightIndex = computed(
+  () => new Map(view.value.weights.map((w) => [`${w.driver}|${w.domain}`, w.weight] as const)),
+);
+const weightOf = (drv: string, d: string): number => weightIndex.value.get(`${drv}|${d}`) ?? 0;
 
-const maxWeight = Math.max(...weights.map((w) => w.weight));
+const leverMap = computed(
+  () => new Map(view.value.perKpi.map((k) => [`${k.driver}|${k.domain}`, k] as const)),
+);
+const hasLever = (drv: string, d: string) => leverMap.value.has(`${drv}|${d}`);
+const leverOf = (drv: string, d: string) => leverMap.value.get(`${drv}|${d}`);
+
+const maxWeight = computed(() => Math.max(0, ...view.value.weights.map((w) => w.weight)));
 function cellColor(w: number): string {
-  const a = maxWeight > 0 ? (w / maxWeight) * 0.5 : 0; // 0..0.5 alpha
+  const a = maxWeight.value > 0 ? (w / maxWeight.value) * 0.5 : 0; // 0..0.5 alpha
   return `rgba(88, 166, 255, ${a.toFixed(3)})`;
 }
 
-const driversWithUplift = computed(() => drivers.filter((d) => (c.perDriver[d] ?? 0) !== 0));
-const maxDriverUplift = computed(() => Math.max(1, ...Object.values(c.perDriver)));
+const driversWithUplift = computed(() => view.value.drivers.filter((d) => (view.value.perDriver[d] ?? 0) !== 0));
+const maxDriverUplift = computed(() => Math.max(1, ...Object.values(view.value.perDriver)));
 const barPct = (v: number) => Math.max(2, (v / maxDriverUplift.value) * 100);
 </script>
 
@@ -110,6 +130,7 @@ const barPct = (v: number) => Math.max(2, (v / maxDriverUplift.value) * 100);
 .vdt-title { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; } .vdt-title h1 { margin: 0; font-size: 1.3rem; }
 .vdt-eyebrow { margin: 0 0 0.1rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
 .vdt-pill { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #e3b341; background: rgba(227, 179, 65, 0.14); border-radius: 5px; padding: 0.1rem 0.35rem; }
+.vdt-pill.live { color: var(--up); background: rgba(63, 185, 80, 0.16); }
 .vdt-ind { font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); }
 .vdt-metrics { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .vdt-metric { display: flex; flex-direction: column; border: 1px solid var(--line-2); border-radius: 10px; padding: 0.4rem 0.8rem; min-width: 8rem; }
