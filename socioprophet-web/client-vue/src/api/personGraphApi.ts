@@ -57,6 +57,33 @@ export async function fetchPersonGraphSnapshotWithFallback(): Promise<PersonGrap
   }
 }
 
+/**
+ * Resolve a single opaque `hg:` identity to its neighborhood in the LIVE graph — the deep-link
+ * seam any surface uses when a graph ref is clicked. The client never touches HellGraph; the
+ * backend adapter (agent-machine /api/person-graph/snapshot?root=…) resolves it.
+ */
+export async function fetchEntityNeighborhood(hgRef: string): Promise<PersonGraphSnapshot> {
+  return getJson<PersonGraphSnapshot>(`/person-graph/snapshot?root=${encodeURIComponent(hgRef)}`);
+}
+
+export async function fetchEntityNeighborhoodWithFallback(hgRef: string): Promise<PersonGraphLoadResult> {
+  try {
+    const snapshot = await fetchEntityNeighborhood(hgRef);
+    // A live graph that doesn't hold this identity yields an empty/unavailable snapshot — fall back
+    // to the fixture rather than render a blank neighborhood.
+    if (snapshot.summary?.health === 'unavailable' || snapshot.nodes.length === 0) {
+      return { snapshot: demoPersonGraphSnapshot(), mode: 'fixture', error: `hg ref not in live graph: ${hgRef}` };
+    }
+    return { snapshot, mode: 'live' };
+  } catch (error) {
+    return {
+      snapshot: demoPersonGraphSnapshot(),
+      mode: 'fixture',
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 // ── Fixture — the demo person-graph the runtime produces (self + relationships) ──
 function node(
   id: string,
