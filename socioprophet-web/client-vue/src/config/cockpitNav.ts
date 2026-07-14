@@ -251,3 +251,62 @@ export const AGENT_COCKPIT: NavGroup[] = [
     ],
   },
 ];
+
+// --- Accordion drawer sections -----------------------------------------------
+// Progressive disclosure: everyday sections open by default, everything else
+// collapsed but PRESENT (nothing removed). `operator: true` sections default to the
+// user's Operator-mode preference (on → expanded/pinned) but stay reachable regardless.
+export interface DrawerSection {
+  id: string;
+  label: string;
+  defaultOpen: boolean;
+  operator?: boolean;
+  items: NavLeaf[];
+}
+
+const _slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+export const DRAWER_SECTIONS: DrawerSection[] = [
+  {
+    id: 'capabilities',
+    label: 'Capabilities',
+    defaultOpen: true,
+    items: CAPABILITY_RAIL.map((c) => ({ label: c.label, to: c.to })),
+  },
+  {
+    id: 'working',
+    label: 'Working surfaces',
+    defaultOpen: true,
+    items: [...OPERATOR_SHORTCUTS, { label: 'Feed', to: '/feed' }],
+  },
+  {
+    id: 'knowledge',
+    label: 'Knowledge & Data',
+    defaultOpen: false,
+    items: [
+      { label: 'Knowledge Graph', to: '/knowledge/graph' },
+      { label: 'Search', to: '/data/search' },
+      { label: 'Living Ontology', to: '/ontology' },
+      { label: 'Noetica Chat', to: '/noetica' },
+    ],
+  },
+  ...AGENT_COCKPIT.map((g) => ({ id: _slug(g.label), label: g.label, defaultOpen: false, operator: true, items: g.items })),
+];
+
+// Flat, de-duplicated surface index for the ⌘K command palette — every reachable
+// leaf across the domain menus and the drawer sections, tagged with its group.
+export interface SurfaceEntry { label: string; to: string; group: string }
+
+export const ALL_SURFACES: SurfaceEntry[] = (() => {
+  const seen = new Set<string>();
+  const out: SurfaceEntry[] = [];
+  const push = (label: string, to: string, group: string) => {
+    if (seen.has(to)) return;
+    seen.add(to);
+    out.push({ label, to, group });
+  };
+  for (const d of DOMAIN_MENU) for (const leaf of d.items) push(leaf.label, leaf.to, d.label);
+  for (const s of DRAWER_SECTIONS) for (const leaf of s.items) push(leaf.label, leaf.to, s.label);
+  push('Settings', '/settings', 'Account');
+  return out;
+})();

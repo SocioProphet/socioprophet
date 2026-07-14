@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
 import { useRouter, type RouteLocationRaw } from 'vue-router';
-import { routeRegistry } from '../config/routeRegistry';
+import { ALL_SURFACES } from '../config/cockpitNav';
 import { newsItems, newsSources } from '../data/newsFeedFixture';
 import { entities } from '../data/peopleFixture';
 import { indices, watchlist } from '../data/marketsFixture';
@@ -61,17 +61,10 @@ const inputEl = ref<HTMLInputElement | null>(null);
 const listEl = ref<HTMLElement | null>(null);
 
 interface Dest { id: string; to: string; label: string; sub: string }
-// Real screens, from the route registry (deduped by path).
-const destinations: Dest[] = (() => {
-  const seen = new Set<string>();
-  const out: Dest[] = [];
-  for (const e of routeRegistry) {
-    if (seen.has(e.path)) continue;
-    seen.add(e.path);
-    out.push({ id: e.path, to: e.path, label: e.label, sub: e.domain });
-  }
-  return out;
-})();
+// Every reachable surface across the domain menus + drawer sections (deduped),
+// so ⌘K can jump to anything — including operator/SourceOS surfaces not in the
+// curated route registry.
+const destinations: Dest[] = ALL_SURFACES.map((s) => ({ id: s.to, to: s.to, label: s.label, sub: s.group }));
 
 type Kind = 'nav' | 'article' | 'entity' | 'market' | 'docket' | 'region' | 'econ' | 'chat';
 interface Result { id: string; kind: Kind; icon: string; label: string; sub?: string; hint: string; route?: RouteLocationRaw; idx: number }

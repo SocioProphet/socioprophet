@@ -95,33 +95,29 @@
            it never disturbs the grid. -->
       <div v-if="navOpen" class="sp-nav-backdrop" @click="navOpen = false" />
       <nav v-if="navOpen" ref="navPanelEl" class="sp-nav-panel" aria-label="Capability navigation" @keydown="onNavPanelKey">
-        <div class="sp-nav-section-title">Capabilities</div>
-        <RouterLink
-          v-for="cap in capabilityRail"
-          :key="cap.to"
-          :to="cap.to"
-          class="sp-nav-link"
-          @click="navOpen = false"
-        >{{ cap.label }}</RouterLink>
-        <div class="sp-nav-section-title">Working surfaces</div>
-        <RouterLink
-          v-for="op in operatorShortcuts"
-          :key="op.to"
-          :to="op.to"
-          class="sp-nav-link"
-          @click="navOpen = false"
-        >{{ op.label }}</RouterLink>
-        <template v-if="settings.operatorMode">
-          <div class="sp-nav-section-title sp-nav-op">Operator · SourceOS</div>
-          <template v-for="grp in agentCockpit" :key="grp.label">
-            <div class="sp-nav-section-title">{{ grp.label }}</div>
-            <RouterLink
-              v-for="leaf in grp.items"
-              :key="leaf.to"
-              :to="leaf.to"
-              class="sp-nav-link"
-              @click="navOpen = false"
-            >{{ leaf.label }}</RouterLink>
+        <button class="sp-nav-search" type="button" @click="paletteOpen = true; navOpen = false">
+          <span>⌕ Jump to a surface…</span><kbd>⌘K</kbd>
+        </button>
+
+        <template v-if="pinnedSurfaces.length">
+          <div class="sp-nav-section-title">Pinned</div>
+          <div v-for="p in pinnedSurfaces" :key="p.to" class="sp-nav-link sp-nav-leaf">
+            <RouterLink :to="p.to" class="sp-nav-lbl" @click="navOpen = false">{{ p.label }}</RouterLink>
+            <button class="sp-pin on" type="button" title="Unpin" @click.stop="settings.togglePin(p.to)">★</button>
+          </div>
+        </template>
+
+        <template v-for="sec in drawerSections" :key="sec.id">
+          <button class="sp-nav-sec" type="button" :aria-expanded="secOpen(sec)" @click="settings.toggleSection(sec.id, secOpen(sec))">
+            <span class="sp-nav-caret">{{ secOpen(sec) ? '▾' : '▸' }}</span>
+            <span class="sp-nav-sec-lbl" :class="{ op: sec.operator }">{{ sec.label }}</span>
+            <span class="sp-nav-count">{{ sec.items.length }}</span>
+          </button>
+          <template v-if="secOpen(sec)">
+            <div v-for="leaf in sec.items" :key="leaf.to" class="sp-nav-link sp-nav-leaf">
+              <RouterLink :to="leaf.to" class="sp-nav-lbl" @click="navOpen = false">{{ leaf.label }}</RouterLink>
+              <button class="sp-pin" :class="{ on: settings.isPinned(leaf.to) }" type="button" :title="settings.isPinned(leaf.to) ? 'Unpin' : 'Pin'" @click.stop="settings.togglePin(leaf.to)">{{ settings.isPinned(leaf.to) ? '★' : '☆' }}</button>
+            </div>
           </template>
         </template>
       </nav>
@@ -243,7 +239,7 @@ import GraphDock from './components/GraphDock.vue';
 import { useOperatorTerminal } from './composables/useOperatorTerminal';
 import { useNoeticaChat } from './composables/useNoeticaChat';
 import { domainSurfaces, surfaceForRoute, surfacesForDomain } from './config/domainRoutes';
-import { AGENT_COCKPIT, CAPABILITY_RAIL, DOMAIN_MENU, OPERATOR_SHORTCUTS } from './config/cockpitNav';
+import { CAPABILITY_RAIL, DOMAIN_MENU, DRAWER_SECTIONS, ALL_SURFACES, type SurfaceEntry } from './config/cockpitNav';
 import {
   entriesForDomain,
   registryEntryForPath,
@@ -269,8 +265,11 @@ const logout = async () => {
 // and only when Operator mode is on). Keeps the primary bar clean for everyday users.
 const domainMenu = [...DOMAIN_MENU];
 const capabilityRail = CAPABILITY_RAIL;
-const operatorShortcuts = OPERATOR_SHORTCUTS;
-const agentCockpit = AGENT_COCKPIT;
+// Accordion drawer: everyday sections open, everything else collapsed-but-present.
+const drawerSections = DRAWER_SECTIONS;
+function secOpen(sec: (typeof DRAWER_SECTIONS)[number]) { return settings.isSectionOpen(sec.id, sec.defaultOpen, sec.operator); }
+const pinnedSurfaces = computed<SurfaceEntry[]>(() =>
+  settings.pinned.map((to) => ALL_SURFACES.find((s) => s.to === to)).filter(Boolean) as SurfaceEntry[]);
 const navOpen = ref(false);
 const userMenuOpen = ref(false);
 const userInitials = computed(() => {
@@ -671,4 +670,19 @@ const activeRuntimeFeatures = computed<RuntimeAdapterFeature[]>(() => {
 }
 .sp-nav-link:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 .sp-nav-link.router-link-active { color: #78c88c; }
+/* Accordion drawer */
+.sp-nav-search { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: calc(100% - 1.2rem); margin: 0.6rem; padding: 0.5rem 0.7rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: rgba(255, 255, 255, 0.6); cursor: pointer; font-size: 0.82rem; }
+.sp-nav-search kbd { font-size: 0.66rem; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 4px; padding: 0 0.3rem; }
+.sp-nav-sec { display: flex; align-items: center; gap: 0.5rem; width: 100%; background: transparent; border: 0; cursor: pointer; padding: 0.5rem 1rem; color: rgba(255, 255, 255, 0.85); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.sp-nav-sec:hover { background: rgba(255, 255, 255, 0.05); }
+.sp-nav-caret { width: 0.8rem; color: rgba(255, 255, 255, 0.5); font-size: 0.7rem; }
+.sp-nav-sec-lbl { flex: 1; text-align: left; }
+.sp-nav-sec-lbl.op { color: #34d399; }
+.sp-nav-count { font-size: 0.68rem; color: rgba(255, 255, 255, 0.4); }
+.sp-nav-leaf { display: flex; align-items: center; gap: 0.5rem; }
+.sp-nav-leaf .sp-nav-lbl { flex: 1; color: rgba(255, 255, 255, 0.82); text-decoration: none; }
+.sp-nav-leaf .sp-nav-lbl.router-link-active { color: #78c88c; }
+.sp-nav-leaf:hover { background: rgba(255, 255, 255, 0.08); }
+.sp-pin { background: transparent; border: 0; cursor: pointer; color: rgba(255, 255, 255, 0.28); font-size: 0.9rem; padding: 0 0.2rem; line-height: 1; }
+.sp-pin.on, .sp-pin:hover { color: #f5b301; }
 </style>
