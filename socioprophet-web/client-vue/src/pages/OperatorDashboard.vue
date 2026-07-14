@@ -8,16 +8,25 @@
       <span class="db-asof">as of {{ asOfLabel }}</span>
     </header>
 
-    <!-- Ask Noetica — the social/assistant surface, one line from home -->
-    <form class="db-ask" @submit.prevent="ask">
-      <span class="db-ask-glyph">◇</span>
-      <input v-model="prompt" type="text" placeholder="Ask Noetica anything…  (⏎ to open the chat)" spellcheck="false" aria-label="Ask Noetica" />
-      <button type="submit" class="db-ask-go" :disabled="!prompt.trim()">Ask</button>
-    </form>
+    <!-- Universal bar: jump to any surface OR ask Noetica — anything in one action -->
+    <div class="db-ask-wrap">
+      <form class="db-ask" @submit.prevent="ask">
+        <span class="db-ask-glyph">◇</span>
+        <input v-model="prompt" type="text" placeholder="Ask Noetica or jump to any surface…  (type to search · ⏎ to ask)" spellcheck="false" aria-label="Ask or jump" @focus="askFocused = true" @blur="onAskBlur" />
+        <button type="submit" class="db-ask-go" :disabled="!prompt.trim()">Ask</button>
+      </form>
+      <div v-if="askFocused && prompt.trim()" class="db-ask-menu">
+        <button v-for="m in askMatches" :key="m.to" class="db-ask-item" @mousedown.prevent="jump(m.to)">
+          <span class="db-ask-lbl">→ {{ m.label }}</span><span class="db-ask-grp">{{ m.group }}</span>
+        </button>
+        <button class="db-ask-item ask" @mousedown.prevent="ask"><span class="db-ask-lbl">◇ Ask Noetica: “{{ prompt.trim() }}”</span></button>
+      </div>
+    </div>
 
     <div class="db-grid">
       <!-- Markets -->
-      <article class="db-card">
+      <article v-if="db.visible('markets')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('markets')">✕</button>
         <RouterLink class="db-card-head" to="/markets/indices-funds"><span>Markets</span><span class="db-open">open →</span></RouterLink>
         <button v-for="i in indices" :key="i.symbol" class="db-row" @click="go('/markets/indices-funds', { sym: i.symbol })">
           <span class="db-row-k">{{ i.symbol }}</span>
@@ -36,8 +45,25 @@
         </form>
       </article>
 
+      <!-- Companies & Valuations -->
+      <article v-if="db.visible('companies')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('companies')">✕</button>
+        <RouterLink class="db-card-head" to="/economy/causal-valuation"><span>Companies &amp; Valuations</span><span class="db-open">open →</span></RouterLink>
+        <button class="db-row" @click="go('/economy/causal-valuation', {})">
+          <span class="db-row-k narrow">Guzman y Gomez</span>
+          <span class="db-row-sub">ASX:GYG · causal valuation</span>
+          <span class="db-num">A$2.14B</span>
+          <span class="db-chg up">+2.7%</span>
+        </button>
+        <button class="db-row" @click="go('/economy/causal-valuation', {})">
+          <span class="db-row-k narrow" style="color:var(--accent)">＋ New valuation</span>
+          <span class="db-row-sub">any listed company or private (Value Driver Studio)</span>
+        </button>
+      </article>
+
       <!-- News -->
-      <article class="db-card">
+      <article v-if="db.visible('news')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('news')">✕</button>
         <RouterLink class="db-card-head" to="/news"><span>News &amp; Events</span><span class="db-open">open →</span></RouterLink>
         <button v-for="n in newsItems" :key="n.id" class="db-row col" @click="go('/news', { item: n.id })">
           <span class="db-row-title">{{ n.title }}</span>
@@ -46,7 +72,8 @@
       </article>
 
       <!-- Economy -->
-      <article class="db-card">
+      <article v-if="db.visible('economy')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('economy')">✕</button>
         <RouterLink class="db-card-head" to="/economy/macro-economics"><span>Economy</span><span class="db-open">open →</span></RouterLink>
         <button v-for="k in indicators" :key="k.id" class="db-row" @click="go('/economy/macro-economics', { k: k.id, kind: 'indicator' })">
           <span class="db-row-sub wide">{{ k.name }}</span>
@@ -56,7 +83,8 @@
       </article>
 
       <!-- People -->
-      <article class="db-card">
+      <article v-if="db.visible('people')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('people')">✕</button>
         <RouterLink class="db-card-head" to="/people/search"><span>People</span><span class="db-open">open →</span></RouterLink>
         <button v-for="e in entities" :key="e.id" class="db-row" @click="go('/people/search', { id: e.id })">
           <span class="db-avatar">{{ initials(e.name) }}</span>
@@ -67,7 +95,8 @@
       </article>
 
       <!-- Law -->
-      <article class="db-card">
+      <article v-if="db.visible('law')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('law')">✕</button>
         <RouterLink class="db-card-head" to="/law/international-law"><span>Law &amp; Regulation</span><span class="db-open">open →</span></RouterLink>
         <button v-for="d in dockets" :key="d.id" class="db-row col" @click="go('/law/international-law', { d: d.id })">
           <span class="db-row-title">{{ d.title }}</span>
@@ -76,7 +105,8 @@
       </article>
 
       <!-- Weather -->
-      <article class="db-card">
+      <article v-if="db.visible('weather')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('weather')">✕</button>
         <RouterLink class="db-card-head" to="/weather/forecast"><span>Weather</span><span class="db-open">open →</span></RouterLink>
         <button v-for="r in regions" :key="r.id" class="db-row" @click="go('/weather/forecast', { r: r.id })">
           <span class="db-row-k narrow">{{ r.name }}</span>
@@ -96,7 +126,8 @@
       </article>
 
       <!-- Social signals -->
-      <article class="db-card">
+      <article v-if="db.visible('social')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('social')">✕</button>
         <RouterLink class="db-card-head" to="/people/social-networks"><span>Social Signals</span><span class="db-open">open →</span></RouterLink>
         <button v-for="t in trends" :key="t.topic" class="db-row" @click="go('/people/social-networks', {})">
           <span class="db-row-k wide">{{ t.topic }}</span>
@@ -106,7 +137,8 @@
       </article>
 
       <!-- Alerts (weather/resource) — the one board that surfaces things needing attention -->
-      <article class="db-card">
+      <article v-if="db.visible('alerts')" class="db-card">
+        <button class="db-remove" title="Hide card" @click="db.hide('alerts')">✕</button>
         <RouterLink class="db-card-head" to="/weather/forecast"><span>Active Alerts</span><span class="db-open">open →</span></RouterLink>
         <button v-for="a in alerts" :key="a.id" class="db-row col" @click="go('/weather/forecast', { r: a.regionId })">
           <span class="db-row-title">{{ a.headline }}</span>
@@ -115,12 +147,19 @@
         <p v-if="alerts.length === 0" class="db-empty">No active alerts.</p>
       </article>
     </div>
+
+    <div v-if="db.hiddenCards().length" class="db-addbar">
+      <span class="db-addbar-label">Add a card:</span>
+      <button v-for="c in db.hiddenCards()" :key="c.id" class="db-addbar-chip" @click="db.show(c.id)">＋ {{ c.label }}</button>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter, type LocationQueryRaw } from 'vue-router';
+import { ALL_SURFACES } from '../config/cockpitNav';
+import { useDashboard } from '../stores/dashboard';
 import { indices } from '../data/marketsFixture';
 import { indicators } from '../data/economyFixture';
 import { regions, alerts } from '../data/weatherFixture';
@@ -135,10 +174,21 @@ const router = useRouter();
 const chat = useNoeticaChat();
 const prompt = ref('');
 const lists = useUserLists();
+const db = useDashboard();
 const newSym = ref('');
 const newCity = ref('');
 function addSym() { lists.addSymbol(newSym.value); newSym.value = ''; }
 function addCity() { lists.addCity(newCity.value); newCity.value = ''; }
+
+// Universal Ask bar: type to jump to any surface, or ask Noetica.
+const askFocused = ref(false);
+const askMatches = computed(() => {
+  const q = prompt.value.trim().toLowerCase();
+  if (!q) return [] as { label: string; to: string; group: string }[];
+  return ALL_SURFACES.filter((s) => s.label.toLowerCase().includes(q) || s.group.toLowerCase().includes(q)).slice(0, 6);
+});
+function jump(to: string) { prompt.value = ''; askFocused.value = false; router.push(to); }
+function onAskBlur() { setTimeout(() => { askFocused.value = false; }, 120); }
 
 const srcTitle = new Map(newsSources.map((s) => [s.id, s.title]));
 const regionName = new Map(regions.map((r) => [r.id, r.name]));
@@ -184,6 +234,21 @@ const asOfLabel = new Date(NOW).toLocaleString('en-US', { weekday: 'short', mont
 .db-ask input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font: inherit; font-size: 0.95rem; }
 .db-ask input::placeholder { color: var(--text-3); }
 .db-ask-go { border: none; background: var(--accent); color: #17130a; border-radius: 8px; padding: 0.4rem 0.95rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; } .db-ask-go:disabled { opacity: 0.5; cursor: default; }
+.db-ask-wrap { position: relative; margin-bottom: 1.1rem; }
+.db-ask-wrap .db-ask { margin-bottom: 0; }
+.db-ask-menu { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 6px); background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.4); overflow: hidden; }
+.db-ask-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; border: none; background: transparent; color: var(--text); padding: 0.55rem 0.9rem; cursor: pointer; text-align: left; font: inherit; font-size: 0.86rem; }
+.db-ask-item:hover { background: var(--surface-2); }
+.db-ask-item.ask { border-top: 1px solid var(--line); color: var(--accent); }
+.db-ask-grp { font-size: 0.72rem; color: var(--text-3); white-space: nowrap; }
+.db-card { position: relative; }
+.db-remove { position: absolute; top: 0.5rem; right: 0.55rem; z-index: 2; border: none; background: transparent; color: var(--text-3); cursor: pointer; font-size: 0.72rem; opacity: 0; transition: opacity 0.12s; }
+.db-card:hover .db-remove { opacity: 1; }
+.db-remove:hover { color: var(--down); }
+.db-addbar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--line); }
+.db-addbar-label { font-size: 0.78rem; color: var(--text-3); }
+.db-addbar-chip { border: 1px solid var(--line-2); background: var(--surface); color: var(--text-2); border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.78rem; cursor: pointer; }
+.db-addbar-chip:hover { color: var(--accent); border-color: var(--accent); }
 
 .db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.85rem; }
 .db-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
