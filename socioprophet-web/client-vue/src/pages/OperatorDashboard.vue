@@ -1,9 +1,9 @@
 <template>
-  <section class="db" aria-label="Operator dashboard">
+  <section class="db" aria-label="User dashboard">
     <header class="db-head">
       <div>
         <p class="db-eyebrow">SocioProphet</p>
-        <h1>Operator Dashboard</h1>
+        <h1>User Dashboard</h1>
       </div>
       <span class="db-asof">as of {{ asOfLabel }}</span>
     </header>
@@ -19,18 +19,27 @@
       <!-- Markets -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/markets/indices-funds"><span>Markets</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="i in indices.slice(0, 5)" :key="i.symbol" class="db-row" @click="go('/markets/indices-funds', { sym: i.symbol })">
+        <button v-for="i in indices" :key="i.symbol" class="db-row" @click="go('/markets/indices-funds', { sym: i.symbol })">
           <span class="db-row-k">{{ i.symbol }}</span>
           <span class="db-row-sub">{{ i.name }}</span>
           <span class="db-num">{{ fmtPrice(i.price) }}</span>
           <span class="db-chg" :class="pctClass(i.changePct)">{{ fmtPct(i.changePct) }}</span>
         </button>
+        <div v-for="s in lists.watchlist" :key="'w-' + s" class="db-row">
+          <span class="db-row-k">{{ s }}</span>
+          <span class="db-row-sub">watching</span>
+          <button class="db-x" title="Remove" @click.stop="lists.removeSymbol(s)">✕</button>
+        </div>
+        <form class="db-add" @submit.prevent="addSym">
+          <input v-model="newSym" placeholder="Add ticker to watchlist (e.g. AAPL)" aria-label="Add ticker" />
+          <button type="submit" :disabled="!newSym.trim()">＋ Add</button>
+        </form>
       </article>
 
       <!-- News -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/news"><span>News &amp; Events</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="n in newsItems.slice(0, 5)" :key="n.id" class="db-row col" @click="go('/news', { item: n.id })">
+        <button v-for="n in newsItems" :key="n.id" class="db-row col" @click="go('/news', { item: n.id })">
           <span class="db-row-title">{{ n.title }}</span>
           <span class="db-row-meta"><span :class="['db-mem', n.membraneDecision]">{{ n.membraneDecision }}</span>{{ srcTitle.get(n.sourceId) }} · {{ rel(n.publishedAt) }}</span>
         </button>
@@ -39,7 +48,7 @@
       <!-- Economy -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/economy/macro-economics"><span>Economy</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="k in indicators.slice(0, 5)" :key="k.id" class="db-row" @click="go('/economy/macro-economics', { k: k.id, kind: 'indicator' })">
+        <button v-for="k in indicators" :key="k.id" class="db-row" @click="go('/economy/macro-economics', { k: k.id, kind: 'indicator' })">
           <span class="db-row-sub wide">{{ k.name }}</span>
           <span class="db-num">{{ fmtVal(k.value, k.unit) }}</span>
           <span class="db-chg" :class="econClass(k.changeAbs, k.better)">{{ signed(k.changeAbs) }}{{ k.unit === '%' ? 'pp' : '' }}</span>
@@ -49,7 +58,7 @@
       <!-- People -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/people/search"><span>People</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="e in entities.slice(0, 5)" :key="e.id" class="db-row" @click="go('/people/search', { id: e.id })">
+        <button v-for="e in entities" :key="e.id" class="db-row" @click="go('/people/search', { id: e.id })">
           <span class="db-avatar">{{ initials(e.name) }}</span>
           <span class="db-row-k narrow">{{ e.name }}</span>
           <span class="db-row-sub">{{ e.role }}</span>
@@ -60,7 +69,7 @@
       <!-- Law -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/law/international-law"><span>Law &amp; Regulation</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="d in dockets.slice(0, 5)" :key="d.id" class="db-row col" @click="go('/law/international-law', { d: d.id })">
+        <button v-for="d in dockets" :key="d.id" class="db-row col" @click="go('/law/international-law', { d: d.id })">
           <span class="db-row-title">{{ d.title }}</span>
           <span class="db-row-meta"><span :class="['db-status', d.status]">{{ d.status }}</span>{{ d.cite }} · {{ d.jurisdiction }}</span>
         </button>
@@ -69,18 +78,27 @@
       <!-- Weather -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/weather/forecast"><span>Weather</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="r in regions.slice(0, 5)" :key="r.id" class="db-row" @click="go('/weather/forecast', { r: r.id })">
+        <button v-for="r in regions" :key="r.id" class="db-row" @click="go('/weather/forecast', { r: r.id })">
           <span class="db-row-k narrow">{{ r.name }}</span>
           <span class="db-row-sub">{{ r.cond }}</span>
           <span class="db-num">{{ r.tempF }}°</span>
           <span class="db-chg" :class="r.changeF >= 0 ? 'up' : 'down'">{{ signed(r.changeF) }}°</span>
         </button>
+        <div v-for="c in lists.cities" :key="'c-' + c" class="db-row">
+          <span class="db-row-k narrow">{{ c }}</span>
+          <span class="db-row-sub">added</span>
+          <button class="db-x" title="Remove" @click.stop="lists.removeCity(c)">✕</button>
+        </div>
+        <form class="db-add" @submit.prevent="addCity">
+          <input v-model="newCity" placeholder="Add a city (e.g. Sydney)" aria-label="Add city" />
+          <button type="submit" :disabled="!newCity.trim()">＋ Add</button>
+        </form>
       </article>
 
       <!-- Social signals -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/people/social-networks"><span>Social Signals</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="t in trends.slice(0, 5)" :key="t.topic" class="db-row" @click="go('/people/social-networks', {})">
+        <button v-for="t in trends" :key="t.topic" class="db-row" @click="go('/people/social-networks', {})">
           <span class="db-row-k wide">{{ t.topic }}</span>
           <span class="db-num sm">{{ fmtNum(t.volume) }}</span>
           <span class="db-chg" :class="t.changePct >= 0 ? 'up' : 'down'">{{ signed(t.changePct) }}%</span>
@@ -90,7 +108,7 @@
       <!-- Alerts (weather/resource) — the one board that surfaces things needing attention -->
       <article class="db-card">
         <RouterLink class="db-card-head" to="/weather/forecast"><span>Active Alerts</span><span class="db-open">open →</span></RouterLink>
-        <button v-for="a in alerts.slice(0, 5)" :key="a.id" class="db-row col" @click="go('/weather/forecast', { r: a.regionId })">
+        <button v-for="a in alerts" :key="a.id" class="db-row col" @click="go('/weather/forecast', { r: a.regionId })">
           <span class="db-row-title">{{ a.headline }}</span>
           <span class="db-row-meta"><span :class="['db-sev', a.severity]">{{ a.severity }}</span>{{ regionName.get(a.regionId) }}<span v-if="a.resource"> · {{ a.resource }}</span></span>
         </button>
@@ -111,10 +129,16 @@ import { trends } from '../data/socialFixture';
 import { entities } from '../data/peopleFixture';
 import { newsItems, newsSources } from '../data/newsFeedFixture';
 import { useNoeticaChat } from '../composables/useNoeticaChat';
+import { useUserLists } from '../stores/userLists';
 
 const router = useRouter();
 const chat = useNoeticaChat();
 const prompt = ref('');
+const lists = useUserLists();
+const newSym = ref('');
+const newCity = ref('');
+function addSym() { lists.addSymbol(newSym.value); newSym.value = ''; }
+function addCity() { lists.addCity(newCity.value); newCity.value = ''; }
 
 const srcTitle = new Map(newsSources.map((s) => [s.id, s.title]));
 const regionName = new Map(regions.map((r) => [r.id, r.name]));
@@ -162,8 +186,8 @@ const asOfLabel = new Date(NOW).toLocaleString('en-US', { weekday: 'short', mont
 .db-ask-go { border: none; background: var(--accent); color: #17130a; border-radius: 8px; padding: 0.4rem 0.95rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; } .db-ask-go:disabled { opacity: 0.5; cursor: default; }
 
 .db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.85rem; }
-.db-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; display: flex; flex-direction: column; }
-.db-card-head { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); text-decoration: none; font-weight: 700; }
+.db-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
+.db-card-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); text-decoration: none; font-weight: 700; background: var(--surface); }
 .db-card-head:hover { color: var(--accent); background: var(--surface-2); }
 .db-open { font-size: 0.64rem; color: var(--text-3); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .db-card-head:hover .db-open { color: var(--accent); }
@@ -189,4 +213,11 @@ const asOfLabel = new Date(NOW).toLocaleString('en-US', { weekday: 'short', mont
 .db-status.comment { color: #58a6ff; background: rgba(88, 166, 255, 0.14); } .db-status.pending { color: var(--accent); background: rgba(216, 162, 80, 0.16); } .db-status.enacted { color: var(--up); background: rgba(75, 191, 115, 0.16); } .db-status.open { color: #8b949e; background: rgba(139, 148, 158, 0.16); }
 .db-sev.advisory { color: #4aa3ff; background: rgba(74, 163, 255, 0.16); } .db-sev.watch { color: #f0883e; background: rgba(240, 136, 62, 0.16); } .db-sev.warning { color: var(--down); background: rgba(240, 101, 106, 0.18); }
 .db-empty { padding: 1rem 0.85rem; color: var(--text-3); font-size: 0.8rem; }
+.db-x { margin-left: auto; border: none; background: transparent; color: var(--text-3); cursor: pointer; font-size: 0.72rem; padding: 0 0.2rem; }
+.db-x:hover { color: var(--down); }
+.db-add { display: flex; gap: 0.4rem; padding: 0.45rem 0.85rem; border-top: 1px solid var(--line); position: sticky; bottom: 0; background: var(--surface); }
+.db-add input { flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--line-2); border-radius: 6px; color: var(--text); padding: 0.3rem 0.5rem; font: inherit; font-size: 0.78rem; }
+.db-add button { border: none; background: var(--surface-2); color: var(--text-2); border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.74rem; cursor: pointer; white-space: nowrap; }
+.db-add button:hover:not(:disabled) { color: var(--accent); }
+.db-add button:disabled { opacity: 0.5; cursor: default; }
 </style>

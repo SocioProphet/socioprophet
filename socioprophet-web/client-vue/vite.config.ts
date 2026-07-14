@@ -28,6 +28,13 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
+        // Same-origin proxy to the live Prophet Mesh (mesh.socioprophet.ai has no CORS).
+        '/mesh': {
+          target: env.VITE_MESH_BASE || 'https://mesh.socioprophet.ai',
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/mesh/, ''),
+        },
       },
     },
     test: {

@@ -2,19 +2,21 @@
 import { ref } from 'vue';
 import { useAuth } from '../stores/auth';
 import { useSettings } from '../stores/settings';
-import { meshBase, setMeshBase, checkMesh, DEFAULT_MESH_BASE, type MeshStatus } from '../config/mesh';
+import { meshBase, setMeshBase, meshToken, setMeshToken, checkMesh, DEFAULT_MESH_BASE, type MeshStatus } from '../config/mesh';
 
 const auth = useAuth();
 const settings = useSettings();
 
-// Prophet Mesh connection (ST011). Endpoint is editable + persisted; the check reports
-// the real reachability observed from the browser.
+// Prophet Mesh connection (ST011) — live OpenAI-compatible conductor on GKE. Endpoint +
+// bearer token are editable + persisted; the check hits the real /v1/models on the mesh.
 const meshUrl = ref(meshBase());
+const meshTok = ref(meshToken());
 const meshStatus = ref<MeshStatus | null>(null);
 const meshChecking = ref(false);
 async function checkMeshConnection() {
   meshChecking.value = true;
   setMeshBase(meshUrl.value);
+  setMeshToken(meshTok.value);
   meshStatus.value = await checkMesh(meshUrl.value.replace(/\/$/, ''));
   meshChecking.value = false;
 }
@@ -78,8 +80,12 @@ function saveConnections() {
     <section id="connections" class="st-card">
       <h2>Connections &amp; integrations</h2>
       <div class="st-row col">
-        <label class="st-label" for="mesh">Prophet Mesh endpoint <span class="st-hint-inline">(hosted Model Choir / Conductor — ST011)</span></label>
+        <label class="st-label" for="mesh">Prophet Mesh endpoint <span class="st-hint-inline">(live Model Choir / Conductor on GKE — ST011)</span></label>
         <input id="mesh" v-model="meshUrl" type="text" :placeholder="DEFAULT_MESH_BASE" />
+      </div>
+      <div class="st-row col">
+        <label class="st-label" for="meshtok">Mesh bearer token <span class="st-hint-inline">(required for chat routing; /v1/models is open)</span></label>
+        <input id="meshtok" v-model="meshTok" type="password" placeholder="MESH_AUTH_TOKEN" />
       </div>
       <div class="st-actions">
         <button class="st-save" @click="checkMeshConnection">{{ meshChecking ? 'Checking…' : 'Check connection' }}</button>
@@ -87,7 +93,16 @@ function saveConnections() {
           <span class="st-dot" :class="{ ok: meshStatus.ok }"></span>{{ meshStatus.detail }}
         </span>
       </div>
-      <p class="st-hint">When the mesh exposes the platform routes, set <code>VITE_MESH_BASE</code> to this endpoint and the whole SPA runs against the hosted cloud instance — the same build Michael and Gus use proves it works for a client on their own mesh.</p>
+      <div v-if="meshStatus && meshStatus.models.length" class="st-models">
+        Models: <span v-for="m in meshStatus.models" :key="m" class="st-pill">{{ m }}</span>
+      </div>
+      <div class="st-row" style="margin-top:.6rem;">
+        <span class="st-label">Route Noetica chat through the mesh <span class="st-hint-inline">(Prophet Cloud Mesh)</span></span>
+        <button class="st-toggle" :class="{ on: settings.meshChat }" role="switch" :aria-checked="settings.meshChat" @click="settings.toggleMeshChat()">
+          <span class="st-knob"></span><span class="st-toggle-txt">{{ settings.meshChat ? 'On' : 'Off' }}</span>
+        </button>
+      </div>
+      <p class="st-hint">The mesh is live on GKE (<code>mesh.socioprophet.ai</code> → conductor → vLLM seat). Turn on Prophet Cloud Mesh to route Noetica chat to <code>model=prophet-mesh</code> end-to-end — the same build proves it works for a client on their own cloud instance.</p>
       <div class="st-row col" style="margin-top:.75rem;">
         <label class="st-label" for="gitea">Gitea token <span class="st-hint-inline">(for Add Local Repo / Forge import)</span></label>
         <input id="gitea" v-model="giteaToken" type="password" placeholder="gitea personal access token" />
@@ -133,4 +148,5 @@ function saveConnections() {
 .st-mesh.ok { color: #065f46; }
 .st-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
 .st-dot.ok { background: #10b981; }
+.st-models { margin-top: .5rem; display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; font-size: .8rem; opacity: .8; }
 </style>

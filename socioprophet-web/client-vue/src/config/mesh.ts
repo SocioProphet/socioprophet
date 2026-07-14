@@ -1,40 +1,67 @@
-// Prophet Mesh connection.
+// Prophet Mesh connection (ST011) — LIVE on GKE.
 //
-// The hosted Model Choir / Conductor mesh (ST011) at mesh.socioprophet.ai fronts the
-// platform's data + model-routing backend. Setting VITE_MESH_BASE (or the per-browser
-// override saved in Settings → Connections) points the app's API clients at the mesh
-// instead of the local dev proxy, so the same SPA runs against a hosted cloud instance.
+// mesh.socioprophet.ai is the Model Choir / Conductor: an OpenAI-compatible gateway
+// (GET /v1/models, POST /v1/chat/completions) that routes model=prophet-mesh to a
+// vLLM seat. /v1/models is open; chat requires the mesh bearer token (MESH_AUTH_TOKEN,
+// k8s secret prophet-mesh-auth). The operator pastes the token in Settings → Connections;
+// it's stored per-browser and never committed.
 
 const ENV_MESH = (import.meta as any).env?.VITE_MESH_BASE as string | undefined;
-const LS_KEY = 'sp.conn.mesh';
+const LS_BASE = 'sp.conn.mesh';
+const LS_TOKEN = 'sp.conn.mesh-token';
 
 export const DEFAULT_MESH_BASE = 'https://mesh.socioprophet.ai';
+export const MESH_MODEL = 'prophet-mesh';
+
+// The mesh sends no CORS headers, so the browser can't call it cross-origin directly.
+// Fetches go through a SAME-ORIGIN proxy path ('/mesh' → mesh.socioprophet.ai): the Vite
+// dev server proxies it in dev; in prod the serving gateway must proxy /mesh the same way
+// (or the conductor must add CORS). meshBase() below is the logical endpoint shown in the UI.
+const MESH_FETCH = '/mesh';
+
+function ls(key: string): string | null {
+  try { return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null; } catch { return null; }
+}
 
 export function meshBase(): string {
-  let override: string | null = null;
-  try { override = typeof localStorage !== 'undefined' ? localStorage.getItem(LS_KEY) : null; } catch { /* ignore */ }
-  return (override || ENV_MESH || DEFAULT_MESH_BASE).replace(/\/$/, '');
+  return (ls(LS_BASE) || ENV_MESH || DEFAULT_MESH_BASE).replace(/\/$/, '');
 }
+export function setMeshBase(url: string) { try { localStorage.setItem(LS_BASE, url.replace(/\/$/, '')); } catch { /* ignore */ } }
+export function meshToken(): string { return ls(LS_TOKEN) || ''; }
+export function setMeshToken(t: string) { try { localStorage.setItem(LS_TOKEN, t.trim()); } catch { /* ignore */ } }
 
-export function setMeshBase(url: string) {
-  try { localStorage.setItem(LS_KEY, url.replace(/\/$/, '')); } catch { /* ignore */ }
-}
+export interface MeshStatus { ok: boolean; status: number | null; detail: string; models: string[] }
 
-export interface MeshStatus { ok: boolean; status: number | null; detail: string }
-
-// Honest reachability probe. A browser fetch to the mesh will succeed, 404 (host up,
-// route not exposed), or throw (network / CORS). We report exactly what we observe —
-// never a fake "connected".
-export async function checkMesh(base = meshBase()): Promise<MeshStatus> {
-  for (const path of ['/health', '/v1/overview', '/']) {
-    try {
-      const res = await fetch(`${base}${path}`, { method: 'GET', mode: 'cors' });
-      if (res.ok) return { ok: true, status: res.status, detail: `connected (${path})` };
-      // reachable but this route isn't there — keep trying, remember the last status
-      if (path === '/') return { ok: false, status: res.status, detail: `reachable — host up, BFF routes not exposed yet (HTTP ${res.status})` };
-    } catch {
-      if (path === '/') return { ok: false, status: null, detail: 'unreachable from browser (network or CORS)' };
-    }
+// Real reachability probe against the live OpenAI-compatible gateway (via the same-origin proxy).
+export async function checkMesh(_base = meshBase()): Promise<MeshStatus> {
+  try {
+    const res = await fetch(`${MESH_FETCH}/v1/models`, { headers: { accept: 'application/json' } });
+    if (!res.ok) return { ok: false, status: res.status, detail: `reachable — HTTP ${res.status} at /v1/models`, models: [] };
+    const body = await res.json();
+    const models = Array.isArray(body?.data) ? body.data.map((m: any) => m.id) : [];
+    return { ok: true, status: 200, detail: `connected — ${models.length} model(s)`, models };
+  } catch {
+    return { ok: false, status: null, detail: 'unreachable from browser (network or CORS)', models: [] };
   }
-  return { ok: false, status: null, detail: 'unreachable' };
+}
+
+export interface MeshChatResult { content: string; model: string; seat?: string }
+
+// Route a chat turn through the mesh conductor (OpenAI /v1/chat/completions). Requires the
+// bearer token from Settings → Connections. Non-streaming for simplicity.
+export async function meshChat(messages: { role: string; content: string }[]): Promise<MeshChatResult> {
+  const token = meshToken();
+  if (!token) throw new Error('no mesh token — set it in Settings → Connections');
+  const res = await fetch(`${MESH_FETCH}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    body: JSON.stringify({ model: MESH_MODEL, messages, max_tokens: 512 }),
+  });
+  if (!res.ok) throw new Error(`mesh chat failed: HTTP ${res.status}`);
+  const body = await res.json();
+  return {
+    content: body?.choices?.[0]?.message?.content ?? '',
+    model: body?.model ?? MESH_MODEL,
+    seat: body?.prophet_mesh?.seat,
+  };
 }

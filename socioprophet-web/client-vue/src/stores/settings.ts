@@ -16,6 +16,7 @@ interface Persisted {
   theme: Theme;
   pinned: string[];
   openSections: Record<string, boolean>;
+  meshChat: boolean;
 }
 
 function load(): Persisted {
@@ -28,10 +29,11 @@ function load(): Persisted {
         theme: p.theme === 'light' ? 'light' : 'dark',
         pinned: Array.isArray(p.pinned) ? p.pinned : [],
         openSections: p.openSections && typeof p.openSections === 'object' ? p.openSections : {},
+        meshChat: !!p.meshChat,
       };
     }
   } catch { /* ignore */ }
-  return { operatorMode: false, theme: 'dark', pinned: [], openSections: {} };
+  return { operatorMode: false, theme: 'dark', pinned: [], openSections: {}, meshChat: false };
 }
 
 function applyTheme(theme: Theme) {
@@ -44,18 +46,21 @@ export const useSettings = defineStore('settings', () => {
   const theme = ref<Theme>(initial.theme);
   const pinned = ref<string[]>(initial.pinned);
   const openSections = ref<Record<string, boolean>>(initial.openSections);
+  const meshChat = ref<boolean>(initial.meshChat);
 
   applyTheme(theme.value);
 
-  watch([operatorMode, theme, pinned, openSections], () => {
+  watch([operatorMode, theme, pinned, openSections, meshChat], () => {
     applyTheme(theme.value);
     try {
       localStorage.setItem(LS_KEY, JSON.stringify({
         operatorMode: operatorMode.value, theme: theme.value,
-        pinned: pinned.value, openSections: openSections.value,
+        pinned: pinned.value, openSections: openSections.value, meshChat: meshChat.value,
       }));
     } catch { /* ignore */ }
   }, { deep: true });
+
+  const toggleMeshChat = () => { meshChat.value = !meshChat.value; };
 
   const toggleOperatorMode = () => { operatorMode.value = !operatorMode.value; };
   const setTheme = (t: Theme) => { theme.value = t; };
@@ -77,8 +82,8 @@ export const useSettings = defineStore('settings', () => {
   };
 
   return {
-    operatorMode, theme, pinned, openSections,
-    toggleOperatorMode, setTheme, toggleTheme,
+    operatorMode, theme, pinned, openSections, meshChat,
+    toggleOperatorMode, setTheme, toggleTheme, toggleMeshChat,
     isPinned, togglePin, isSectionOpen, toggleSection,
   };
 });

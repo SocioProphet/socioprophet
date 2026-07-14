@@ -29,7 +29,7 @@ describe('Operator Dashboard', () => {
     const wrapper = await mountDashboard();
     const text = wrapper.text();
 
-    expect(text).toContain('Operator Dashboard');
+    expect(text).toContain('User Dashboard');
     for (const tile of ['Markets', 'News & Events', 'Economy', 'People', 'Law & Regulation', 'Weather', 'Social Signals', 'Active Alerts']) {
       expect(text).toContain(tile);
     }

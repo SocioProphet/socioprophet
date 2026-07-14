@@ -462,7 +462,7 @@ export const routeRegistry: RouteRegistryEntry[] = [
   },
   {
     path: '/capability/dashboard',
-    label: 'Operator Dashboard',
+    label: 'User Dashboard',
     domain: 'Capabilities',
     maturity: 'L2',
     stateMode: 'fixture',

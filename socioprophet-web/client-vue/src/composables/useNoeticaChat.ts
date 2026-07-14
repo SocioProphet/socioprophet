@@ -5,6 +5,8 @@
 // `done` finalizes, `error` degrades honestly. One shared session below.
 import { ref, watch } from 'vue';
 import { AM_BASE } from '../services/agentMachineApi';
+import { useSettings } from '../stores/settings';
+import { meshChat } from '../config/mesh';
 
 const STORE_KEY = 'noetica-chat-v1';
 function loadPersisted(): ChatTurn[] {
@@ -53,6 +55,24 @@ export function createNoeticaChat() {
     const history = turns.value
       .filter((t) => !(t.role === 'assistant' && t.streaming))
       .map((t) => ({ role: t.role, content: t.content }));
+
+    // Prophet Cloud Mesh: when enabled in Settings, route the turn to the live GKE
+    // conductor (model=prophet-mesh) instead of the local agent-machine. Non-streaming.
+    if (useSettings().meshChat) {
+      try {
+        const r = await meshChat(history);
+        assistant.content = r.content;
+        assistant.model = r.seat ? `${r.model} · seat ${r.seat}` : r.model;
+        assistant.badge = 'Prophet Cloud Mesh';
+      } catch (e) {
+        assistant.content = `⚠ ${e instanceof Error ? e.message : 'mesh chat failed'}`;
+        assistant.error = true;
+      } finally {
+        assistant.streaming = false;
+        busy.value = false;
+      }
+      return;
+    }
 
     try {
       const res = await fetch(`${AM_BASE}/api/chat`, {
