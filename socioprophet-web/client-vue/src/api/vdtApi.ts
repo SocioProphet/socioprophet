@@ -20,7 +20,9 @@ import {
   type Polarity,
 } from '../data/vdtFixture';
 
-const API_BASE = (import.meta as any).env?.VITE_DASHBOARD_BFF_BASE || '/api';
+// Dev uses the Vite proxy ('/api'); set VITE_DASHBOARD_BFF_BASE or VITE_MESH_BASE
+// (mesh.socioprophet.ai) to run the SPA against a hosted Prophet Mesh instance.
+const API_BASE = (import.meta as any).env?.VITE_DASHBOARD_BFF_BASE || (import.meta as any).env?.VITE_MESH_BASE || '/api';
 
 export interface VdtWeightCell {
   driver: string;

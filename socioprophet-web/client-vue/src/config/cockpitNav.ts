@@ -65,6 +65,7 @@ export const DOMAIN_MENU: NavGroup[] = [
       { label: 'Labor Economics', to: '/economy/labor-economics' },
       { label: 'Industry & Commerce', to: '/economy/industry-commerce' },
       { label: 'Value Drivers', to: '/economy/value-drivers' },
+      { label: 'Causal Valuation', to: '/economy/causal-valuation' },
       { label: 'Farming & Agriculture', to: '/economy/farming-agriculture' },
       { label: 'Mining & Extraction', to: '/economy/mining-extraction' },
       { label: 'Processing & Refinement', to: '/economy/processing-refinement' },
@@ -85,6 +86,8 @@ export const DOMAIN_MENU: NavGroup[] = [
       { label: 'Crypto / Digital', to: '/markets/crypto-digital' },
       { label: 'Real-Assets', to: '/markets/real-assets' },
       { label: 'Alternative Investments', to: '/markets/alternative-investments' },
+      { label: 'Portfolios & Watch Lists', to: '/capability/portfolios' },
+      { label: 'Algorithmic Trading', to: '/capability/algorithmic-trading' },
     ],
   },
   {
@@ -106,6 +109,20 @@ export const DOMAIN_MENU: NavGroup[] = [
       { label: 'Charts & Graphs', to: '/analytics/charts-graphs' },
       { label: 'Maps & Interactives', to: '/map' },
       { label: 'Custom Analytics', to: '/analytics' },
+    ],
+  },
+  {
+    label: 'Knowledge',
+    to: '/knowledge/graph',
+    items: [
+      { label: 'Knowledge Graph', to: '/knowledge/graph' },
+      { label: 'Search', to: '/data/search' },
+      { label: 'Living Ontology', to: '/ontology' },
+      { label: 'Noetica Chat', to: '/noetica' },
+      { label: 'Research Capture', to: '/research' },
+      { label: 'Reader', to: '/reader' },
+      { label: 'Journal', to: '/journal' },
+      { label: 'Feed', to: '/feed' },
     ],
   },
 ];
@@ -164,59 +181,45 @@ export const CAPABILITY_RAIL: NavGroup[] = [
   { label: 'Experiments & Simulations', to: '/capability/experiments-simulations', items: [] },
 ];
 
-// Real working surfaces that already exist — surfaced as direct rail links
-// below the capability axis so nothing that works is buried.
+// Everyday working surfaces surfaced as direct rail links (always visible). The
+// former dev/SourceOS shortcuts (Code Search, NLBoot Evidence, Operator Workbench)
+// moved into the operator-mode-gated AGENT_COCKPIT · SourceOS group; the reading/
+// capture surfaces now also live in the Knowledge domain menu.
 export const OPERATOR_SHORTCUTS: NavLeaf[] = [
   { label: 'Research Capture', to: '/research' },
-  { label: 'Feed', to: '/feed' },
   { label: 'Reader', to: '/reader' },
   { label: 'Journal', to: '/journal' },
-  { label: 'Code Search', to: '/code' },
-  { label: 'NLBoot Evidence', to: '/nlboot' },
-  { label: 'Operator Workbench', to: '/workbench' },
 ];
 
 // Agent Machine cockpit — live on-device surfaces backed by the Noetica
 // agent-machine /api/* endpoints (sovereign, no auth). These are the ported
 // command-center surfaces: workstation ops, models, knowledge, forge.
+// Operator / SourceOS cockpit — revealed only when the user enables Operator mode
+// in Settings (off by default, so a normal user never meets SourceOS). Regrouped
+// for clarity; Model Labs deduped to /ai/labs; NLBoot Evidence / Operator Workbench
+// / Code Search collected under SourceOS. Noetica Chat and HolographMe moved OUT to
+// user-facing places (Knowledge menu and the user dropdown).
 export const AGENT_COCKPIT: NavGroup[] = [
   {
-    label: 'Operating System',
+    label: 'Infrastructure',
     to: '/agentic-os',
     items: [
       { label: 'Agentic OS', to: '/agentic-os' },
-    ],
-  },
-  {
-    label: 'Marketplace',
-    to: '/marketplace',
-    items: [
-      { label: 'Triparty Netting', to: '/marketplace' },
-      { label: 'Supply-chain Orchestrator', to: '/marketplace/orchestrate' },
-    ],
-  },
-  {
-    label: 'Noetica',
-    to: '/noetica',
-    items: [
-      { label: 'Chat (social surface)', to: '/noetica' },
-    ],
-  },
-  {
-    label: 'Operator & Infra',
-    to: '/control-plane/org',
-    items: [
       { label: 'Control Plane', to: '/control-plane/org' },
       { label: 'Universe Viewer', to: '/universe' },
       { label: 'Situations (n-ary)', to: '/situations' },
-      { label: 'Living Ontology', to: '/ontology' },
-      { label: 'Data Catalog', to: '/operator/data-catalog' },
-      { label: 'Pipelines (Beam / Ray)', to: '/operator/pipelines' },
-      { label: 'Model Labs', to: '/operator/labs' },
+    ],
+  },
+  {
+    label: 'Models & Pipelines',
+    to: '/ai/labs',
+    items: [
+      { label: 'Model Labs', to: '/ai/labs' },
       { label: 'Studio', to: '/operator/studio' },
-      { label: 'RAG Inspect', to: '/operator/rag-inspect' },
-      { label: 'HolographMe', to: '/operator/holograph-me' },
+      { label: 'Pipelines (Beam / Ray)', to: '/operator/pipelines' },
       { label: 'Lattice Forge', to: '/operator/lattice-forge' },
+      { label: 'RAG Inspect', to: '/operator/rag-inspect' },
+      { label: 'Data Catalog', to: '/operator/data-catalog' },
     ],
   },
   {
@@ -227,22 +230,24 @@ export const AGENT_COCKPIT: NavGroup[] = [
       { label: 'Deploy', to: '/workstation/deploy' },
       { label: 'Services · DevSpaces', to: '/workstation/services' },
       { label: 'Terminal', to: '/workstation/terminal' },
-    ],
-  },
-  {
-    label: 'Knowledge & Data',
-    to: '/knowledge/graph',
-    items: [
-      { label: 'Knowledge Graph', to: '/knowledge/graph' },
-      { label: 'Search', to: '/data/search' },
-    ],
-  },
-  {
-    label: 'Models & Forge',
-    to: '/ai/labs',
-    items: [
-      { label: 'Model Labs', to: '/ai/labs' },
       { label: 'Add Local Repo', to: '/forge/import' },
+    ],
+  },
+  {
+    label: 'SourceOS',
+    to: '/nlboot',
+    items: [
+      { label: 'NLBoot Evidence', to: '/nlboot' },
+      { label: 'Operator Workbench', to: '/workbench' },
+      { label: 'Code Search', to: '/code' },
+    ],
+  },
+  {
+    label: 'Marketplace',
+    to: '/marketplace',
+    items: [
+      { label: 'Triparty Netting', to: '/marketplace' },
+      { label: 'Supply-chain Orchestrator', to: '/marketplace/orchestrate' },
     ],
   },
 ];
