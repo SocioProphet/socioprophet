@@ -11,7 +11,9 @@ const LS_BASE = 'sp.conn.mesh';
 const LS_TOKEN = 'sp.conn.mesh-token';
 
 export const DEFAULT_MESH_BASE = 'https://mesh.socioprophet.ai';
-export const MESH_MODEL = 'prophet-mesh';
+// Default to the muscular seat (Qwen3-32B on A100). The conductor routes 'xl' → that seat;
+// it falls back to the always-on T4 'default' seat if xl is scaled down.
+export const MESH_MODEL = 'xl';
 
 // The mesh sends no CORS headers, so the browser can't call it cross-origin directly.
 // Fetches go through a SAME-ORIGIN proxy path ('/mesh' → mesh.socioprophet.ai): the Vite
@@ -46,6 +48,47 @@ export async function checkMesh(_base = meshBase()): Promise<MeshStatus> {
 }
 
 export interface MeshChatResult { content: string; model: string; seat?: string }
+
+// Streaming chat through the mesh conductor (OpenAI SSE, stream=true). Calls onDelta for each
+// token chunk so the UI renders as it generates — the Claude/OpenAI feel. Returns the final text.
+export async function meshChatStream(
+  messages: { role: string; content: string }[],
+  onDelta: (t: string) => void,
+): Promise<MeshChatResult> {
+  const token = meshToken();
+  if (!token) throw new Error('no mesh token — set it in Settings → Connections');
+  const res = await fetch(`${MESH_FETCH}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    body: JSON.stringify({ model: MESH_MODEL, messages, max_tokens: 1024, stream: true }),
+  });
+  if (!res.ok || !res.body) throw new Error(`mesh chat failed: HTTP ${res.status}`);
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', content = '', model = MESH_MODEL;
+  let seat: string | undefined;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop() ?? '';
+    for (const line of lines) {
+      const l = line.trim();
+      if (!l.startsWith('data:')) continue;
+      const p = l.slice(5).trim();
+      if (!p || p === '[DONE]') continue;
+      try {
+        const d = JSON.parse(p);
+        const delta = d?.choices?.[0]?.delta?.content;
+        if (delta) { content += delta; onDelta(delta); }
+        if (d?.model) model = d.model;
+        if (d?.prophet_mesh?.seat) seat = d.prophet_mesh.seat;
+      } catch { /* skip partial frame */ }
+    }
+  }
+  return { content, model, seat };
+}
 
 // Route a chat turn through the mesh conductor (OpenAI /v1/chat/completions). Requires the
 // bearer token from Settings → Connections. Non-streaming for simplicity.

@@ -14,6 +14,27 @@
       </template>
     </SurfaceHeader>
 
+    <!-- Strategy Copilot — Robinhood-clean input, Claude-grade reasoning -->
+    <div class="at-copilot">
+      <span class="at-copilot-glyph">◇</span>
+      <input
+        v-model="copilotText"
+        class="at-copilot-input"
+        type="text"
+        spellcheck="false"
+        placeholder="Describe a strategy in plain English — e.g. buy semis on breakout with a 3% trailing stop…"
+        @keydown.enter="generateStrategy"
+      />
+      <button class="at-copilot-go" :disabled="!copilotText.trim() || generating" @click="generateStrategy">
+        {{ generating ? 'Generating…' : 'Generate strategy' }}
+      </button>
+    </div>
+    <div class="at-copilot-hints">
+      <span class="at-copilot-try">Try:</span>
+      <button v-for="ex in copilotExamples" :key="ex" class="at-copilot-chip" @click="copilotText = ex; generateStrategy()">{{ ex }}</button>
+      <span class="at-copilot-gov">Paper only · governed · not investment advice</span>
+    </div>
+
     <SplitPane storage-key="algo-trading" label="strategies" :initial="360">
       <template #list>
       <!-- Strategy list -->
@@ -114,12 +135,14 @@ import SurfaceHeader from '../components/SurfaceHeader.vue';
 import SplitPane from '../components/SplitPane.vue';
 import { ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { strategies, asOf, type Strategy, type StrategyStatus } from '../data/algoTradingFixture';
+import { strategies, asOf, type Strategy, type StrategyStatus, type StrategyClass } from '../data/algoTradingFixture';
 import { sparkPoints, areaPoints } from '../utils/sparkline';
 import { navScopeForPath } from '../config/cockpitNav';
 import { arrowRove } from '../utils/listKeys';
 import { usePortfolio } from '../stores/portfolio';
 import { useCockpit } from '../stores/cockpit';
+import { useSettings } from '../stores/settings';
+import { meshChatStream } from '../config/mesh';
 
 const router = useRouter();
 const route = useRoute();
@@ -133,10 +156,13 @@ const status = ref<(typeof statuses)[number]>('all');
 const selectedId = ref<string>(strategies[0]!.id);
 const listEl = ref<HTMLElement | null>(null);
 
+// Copilot-generated (paper) strategies live above the fixture book.
+const genStrategies = ref<Strategy[]>([]);
+const pool = computed<Strategy[]>(() => [...genStrategies.value, ...strategies]);
 const results = computed<Strategy[]>(() =>
-  status.value === 'all' ? strategies : strategies.filter((s) => s.status === (status.value as StrategyStatus)),
+  status.value === 'all' ? pool.value : pool.value.filter((s) => s.status === (status.value as StrategyStatus)),
 );
-const selected = computed<Strategy | undefined>(() => strategies.find((s) => s.id === selectedId.value));
+const selected = computed<Strategy | undefined>(() => pool.value.find((s) => s.id === selectedId.value));
 watch(results, (r) => { if (!r.some((s) => s.id === selectedId.value) && r[0]) selectedId.value = r[0].id; });
 
 const liveCount = strategies.filter((s) => s.status === 'live').length;
@@ -153,6 +179,74 @@ function signed(n: number): string { return `${n >= 0 ? '+' : ''}${n}`; }
 function openSymbol(sym: string) { if (!/[/]/.test(sym)) router.push({ path: '/markets/indices-funds', query: { sym } }); }
 
 const asOfLabel = new Date(asOf).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+// ── Strategy Copilot — describe an algo in plain English; the mesh writes the rationale ──
+const settings = useSettings();
+const copilotText = ref('');
+const generating = ref(false);
+const copilotExamples = [
+  'Buy semis on breakout, 3% trailing stop',
+  'Mean-reversion on oversold megacaps (RSI < 30)',
+  'Market-neutral: long quality, short high-beta',
+];
+function pickClass(t: string): StrategyClass {
+  const s = t.toLowerCase();
+  if (/rsi|revert|revers|oversold|dip|mean/.test(s)) return 'mean-reversion';
+  if (/pairs|neutral|hedge|long.?short/.test(s)) return 'market-neutral';
+  if (/trend|macd|moving average|ma cross/.test(s)) return 'trend';
+  if (/arb|spread|basis/.test(s)) return 'stat-arb';
+  return 'momentum';
+}
+function genCurve(seed: number, n = 40): number[] {
+  const out: number[] = []; let v = 100; let r = seed;
+  const rand = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
+  const drift = 0.15 + rand() * 0.5;
+  for (let i = 0; i < n; i++) { v += drift + (rand() - 0.5) * 2.2; out.push(Math.round(v * 100) / 100); }
+  return out;
+}
+function tickersIn(t: string): string { const m = t.toUpperCase().match(/\b[A-Z]{2,5}\b/g); return m ? m.slice(0, 3).join(', ') : 'US equities'; }
+
+async function generateStrategy() {
+  const text = copilotText.value.trim();
+  if (!text || generating.value) return;
+  generating.value = true;
+  const seed = Math.floor(Math.random() * 1e6);
+  const equity = genCurve(seed);
+  const klass = pickClass(text);
+  const s: Strategy = {
+    id: 'gen-' + seed,
+    name: text.length > 42 ? text.slice(0, 42) + '…' : text,
+    klass, status: 'paper', universe: tickersIn(text),
+    returnPct: Math.round((equity[equity.length - 1]! - 100) * 10) / 10,
+    sharpe: Math.round((0.6 + Math.random() * 1.6) * 100) / 100,
+    maxDrawdownPct: -Math.round((3 + Math.random() * 14) * 10) / 10,
+    winRatePct: 48 + Math.floor(Math.random() * 18),
+    trades: 40 + Math.floor(Math.random() * 400),
+    exposurePct: 40 + Math.floor(Math.random() * 60),
+    equity,
+    signals: [{ label: 'generated', tone: 'neutral' }, { label: klass, tone: 'up' }],
+    fills: [],
+    note: 'Generating rationale…',
+  };
+  genStrategies.value = [s, ...genStrategies.value];
+  selectedId.value = s.id;
+  copilotText.value = '';
+  try {
+    if (settings.meshChat) {
+      s.note = '';
+      await meshChatStream(
+        [{ role: 'user', content: `You are a quant strategy copilot. In 2-3 sentences, explain this trading strategy and its main risk. Paper-trading only, NOT investment advice.\n\nStrategy: "${text}"` }],
+        (d) => { s.note += d; },
+      );
+    } else {
+      s.note = `Paper strategy synthesized from your description (${klass}, ${s.universe}). Turn on Prophet Cloud Mesh in Settings → Connections for a live AI rationale. Advisory only — not investment advice.`;
+    }
+  } catch (e) {
+    s.note = `Paper strategy (${klass}). AI rationale unavailable: ${e instanceof Error ? e.message : 'mesh error'}. Not investment advice.`;
+  } finally {
+    generating.value = false;
+  }
+}
 
 // ── Integration: route a strategy's fills into the SHARED portfolio book ──
 function deployToBook() {
@@ -235,4 +329,15 @@ watch(selected, (s) => {
 .at-fill-head { color: var(--text-3); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; cursor: default; }
 .at-sym { font-family: ui-monospace, monospace; font-weight: 600; }
 .at-side.buy { color: var(--up); background: rgba(75, 191, 115, 0.14); justify-self: start; } .at-side.sell { color: var(--down); background: rgba(240, 101, 106, 0.14); justify-self: start; }
+.at-copilot { display: flex; align-items: center; gap: 0.6rem; margin: 0.5rem 0 0.4rem; padding: 0.6rem 0.9rem; background: var(--surface); border: 1px solid var(--line-2); border-radius: 12px; }
+.at-copilot-glyph { color: var(--accent); font-size: 1.05rem; }
+.at-copilot-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-size: 0.95rem; }
+.at-copilot-input::placeholder { color: var(--text-3); }
+.at-copilot-go { border: none; background: var(--accent); color: #17130a; border-radius: 8px; padding: 0.45rem 0.9rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.at-copilot-go:disabled { opacity: 0.5; cursor: default; }
+.at-copilot-hints { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
+.at-copilot-try { font-size: 0.74rem; color: var(--text-3); }
+.at-copilot-chip { border: 1px solid var(--line-2); background: transparent; color: var(--text-2); border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.74rem; cursor: pointer; }
+.at-copilot-chip:hover { color: var(--accent); border-color: var(--accent); }
+.at-copilot-gov { margin-left: auto; font-size: 0.72rem; color: var(--text-3); }
 </style>

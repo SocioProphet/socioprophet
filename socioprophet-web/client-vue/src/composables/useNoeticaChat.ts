@@ -6,7 +6,7 @@
 import { ref, watch } from 'vue';
 import { AM_BASE } from '../services/agentMachineApi';
 import { useSettings } from '../stores/settings';
-import { meshChat } from '../config/mesh';
+import { meshChatStream } from '../config/mesh';
 
 const STORE_KEY = 'noetica-chat-v1';
 function loadPersisted(): ChatTurn[] {
@@ -60,8 +60,8 @@ export function createNoeticaChat() {
     // conductor (model=prophet-mesh) instead of the local agent-machine. Non-streaming.
     if (useSettings().meshChat) {
       try {
-        const r = await meshChat(history);
-        assistant.content = r.content;
+        const r = await meshChatStream(history, (delta) => { assistant.content += delta; });
+        if (!assistant.content) assistant.content = r.content;
         assistant.model = r.seat ? `${r.model} · seat ${r.seat}` : r.model;
         assistant.badge = 'Prophet Cloud Mesh';
       } catch (e) {
