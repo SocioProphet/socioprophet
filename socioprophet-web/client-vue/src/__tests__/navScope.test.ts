@@ -12,8 +12,10 @@ describe('navScopeForPath', () => {
   });
 
   it('resolves a CAPABILITY rail cell as a non-primary lens', () => {
-    const portfolios = navScopeForPath('/capability/portfolios');
-    expect(portfolios).toMatchObject({ domain: 'Capabilities', label: 'Portfolios & Watch Lists', isPrimary: false });
+    // Economic Prophet stays rail-only, so it resolves via the CAPABILITY axis.
+    // (Portfolios & Algo Trading were intentionally promoted into the Capital & Markets menu.)
+    const cap = navScopeForPath('/capability/economic-prophet');
+    expect(cap).toMatchObject({ domain: 'Capabilities', label: 'Economic Prophet', isPrimary: false });
 
     const entity = navScopeForPath('/capability/entity-analytics');
     expect(entity?.label).toBe('Entity Analytics');

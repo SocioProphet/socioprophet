@@ -12,7 +12,7 @@
     <div class="db-ask-wrap">
       <form class="db-ask" @submit.prevent="ask">
         <span class="db-ask-glyph">◇</span>
-        <input v-model="prompt" type="text" placeholder="Ask Noetica or jump to any surface…  (type to search · ⏎ to ask)" spellcheck="false" aria-label="Ask or jump" @focus="askFocused = true" @blur="onAskBlur" />
+        <input v-model="prompt" type="text" placeholder="Ask Noetica or jump to any surface…  (type to search · ⏎ to ask)" spellcheck="false" aria-label="Ask Noetica or jump to any surface" @focus="askFocused = true" @blur="onAskBlur" />
         <button type="submit" class="db-ask-go" :disabled="!prompt.trim()">Ask</button>
       </form>
       <div v-if="askFocused && prompt.trim()" class="db-ask-menu">
