@@ -24,6 +24,7 @@ import EconomySectorBoard from './pages/EconomySectorBoard.vue';
 import ValueDriverTree from './pages/ValueDriverTree.vue';
 import CausalValuation from './pages/CausalValuation.vue';
 import Settings from './pages/Settings.vue';
+import Provenance from './pages/Provenance.vue';
 import PeopleDirectory from './pages/PeopleDirectory.vue';
 import SocialSignals from './pages/SocialSignals.vue';
 import LawDocket from './pages/LawDocket.vue';
@@ -127,6 +128,7 @@ const explicitRoutes = [
   { path: '/economy/value-drivers', component: ValueDriverTree },
   { path: '/economy/causal-valuation', component: CausalValuation },
   { path: '/settings', component: Settings },
+  { path: '/control-plane/provenance', component: Provenance },
   { path: '/people/search', component: PeopleDirectory },
   { path: '/people/social-networks', component: SocialSignals },
   { path: '/law/international-law', component: LawDocket },

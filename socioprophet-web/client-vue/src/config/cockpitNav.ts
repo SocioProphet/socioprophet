@@ -206,6 +206,7 @@ export const AGENT_COCKPIT: NavGroup[] = [
     items: [
       { label: 'Agentic OS', to: '/agentic-os' },
       { label: 'Control Plane', to: '/control-plane/org' },
+      { label: 'Provenance (why a decision)', to: '/control-plane/provenance' },
       { label: 'Universe Viewer', to: '/universe' },
       { label: 'Situations (n-ary)', to: '/situations' },
     ],
