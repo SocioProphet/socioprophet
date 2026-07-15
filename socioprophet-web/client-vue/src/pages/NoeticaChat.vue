@@ -61,9 +61,16 @@
                 </div>
               </details>
 
-              <!-- Main content -->
+              <!-- Main content (reasoning split into a collapsible block) -->
               <div class="nx-a-body" :class="{ err: t.error }">
-                <template v-if="t.content">{{ t.content }}<span v-if="t.streaming" class="nx-cursor">▍</span></template>
+                <template v-if="t.content">
+                  <details v-if="splitThink(t.content).reasoning" class="nx-think" :open="splitThink(t.content).thinking">
+                    <summary>{{ splitThink(t.content).thinking ? 'Thinking…' : 'Reasoning' }}</summary>
+                    <div class="nx-think-body">{{ splitThink(t.content).reasoning }}</div>
+                  </details>
+                  <template v-if="splitThink(t.content).answer">{{ splitThink(t.content).answer }}<span v-if="t.streaming" class="nx-cursor">▍</span></template>
+                  <span v-else-if="t.streaming && !splitThink(t.content).reasoning" class="nx-cursor">▍</span>
+                </template>
                 <span v-else-if="t.streaming" class="nx-thinking">
                   <span class="nx-dot" /><span class="nx-dot" /><span class="nx-dot" /> thinking…
                 </span>
@@ -138,6 +145,16 @@ const suggestions = [
 
 function autoGrow() { const el = inputEl.value; if (!el) return; el.style.height = 'auto'; el.style.height = `${Math.min(200, el.scrollHeight)}px`; }
 watch(draft, () => nextTick(autoGrow));
+
+// Qwen3 (and other reasoning models) emit a <think>…</think> block before the answer.
+// Split it out so the UI shows a collapsible "reasoning" section, not raw tags.
+function splitThink(content: string): { reasoning: string; answer: string; thinking: boolean } {
+  const open = content.indexOf('<think>');
+  if (open === -1) return { reasoning: '', answer: content, thinking: false };
+  const close = content.indexOf('</think>');
+  if (close === -1) return { reasoning: content.slice(open + 7), answer: '', thinking: true };
+  return { reasoning: content.slice(open + 7, close).trim(), answer: content.slice(close + 8).trim(), thinking: false };
+}
 
 function scrollToEnd() { const el = scrollEl.value; if (el) el.scrollTop = el.scrollHeight; }
 watch(() => chat.turns.value.map((t) => t.content).join('|'), async () => { await nextTick(); scrollToEnd(); });
@@ -250,6 +267,12 @@ onMounted(() => inputEl.value?.focus());
 .nx-a-body.err { color: #fca5a5; }
 .nx-cursor { color: var(--nblue); }
 .nx-thinking { display: inline-flex; align-items: center; gap: 5px; color: var(--ntext3); font-size: 13px; }
+.nx-think { margin: 0 0 8px; border-left: 2px solid var(--nline-weak); padding-left: 10px; }
+.nx-think > summary { cursor: pointer; color: var(--ntext3); font-size: 12px; list-style: none; user-select: none; }
+.nx-think > summary::-webkit-details-marker { display: none; }
+.nx-think > summary::before { content: '▸ '; }
+.nx-think[open] > summary::before { content: '▾ '; }
+.nx-think-body { color: var(--ntext3); font-size: 13px; line-height: 1.6; white-space: pre-wrap; margin-top: 4px; opacity: 0.85; }
 .nx-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ntext3); animation: nx-pulse 1.2s infinite ease-in-out; }
 .nx-dot:nth-child(2) { animation-delay: 0.15s; }
 .nx-dot:nth-child(3) { animation-delay: 0.3s; }
