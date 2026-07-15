@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import {
   fetchCausalValuation, recomputeCausalValuation, fetchLocations,
+  fetchStudioValuation, recomputeStudioValuation, fetchStudioTemplates, type StudioParams,
   type CausalValuation, type LocationsPayload, type LoadMode,
 } from '../api/causalValuationApi';
 
@@ -17,6 +18,40 @@ const horizon = ref(5);
 const discountPct = ref(9);
 const q = ref('');
 const selected = ref<string | null>(null);
+
+// ── Value Driver Studio — value any listed company (ticker) or a private company ──
+const studioCtx = ref<StudioParams | null>(null); // null = GYG default; set = Studio subject
+const studioTemplates = ref<Array<{ id: string; industry: string }>>([]);
+const studioTicker = ref('');
+const studioTemplate = ref('software');
+const studioPrivate = ref(false);
+const studioName = ref('');
+const studioEv = ref<number | null>(null);
+
+function applyLoaded(v: CausalValuation) {
+  cv.value = v;
+  overrides.value = Object.fromEntries(v.assumptions_editable.map((a) => [a.kpi, a.delta_pct]));
+  horizon.value = v.timeseries.horizon_years;
+  discountPct.value = Math.round(v.timeseries.discount_rate * 100);
+  dirty.value = false;
+}
+
+async function runStudio() {
+  loading.value = true; error.value = '';
+  try {
+    const p: StudioParams = studioPrivate.value
+      ? { template: studioTemplate.value, name: studioName.value || 'Private company', ev_baseline: studioEv.value || undefined }
+      : { ticker: studioTicker.value.trim(), template: studioTemplate.value };
+    studioCtx.value = p;
+    applyLoaded(await fetchStudioValuation(p));
+  } catch (e) { error.value = e instanceof Error ? e.message : String(e); }
+  finally { loading.value = false; }
+}
+
+async function backToGyg() {
+  studioCtx.value = null;
+  await loadAll();
+}
 
 async function loadAll() {
   loading.value = true; error.value = '';
@@ -34,8 +69,15 @@ async function loadAll() {
 async function recompute() {
   loading.value = true; error.value = '';
   try {
-    cv.value = await recomputeCausalValuation(
-      { kpi_overrides: overrides.value, horizon_years: horizon.value, discount_rate: discountPct.value / 100 }, 'gyg');
+    if (studioCtx.value) {
+      cv.value = await recomputeStudioValuation({
+        ...studioCtx.value, kpi_overrides: overrides.value,
+        horizon_years: horizon.value, discount_rate: discountPct.value / 100,
+      });
+    } else {
+      cv.value = await recomputeCausalValuation(
+        { kpi_overrides: overrides.value, horizon_years: horizon.value, discount_rate: discountPct.value / 100 }, 'gyg');
+    }
     dirty.value = false;
   } catch (e) { error.value = e instanceof Error ? e.message : String(e); }
   finally { loading.value = false; }
@@ -46,7 +88,7 @@ async function searchLocations() {
   loc.value = l.data;
 }
 
-onMounted(loadAll);
+onMounted(async () => { await loadAll(); studioTemplates.value = await fetchStudioTemplates(); });
 
 function money(n: number, c = 'AUD') {
   const a = Math.abs(n);
@@ -99,6 +141,31 @@ const selectedLoc = computed(() => loc.value?.locations.find((l) => l.id === sel
     </header>
 
     <p v-if="mode === 'unavailable'" class="cv-warn">dashboard-bff unavailable ({{ error }}). Start it on the client-vue data port to load the live causal valuation.</p>
+
+    <!-- Value Driver Studio — value ANY company -->
+    <section class="cv-studio">
+      <div class="cv-studio-row">
+        <span class="cv-studio-eyebrow">Value Driver Studio</span>
+        <label class="cv-studio-toggle"><input type="checkbox" v-model="studioPrivate" /> private company</label>
+        <button v-if="studioCtx" class="cv-btn" @click="backToGyg">← GYG demo</button>
+      </div>
+      <div class="cv-studio-row">
+        <template v-if="!studioPrivate">
+          <input v-model="studioTicker" class="cv-studio-in" placeholder="Any exchange:ticker — e.g. GYG.AX, AAPL, TSLA" @keyup.enter="runStudio" />
+        </template>
+        <template v-else>
+          <input v-model="studioName" class="cv-studio-in" placeholder="Private company name" />
+          <input v-model.number="studioEv" class="cv-studio-in cv-studio-ev" type="number" placeholder="Enterprise value (e.g. 250000000)" />
+        </template>
+        <select v-model="studioTemplate" class="cv-studio-sel" aria-label="Value-driver surface">
+          <option v-for="t in studioTemplates" :key="t.id" :value="t.id">{{ t.industry }}</option>
+        </select>
+        <button class="cv-btn primary" :disabled="loading || (!studioPrivate && !studioTicker.trim())" @click="runStudio">
+          {{ loading ? 'Valuing…' : 'Value company' }}
+        </button>
+      </div>
+      <p class="cv-studio-hint">Listed companies auto-pull free public financials for the EV baseline; private companies use your entered EV. Both run the same canonical engine. Advisory only — not investment advice.</p>
+    </section>
 
     <template v-if="cv">
       <div class="cv-metrics">
@@ -221,6 +288,14 @@ const selectedLoc = computed(() => loc.value?.locations.find((l) => l.id === sel
 .cv-pill.live { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
 .cv-pill.unavailable { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
 .cv-warn { border: 1px solid #fecaca; background: #fef2f2; color: #991b1b; border-radius: 10px; padding: .75rem; }
+.cv-studio { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: .75rem .85rem; margin-bottom: 1rem; }
+.cv-studio-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.cv-studio-eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; opacity: .6; }
+.cv-studio-toggle { font-size: .8rem; display: inline-flex; gap: .3rem; align-items: center; margin-left: auto; }
+.cv-studio-in { flex: 1; min-width: 180px; padding: .45rem .7rem; border: 1px solid #cbd5e1; border-radius: 8px; }
+.cv-studio-ev { flex: 0 0 210px; }
+.cv-studio-sel { padding: .45rem .6rem; border: 1px solid #cbd5e1; border-radius: 8px; }
+.cv-studio-hint { font-size: .76rem; opacity: .6; margin: 0; }
 .cv-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .75rem; margin: 1rem 0; }
 .cv-metric { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: .85rem; display: flex; flex-direction: column; }
 .cv-m-label { font-size: .72rem; opacity: .6; text-transform: uppercase; letter-spacing: .04em; }

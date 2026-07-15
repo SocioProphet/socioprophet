@@ -101,6 +101,32 @@ export async function recomputeCausalValuation(overrides: CausalOverrides, compa
   return postJson<CausalValuation>(`/v1/valuation/causal/recompute?company=${encodeURIComponent(company)}`, overrides);
 }
 
+// ── Value Driver Studio — causal valuation for ANY company (listed via ticker, or private) ──
+export interface StudioParams {
+  ticker?: string; template?: string; ev_baseline?: number; name?: string;
+  horizon_years?: number; discount_rate?: number;
+}
+
+export async function fetchStudioTemplates(): Promise<Array<{ id: string; industry: string }>> {
+  try { return (await getJson<{ templates: Array<{ id: string; industry: string }> }>('/v1/valuation/studio/templates')).templates; }
+  catch { return []; }
+}
+
+export async function fetchStudioValuation(p: StudioParams): Promise<CausalValuation> {
+  const q = new URLSearchParams();
+  if (p.ticker) q.set('ticker', p.ticker);
+  if (p.template) q.set('template', p.template);
+  if (p.ev_baseline) q.set('ev_baseline', String(p.ev_baseline));
+  if (p.name) q.set('name', p.name);
+  if (p.horizon_years) q.set('horizon_years', String(p.horizon_years));
+  if (p.discount_rate != null) q.set('discount_rate', String(p.discount_rate));
+  return getJson<CausalValuation>(`/v1/valuation/studio?${q.toString()}`);
+}
+
+export async function recomputeStudioValuation(overrides: StudioParams & { kpi_overrides?: Record<string, number> }): Promise<CausalValuation> {
+  return postJson<CausalValuation>('/v1/valuation/studio/recompute', overrides);
+}
+
 export async function fetchLocations(company = 'gyg', q = '', state = ''): Promise<{ data: LocationsPayload | null; mode: LoadMode; error?: string }> {
   const params = new URLSearchParams({ company, q, state });
   try {
