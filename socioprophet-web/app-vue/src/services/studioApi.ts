@@ -116,6 +116,40 @@ const STUB: StudioBundle = {
   stub: true,
 };
 
+// ── KE-2: the project sub-graph with PROVENANCE per node (the differentiator) ──
+export interface GraphNode { id: string; name: string; epistemic_mode: string; source?: string; extractor?: string; labels: string[] }
+export interface GraphView {
+  project: string; projectCollection: string;
+  nodes: GraphNode[]; count: number; epistemic_distribution: Record<string, number>;
+  degraded?: string | null; stub?: boolean;
+}
+
+// Epistemic-mode → colour (the ladder hypothesis→…→attested). This colouring IS the feature: Bloom shows topology,
+// we show epistemic status per node.
+export const EPISTEMIC_COLORS: Record<string, string> = {
+  hypothesis: "#9aa0a6", observed: "#1a73e8", derived: "#8b5cf6",
+  verified: "#137333", attested: "#00897b", simulated: "#b06000", unknown: "#c0c4c9",
+};
+
+const STUB_GRAPH: GraphView = {
+  project: "demo", projectCollection: "proj-demo",
+  nodes: [
+    { id: "proj-demo:ent:hellgraph", name: "HellGraph", epistemic_mode: "verified", source: "doc:spec", extractor: "lattice-studio/deterministic-v0", labels: ["proj-demo", "Entity"] },
+    { id: "proj-demo:ent:neo4j", name: "Neo4j", epistemic_mode: "observed", source: "doc:demo", extractor: "lattice-studio/deterministic-v0", labels: ["proj-demo", "Entity"] },
+    { id: "proj-demo:ent:anzo", name: "Anzo", epistemic_mode: "observed", source: "doc:demo", extractor: "lattice-studio/deterministic-v0", labels: ["proj-demo", "Entity"] },
+    { id: "proj-demo:ent:sae", name: "SAE feature", epistemic_mode: "derived", source: "notebook:nb-3", extractor: "superconscious", labels: ["proj-demo", "Entity"] },
+    { id: "proj-demo:ent:claim", name: "Contradiction claim", epistemic_mode: "hypothesis", source: "holmes", extractor: "holmes", labels: ["proj-demo", "Entity"] },
+  ],
+  count: 5, epistemic_distribution: { verified: 1, observed: 2, derived: 1, hypothesis: 1 }, stub: true,
+};
+
+export async function loadGraph(project: string): Promise<GraphView> {
+  if (!BASE) return STUB_GRAPH;
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/graph?project=${encodeURIComponent(project)}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`graph load failed: ${res.status}`);
+  return (await res.json()) as GraphView;
+}
+
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!BASE) return STUB;
   const q = projectId ? `?project=${encodeURIComponent(projectId)}` : "";

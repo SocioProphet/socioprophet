@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { loadStudio, SECTION_COUNT, type StudioBundle, type StudioSection } from "../services/studioApi";
+import StudioGraph from "../components/StudioGraph.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -92,13 +93,16 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 
       <!-- main panel -->
       <main class="panel">
-        <div class="sec-head">
+        <div class="sec-head" v-if="section !== 'graph'">
           <h1>{{ activeMeta.icon }} {{ activeMeta.label }}</h1>
           <p class="blurb">{{ activeMeta.blurb }}</p>
         </div>
 
+        <!-- Graph section = the provenance-first explorer (KE-2) -->
+        <StudioGraph v-if="section === 'graph'" :project="project" />
+
         <!-- skeletons -->
-        <div v-if="loading" class="grid">
+        <div v-else-if="loading" class="grid">
           <div v-for="i in 4" :key="i" class="card skeleton"><div class="sk-line w60" /><div class="sk-line w40" /></div>
         </div>
         <p v-else-if="error" class="msg err">{{ error }}</p>
@@ -151,12 +155,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
               <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="{ ok: it.aligned }">{{ it.kind }}</span></div>
               <div class="sub"><span class="method">{{ it.engine }}</span><span v-if="it.count"> · {{ it.count.toLocaleString() }}</span><span v-if="it.aligned"> · aligned</span></div>
             </template>
-            <!-- graph (hellgraph) -->
-            <template v-else-if="section === 'graph'">
-              <div class="row"><span class="name">{{ it.label }}</span></div>
-              <div class="stat">{{ typeof it.value === 'number' ? it.value.toLocaleString() : it.value }}</div>
-              <div v-if="it.hint" class="sub">{{ it.hint }}</div>
-            </template>
+            <!-- graph: handled by the StudioGraph explorer at the panel level (provenance-first) -->
             <!-- retrieval (fiber / graph-rag / topic) -->
             <template v-else-if="section === 'retrieval'">
               <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="{ ok: it.ready }">{{ it.ready ? 'ready' : 'building' }}</span></div>
