@@ -118,9 +118,11 @@ const STUB: StudioBundle = {
 
 // ── KE-2: the project sub-graph with PROVENANCE per node (the differentiator) ──
 export interface GraphNode { id: string; name: string; epistemic_mode: string; source?: string; extractor?: string; labels: string[] }
+export interface GraphEdge { id: string; source: string; target: string; label: string; weight?: number }
 export interface GraphView {
   project: string; projectCollection: string;
-  nodes: GraphNode[]; count: number; epistemic_distribution: Record<string, number>;
+  nodes: GraphNode[]; edges?: GraphEdge[]; count: number; edge_count?: number;
+  epistemic_distribution: Record<string, number>;
   degraded?: string | null; stub?: boolean;
 }
 
@@ -140,7 +142,15 @@ const STUB_GRAPH: GraphView = {
     { id: "proj-demo:ent:sae", name: "SAE feature", epistemic_mode: "derived", source: "notebook:nb-3", extractor: "superconscious", labels: ["proj-demo", "Entity"] },
     { id: "proj-demo:ent:claim", name: "Contradiction claim", epistemic_mode: "hypothesis", source: "holmes", extractor: "holmes", labels: ["proj-demo", "Entity"] },
   ],
-  count: 5, epistemic_distribution: { verified: 1, observed: 2, derived: 1, hypothesis: 1 }, stub: true,
+  edges: [
+    { id: "e1", source: "proj-demo:ent:hellgraph", target: "proj-demo:ent:neo4j", label: "COMPARED_WITH", weight: 3 },
+    { id: "e2", source: "proj-demo:ent:hellgraph", target: "proj-demo:ent:anzo", label: "COMPARED_WITH", weight: 2 },
+    { id: "e3", source: "proj-demo:ent:neo4j", target: "proj-demo:ent:anzo", label: "CO_OCCURS", weight: 1 },
+    { id: "e4", source: "proj-demo:ent:hellgraph", target: "proj-demo:ent:sae", label: "GROUNDS", weight: 2 },
+    { id: "e5", source: "proj-demo:ent:sae", target: "proj-demo:ent:claim", label: "SUPPORTS", weight: 1 },
+    { id: "e6", source: "proj-demo:ent:hellgraph", target: "proj-demo:ent:claim", label: "GROUNDS", weight: 1 },
+  ],
+  count: 5, edge_count: 6, epistemic_distribution: { verified: 1, observed: 2, derived: 1, hypothesis: 1 }, stub: true,
 };
 
 export async function loadGraph(project: string): Promise<GraphView> {
