@@ -1,0 +1,68 @@
+# app-vue deploy — builds the real app-vue SPA and deploys it to Firebase Hosting, DEV-FIRST.
+#
+# Closes the gap the deploy audit found: app-vue had NO build/deploy workflow (deploys were manual shell scripts).
+# Dev-vs-prod is the Firebase project alias (dev → socioprophet-web-dev-env, prod → socioprophet-web).
+#
+#   push to master (app-vue/firebase changes) → auto-deploy to DEV
+#   manual run (workflow_dispatch, environment=prod) → deploy to PROD, gated by the `production` GitHub
+#     Environment (add required reviewers there so prod needs an explicit human approval — "prod on my say-so").
+#
+# Required repo secret: FIREBASE_TOKEN (generate once with `firebase login:ci`). Nothing deploys without it.
+name: app-vue deploy
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'socioprophet-web/app-vue/**'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/app-vue-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Firebase project alias to deploy'
+        required: true
+        default: dev
+        type: choice
+        options: [dev, prod]
+
+# Least privilege: only needs to read the repo + build.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm', cache-dependency-path: socioprophet-web/app-vue/package-lock.json }
+      - name: Build app-vue
+        working-directory: socioprophet-web/app-vue
+        run: |
+          npm ci
+          npm run build
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with: { name: app-vue-dist, path: socioprophet-web/app-vue/dist, retention-days: 3 }
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # A push to master deploys dev; a manual run deploys the chosen alias. The `prod` alias runs under the
+    # `production` Environment so it inherits that Environment's protection rules (required reviewers).
+    environment: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod') && 'production' || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: app-vue-dist, path: socioprophet-web/app-vue/dist }
+      - name: Resolve alias
+        id: env
+        run: echo "alias=${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'dev' }}" >> "$GITHUB_OUTPUT"
+      - name: Deploy to Firebase Hosting (app target)
+        uses: w9jds/firebase-action@v13.23.1
+        with:
+          args: deploy --only hosting:app --project ${{ steps.env.outputs.alias }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

@@ -1,0 +1,32 @@
+# app-vue-web — nginx serving the app-vue SPA. SCAFFOLD (sovereign Firebase-Hosting replacement); not live until
+# cutover. Image is built from deploy/sovereign/Dockerfile by CI at cutover; tag pinned per the no-moving-tag rule.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-vue-web
+  labels: { app: app-vue-web }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: app-vue-web } }
+  template:
+    metadata: { labels: { app: app-vue-web } }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 101, seccompProfile: { type: RuntimeDefault } }  # nginx uid
+      containers:
+        - name: nginx
+          image: registry.socioprophet.ai/app-vue-web:REPLACE_WITH_SHA_AT_CUTOVER
+          ports: [{ name: http, containerPort: 8080 }]
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: false, capabilities: { drop: ["ALL"] } }
+          readinessProbe: { httpGet: { path: /healthz, port: http }, initialDelaySeconds: 3, periodSeconds: 10 }
+          livenessProbe:  { httpGet: { path: /healthz, port: http }, initialDelaySeconds: 5, periodSeconds: 15 }
+          resources: { requests: { cpu: 20m, memory: 32Mi }, limits: { cpu: 200m, memory: 128Mi } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-vue-web
+  labels: { app: app-vue-web }
+spec:
+  type: ClusterIP
+  selector: { app: app-vue-web }
+  ports: [{ name: http, port: 8080, targetPort: http }]

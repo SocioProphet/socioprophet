@@ -1,0 +1,8 @@
+# DEV overlay — mirrors the Firebase `dev` alias (project socioprophet-web-dev-env). Ingress host + cert added at
+# cutover (a ManagedCertificate's clock starts at DNS — never create it before the record exists).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: socioprophet-dev
+resources:
+  - ../../base
+# nameSuffix: -dev   # enable when both envs share a cluster/namespace

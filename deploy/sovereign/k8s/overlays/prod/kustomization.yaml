@@ -1,0 +1,8 @@
+# PROD overlay — mirrors the Firebase `prod` alias (project socioprophet-web). Cut over ONLY after dev is validated.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: socioprophet
+resources:
+  - ../../base
+replicas:
+  - { name: app-vue-web, count: 2 }
