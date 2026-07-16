@@ -11,13 +11,19 @@ const selected = ref<{ kind: StudioSection; item: Record<string, any> } | null>(
 // Project scope — every artifact lives in the project's proj- collection, so the agent team already retrieves it.
 const project = ref("Untitled project");
 
-const sections: { id: StudioSection; label: string; icon: string; blurb: string }[] = [
-  { id: "notebooks",   label: "Notebooks",     icon: "⬢", blurb: "Ray-backed notebooks — authoring + provenance, run as jobs on the fabric." },
-  { id: "data",        label: "Data catalog",  icon: "▤", blurb: "Governed datasets & tables with lineage and reproduce commands." },
-  { id: "models",      label: "Model catalog", icon: "◈", blurb: "The model zoo — factsheets, lineage, promote & serve." },
-  { id: "tuning",      label: "Tune",          icon: "✳", blurb: "LoRA & quantized fine-tunes on the Ray fabric · SAE / circuit probes (roadmap)." },
-  { id: "experiments", label: "Experiments",   icon: "⟳", blurb: "Reproducible science — provenance + lockfiles, one-click re-run." },
+const sections: { id: StudioSection; label: string; icon: string; group: string; blurb: string }[] = [
+  { id: "notebooks",   label: "Notebooks",     icon: "⬢", group: "Workbench", blurb: "Ray-backed notebooks — authoring + provenance, run as jobs on the fabric." },
+  { id: "data",        label: "Data catalog",  icon: "▤", group: "Workbench", blurb: "Governed datasets & tables with lineage and reproduce commands." },
+  { id: "models",      label: "Model catalog", icon: "◈", group: "Workbench", blurb: "The model zoo — factsheets, lineage, promote & serve." },
+  { id: "tuning",      label: "Tune",          icon: "✳", group: "Workbench", blurb: "LoRA & quantized fine-tunes on the Ray fabric · SAE / circuit probes (roadmap)." },
+  { id: "experiments", label: "Experiments",   icon: "⟳", group: "Workbench", blurb: "Reproducible science — provenance + lockfiles, one-click re-run." },
+  { id: "extraction",  label: "Extraction",    icon: "⛏", group: "Knowledge engineering", blurb: "Pull knowledge into the project graph — Holmes entities/relations, Sherlock federated search, governed ingest." },
+  { id: "ontology",    label: "Ontology",      icon: "⬡", group: "Knowledge engineering", blurb: "The schema & alignment layer — Ontogenesis classes, relations, KKO alignment." },
+  { id: "graph",       label: "Graph",         icon: "⧉", group: "Knowledge engineering", blurb: "The project knowledge graph — HellGraph, gremlin/sparql, grounded to your docs." },
+  { id: "retrieval",   label: "Retrieval",     icon: "◎", group: "Knowledge engineering", blurb: "Fibered retrieval (PageIndex ⊕ HellGraph) · Graph-RAG · topic & semantic indexes." },
+  { id: "generation",  label: "Generation",    icon: "✦", group: "Knowledge engineering", blurb: "Grounded generation & generation-tuning — New-Hope synthesis over the graph." },
 ];
+const groups = computed(() => [...new Set(sections.map((s) => s.group))]);
 
 onMounted(async () => {
   try { bundle.value = await loadStudio(); }
@@ -45,6 +51,11 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   models:      [{ label: "Promote", hint: "tritfabric /v1/promote" }, { label: "Serve", hint: "tritfabric Serve.Deploy" }, { label: "Factsheet", hint: "governance factsheet" }],
   tuning:      [{ label: "Register model", hint: "→ model zoo" }, { label: "Logs", hint: "job status" }, { label: "Cancel", hint: "cancel job" }],
   experiments: [{ label: "Re-run", hint: "reproduce end-to-end" }, { label: "Provenance", hint: "in-toto chain" }, { label: "Publish", hint: "publication artifact" }],
+  extraction:  [{ label: "Run extraction", hint: "Holmes/Sherlock → project graph" }, { label: "View in graph", hint: "open the graph" }, { label: "Share to team", hint: "in the project collection" }],
+  ontology:    [{ label: "Edit ontology", hint: "Ontogenesis" }, { label: "Align", hint: "map to KKO / project" }, { label: "Apply to graph", hint: "re-type entities" }],
+  graph:       [{ label: "Open graph", hint: "HellGraph gremlin/sparql" }, { label: "Query", hint: "graph-RAG" }, { label: "Export", hint: "sub-graph" }],
+  retrieval:   [{ label: "Query", hint: "run fibered retrieval" }, { label: "Rebuild index", hint: "re-embed" }, { label: "Use in notebook", hint: "attach retriever" }],
+  generation:  [{ label: "Run", hint: "New-Hope grounded synthesis" }, { label: "→ Annotation set", hint: "into the workbench" }, { label: "→ Tune", hint: "generation-tuning" }],
 };
 </script>
 
@@ -66,11 +77,14 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
     <div class="body">
       <!-- section rail -->
       <aside class="rail">
-        <button v-for="s in sections" :key="s.id" :class="{ on: section === s.id }" @click="section = s.id; selected = null">
-          <span class="ic">{{ s.icon }}</span>
-          <span class="lbl">{{ s.label }}</span>
-          <span class="cnt">{{ SECTION_COUNT(bundle, s.id) }}</span>
-        </button>
+        <template v-for="g in groups" :key="g">
+          <div class="rail-group">{{ g }}</div>
+          <button v-for="s in sections.filter((x) => x.group === g)" :key="s.id" :class="{ on: section === s.id }" @click="section = s.id; selected = null">
+            <span class="ic">{{ s.icon }}</span>
+            <span class="lbl">{{ s.label }}</span>
+            <span class="cnt">{{ SECTION_COUNT(bundle, s.id) }}</span>
+          </button>
+        </template>
         <div class="rail-foot">
           <span v-if="bundle?.stub" class="stub">preview · fabric not yet wired</span>
         </div>
@@ -121,10 +135,38 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
               <div v-if="it.metric" class="sub">{{ it.metric.name }}: <b>{{ it.metric.value }}</b></div>
             </template>
             <!-- experiments -->
-            <template v-else>
+            <template v-else-if="section === 'experiments'">
               <div class="row"><span class="name">{{ it.title }}</span><span v-if="it.reproducible" class="pill ok">reproducible</span></div>
               <div class="sub">{{ it.provenance }}</div>
               <div v-if="it.steps" class="prov"><span v-for="st in it.steps" :key="st.label" class="pstep" :title="st.hash">{{ st.label }}</span></div>
+            </template>
+            <!-- extraction (holmes / sherlock / ingest → graph) -->
+            <template v-else-if="section === 'extraction'">
+              <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="it.status">{{ it.status }}</span></div>
+              <div class="sub"><span class="method">{{ it.engine }}</span> · {{ it.kind }} → {{ it.target }}</div>
+              <div v-if="it.extracted" class="sub"><b>{{ it.extracted.toLocaleString() }}</b> extracted</div>
+            </template>
+            <!-- ontology (ontogenesis) -->
+            <template v-else-if="section === 'ontology'">
+              <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="{ ok: it.aligned }">{{ it.kind }}</span></div>
+              <div class="sub"><span class="method">{{ it.engine }}</span><span v-if="it.count"> · {{ it.count.toLocaleString() }}</span><span v-if="it.aligned"> · aligned</span></div>
+            </template>
+            <!-- graph (hellgraph) -->
+            <template v-else-if="section === 'graph'">
+              <div class="row"><span class="name">{{ it.label }}</span></div>
+              <div class="stat">{{ typeof it.value === 'number' ? it.value.toLocaleString() : it.value }}</div>
+              <div v-if="it.hint" class="sub">{{ it.hint }}</div>
+            </template>
+            <!-- retrieval (fiber / graph-rag / topic) -->
+            <template v-else-if="section === 'retrieval'">
+              <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="{ ok: it.ready }">{{ it.ready ? 'ready' : 'building' }}</span></div>
+              <div class="sub"><span class="method">{{ it.method }}</span> · {{ it.engine }} · scope: {{ it.scope }}</div>
+            </template>
+            <!-- generation (new-hope) -->
+            <template v-else>
+              <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="it.status">{{ it.status }}</span></div>
+              <div class="sub"><span class="method">{{ it.engine }}</span> · {{ it.kind }}<span v-if="it.grounded" class="dot ok"> ● grounded</span></div>
+              <div v-if="it.output" class="sub">{{ it.output }}</div>
             </template>
           </article>
         </div>
@@ -196,6 +238,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 .bar { height: 5px; background: #eceff1; border-radius: 3px; margin: 9px 0 5px; overflow: hidden; } .bar span { display: block; height: 100%; background: var(--accent); }
 .prov { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; } .pstep { font: 10px/1.4 ui-monospace, monospace; background: #f1f3f4; border-radius: 6px; padding: 1px 7px; color: #3c4043; }
 .dot.ok { color: #137333; font-size: 11px; }
+.stat { font-size: 26px; font-weight: 700; margin-top: 6px; letter-spacing: -0.5px; }
+.rail-group { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #9aa0a6; padding: 12px 12px 4px; }
 
 .pill { font-size: 11px; border-radius: 8px; padding: 1px 8px; border: 1px solid var(--line); color: var(--sub); white-space: nowrap; }
 .pill.ok, .pill.promoted, .pill.done { border-color: #137333; color: #137333; }

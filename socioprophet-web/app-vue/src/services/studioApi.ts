@@ -7,7 +7,9 @@
 
 const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_API;
 
-export type StudioSection = "notebooks" | "data" | "models" | "tuning" | "experiments";
+export type StudioSection =
+  | "notebooks" | "data" | "models" | "tuning" | "experiments"          // Workbench
+  | "extraction" | "ontology" | "graph" | "retrieval" | "generation";   // Knowledge engineering
 
 export interface Notebook {
   id: string; name: string; runtime: string; kernel: string;
@@ -32,8 +34,28 @@ export interface Experiment {
   steps?: { label: string; hash: string }[]; rerunnable?: boolean;
 }
 
+// ── Knowledge engineering — extraction → ontology → graph → retrieval → generation ──
+export interface ExtractionSource {
+  id: string; name: string; engine: "holmes" | "sherlock" | "doc-ingest"; kind: string;
+  status: "idle" | "running" | "done"; extracted?: number; target: string; // → graph
+}
+export interface OntologyItem {
+  id: string; name: string; kind: "class" | "relation" | "axiom" | "alignment"; engine: "ontogenesis";
+  count?: number; aligned?: boolean;
+}
+export interface GraphStat { id: string; label: string; value: number | string; hint?: string }
+export interface RetrievalIndex {
+  id: string; name: string; method: "fiber" | "graph-rag" | "topic" | "vector" | "lexical";
+  engine: "fibered-retrieval" | "slash-topics" | "hellgraph" | "noetica"; scope: string; ready: boolean;
+}
+export interface GenerationRun {
+  id: string; name: string; engine: "new-hope"; kind: "synthesis" | "generation-tuning" | "distillation";
+  status: "queued" | "running" | "done" | "failed"; grounded?: boolean; output?: string;
+}
+
 export interface StudioBundle {
   notebooks: Notebook[]; data: DataAsset[]; models: ModelCard[]; tuning: TuningRun[]; experiments: Experiment[];
+  extraction: ExtractionSource[]; ontology: OntologyItem[]; graph: GraphStat[]; retrieval: RetrievalIndex[]; generation: GenerationRun[];
   stub?: boolean;
 }
 
@@ -64,6 +86,32 @@ const STUB: StudioBundle = {
   experiments: [
     { id: "e-1", title: "LoRA vs full fine-tune", reproducible: true, provenance: "in-toto + conda-lock", createdAt: now(), rerunnable: true, steps: [{ label: "runtime", hash: "sha256:9a1…" }, { label: "data", hash: "sha256:c4f…" }, { label: "code", hash: "sha256:2e8…" }] },
     { id: "e-2", title: "SAE sparsity sweep", reproducible: true, provenance: "in-toto + flake.lock", createdAt: now(), rerunnable: true, steps: [{ label: "runtime", hash: "sha256:77b…" }, { label: "params", hash: "sha256:1d3…" }] },
+  ],
+  extraction: [
+    { id: "x-1", name: "Entity & relation extraction — corpus_v3", engine: "holmes", kind: "entities+relations", status: "running", extracted: 48210, target: "project graph" },
+    { id: "x-2", name: "Federated retrieval → facts", engine: "sherlock", kind: "federated search", status: "idle", target: "project graph" },
+    { id: "x-3", name: "Doc ingest — governed", engine: "doc-ingest", kind: "chunks+claims", status: "done", extracted: 12904, target: "proj- collection" },
+  ],
+  ontology: [
+    { id: "o-1", name: "Domain ontology", kind: "class", engine: "ontogenesis", count: 342, aligned: true },
+    { id: "o-2", name: "Relations", kind: "relation", engine: "ontogenesis", count: 118, aligned: true },
+    { id: "o-3", name: "KKO ⇄ project alignment", kind: "alignment", engine: "ontogenesis", aligned: true },
+  ],
+  graph: [
+    { id: "g-1", label: "Entities", value: 61240, hint: "canonical entities in the project graph" },
+    { id: "g-2", label: "Relations", value: 148900 },
+    { id: "g-3", label: "Documents grounded", value: 12904 },
+    { id: "g-4", label: "Engine", value: "HellGraph", hint: "gremlin / sparql over :8090" },
+  ],
+  retrieval: [
+    { id: "r-1", name: "Fibered retrieval (PageIndex ⊕ HellGraph)", method: "fiber", engine: "fibered-retrieval", scope: "project", ready: true },
+    { id: "r-2", name: "Graph-RAG", method: "graph-rag", engine: "hellgraph", scope: "project", ready: true },
+    { id: "r-3", name: "Topic index", method: "topic", engine: "slash-topics", scope: "project", ready: true },
+    { id: "r-4", name: "Semantic + lexical", method: "vector", engine: "noetica", scope: "chat + project", ready: true },
+  ],
+  generation: [
+    { id: "gn-1", name: "Synthesize training set from graph", engine: "new-hope", kind: "synthesis", status: "running", grounded: true, output: "→ annotation set" },
+    { id: "gn-2", name: "Generation-tuning — grounded rewrite", engine: "new-hope", kind: "generation-tuning", status: "queued", grounded: true },
   ],
   stub: true,
 };
