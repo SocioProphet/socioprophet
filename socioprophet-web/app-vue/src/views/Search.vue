@@ -1,0 +1,119 @@
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { search, type BlendedResults, type SearchResult } from "../services/searchApi";
+
+const q = ref("");
+const loading = ref(false);
+const error = ref("");
+const data = ref<BlendedResults | null>(null);
+
+const commons = computed(() => (data.value?.results ?? []).filter((r) => r.source === "commons"));
+const web = computed(() => (data.value?.results ?? []).filter((r) => r.source === "web"));
+
+async function run() {
+  const query = q.value.trim();
+  if (!query) return;
+  loading.value = true;
+  error.value = "";
+  try {
+    data.value = await search(query);
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "search failed";
+    data.value = null;
+  } finally {
+    loading.value = false;
+  }
+}
+
+function hostOf(url: string): string {
+  const m = url.match(/^[a-z]+:\/\/([^/]+)/i);
+  return m ? m[1] : url.split("/")[0];
+}
+function isExternal(url: string): boolean {
+  return url.startsWith("http");
+}
+</script>
+
+<template>
+  <div class="search" :class="{ landing: !data && !loading }">
+    <header class="masthead">
+      <div class="brand">socioprophet<span class="ai">.ai</span></div>
+      <p class="tagline">Agentic search over the web <em>and</em> a sovereign commons the web can't index — grounded, cited, yours.</p>
+    </header>
+
+    <form class="box" @submit.prevent="run">
+      <input
+        v-model="q"
+        type="search"
+        placeholder="Ask anything…"
+        aria-label="Search query"
+        autofocus
+      />
+      <button type="submit" :disabled="loading">{{ loading ? "…" : "Search" }}</button>
+    </form>
+
+    <p v-if="data?.stub" class="note stub">Preview mode — showing sample results. Live results appear once the search gateway is connected.</p>
+    <p v-if="data?.degraded?.web" class="note warn">Web results are temporarily unavailable — showing commons only.</p>
+    <p v-if="data?.degraded?.commons" class="note warn">Commons results are temporarily unavailable — showing web only.</p>
+    <p v-if="error" class="note err">{{ error }}</p>
+
+    <section v-if="data && !loading" class="results">
+      <div v-if="commons.length" class="group">
+        <h2>⬡ Community commons <span class="count">{{ commons.length }}</span></h2>
+        <article v-for="(r, i) in commons" :key="'c' + i" class="hit commons">
+          <a v-if="isExternal(r.url)" :href="r.url" target="_blank" rel="noopener" class="title">{{ r.title }}</a>
+          <span v-else class="title plain">{{ r.title }}</span>
+          <div class="src">{{ hostOf(r.url) }} · <span class="badge sov">sovereign commons</span><span v-if="r.publishedDate" class="date"> · {{ new Date(r.publishedDate).toLocaleDateString() }}</span></div>
+          <p class="snippet">{{ r.snippet }}</p>
+        </article>
+      </div>
+
+      <div v-if="web.length" class="group">
+        <h2>◍ Web <span class="count">{{ web.length }}</span></h2>
+        <article v-for="(r, i) in web" :key="'w' + i" class="hit">
+          <a :href="r.url" target="_blank" rel="noopener" class="title">{{ r.title }}</a>
+          <div class="src">{{ hostOf(r.url) }} · <span class="badge">{{ r.engine }}</span></div>
+          <p class="snippet">{{ r.snippet }}</p>
+        </article>
+      </div>
+
+      <p v-if="!commons.length && !web.length" class="empty">Nothing found for “{{ data.query }}”. Try different words.</p>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.search { padding: 24px 32px; font: 15px/1.55 system-ui, sans-serif; color: #202124; height: 100%; overflow: auto; max-width: 780px; margin: 0 auto; }
+.search.landing { display: flex; flex-direction: column; justify-content: center; }
+.masthead { text-align: center; margin-bottom: 20px; }
+.brand { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+.brand .ai { color: #1a73e8; }
+.tagline { color: #5f6368; max-width: 560px; margin: 6px auto 0; }
+.tagline em { color: #202124; font-style: normal; font-weight: 600; }
+
+.box { display: flex; gap: 8px; margin: 8px 0 4px; }
+.box input { flex: 1; padding: 13px 16px; font-size: 16px; border: 1px solid #dadce0; border-radius: 26px; outline: none; }
+.box input:focus { border-color: #1a73e8; box-shadow: 0 1px 6px rgba(26,115,232,0.18); }
+.box button { padding: 0 22px; font-size: 15px; font-weight: 600; color: #fff; background: #1a73e8; border: none; border-radius: 26px; cursor: pointer; }
+.box button:disabled { opacity: 0.6; cursor: default; }
+
+.note { font-size: 13px; margin: 10px 2px; padding: 8px 12px; border-radius: 8px; }
+.note.stub { background: #e8f0fe; color: #1a56c4; }
+.note.warn { background: #fef7e0; color: #b06000; }
+.note.err { background: #fce8e6; color: #c5221f; }
+
+.results { margin-top: 14px; }
+.group { margin-bottom: 26px; }
+.group h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #5f6368; border-bottom: 1px solid #eceff1; padding-bottom: 6px; margin: 0 0 12px; }
+.group h2 .count { color: #9aa0a6; font-weight: 400; }
+.hit { margin-bottom: 16px; }
+.hit .title { font-size: 18px; color: #1a0dab; text-decoration: none; }
+.hit .title:hover { text-decoration: underline; }
+.hit .title.plain { color: #202124; }
+.hit .src { font-size: 12px; color: #5f6368; margin: 2px 0 3px; }
+.hit .snippet { color: #3c4043; margin: 0; }
+.hit.commons { border-left: 3px solid #1a73e8; padding-left: 12px; }
+.badge { font-size: 11px; border: 1px solid #dadce0; border-radius: 8px; padding: 1px 6px; color: #5f6368; }
+.badge.sov { border-color: #1a73e8; color: #1a73e8; }
+.empty { color: #5f6368; }
+</style>

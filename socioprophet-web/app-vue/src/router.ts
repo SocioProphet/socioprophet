@@ -4,6 +4,9 @@ import { useAuth } from "./stores/auth";
 const routes = [
   { path: "/", redirect: "/builder" },
   { path: "/login", component: () => import("./views/Login.vue"), meta: { public: true } },
+  // socioprophet.ai — the agentic search surface. PUBLIC: you don't log in to search (login is for save/
+  // personalize, later). Blends web + the sovereign commons via the search-gateway.
+  { path: "/search", component: () => import("./views/Search.vue"), meta: { public: true } },
   { path: "/builder", component: () => import("./views/Builder.vue") },
   { path: "/builds", component: () => import("./views/Builds.vue") },
   { path: "/fleet", component: () => import("./views/Fleet.vue") },
