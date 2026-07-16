@@ -16,6 +16,9 @@ const routes = [
   { path: "/cloud", component: () => import("./views/Cloud.vue") },
   { path: "/code", component: () => import("./views/Code.vue") },
   { path: "/market", component: () => import("./views/Market.vue") },
+  // Lattice Studio — the integrated workbench (notebooks · data + model catalogs · tuning · reproducible
+  // experiments), project-scoped so an agent team retrieves what's here. Authenticated.
+  { path: "/studio", component: () => import("./views/Studio.vue") },
 ];
 
 export const router = createRouter({ history: createWebHistory(), routes });
