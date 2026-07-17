@@ -1,0 +1,210 @@
+<script setup lang="ts">
+// The Governance cockpit — the Foundry-Workshop answer + the estate's crown jewels, operable in-product:
+// the REAL Ontogenesis ontology (817 classes) you type against, the typed/SHACL-validated ONTOLOGY ACTIONS
+// (Foundry's crown jewel, beaten), and the GAIA world-signals PROMOTION MEMBRANE where a promotion state IS an
+// epistemic status — the same governed-evidence discipline across the knowledge, human, and Earth twins.
+import { ref, onMounted, watch } from "vue";
+import {
+  loadOntology, loadOntologyClass, loadActions, invokeAction, loadWorldsignals, submitWorldsignal,
+  promoteWorldsignal, loadGaiaOntology, EPISTEMIC_COLORS,
+  type OntologyView, type OntologyClassDetail, type ActionDef, type WorldSignal, type GaiaOntology,
+} from "../services/studioApi";
+
+const props = defineProps<{ project: string }>();
+
+const onto = ref<OntologyView | null>(null);
+const actions = ref<ActionDef[]>([]);
+const signals = ref<WorldSignal[]>([]);
+const gaia = ref<GaiaOntology | null>(null);
+const loading = ref(true);
+const err = ref("");
+const token = ref("");
+const flash = ref("");
+function say(m: string) { flash.value = m; setTimeout(() => (flash.value = ""), 3000); }
+
+async function load() {
+  loading.value = true; err.value = "";
+  try {
+    const [o, a, s, g] = await Promise.all([loadOntology(""), loadActions(props.project), loadWorldsignals(props.project), loadGaiaOntology()]);
+    onto.value = o; actions.value = a.actions; signals.value = s.world_signals; gaia.value = g;
+  } catch (e) { err.value = e instanceof Error ? e.message : "failed to load governance"; }
+  finally { loading.value = false; }
+}
+onMounted(load);
+watch(() => props.project, load);
+
+// ontology browse
+const q = ref(""); const classDetail = ref<OntologyClassDetail | null>(null);
+async function search() { try { onto.value = await loadOntology(q.value); } catch { /* */ } }
+async function openClass(iri: string) { try { classDetail.value = await loadOntologyClass(iri); } catch { /* */ } }
+
+// invoke action
+const invAction = ref(""); const invTarget = ref(""); const invArgs = ref("{}");
+async function doInvoke() {
+  try {
+    const args = JSON.parse(invArgs.value || "{}");
+    const r = await invokeAction({ project: props.project, action: invAction.value, target: invTarget.value, args }, token.value);
+    say(`Invoked ${invAction.value} → ${r.applied.join(", ")} · receipt ${r.receipt.correlation_id}`);
+  } catch (e) { say(e instanceof Error ? e.message : "invoke failed"); }
+}
+
+// GAIA
+const wsFeature = ref(""); const wsType = ref("feature_registry"); const wsActor = ref("human");
+async function doSubmit() {
+  try { const r = await submitWorldsignal({ project: props.project, feature_id: wsFeature.value, signal_type: wsType.value, actor_kind: wsActor.value }, token.value);
+    say(`Signal ${r.signal_id.split(":").pop()} → ${r.promotion_state} (${r.epistemic_mode})`); wsFeature.value = ""; await load(); }
+  catch (e) { say(e instanceof Error ? e.message : "submit failed"); }
+}
+async function doPromote(sig: WorldSignal, to_state: string, actor_kind: string) {
+  try {
+    const r = await promoteWorldsignal({ project: props.project, signal: sig.signal_id, to_state, actor_kind }, token.value);
+    if ("blocked" in r) say(`🔒 ${r.message}`);
+    else { say(`${sig.feature_id} → ${r.to_state} (${r.epistemic_mode})`); await load(); }
+  } catch (e) { say(e instanceof Error ? e.message : "promote failed"); }
+}
+
+function epi(mode?: string | null): string { return EPISTEMIC_COLORS[mode || "observed"] || "#c0c4c9"; }
+</script>
+
+<template>
+  <div class="gov">
+    <div class="gbar">
+      <span class="cnt">Governance · real ontology · typed actions · the GAIA promotion membrane</span>
+      <div class="spacer" />
+      <input v-model="token" type="password" class="tok" placeholder="write token" />
+      <button class="ghost" @click="load" :disabled="loading">↻</button>
+    </div>
+    <p v-if="flash" class="flash">{{ flash }}</p>
+    <p v-if="err" class="msg err">{{ err }}</p>
+    <p v-else-if="loading" class="msg">Loading governance…</p>
+
+    <div v-else class="grid">
+      <!-- Ontogenesis ontology browser -->
+      <section class="card">
+        <header class="ch"><span class="ci">⬡</span> Ontology<span class="score" v-if="onto">{{ onto.counts.classes }} classes · real</span></header>
+        <div class="orow">
+          <input v-model="q" class="j" placeholder="search Ontogenesis classes…" @keyup.enter="search" />
+          <button class="mini" @click="search">Search</button>
+        </div>
+        <ul class="clist">
+          <li v-for="c in onto?.classes.slice(0, 8)" :key="c.iri" @click="openClass(c.iri)" :class="{ sel: classDetail?.class.iri === c.iri }">
+            <code class="mono">{{ c.iri }}</code><span class="pc">{{ c.property_count }} props</span>
+          </li>
+        </ul>
+        <div v-if="classDetail" class="cdetail">
+          <div class="cd-h"><b>{{ classDetail.class.iri }}</b><span v-if="classDetail.class.subClassOf.length" class="sub">⊑ {{ classDetail.class.subClassOf.join(", ") }}</span></div>
+          <div class="props">
+            <span v-for="p in classDetail.class.inherited_properties.slice(0, 12)" :key="p.iri" class="prop" :class="p.kind">{{ p.iri }}<i v-if="p.range">→{{ p.range }}</i></span>
+          </div>
+        </div>
+        <p class="sub">The real Ontogenesis OWL corpus — actions are <b>typed</b> against these classes and their declared properties.</p>
+      </section>
+
+      <!-- Ontology actions (Foundry Workshop, beaten) -->
+      <section class="card">
+        <header class="ch"><span class="ci">◑</span> Actions<span class="tagline">typed · SHACL-validated · reversible</span></header>
+        <div v-for="a in actions" :key="a.action_id" class="action">
+          <div class="arow"><b>{{ a.name }}</b><code class="mono tt">{{ a.target_type }}</code></div>
+          <div class="eff"><span v-for="(e, i) in a.effects" :key="i" class="e">{{ e.op }} {{ e.property || e.label }}</span></div>
+        </div>
+        <div class="invoke">
+          <div class="irow">
+            <input v-model="invAction" class="j" placeholder="action name" />
+            <input v-model="invTarget" class="j" placeholder="target node id" />
+          </div>
+          <input v-model="invArgs" class="j mono" placeholder='args {"newname":"width"}' />
+          <button class="primary" @click="doInvoke">Invoke</button>
+        </div>
+        <p class="sub">Foundry's crown jewel — but every invocation is proof-carrying, <b>SHACL-validated against the ontology</b>, receipted, and reversible.</p>
+      </section>
+
+      <!-- GAIA promotion membrane -->
+      <section class="card wide" v-if="gaia">
+        <header class="ch"><span class="ci">◍</span> GAIA world-signals — the promotion membrane<span class="tagline">Earth twin</span></header>
+        <div class="membrane">
+          <div v-for="(m, i) in gaia.promotion_epistemic_membrane" :key="m.state" class="mstate" :class="{ canon: m.canonical }">
+            <span class="ms-n">{{ m.state }}</span>
+            <span class="ms-epi" :style="{ color: epi(m.epistemic_human) }">{{ m.epistemic_human }}</span>
+            <span v-if="i < gaia.promotion_epistemic_membrane.length - 1" class="ms-arrow">→</span>
+          </div>
+        </div>
+        <p class="invariant">⚖ {{ gaia.invariant }}</p>
+
+        <div class="submit">
+          <input v-model="wsFeature" class="j" placeholder="feature_id" />
+          <select v-model="wsType" class="j"><option>feature_registry</option><option>weather</option><option>foot_traffic</option></select>
+          <select v-model="wsActor" class="j"><option value="human">human</option><option value="model">model</option></select>
+          <button class="primary" @click="doSubmit">Submit signal</button>
+        </div>
+
+        <table class="wgrid">
+          <thead><tr><th>Feature</th><th>State</th><th>Epistemic</th><th>Evidence</th><th>Promote</th></tr></thead>
+          <tbody>
+            <tr v-for="s in signals" :key="s.signal_id">
+              <td class="nm">{{ s.feature_id }}</td>
+              <td><span class="state" :class="{ canon: s.canonical }">{{ s.promotion_state }}</span></td>
+              <td><span class="epi" :style="{ borderColor: epi(s.epistemic_mode), color: epi(s.epistemic_mode) }">{{ s.epistemic_mode }}</span></td>
+              <td class="ev">{{ s.evidence_count }}</td>
+              <td class="promote">
+                <button class="mini" @click="doPromote(s, 'ReviewRequired', 'human')" v-if="!s.canonical">→ review</button>
+                <button class="mini go" @click="doPromote(s, 'Promoted', 'human')" v-if="!s.canonical">→ promote</button>
+                <button class="mini danger" @click="doPromote(s, 'Promoted', 'model')" v-if="!s.canonical" title="demonstrates the invariant">→ promote as model</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="sub">The promotion state <b>is</b> the epistemic status. Try “promote as model” — GAIA invariant #2 blocks a model from canonizing. One discipline across knowledge, human &amp; Earth twins.</p>
+      </section>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.gov { font: 14px/1.5 system-ui, sans-serif; color: #202124; }
+.gbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.gbar .cnt { color: #5f6368; font-size: 12px; } .gbar .spacer { flex: 1; }
+.gbar .tok { border: 1px solid #dadce0; border-radius: 8px; padding: 6px 8px; font-size: 13px; width: 120px; }
+.ghost { border: 1px solid #dadce0; background: #fff; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; }
+.flash { background: #eaf5ee; color: #137333; border-radius: 8px; padding: 7px 12px; font-size: 12.5px; margin: 0 0 12px; }
+.msg { color: #5f6368; } .msg.err { color: #c5221f; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.card { border: 1px solid #e8eaed; border-radius: 12px; padding: 14px 16px; background: #fff; } .card.wide { grid-column: 1 / -1; }
+.ch { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+.ch .ci { color: #1a73e8; } .ch .tagline { margin-left: auto; font-size: 10.5px; color: #1a73e8; background: #e8f0fe; border-radius: 10px; padding: 2px 9px; font-weight: 500; }
+.score { margin-left: auto; font-size: 11px; color: #137333; background: #eaf5ee; border-radius: 10px; padding: 2px 9px; }
+.mono { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; }
+.sub { color: #5f6368; font-size: 12px; margin: 10px 0 0; } .sub b { color: #202124; }
+.j { border: 1px solid #dadce0; border-radius: 8px; padding: 6px 8px; font-size: 13px; }
+.primary { border: 1px solid #1a73e8; background: #1a73e8; color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
+.mini { border: 1px solid #dadce0; background: #fff; border-radius: 7px; padding: 3px 9px; font-size: 11.5px; cursor: pointer; }
+.mini.go { border-color: #1a73e8; color: #1a73e8; } .mini.danger { border-color: #e0a44a; color: #b06000; }
+
+.orow { display: flex; gap: 6px; margin-bottom: 8px; } .orow .j { flex: 1; }
+.clist { list-style: none; margin: 0 0 8px; padding: 0; }
+.clist li { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 6px; cursor: pointer; }
+.clist li:hover, .clist li.sel { background: #f6f9fe; } .clist .pc { margin-left: auto; font-size: 11px; color: #80868b; }
+.cdetail { border-top: 1px solid #f1f3f4; padding-top: 8px; margin-top: 6px; }
+.cd-h { display: flex; gap: 8px; align-items: baseline; } .cd-h .sub { font-size: 11px; color: #5f6368; }
+.props { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.prop { font-size: 10.5px; background: #f1f3f4; border-radius: 6px; padding: 1px 6px; font-family: ui-monospace, Menlo, monospace; }
+.prop.object { background: #e8f0fe; color: #1a73e8; } .prop i { font-style: normal; opacity: .6; }
+
+.action { border: 1px solid #f1f3f4; border-radius: 8px; padding: 6px 8px; margin-bottom: 6px; }
+.arow { display: flex; align-items: center; gap: 8px; } .arow .tt { margin-left: auto; background: #f1f3f4; border-radius: 6px; padding: 1px 6px; }
+.eff { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; } .eff .e { font-size: 10.5px; color: #5f6368; background: #f8f9fa; border-radius: 6px; padding: 1px 6px; }
+.invoke { border-top: 1px solid #f1f3f4; padding-top: 8px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
+.irow { display: flex; gap: 6px; } .irow .j { flex: 1; } .invoke .j { width: 100%; }
+
+.membrane { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.mstate { display: flex; align-items: center; gap: 6px; border: 1px solid #e8eaed; border-radius: 8px; padding: 5px 9px; }
+.mstate.canon { border-color: #cbe6d3; background: #f4fbf6; }
+.ms-n { font-weight: 600; font-size: 12px; } .ms-epi { font-size: 10.5px; } .ms-arrow { color: #9aa0a6; margin: 0 2px; }
+.invariant { background: #fef7e0; color: #b06000; border-radius: 8px; padding: 6px 10px; font-size: 12px; margin: 0 0 10px; }
+.submit { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.wgrid { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.wgrid th { text-align: left; padding: 6px 8px; background: #f8f9fa; border-bottom: 1px solid #e8eaed; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #5f6368; }
+.wgrid td { padding: 6px 8px; border-bottom: 1px solid #f1f3f4; } .wgrid .nm { font-weight: 600; }
+.state { font-size: 10.5px; border-radius: 8px; padding: 1px 8px; background: #f1f3f4; color: #5f6368; } .state.canon { background: #eaf5ee; color: #137333; }
+.epi { font-size: 10px; border: 1px solid; border-radius: 8px; padding: 1px 7px; } .ev { text-align: center; }
+.promote { display: flex; gap: 4px; flex-wrap: wrap; }
+</style>

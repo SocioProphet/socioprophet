@@ -11,6 +11,7 @@ export type StudioSection =
   | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench
   | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation" // Knowledge engineering
   | "operations"                                                                // Operations cockpit (WS#45–48/#31)
+  | "governance"                                                                // Governance: ontology · actions · GAIA
   | "commons";                                                                  // Commons (WS#36–39)
 
 export interface Notebook {
@@ -534,6 +535,87 @@ export async function execute(
   }
   if (!res.ok) throw writeError("execute failed", res.status);
   return { ok: true, ...(await res.json()) };
+}
+
+// ── Governance panel: the real ontology (Ontogenesis) · typed actions (Foundry-Workshop) · GAIA world-signals ──
+export interface OntologyClassLite { iri: string; label?: string; subClassOf: string[]; property_count: number }
+export interface OntologyProperty { iri: string; label?: string; kind: string; range?: string | null }
+export interface OntologyView { base_iri: string; counts: Record<string, unknown>; classes: OntologyClassLite[]; total_matched: number }
+export interface OntologyClassDetail { class: { iri: string; label?: string; subClassOf: string[]; inherited_properties: OntologyProperty[] }; base_iri: string }
+
+export interface ActionEffectDef { op: string; property?: string; label?: string; value?: unknown; value_from?: string }
+export interface ActionDef { action_id: string; name: string; target_type: string; description?: string | null; params: { name: string; type?: string }[]; effects: ActionEffectDef[] }
+
+export interface WorldSignal { signal_id: string; feature_id: string; signal_type: string; promotion_state: string; epistemic_mode?: string | null; canonical: boolean; evidence_count: number; confidence?: number | null; submitted_at?: string | null }
+export interface GaiaMembrane { state: string; epistemic_human: string; epistemic_model: string; canonical: boolean }
+export interface GaiaOntology { promotion_states: string[]; promotion_epistemic_membrane: GaiaMembrane[]; invariant: string; three_twins: Record<string, string> }
+
+const STUB_ONTOLOGY: OntologyView = {
+  base_iri: "https://socioprophet.dev/ont/ontogenesis#", counts: { classes: 817, object_properties: 621, datatype_properties: 590 }, total_matched: 12,
+  classes: [
+    { iri: "upper:Entity", label: "Entity", subClassOf: [], property_count: 3 },
+    { iri: "upper:Agent", label: "Agent", subClassOf: ["upper:Entity"], property_count: 4 },
+    { iri: "upper:Evidence", label: "Evidence", subClassOf: ["upper:InformationArtifact"], property_count: 2 },
+    { iri: "upper:Policy", label: "Policy", subClassOf: ["upper:InformationArtifact"], property_count: 2 }],
+};
+const STUB_ACTIONS: { actions: ActionDef[]; count: number } = {
+  count: 1,
+  actions: [{ action_id: "proj-demo:action:rename_attr", name: "Rename attr", target_type: "ACSETAttr", description: "typed against the real ontology",
+    params: [{ name: "newname" }], effects: [{ op: "set_property", property: "acsetAttrName", value_from: "newname" }] }],
+};
+const STUB_WORLDSIGNALS: { world_signals: WorldSignal[]; count: number } = {
+  count: 2,
+  world_signals: [
+    { signal_id: "proj-demo:worldsignal:ft-42", feature_id: "foot-traffic-poi-42", signal_type: "feature_registry", promotion_state: "Promoted", epistemic_mode: "attested", canonical: true, evidence_count: 3, confidence: 0.91, submitted_at: "2h ago" },
+    { signal_id: "proj-demo:worldsignal:wx", feature_id: "weather-nowcast", signal_type: "weather", promotion_state: "EvidenceOnly", epistemic_mode: "derived", canonical: false, evidence_count: 0, confidence: 0.4, submitted_at: "5m ago" }],
+};
+const STUB_GAIA: GaiaOntology = {
+  promotion_states: ["EvidenceOnly", "ReviewRequired", "Rejected", "Promoted"],
+  invariant: "GAIA-2: a model may propose but only a human/policy actor may Promote to canonical (attested)",
+  three_twins: { knowledge: "HellGraph fact · observed→attested", human: "HDT Observation → OmegaState", earth: "GAIA WorldSignal → PromotionState" },
+  promotion_epistemic_membrane: [
+    { state: "EvidenceOnly", epistemic_human: "observed", epistemic_model: "derived", canonical: false },
+    { state: "ReviewRequired", epistemic_human: "observed", epistemic_model: "derived", canonical: false },
+    { state: "Rejected", epistemic_human: "simulated", epistemic_model: "simulated", canonical: false },
+    { state: "Promoted", epistemic_human: "attested", epistemic_model: "attested", canonical: true }],
+};
+
+export const loadOntology = (search: string) => _read<OntologyView>(`/api/studio/ontology${search ? `?search=${encodeURIComponent(search)}` : ""}`, STUB_ONTOLOGY);
+export const loadOntologyClass = (cls: string) => _read<OntologyClassDetail>(`/api/studio/ontology?cls=${encodeURIComponent(cls)}`, { class: { iri: cls, subClassOf: [], inherited_properties: [] }, base_iri: "" });
+export const loadActions = (project: string) => _read(`/api/studio/actions?project=${encodeURIComponent(project)}`, STUB_ACTIONS);
+export const loadWorldsignals = (project: string) => _read(`/api/studio/worldsignals?project=${encodeURIComponent(project)}`, STUB_WORLDSIGNALS);
+export const loadGaiaOntology = () => _read(`/api/studio/gaia/ontology`, STUB_GAIA);
+
+export async function invokeAction(input: { project: string; action: string; target: string; args: Record<string, unknown> }, token: string): Promise<{ invocation_id: string; applied: string[]; receipt: { correlation_id: string } }> {
+  if (!BASE) return { invocation_id: "stub:inv", applied: ["set acsetAttrName"], receipt: { correlation_id: "act-stub" } };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/action/invoke`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) {
+    let msg = `${res.status}`;
+    try { const j = await res.json(); msg = typeof j.detail === "object" ? JSON.stringify(j.detail.violations ?? j.detail) : (j.detail ?? msg); } catch { /* */ }
+    throw new Error(`invoke failed: ${msg}`);
+  }
+  return await res.json();
+}
+
+export async function submitWorldsignal(input: { project: string; feature_id: string; signal_type: string; confidence?: number; evidence_refs?: string[]; actor_kind?: string }, token: string): Promise<{ signal_id: string; promotion_state: string; epistemic_mode: string }> {
+  if (!BASE) return { signal_id: `stub:${input.feature_id}`, promotion_state: "EvidenceOnly", epistemic_mode: input.actor_kind === "model" ? "derived" : "observed" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/worldsignal`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) throw writeError("submit failed", res.status);
+  return await res.json();
+}
+
+export async function promoteWorldsignal(input: { project: string; signal: string; to_state: string; actor_kind?: string; policy_id?: string }, token: string): Promise<{ to_state: string; epistemic_mode: string; canonical: boolean } | { blocked: true; message: string }> {
+  if (!BASE) return input.actor_kind === "model" && input.to_state === "Promoted" ? { blocked: true, message: "GAIA invariant #2 — a model may not Promote to canonical" } : { to_state: input.to_state, epistemic_mode: input.to_state === "Promoted" ? "attested" : "observed", canonical: input.to_state === "Promoted" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/worldsignal/promote`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (res.status === 403 || res.status === 422) {
+    const d = (await res.json().catch(() => ({}))) as { detail?: { message?: string } | string };
+    return { blocked: true, message: typeof d.detail === "object" ? (d.detail.message ?? "blocked") : (d.detail ?? "blocked") };
+  }
+  if (!res.ok) throw writeError("promote failed", res.status);
+  return await res.json();
 }
 
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {

@@ -6,6 +6,7 @@ import StudioQuery from "../components/StudioQuery.vue";
 import StudioExperiments from "../components/StudioExperiments.vue";
 import StudioCommons from "../components/StudioCommons.vue";
 import StudioOps from "../components/StudioOps.vue";
+import StudioGovernance from "../components/StudioGovernance.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -59,6 +60,7 @@ const sections: { id: StudioSection; label: string; icon: string; group: string;
   { id: "retrieval",   label: "Retrieval",     icon: "◎", group: "Knowledge engineering", blurb: "Fibered retrieval (PageIndex ⊕ HellGraph) · Graph-RAG · topic & semantic indexes." },
   { id: "generation",  label: "Generation",    icon: "✦", group: "Knowledge engineering", blurb: "Grounded generation & generation-tuning — New-Hope synthesis over the graph." },
   { id: "operations",  label: "Operations",    icon: "⚙", group: "Operations", blurb: "The operations cockpit — run pipelines, promote models, browse the data catalog, submit pay-gated compute, and inspect GraphRAG communities. Every action proof-carrying; compute entitlement-gated (sovereign + multi-backend)." },
+  { id: "governance",  label: "Governance",    icon: "⬡", group: "Operations", blurb: "The governance cockpit — browse the real Ontogenesis ontology (817 classes), invoke SHACL-validated ontology actions (Foundry's crown jewel, beaten), and work the GAIA world-signal promotion membrane where a promotion state IS an epistemic status. One discipline across the knowledge, human & Earth twins." },
   { id: "commons",     label: "Commons",       icon: "◆", group: "Commons", blurb: "The proof-carrying knowledge commons — FAIR+ metadata, sovereign DOIs, immutable preservation, ORCID/OpenAIRE + agent hooks, and epistemic-weighted community curation." },
 ];
 const groups = computed(() => [...new Set(sections.map((s) => s.group))]);
@@ -97,6 +99,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   generation:  [{ label: "Run", hint: "New-Hope grounded synthesis" }, { label: "→ Annotation set", hint: "into the workbench" }, { label: "→ Tune", hint: "generation-tuning" }],
   commons:     [{ label: "Cite", hint: "mint a sovereign DOI" }, { label: "Preserve", hint: "seal an immutable version" }, { label: "Export FAIR", hint: "schema.org / DataCite / PROV-O" }],
   operations:  [{ label: "Run pipeline", hint: "governed run ledger" }, { label: "Promote model", hint: "staging → production" }, { label: "Submit compute", hint: "entitlement-gated execution" }],
+  governance:  [{ label: "Invoke action", hint: "SHACL-validated writeback" }, { label: "Submit signal", hint: "GAIA world-signal" }, { label: "Promote", hint: "the epistemic membrane" }],
 };
 </script>
 
@@ -211,6 +214,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
         <StudioExperiments v-else-if="section === 'experiments'" :project="project" />
         <!-- Operations = the operable cockpit: pipelines/registry/catalog/compute/communities (WS#45–48/#31) -->
         <StudioOps v-else-if="section === 'operations'" :project="project" />
+        <!-- Governance = ontology · typed SHACL-validated actions · GAIA promotion membrane (WS#49–51) -->
+        <StudioGovernance v-else-if="section === 'governance'" :project="project" />
         <!-- Commons = the proof-carrying knowledge commons (WS#36–39) -->
         <StudioCommons v-else-if="section === 'commons'" :project="project" />
 
