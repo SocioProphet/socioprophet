@@ -10,6 +10,7 @@ const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_
 export type StudioSection =
   | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench
   | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation" // Knowledge engineering
+  | "operations"                                                                // Operations cockpit (WS#45–48/#31)
   | "commons";                                                                  // Commons (WS#36–39)
 
 export interface Notebook {
@@ -450,6 +451,89 @@ export async function endorse(
   });
   if (!res.ok) throw writeError("endorse failed", res.status);
   return await res.json();
+}
+
+// ── Operations panel (Databricks/Foundry-parity): pipelines · model registry · catalog · compute · communities ──
+export interface PipelineStepDef { id: string; kind: string; inputs?: string[]; outputs?: string[] }
+export interface Pipeline { pipeline_id: string; name: string; steps: PipelineStepDef[]; step_count: number }
+export interface ModelVersion { model_id: string; version: string; stage: string; metrics: Record<string, number>; run?: string | null }
+export interface ModelEntry { name: string; versions: ModelVersion[] }
+export interface Dataset { id: string; name: string; labels: string[]; connector?: string | null; epistemic_mode: string; columns: string[] }
+export interface ComputeBackend { id: string; kind: string; note: string; entitled: boolean; default?: boolean }
+export interface Compute { backends: ComputeBackend[]; entitled_any: boolean; model: string }
+export interface Community { community: string; size: number; top_members: { id: string; label: string; degree: number }[]; epistemic_distribution: Record<string, number> }
+export interface ExecReceipt { correlation_id: string; backend: string; replayable: boolean; bundle_ref: string; payload_sha256: string }
+export type ExecResult =
+  | { ok: true; execution_id: string; backend: string; status: string; receipt: ExecReceipt }
+  | { ok: false; entitlement_required: true; backend: string; message: string };
+
+const STUB_PIPELINES: { pipelines: Pipeline[]; count: number } = {
+  count: 1,
+  pipelines: [{ pipeline_id: "proj-demo:pipeline:etl_train", name: "ETL → train", step_count: 3,
+    steps: [{ id: "load", kind: "extract", outputs: ["raw"] }, { id: "clean", kind: "transform", inputs: ["raw"], outputs: ["tidy"] }, { id: "fit", kind: "train", inputs: ["tidy"] }] }],
+};
+const STUB_MODELS: { models: ModelEntry[]; count: number } = {
+  count: 2,
+  models: [{ name: "classifier", versions: [
+    { model_id: "proj-demo:model:classifier:2", version: "2", stage: "production", metrics: { acc: 0.93 }, run: "proj-demo:run:abc" },
+    { model_id: "proj-demo:model:classifier:1", version: "1", stage: "archived", metrics: { acc: 0.88 }, run: "proj-demo:run:aa0" }] }],
+};
+const STUB_CATALOG: { datasets: Dataset[]; count: number } = {
+  count: 2,
+  datasets: [
+    { id: "proj-demo:ingest:people", name: "people", labels: ["Person", "Ingested"], connector: "csv", epistemic_mode: "observed", columns: ["id", "name", "age"] },
+    { id: "proj-demo:ingest:orders", name: "orders", labels: ["Order", "Ingested"], connector: "postgres", epistemic_mode: "observed", columns: ["order_id", "total"] }],
+};
+const STUB_COMPUTE: Compute = {
+  entitled_any: false,
+  model: "pay-gated full service — capability available, runtime provisioned only when entitled",
+  backends: [
+    { id: "mesh-k8s", kind: "sovereign", default: true, note: "self-hosted sandbox on the paid mesh (kind / k3s / k8s / DinD)", entitled: false },
+    { id: "spark", kind: "sovereign", note: "a small Spark namespace on the mesh", entitled: false },
+    { id: "databricks", kind: "external", note: "connect to your own Databricks workspace", entitled: false }],
+};
+const STUB_COMMUNITIES: { communities: Community[]; count: number; inter_community_edges: number; algorithm: string } = {
+  count: 2, inter_community_edges: 3, algorithm: "louvain-modularity (deterministic, single-level)",
+  communities: [
+    { community: "proj-demo:community:a1b2", size: 7, epistemic_distribution: { verified: 3, observed: 4 }, top_members: [{ id: "proj-demo:ent:hellgraph", label: "HellGraph", degree: 6 }, { id: "proj-demo:ent:provenance", label: "provenance", degree: 4 }] },
+    { community: "proj-demo:community:c3d4", size: 4, epistemic_distribution: { observed: 4 }, top_members: [{ id: "proj-demo:ent:foundry", label: "Foundry", degree: 3 }] }],
+};
+
+export const loadPipelines = (project: string) => _read(`/api/studio/pipelines?project=${encodeURIComponent(project)}`, STUB_PIPELINES);
+export const loadModels = (project: string) => _read(`/api/studio/models?project=${encodeURIComponent(project)}`, STUB_MODELS);
+export const loadCatalog = (project: string) => _read(`/api/studio/catalog?project=${encodeURIComponent(project)}`, STUB_CATALOG);
+export const loadCompute = (project: string) => _read(`/api/studio/compute?project=${encodeURIComponent(project)}`, STUB_COMPUTE);
+export const loadCommunities = (project: string) => _read(`/api/studio/communities?project=${encodeURIComponent(project)}`, STUB_COMMUNITIES);
+
+export async function runPipeline(input: { project: string; pipeline: string; status?: string }, token: string): Promise<{ run_id: string; status: string }> {
+  if (!BASE) return { run_id: `stub:run:${input.pipeline}`, status: input.status ?? "finished" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/pipeline/run`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) throw writeError("pipeline run failed", res.status);
+  return await res.json();
+}
+
+export async function promoteModel(input: { project: string; name: string; version: string; stage: string }, token: string): Promise<{ model_id: string; stage: string; from_stage: string }> {
+  if (!BASE) return { model_id: `stub:model:${input.name}:${input.version}`, stage: input.stage, from_stage: "staging" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/model/promote`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) throw writeError("promote failed", res.status);
+  return await res.json();
+}
+
+export async function execute(
+  input: { project: string; kind: string; backend: string; ref?: string; code?: string },
+  token: string,
+): Promise<ExecResult> {
+  if (!BASE) return { ok: false, entitlement_required: true, backend: input.backend, message: "compute is a paid, provisioned service — provision an entitlement to run (dev stub)" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/execute`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (res.status === 402) {
+    const d = (await res.json().catch(() => ({}))) as { detail?: { message?: string } };
+    return { ok: false, entitlement_required: true, backend: input.backend, message: d.detail?.message ?? "compute entitlement required" };
+  }
+  if (!res.ok) throw writeError("execute failed", res.status);
+  return { ok: true, ...(await res.json()) };
 }
 
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
