@@ -160,6 +160,39 @@ export async function loadGraph(project: string): Promise<GraphView> {
   return (await res.json()) as GraphView;
 }
 
+// ── WRITE workbench: hand-author facts into the project graph (KE-1). Fail-closed behind the Studio write
+// token (Bearer) — the same gate /extract uses, so a manual fact is as governed + proof-carrying as an
+// extracted one. The token is held in-session only (never persisted). ──
+export const EPISTEMIC_ORDER = ["attested", "verified", "observed", "derived", "hypothesis", "simulated"] as const;
+
+export interface AddNodeInput { project: string; name: string; epistemic_mode?: string; labels?: string[]; source?: string }
+export interface AddEdgeInput { project: string; from_name: string; to_name: string; label?: string; epistemic_mode?: string; source?: string }
+
+function writeHeaders(token: string): HeadersInit {
+  return { "content-type": "application/json", accept: "application/json", authorization: `Bearer ${token}` };
+}
+
+function writeError(prefix: string, status: number): Error {
+  const hint = status === 401 ? " — bad write token" : status === 503 ? " — writes disabled (STUDIO_WRITE_TOKEN unset)" : status === 502 ? " — graph write failed" : "";
+  return new Error(`${prefix}: ${status}${hint}`);
+}
+
+export async function addNode(input: AddNodeInput, token: string): Promise<{ id: string; written: boolean }> {
+  if (!BASE) throw new Error("Studio backend not connected (set VITE_STUDIO_API)");
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/node`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) throw writeError("add node failed", res.status);
+  return (await res.json()) as { id: string; written: boolean };
+}
+
+export async function addEdge(input: AddEdgeInput, token: string): Promise<{ from: string; to: string; written: boolean }> {
+  if (!BASE) throw new Error("Studio backend not connected (set VITE_STUDIO_API)");
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/edge`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) throw writeError("add edge failed", res.status);
+  return (await res.json()) as { from: string; to: string; written: boolean };
+}
+
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!BASE) return STUB;
   const q = projectId ? `?project=${encodeURIComponent(projectId)}` : "";

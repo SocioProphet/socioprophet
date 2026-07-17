@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch } from "vue";
-import { loadGraph, EPISTEMIC_COLORS, type GraphView, type GraphNode, type GraphEdge } from "../services/studioApi";
+import { loadGraph, addNode, addEdge, EPISTEMIC_COLORS, EPISTEMIC_ORDER, type GraphView, type GraphNode, type GraphEdge } from "../services/studioApi";
 
 const props = defineProps<{ project: string }>();
 const view = ref<GraphView | null>(null);
@@ -160,6 +160,33 @@ onBeforeUnmount(() => { if (raf) cancelAnimationFrame(raf); });
 
 // stroke width encodes edge weight (Tufte: encode the datum, keep it thin so edges recede)
 function edgeW(e: SimEdge) { return Math.min(4, 0.8 + Math.sqrt(e.weight)); }
+
+// ── WRITE workbench: hand-author a node or edge into this project's graph. Fail-closed behind the Studio
+// write token (Bearer), which is held in-session only (never persisted). On success we reload the explorer. ──
+const showAdd = ref(false);
+const addMode = ref<"node" | "edge">("node");
+const writeToken = ref("");
+const fName = ref(""), fFrom = ref(""), fTo = ref(""), fLabel = ref("relates_to");
+const fEpistemic = ref("observed");
+const adding = ref(false), addMsg = ref(""), addErr = ref("");
+
+async function submitAdd() {
+  adding.value = true; addMsg.value = ""; addErr.value = "";
+  try {
+    if (addMode.value === "node") {
+      if (!fName.value.trim()) throw new Error("name required");
+      const r = await addNode({ project: props.project, name: fName.value.trim(), epistemic_mode: fEpistemic.value }, writeToken.value);
+      addMsg.value = `Added node ${r.id}`; fName.value = "";
+    } else {
+      if (!fFrom.value.trim() || !fTo.value.trim()) throw new Error("from and to required");
+      const r = await addEdge({ project: props.project, from_name: fFrom.value.trim(), to_name: fTo.value.trim(), label: fLabel.value.trim() || "relates_to", epistemic_mode: fEpistemic.value }, writeToken.value);
+      addMsg.value = `Added edge ${r.from} → ${r.to}`; fFrom.value = ""; fTo.value = "";
+    }
+    await load();  // reflect the new fact in the explorer
+  } catch (e) {
+    addErr.value = e instanceof Error ? e.message : "write failed";
+  } finally { adding.value = false; }
+}
 </script>
 
 <template>
@@ -170,10 +197,36 @@ function edgeW(e: SimEdge) { return Math.min(4, 0.8 + Math.sqrt(e.weight)); }
         <p class="sub">A force-directed explorer where every node carries its <b>epistemic status</b> and <b>provenance</b> — what a graph explorer shows that Neo4j Bloom can't.</p>
       </div>
       <div class="tools">
+        <button class="tbtn" :class="{ on: showAdd }" @click="showAdd = !showAdd" title="hand-author a node or edge (KE-1 workbench)">＋</button>
         <button class="tbtn" @click="resetView" title="reset pan/zoom">⤢</button>
         <button class="tbtn" @click="load" :disabled="loading" title="reload">↻</button>
       </div>
     </header>
+
+    <!-- WRITE workbench (KE-1): hand-author a governed, proof-carrying fact -->
+    <div v-if="showAdd" class="addbox">
+      <div class="addrow">
+        <div class="seg">
+          <button :class="{ on: addMode === 'node' }" @click="addMode = 'node'">Node</button>
+          <button :class="{ on: addMode === 'edge' }" @click="addMode = 'edge'">Edge</button>
+        </div>
+        <input v-if="addMode === 'node'" v-model="fName" placeholder="entity name" @keyup.enter="submitAdd" />
+        <template v-else>
+          <input v-model="fFrom" placeholder="from" @keyup.enter="submitAdd" />
+          <span class="arr">→</span>
+          <input v-model="fTo" placeholder="to" @keyup.enter="submitAdd" />
+          <input v-model="fLabel" class="short" placeholder="relation" />
+        </template>
+        <select v-model="fEpistemic" title="epistemic status stamped on the fact">
+          <option v-for="m in EPISTEMIC_ORDER" :key="m" :value="m">{{ m }}</option>
+        </select>
+        <input v-model="writeToken" type="password" class="short" placeholder="write token" title="Studio write token (Bearer) — held this session only" />
+        <button class="primary" @click="submitAdd" :disabled="adding">{{ adding ? "…" : "Add" }}</button>
+      </div>
+      <p v-if="addErr" class="addfeedback err">{{ addErr }}</p>
+      <p v-else-if="addMsg" class="addfeedback ok">✓ {{ addMsg }}</p>
+      <p class="addnote">Fail-closed behind the write token. The fact is stamped with provenance + your chosen epistemic status, scoped to this project — as governed as an extracted one.</p>
+    </div>
 
     <!-- epistemic distribution — the governance readout no incumbent surfaces -->
     <div v-if="total" class="dist">
@@ -242,6 +295,19 @@ function edgeW(e: SimEdge) { return Math.min(4, 0.8 + Math.sqrt(e.weight)); }
 .tools { display: flex; gap: 6px; }
 .tbtn { border: 1px solid #dadce0; background: #fff; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 14px; }
 .tbtn:hover { background: #f8f9fa; }
+.tbtn.on { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+.addbox { border: 1px solid #dadce0; border-radius: 10px; background: #f8f9fa; padding: 10px 12px; margin: 0 0 12px; }
+.addrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.addrow input, .addrow select { border: 1px solid #dadce0; border-radius: 8px; padding: 6px 8px; font-size: 13px; background: #fff; min-width: 120px; }
+.addrow input.short { min-width: 90px; width: 110px; }
+.addrow .arr { color: #5f6368; }
+.addrow .seg { display: inline-flex; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; }
+.addrow .seg button { border: 0; background: #fff; padding: 6px 10px; font-size: 12px; cursor: pointer; color: #5f6368; }
+.addrow .seg button.on { background: #1a73e8; color: #fff; }
+.addrow button.primary { border: 1px solid #1a73e8; background: #1a73e8; color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
+.addrow button.primary:disabled { opacity: .6; cursor: default; }
+.addfeedback { margin: 8px 0 0; font-size: 12.5px; } .addfeedback.ok { color: #137333; } .addfeedback.err { color: #c5221f; }
+.addnote { margin: 6px 0 0; font-size: 11px; color: #5f6368; }
 
 .dist { margin: 4px 0 12px; }
 .dist .bar { display: flex; height: 8px; border-radius: 5px; overflow: hidden; background: #eceff1; }
