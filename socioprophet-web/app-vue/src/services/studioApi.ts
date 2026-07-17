@@ -53,16 +53,23 @@ export interface GenerationRun {
   status: "queued" | "running" | "done" | "failed"; grounded?: boolean; output?: string;
 }
 
+// The MOAT header — the proof-carrying identity of the whole workspace, computed live on every load.
+export interface Moat {
+  epistemic_distribution: Record<string, number>; fact_count: number; provenance_coverage: number;
+  verified_compute: boolean; receipts_recent: number; governed_writes: boolean; read_auth: boolean;
+}
 export interface StudioBundle {
   notebooks: Notebook[]; data: DataAsset[]; models: ModelCard[]; tuning: TuningRun[]; experiments: Experiment[];
   extraction: ExtractionSource[]; ontology: OntologyItem[]; graph: GraphStat[]; retrieval: RetrievalIndex[]; generation: GenerationRun[];
-  stub?: boolean;
+  moat?: Moat; stub?: boolean;
 }
 
 export const SECTION_COUNT = (b: StudioBundle | null, s: StudioSection): number => (b ? (b[s]?.length ?? 0) : 0);
 
 const now = () => new Date().toISOString();
 const STUB: StudioBundle = {
+  moat: { epistemic_distribution: { verified: 1, observed: 2, derived: 1, hypothesis: 1 }, fact_count: 5,
+          provenance_coverage: 0.8, verified_compute: true, receipts_recent: 3, governed_writes: true, read_auth: false },
   notebooks: [
     { id: "nb-1", name: "Exploratory analysis", runtime: "prophet-python-ml", kernel: "python3", status: "idle", updatedAt: now(), cells: 24, collaborators: ["you", "analyst-agent"], lastCell: "df.groupby('cohort').agg(...)" },
     { id: "nb-2", name: "LoRA fine-tune", runtime: "prophet-ray-ml", kernel: "ray", status: "running", updatedAt: now(), cells: 11, collaborators: ["you"], lastCell: "trainer.fit(ray_dataset)" },
@@ -222,6 +229,27 @@ export async function getProvenance(project: string, id: string, stubGraph?: Gra
   const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/provenance?project=${encodeURIComponent(project)}&id=${encodeURIComponent(id)}`, { headers: { accept: "application/json" } });
   if (!res.ok) throw new Error(`provenance failed: ${res.status}`);
   return (await res.json()) as Provenance;
+}
+
+// ── WS#29: verified-compute RECEIPTS from the evidence fabric — the replayable proof-of-work behind Studio. ──
+export interface Receipt { service: string; correlation_id: string; received_at?: string | null; verdict?: string | null; kind?: string | null; bundle_ref?: string | null }
+export interface Receipts { receipts: Receipt[]; count: number; services: Record<string, boolean>; services_reachable: number; detail_endpoint: string }
+
+const STUB_RECEIPTS: Receipts = {
+  receipts: [
+    { service: "hellgraph-service", correlation_id: "hg-9f2a", received_at: "just now", verdict: "ok", kind: "graph-write", bundle_ref: "/v1/receipts/hellgraph-service/hg-9f2a" },
+    { service: "owl-reasoner", correlation_id: "owl-71c", received_at: "2m ago", verdict: "sound", kind: "reason", bundle_ref: "/v1/receipts/owl-reasoner/owl-71c" },
+    { service: "entity-resolution", correlation_id: "er-33b", received_at: "6m ago", verdict: "merged", kind: "resolve", bundle_ref: "/v1/receipts/entity-resolution/er-33b" },
+  ],
+  count: 3, services: { "hellgraph-service": true, "owl-reasoner": true, "entity-resolution": true }, services_reachable: 3,
+  detail_endpoint: "/v1/receipts/{service}/{correlation_id}",
+};
+
+export async function loadReceipts(limit = 12): Promise<Receipts> {
+  if (!BASE) return STUB_RECEIPTS;
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/receipts?limit=${limit}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`receipts failed: ${res.status}`);
+  return (await res.json()) as Receipts;
 }
 
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {

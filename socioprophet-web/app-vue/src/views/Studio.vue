@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { loadStudio, SECTION_COUNT, type StudioBundle, type StudioSection } from "../services/studioApi";
+import { loadStudio, loadReceipts, SECTION_COUNT, EPISTEMIC_COLORS, type StudioBundle, type StudioSection, type Receipts } from "../services/studioApi";
 import StudioGraph from "../components/StudioGraph.vue";
 
 const bundle = ref<StudioBundle | null>(null);
@@ -9,6 +9,18 @@ const loading = ref(true);
 const section = ref<StudioSection>("notebooks");
 const query = ref("");
 const selected = ref<{ kind: StudioSection; item: Record<string, any> } | null>(null);
+
+// WS#29: verified-compute receipts drawer, opened from the moat strip.
+const receiptsOpen = ref(false);
+const receiptsData = ref<Receipts | null>(null);
+const receiptsErr = ref("");
+async function toggleReceipts() {
+  receiptsOpen.value = !receiptsOpen.value;
+  if (receiptsOpen.value && !receiptsData.value) {
+    try { receiptsData.value = await loadReceipts(); }
+    catch (e) { receiptsErr.value = e instanceof Error ? e.message : "receipts failed"; }
+  }
+}
 // Project scope — every artifact lives in the project's proj- collection, so the agent team already retrieves it.
 const project = ref("Untitled project");
 
@@ -74,6 +86,44 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
       <button class="ghost" title="Everything here is in the project's collection — your agent team already reads it.">⤳ Share to agent team</button>
       <button class="primary">＋ New <span class="chev">▾</span></button>
     </header>
+
+    <!-- WS#29: the MOAT strip — the proof-carrying identity of the workspace, riding above every section -->
+    <div v-if="bundle?.moat" class="moatbar">
+      <div class="mb-epi" v-if="bundle.moat.fact_count">
+        <span class="mb-lbl">{{ bundle.moat.fact_count }} facts</span>
+        <span class="mb-bar" title="epistemic status of the project's facts">
+          <i v-for="(n, mode) in bundle.moat.epistemic_distribution" :key="mode"
+             :style="{ width: (n / bundle.moat.fact_count * 100) + '%', background: EPISTEMIC_COLORS[mode] || '#c0c4c9' }" :title="mode + ': ' + n" />
+        </span>
+        <span class="mb-lbl">{{ Math.round(bundle.moat.provenance_coverage * 100) }}% sourced</span>
+      </div>
+      <div class="spacer" />
+      <button class="mb-chip" :class="{ on: bundle.moat.verified_compute }" @click="toggleReceipts" title="verified-compute receipts from the evidence fabric — click to inspect">
+        {{ bundle.moat.verified_compute ? '◆ verified compute' : '◇ compute unverified' }}<b v-if="bundle.moat.receipts_recent"> · {{ bundle.moat.receipts_recent }}</b>
+      </button>
+      <span class="mb-chip" :class="{ on: bundle.moat.governed_writes }" :title="bundle.moat.governed_writes ? 'writes are fail-closed behind a token' : 'writes disabled (fail-closed)'">
+        {{ bundle.moat.governed_writes ? '● governed writes' : '○ writes off' }}
+      </span>
+      <span class="mb-chip" :class="{ on: bundle.moat.read_auth }" :title="bundle.moat.read_auth ? 'reads require sovereign identity' : 'reads open'">
+        {{ bundle.moat.read_auth ? '● read-auth' : '○ open reads' }}
+      </span>
+    </div>
+
+    <!-- verified-compute receipts drawer -->
+    <div v-if="receiptsOpen" class="receipts">
+      <div class="rc-head"><b>Verified-compute receipts</b><span class="rc-sub">replayable proof-of-work · {{ receiptsData?.services_reachable ?? 0 }} services answering</span><button class="rc-x" @click="receiptsOpen = false">✕</button></div>
+      <div v-if="receiptsErr" class="rc-err">{{ receiptsErr }}</div>
+      <div v-else-if="receiptsData" class="rc-list">
+        <div v-for="r in receiptsData.receipts" :key="r.service + r.correlation_id" class="rc-row" :title="r.bundle_ref || ''">
+          <span class="rc-svc">{{ r.service }}</span>
+          <span class="rc-cid mono">{{ r.correlation_id }}</span>
+          <span v-if="r.verdict" class="rc-verdict">{{ r.verdict }}</span>
+          <span class="rc-when">{{ r.received_at }}</span>
+        </div>
+        <div v-if="!receiptsData.receipts.length" class="rc-empty">No receipts yet — run an extraction or a graph write.</div>
+      </div>
+      <div v-else class="rc-empty">Loading…</div>
+    </div>
 
     <div class="body">
       <!-- section rail -->
@@ -198,6 +248,31 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   display: flex; flex-direction: column; height: 100%; font: 14px/1.5 system-ui, sans-serif; color: var(--ink); }
 
 .topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+/* WS#29 moat strip */
+.moatbar { display: flex; align-items: center; gap: 12px; padding: 7px 16px; border-bottom: 1px solid var(--line);
+  background: var(--card); font-size: 12px; color: var(--sub); }
+.moatbar .spacer { flex: 1; }
+.mb-epi { display: flex; align-items: center; gap: 8px; }
+.mb-lbl { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mb-bar { display: inline-flex; width: 168px; height: 8px; border-radius: 5px; overflow: hidden; background: #eceef2; }
+.mb-bar i { height: 100%; }
+.mb-chip { border: 1px solid var(--line); background: var(--card); color: var(--sub); border-radius: 20px;
+  padding: 3px 10px; font-size: 11.5px; cursor: default; }
+button.mb-chip { cursor: pointer; }
+.mb-chip.on { color: #137333; border-color: #bfe3c9; background: #eaf5ee; }
+.mb-chip b { font-weight: 700; }
+.receipts { border-bottom: 1px solid var(--line); background: #fbfcfe; padding: 10px 16px 12px; }
+.rc-head { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.rc-head .rc-sub { color: var(--sub); font-size: 11.5px; } .rc-head .rc-x { margin-left: auto; border: 0; background: none; cursor: pointer; color: var(--sub); font-size: 14px; }
+.rc-err { color: #c5221f; font-size: 12px; margin-top: 6px; }
+.rc-list { margin-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.rc-row { display: grid; grid-template-columns: 160px 1fr auto auto; gap: 10px; align-items: center; font-size: 12px; padding: 4px 8px; border-radius: 8px; }
+.rc-row:hover { background: var(--accent-bg); }
+.rc-svc { font-weight: 600; color: var(--ink); } .rc-cid { color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-verdict { font-size: 10.5px; font-weight: 700; color: #137333; background: #eaf5ee; border-radius: 10px; padding: 1px 8px; }
+.rc-when { color: var(--sub); font-size: 11px; white-space: nowrap; }
+.rc-empty { color: var(--sub); font-size: 12px; margin-top: 6px; }
+.mono { font-family: "SF Mono", ui-monospace, Menlo, monospace; }
 .topbar .brand { font-size: 16px; font-weight: 700; }
 .topbar .proj { border: 1px solid var(--line); background: var(--accent-bg); color: var(--accent); border-radius: 16px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
 .topbar .chev { opacity: .6; font-size: 10px; }
