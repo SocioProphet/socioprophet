@@ -40,6 +40,12 @@ jobs:
         with: { node-version: '20', cache: 'npm', cache-dependency-path: socioprophet-web/app-vue/package-lock.json }
       - name: Build app-vue
         working-directory: socioprophet-web/app-vue
+        # VITE_SEARCH_API bakes the live sovereign search edge into the bundle (public URL, not a secret):
+        # search-api.socioprophet.ai → search-gateway → SearXNG (web) ⊕ commons-search (sovereign commons).
+        # Cert is Active and the endpoint serves real blended results. Studio API stays unset until its
+        # public ingress lands (renders in preview until then).
+        env:
+          VITE_SEARCH_API: https://search-api.socioprophet.ai
         run: |
           npm ci
           npm run build
