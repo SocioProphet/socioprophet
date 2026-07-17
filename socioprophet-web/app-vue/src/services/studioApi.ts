@@ -586,6 +586,55 @@ export const loadActions = (project: string) => _read(`/api/studio/actions?proje
 export const loadWorldsignals = (project: string) => _read(`/api/studio/worldsignals?project=${encodeURIComponent(project)}`, STUB_WORLDSIGNALS);
 export const loadGaiaOntology = () => _read(`/api/studio/gaia/ontology`, STUB_GAIA);
 
+// ── HDT — the human twin (closes the triangle) ──
+export interface HdtObservation { observation_id: string; subject: string; code: string; omega_state: string; epistemic_mode?: string | null; canonical: boolean; recorded_at?: string | null }
+export interface OmegaStep { state: string; epistemic_human: string; epistemic_model: string; canonical: boolean }
+export interface HdtOntology { omega_states: string[]; omega_epistemic_lattice: OmegaStep[]; kfs_triad: Record<string, string>; invariant: string; three_twins_closed: Record<string, string> }
+
+const STUB_HDT: { observations: HdtObservation[]; count: number } = {
+  count: 2,
+  observations: [
+    { observation_id: "proj-demo:hdtobs:hr", subject: "person:kim", code: "8867-4", omega_state: "DELIVERED", epistemic_mode: "attested", canonical: true, recorded_at: "1h ago" },
+    { observation_id: "proj-demo:hdtobs:bp", subject: "person:kim", code: "85354-9", omega_state: "SEEDED", epistemic_mode: "observed", canonical: false, recorded_at: "3m ago" }],
+};
+const STUB_HDT_ONT: HdtOntology = {
+  omega_states: ["ABSENT", "SEEDED", "NORMALIZED", "LINKED", "TRUSTED", "ACTIONABLE", "DELIVERED"],
+  kfs_triad: { CBD: "Cognition", CGT: "Values", NHY: "Action" },
+  invariant: "a model may advance an observation but only a human/clinician/policy actor may DELIVER to canonical human-actionable truth",
+  three_twins_closed: { knowledge: "HellGraph · observed→attested", human: "HDT · ABSENT→DELIVERED", earth: "GAIA · EvidenceOnly→Promoted" },
+  omega_epistemic_lattice: [
+    { state: "ABSENT", epistemic_human: "observed", epistemic_model: "hypothesis", canonical: false },
+    { state: "SEEDED", epistemic_human: "observed", epistemic_model: "hypothesis", canonical: false },
+    { state: "NORMALIZED", epistemic_human: "observed", epistemic_model: "derived", canonical: false },
+    { state: "LINKED", epistemic_human: "observed", epistemic_model: "derived", canonical: false },
+    { state: "TRUSTED", epistemic_human: "verified", epistemic_model: "verified", canonical: false },
+    { state: "ACTIONABLE", epistemic_human: "verified", epistemic_model: "verified", canonical: false },
+    { state: "DELIVERED", epistemic_human: "attested", epistemic_model: "attested", canonical: true }],
+};
+
+export const loadHdt = (project: string) => _read(`/api/studio/hdt?project=${encodeURIComponent(project)}`, STUB_HDT);
+export const loadHdtOntology = () => _read(`/api/studio/hdt/ontology`, STUB_HDT_ONT);
+
+export async function submitHdtObservation(input: { project: string; subject: string; code: string; value?: string; actor_kind?: string }, token: string): Promise<{ observation_id: string; omega_state: string; epistemic_mode: string }> {
+  if (!BASE) return { observation_id: `stub:${input.code}`, omega_state: "SEEDED", epistemic_mode: input.actor_kind === "model" ? "hypothesis" : "observed" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/hdt/observation`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (!res.ok) throw writeError("submit failed", res.status);
+  return await res.json();
+}
+
+export async function promoteHdt(input: { project: string; observation: string; to_state: string; actor_kind?: string }, token: string): Promise<{ to_state: string; epistemic_mode: string; canonical: boolean } | { blocked: true; message: string }> {
+  if (!BASE) return input.actor_kind === "model" && input.to_state === "DELIVERED" ? { blocked: true, message: "HDT invariant — only a human/clinician/policy may DELIVER to canonical" } : { to_state: input.to_state, epistemic_mode: input.to_state === "DELIVERED" ? "attested" : "observed", canonical: input.to_state === "DELIVERED" };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/hdt/promote`, { method: "POST", headers: writeHeaders(token), body: JSON.stringify(input) });
+  if (res.status === 403 || res.status === 422) {
+    const d = (await res.json().catch(() => ({}))) as { detail?: { message?: string } | string };
+    return { blocked: true, message: typeof d.detail === "object" ? (d.detail.message ?? "blocked") : (d.detail ?? "blocked") };
+  }
+  if (!res.ok) throw writeError("promote failed", res.status);
+  return await res.json();
+}
+
 export async function invokeAction(input: { project: string; action: string; target: string; args: Record<string, unknown> }, token: string): Promise<{ invocation_id: string; applied: string[]; receipt: { correlation_id: string } }> {
   if (!BASE) return { invocation_id: "stub:inv", applied: ["set acsetAttrName"], receipt: { correlation_id: "act-stub" } };
   if (!token) throw new Error("write token required");

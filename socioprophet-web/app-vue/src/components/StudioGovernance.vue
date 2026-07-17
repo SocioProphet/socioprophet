@@ -6,8 +6,9 @@
 import { ref, onMounted, watch } from "vue";
 import {
   loadOntology, loadOntologyClass, loadActions, invokeAction, loadWorldsignals, submitWorldsignal,
-  promoteWorldsignal, loadGaiaOntology, EPISTEMIC_COLORS,
+  promoteWorldsignal, loadGaiaOntology, loadHdt, loadHdtOntology, submitHdtObservation, promoteHdt, EPISTEMIC_COLORS,
   type OntologyView, type OntologyClassDetail, type ActionDef, type WorldSignal, type GaiaOntology,
+  type HdtObservation, type HdtOntology,
 } from "../services/studioApi";
 
 const props = defineProps<{ project: string }>();
@@ -16,6 +17,8 @@ const onto = ref<OntologyView | null>(null);
 const actions = ref<ActionDef[]>([]);
 const signals = ref<WorldSignal[]>([]);
 const gaia = ref<GaiaOntology | null>(null);
+const observations = ref<HdtObservation[]>([]);
+const hdt = ref<HdtOntology | null>(null);
 const loading = ref(true);
 const err = ref("");
 const token = ref("");
@@ -25,8 +28,9 @@ function say(m: string) { flash.value = m; setTimeout(() => (flash.value = ""), 
 async function load() {
   loading.value = true; err.value = "";
   try {
-    const [o, a, s, g] = await Promise.all([loadOntology(""), loadActions(props.project), loadWorldsignals(props.project), loadGaiaOntology()]);
+    const [o, a, s, g, ho, hon] = await Promise.all([loadOntology(""), loadActions(props.project), loadWorldsignals(props.project), loadGaiaOntology(), loadHdt(props.project), loadHdtOntology()]);
     onto.value = o; actions.value = a.actions; signals.value = s.world_signals; gaia.value = g;
+    observations.value = ho.observations; hdt.value = hon;
   } catch (e) { err.value = e instanceof Error ? e.message : "failed to load governance"; }
   finally { loading.value = false; }
 }
@@ -60,6 +64,21 @@ async function doPromote(sig: WorldSignal, to_state: string, actor_kind: string)
     const r = await promoteWorldsignal({ project: props.project, signal: sig.signal_id, to_state, actor_kind }, token.value);
     if ("blocked" in r) say(`🔒 ${r.message}`);
     else { say(`${sig.feature_id} → ${r.to_state} (${r.epistemic_mode})`); await load(); }
+  } catch (e) { say(e instanceof Error ? e.message : "promote failed"); }
+}
+
+// HDT (the human twin)
+const hdtSubject = ref(""); const hdtCode = ref(""); const hdtActor = ref("human");
+async function doHdtSubmit() {
+  try { const r = await submitHdtObservation({ project: props.project, subject: hdtSubject.value, code: hdtCode.value, actor_kind: hdtActor.value }, token.value);
+    say(`Observation → ${r.omega_state} (${r.epistemic_mode})`); hdtCode.value = ""; await load(); }
+  catch (e) { say(e instanceof Error ? e.message : "submit failed"); }
+}
+async function doHdtPromote(o: HdtObservation, to_state: string, actor_kind: string) {
+  try {
+    const r = await promoteHdt({ project: props.project, observation: o.observation_id, to_state, actor_kind }, token.value);
+    if ("blocked" in r) say(`🔒 ${r.message}`);
+    else { say(`${o.code} → ${r.to_state} (${r.epistemic_mode})`); await load(); }
   } catch (e) { say(e instanceof Error ? e.message : "promote failed"); }
 }
 
@@ -154,6 +173,42 @@ function epi(mode?: string | null): string { return EPISTEMIC_COLORS[mode || "ob
           </tbody>
         </table>
         <p class="sub">The promotion state <b>is</b> the epistemic status. Try “promote as model” — GAIA invariant #2 blocks a model from canonizing. One discipline across knowledge, human &amp; Earth twins.</p>
+      </section>
+
+      <!-- HDT — the human twin (closes the triangle) -->
+      <section class="card wide" v-if="hdt">
+        <header class="ch"><span class="ci">◐</span> HDT observations — the OmegaState lattice<span class="tagline">human twin · closes the triangle</span></header>
+        <div class="membrane">
+          <div v-for="(m, i) in hdt.omega_epistemic_lattice" :key="m.state" class="mstate" :class="{ canon: m.canonical }">
+            <span class="ms-n">{{ m.state }}</span>
+            <span class="ms-epi" :style="{ color: epi(m.epistemic_human) }">{{ m.epistemic_human }}</span>
+            <span v-if="i < hdt.omega_epistemic_lattice.length - 1" class="ms-arrow">→</span>
+          </div>
+        </div>
+        <p class="invariant">⚖ {{ hdt.invariant }}</p>
+        <div class="submit">
+          <input v-model="hdtSubject" class="j" placeholder="subject (person id)" />
+          <input v-model="hdtCode" class="j" placeholder="observation code (e.g. LOINC 8867-4)" />
+          <select v-model="hdtActor" class="j"><option value="human">human</option><option value="clinician">clinician</option><option value="model">model</option></select>
+          <button class="primary" @click="doHdtSubmit">Record observation</button>
+        </div>
+        <table class="wgrid">
+          <thead><tr><th>Code</th><th>Subject</th><th>OmegaState</th><th>Epistemic</th><th>Advance</th></tr></thead>
+          <tbody>
+            <tr v-for="o in observations" :key="o.observation_id">
+              <td class="nm">{{ o.code }}</td>
+              <td class="mono">{{ o.subject }}</td>
+              <td><span class="state" :class="{ canon: o.canonical }">{{ o.omega_state }}</span></td>
+              <td><span class="epi" :style="{ borderColor: epi(o.epistemic_mode), color: epi(o.epistemic_mode) }">{{ o.epistemic_mode }}</span></td>
+              <td class="promote">
+                <button class="mini" @click="doHdtPromote(o, 'TRUSTED', 'clinician')" v-if="!o.canonical">→ trusted</button>
+                <button class="mini go" @click="doHdtPromote(o, 'DELIVERED', 'clinician')" v-if="!o.canonical">→ deliver</button>
+                <button class="mini danger" @click="doHdtPromote(o, 'DELIVERED', 'model')" v-if="!o.canonical" title="demonstrates the invariant">→ deliver as model</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="sub">The <b>third twin</b>. OmegaState = epistemic status, exactly as knowledge &amp; Earth. Only a human/clinician DELIVERS to canonical — “deliver as model” is blocked. <b>All three twins, one discipline.</b></p>
       </section>
     </div>
   </div>
