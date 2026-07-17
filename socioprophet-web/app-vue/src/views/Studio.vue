@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { loadStudio, loadReceipts, SECTION_COUNT, EPISTEMIC_COLORS, type StudioBundle, type StudioSection, type Receipts } from "../services/studioApi";
+import { loadStudio, loadReceipts, mintCitation, SECTION_COUNT, EPISTEMIC_COLORS, type StudioBundle, type StudioSection, type Receipts, type Citation } from "../services/studioApi";
 import StudioGraph from "../components/StudioGraph.vue";
 import StudioQuery from "../components/StudioQuery.vue";
 import StudioExperiments from "../components/StudioExperiments.vue";
@@ -23,6 +23,24 @@ async function toggleReceipts() {
     catch (e) { receiptsErr.value = e instanceof Error ? e.message : "receipts failed"; }
   }
 }
+
+// WS#35: mint a citable, persistent identifier for the project's knowledge-graph snapshot.
+const citeOpen = ref(false);
+const citeData = ref<Citation | null>(null);
+const citeToken = ref("");
+const citeErr = ref("");
+const minting = ref(false);
+const copied = ref("");
+async function mintCite() {
+  minting.value = true; citeErr.value = "";
+  try { citeData.value = await mintCitation({ project: project.value, kind: "graph", title: `${project.value} — knowledge graph` }, citeToken.value); }
+  catch (e) { citeErr.value = e instanceof Error ? e.message : "cite failed"; }
+  finally { minting.value = false; }
+}
+async function copyText(what: string, text: string) {
+  try { await navigator.clipboard.writeText(text); copied.value = what; setTimeout(() => (copied.value = ""), 1400); } catch { /* */ }
+}
+
 // Project scope — every artifact lives in the project's proj- collection, so the agent team already retrieves it.
 const project = ref("Untitled project");
 
@@ -111,6 +129,33 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
       <span class="mb-chip" :class="{ on: bundle.moat.read_auth }" :title="bundle.moat.read_auth ? 'reads require sovereign identity' : 'reads open'">
         {{ bundle.moat.read_auth ? '● read-auth' : '○ open reads' }}
       </span>
+      <button class="mb-chip on" @click="citeOpen = !citeOpen" title="mint a citable, persistent identifier (DOI) for this knowledge graph — resolves to a proof-carrying record">⎘ Cite</button>
+    </div>
+
+    <!-- WS#35: cite / persistent identifier drawer -->
+    <div v-if="citeOpen" class="cite">
+      <div class="rc-head"><b>Cite this knowledge graph</b><span class="rc-sub">a persistent identifier that resolves to a proof-carrying record — DataCite-compatible</span><button class="rc-x" @click="citeOpen = false">✕</button></div>
+      <div v-if="!citeData" class="cite-mint">
+        <input v-model="citeToken" type="password" placeholder="write token" />
+        <button class="primary" @click="mintCite" :disabled="minting">{{ minting ? "Minting…" : "Mint DOI" }}</button>
+        <span v-if="citeErr" class="rc-err">{{ citeErr }}</span>
+      </div>
+      <div v-else class="cite-out">
+        <div class="cite-ids">
+          <span class="cid"><b>PID</b> <code class="mono">{{ citeData.pid }}</code></span>
+          <span class="cid"><b>DOI</b> <code class="mono">{{ citeData.doi }}</code></span>
+          <span class="cid ok">◆ proof-carrying · {{ citeData.content_hash }}</span>
+        </div>
+        <div class="cite-block">
+          <div class="cb-head">Citation <button @click="copyText('cite', citeData.citation)">{{ copied === 'cite' ? '✓ copied' : 'copy' }}</button></div>
+          <p class="cb-body">{{ citeData.citation }}</p>
+        </div>
+        <div class="cite-block">
+          <div class="cb-head">BibTeX <button @click="copyText('bib', citeData.bibtex)">{{ copied === 'bib' ? '✓ copied' : 'copy' }}</button></div>
+          <pre class="cb-body mono">{{ citeData.bibtex }}</pre>
+        </div>
+        <p class="cite-note">The identifier is itself a graph fact (epistemic: <b>attested</b>) and resolves to a verifiable record — not a landing page. That's the beat over Zenodo.</p>
+      </div>
     </div>
 
     <!-- verified-compute receipts drawer -->
@@ -264,7 +309,20 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 button.mb-chip { cursor: pointer; }
 .mb-chip.on { color: #137333; border-color: #bfe3c9; background: #eaf5ee; }
 .mb-chip b { font-weight: 700; }
-.receipts { border-bottom: 1px solid var(--line); background: #fbfcfe; padding: 10px 16px 12px; }
+.receipts, .cite { border-bottom: 1px solid var(--line); background: #fbfcfe; padding: 10px 16px 12px; }
+.cite-mint { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.cite-mint input { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 13px; width: 160px; }
+.cite-mint .primary { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
+.cite-mint .primary:disabled { opacity: .6; }
+.cite-out { margin-top: 8px; }
+.cite-ids { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; margin-bottom: 8px; }
+.cite-ids .cid b { color: var(--sub); font-weight: 600; margin-right: 4px; } .cite-ids .cid code { color: #1a73e8; }
+.cite-ids .cid.ok { color: #137333; }
+.cite-block { border: 1px solid var(--line); border-radius: 8px; background: #fff; margin-top: 8px; overflow: hidden; }
+.cb-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #f8f9fa; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--sub); }
+.cb-head button { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 2px 8px; font-size: 11px; cursor: pointer; }
+.cb-body { margin: 0; padding: 8px 10px; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+.cite-note { color: var(--sub); font-size: 11.5px; margin-top: 8px; } .cite-note b { color: #137333; }
 .rc-head { display: flex; align-items: center; gap: 10px; font-size: 13px; }
 .rc-head .rc-sub { color: var(--sub); font-size: 11.5px; } .rc-head .rc-x { margin-left: auto; border: 0; background: none; cursor: pointer; color: var(--sub); font-size: 14px; }
 .rc-err { color: #c5221f; font-size: 12px; margin-top: 6px; }

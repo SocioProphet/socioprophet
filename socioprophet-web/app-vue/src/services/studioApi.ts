@@ -323,6 +323,37 @@ export async function logExperiment(
   return (await res.json()) as ExperimentRun;
 }
 
+// ── WS#35: sovereign persistent IDs + citation — DataCite-compatible, resolves to a proof-carrying record. ──
+export interface Citation {
+  pid: string; doi: string; resolve: string; content_hash: string; created_at?: string;
+  citation: string; bibtex: string; datacite: unknown; proof_carrying: boolean;
+}
+
+const STUB_CITATION = (kind: string, ref: string): Citation => {
+  const h = "8f2ad4c1b9e0";
+  const pid = `sp:proj-demo/${kind}/${h.slice(0, 12)}`;
+  const doi = `10.82044/proj-demo.${kind}.${h.slice(0, 8)}`;
+  return {
+    pid, doi, resolve: `https://studio.socioprophet.ai/resolve?pid=${pid}`, content_hash: h, created_at: "just now",
+    citation: `SocioProphet Knowledge Commons (2026). ${kind} · ${ref || "proj-demo"}. SocioProphet Knowledge Commons. ${pid} (DOI: ${doi}).`,
+    bibtex: `@misc{${h.slice(0, 8)},\n  author = {SocioProphet Knowledge Commons},\n  title = {${kind} · ${ref || "proj-demo"}},\n  year = {2026},\n  note = {${pid}},\n  doi = {${doi}}\n}`,
+    datacite: { id: doi, type: "dois" }, proof_carrying: true,
+  };
+};
+
+export async function mintCitation(
+  input: { project: string; kind: string; ref?: string; title?: string; creators?: string[] },
+  token: string,
+): Promise<Citation> {
+  if (!BASE) return STUB_CITATION(input.kind, input.ref ?? "");
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/cite`, {
+    method: "POST", headers: writeHeaders(token), body: JSON.stringify(input),
+  });
+  if (!res.ok) throw writeError("cite failed", res.status);
+  return (await res.json()) as Citation;
+}
+
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!BASE) return STUB;
   const q = projectId ? `?project=${encodeURIComponent(projectId)}` : "";
