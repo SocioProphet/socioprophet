@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch } from "vue";
-import { loadGraph, addNode, addEdge, EPISTEMIC_COLORS, EPISTEMIC_ORDER, type GraphView, type GraphNode, type GraphEdge } from "../services/studioApi";
+import { loadGraph, addNode, addEdge, getProvenance, EPISTEMIC_COLORS, EPISTEMIC_ORDER, type GraphView, type GraphNode, type GraphEdge, type Provenance } from "../services/studioApi";
 
 const props = defineProps<{ project: string }>();
 const view = ref<GraphView | null>(null);
@@ -187,6 +187,20 @@ async function submitAdd() {
     addErr.value = e instanceof Error ? e.message : "write failed";
   } finally { adding.value = false; }
 }
+
+// ── KE-5 "How derived?": pull the proof-carrying lineage of the selected fact. Reset whenever the
+// selection changes so the panel never shows stale provenance. ──
+const derived = ref<Provenance | null>(null);
+const derivedLoading = ref(false);
+const derivedErr = ref("");
+watch(selected, () => { derived.value = null; derivedErr.value = ""; });
+async function loadDerived() {
+  if (!selected.value) return;
+  derivedLoading.value = true; derivedErr.value = "";
+  try { derived.value = await getProvenance(props.project, selected.value.id, view.value ?? undefined); }
+  catch (e) { derivedErr.value = e instanceof Error ? e.message : "provenance failed"; }
+  finally { derivedLoading.value = false; }
+}
 </script>
 
 <template>
@@ -281,7 +295,25 @@ async function submitAdd() {
           <div><dt>labels</dt><dd>{{ selected.labels.join(", ") }}</dd></div>
           <div><dt>atom id</dt><dd class="mono">{{ selected.id }}</dd></div>
         </dl>
-        <div class="acts"><button class="primary" title="replay how this fact was derived (KE-5)">How derived?</button><button title="agents in this project already retrieve this">Share to team</button></div>
+        <div class="acts"><button class="primary" :disabled="derivedLoading" @click="loadDerived" title="replay how this fact was derived (KE-5)">{{ derivedLoading ? "…" : "How derived?" }}</button><button title="agents in this project already retrieve this">Share to team</button></div>
+        <!-- KE-5 proof-replay: provenance + derivation lineage a Bloom/Stardog inspector can't show -->
+        <div v-if="derivedErr" class="derived err">{{ derivedErr }}</div>
+        <div v-else-if="derived" class="derived">
+          <p class="dsum">{{ derived.summary }}</p>
+          <div class="dmeta">
+            <span v-if="derived.kko_type" class="kko" title="KKO upper-ontology type">{{ derived.kko_type }}</span>
+            <span v-if="derived.extractor" class="ex">via {{ derived.extractor }}</span>
+          </div>
+          <div v-if="derived.derivation_count" class="dlist">
+            <div class="dlbl">Derived / co-observed with</div>
+            <div v-for="(d, i) in derived.derivations" :key="i" class="drow">
+              <span class="rel">{{ d.direction === 'out' ? '→' : '←' }} {{ d.relation }}</span>
+              <span class="dwith">{{ d.with.name }}</span>
+              <span class="dpill" :style="{ borderColor: color(d.with.epistemic_mode), color: color(d.with.epistemic_mode) }">{{ d.with.epistemic_mode }}</span>
+            </div>
+          </div>
+          <div v-else class="dnone">No related facts yet — a root observation.</div>
+        </div>
       </aside>
     </transition>
   </div>
@@ -340,6 +372,19 @@ async function submitAdd() {
 .prov .acts { display: flex; gap: 8px; margin-top: 14px; }
 .prov .acts button { border: 1px solid #dadce0; background: #fff; border-radius: 16px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
 .prov .acts button.primary { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+.prov .acts button.primary:disabled { opacity: .6; cursor: default; }
+.derived { margin-top: 10px; border-top: 1px solid #e8eaed; padding-top: 10px; }
+.derived.err { color: #c5221f; font-size: 12px; }
+.derived .dsum { margin: 0 0 6px; font-size: 12.5px; color: #202124; }
+.derived .dmeta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.derived .kko { font-size: 10px; border: 1px solid #dadce0; border-radius: 10px; padding: 1px 7px; color: #5f6368; }
+.derived .ex { font-size: 10px; color: #5f6368; }
+.derived .dlbl { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: #5f6368; margin-bottom: 4px; }
+.derived .drow { display: flex; align-items: center; gap: 6px; padding: 3px 0; font-size: 12px; }
+.derived .rel { color: #5f6368; min-width: 92px; }
+.derived .dwith { flex: 1; color: #202124; }
+.derived .dpill { font-size: 10px; border: 1px solid; border-radius: 10px; padding: 0 6px; }
+.derived .dnone { font-size: 12px; color: #5f6368; }
 .slide-enter-active, .slide-leave-active { transition: transform .18s, opacity .18s; }
 .slide-enter-from, .slide-leave-to { transform: translateX(16px); opacity: 0; }
 </style>

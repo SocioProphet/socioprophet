@@ -193,6 +193,37 @@ export async function addEdge(input: AddEdgeInput, token: string): Promise<{ fro
   return (await res.json()) as { from: string; to: string; written: boolean };
 }
 
+// ── KE-5 "How derived?": the proof-carrying lineage of one fact — provenance + the facts it was
+// derived/co-observed with, each carrying its own epistemic status. What Bloom/Stardog can't show. ──
+export interface Derivation { relation: string; direction: "in" | "out"; weight: number; with: { id: string; name: string; epistemic_mode: string; source?: string | null } }
+export interface Provenance {
+  id: string; found: boolean; name?: string; epistemic_mode?: string; source?: string | null;
+  extractor?: string | null; kko_type?: string; labels?: string[];
+  derivations: Derivation[]; derivation_count: number; summary?: string; degraded?: string | null;
+}
+
+const STUB_PROVENANCE = (id: string, nodes: GraphNode[], edges: GraphEdge[]): Provenance => {
+  const node = nodes.find((n) => n.id === id);
+  if (!node) return { id, found: false, derivations: [], derivation_count: 0 };
+  const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+  const derivations: Derivation[] = edges.filter((e) => e.source === id || e.target === id).map((e) => {
+    const out = e.source === id; const o = byId[out ? e.target : e.source];
+    return { relation: e.label, direction: out ? "out" : "in", weight: e.weight ?? 1,
+             with: { id: o?.id ?? "", name: o?.name ?? "", epistemic_mode: o?.epistemic_mode ?? "unknown", source: o?.source } };
+  });
+  return { id, found: true, name: node.name, epistemic_mode: node.epistemic_mode, source: node.source,
+           extractor: node.extractor, kko_type: "Particulars", labels: node.labels,
+           derivations, derivation_count: derivations.length,
+           summary: `‘${node.name}’ is held as ${node.epistemic_mode}, connected to ${derivations.length} related fact(s).` };
+};
+
+export async function getProvenance(project: string, id: string, stubGraph?: GraphView): Promise<Provenance> {
+  if (!BASE) return STUB_PROVENANCE(id, stubGraph?.nodes ?? STUB_GRAPH.nodes, stubGraph?.edges ?? STUB_GRAPH.edges ?? []);
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/provenance?project=${encodeURIComponent(project)}&id=${encodeURIComponent(id)}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`provenance failed: ${res.status}`);
+  return (await res.json()) as Provenance;
+}
+
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!BASE) return STUB;
   const q = projectId ? `?project=${encodeURIComponent(projectId)}` : "";
