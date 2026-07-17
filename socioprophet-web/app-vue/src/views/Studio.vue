@@ -4,6 +4,7 @@ import { loadStudio, loadReceipts, mintCitation, SECTION_COUNT, EPISTEMIC_COLORS
 import StudioGraph from "../components/StudioGraph.vue";
 import StudioQuery from "../components/StudioQuery.vue";
 import StudioExperiments from "../components/StudioExperiments.vue";
+import StudioCommons from "../components/StudioCommons.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -56,6 +57,7 @@ const sections: { id: StudioSection; label: string; icon: string; group: string;
   { id: "query",       label: "Query",         icon: "⌗", group: "Knowledge engineering", blurb: "SPARQL / Cypher / Gremlin over the live kernel — results you can replay (proof-carrying) and whose facts carry epistemic status." },
   { id: "retrieval",   label: "Retrieval",     icon: "◎", group: "Knowledge engineering", blurb: "Fibered retrieval (PageIndex ⊕ HellGraph) · Graph-RAG · topic & semantic indexes." },
   { id: "generation",  label: "Generation",    icon: "✦", group: "Knowledge engineering", blurb: "Grounded generation & generation-tuning — New-Hope synthesis over the graph." },
+  { id: "commons",     label: "Commons",       icon: "◆", group: "Commons", blurb: "The proof-carrying knowledge commons — FAIR+ metadata, sovereign DOIs, immutable preservation, ORCID/OpenAIRE + agent hooks, and epistemic-weighted community curation." },
 ];
 const groups = computed(() => [...new Set(sections.map((s) => s.group))]);
 
@@ -91,6 +93,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   query:       [{ label: "Run", hint: "SPARQL/Cypher/Gremlin over the kernel" }, { label: "Replay", hint: "re-evaluate by query hash" }, { label: "Export", hint: "results + proof" }],
   retrieval:   [{ label: "Query", hint: "run fibered retrieval" }, { label: "Rebuild index", hint: "re-embed" }, { label: "Use in notebook", hint: "attach retriever" }],
   generation:  [{ label: "Run", hint: "New-Hope grounded synthesis" }, { label: "→ Annotation set", hint: "into the workbench" }, { label: "→ Tune", hint: "generation-tuning" }],
+  commons:     [{ label: "Cite", hint: "mint a sovereign DOI" }, { label: "Preserve", hint: "seal an immutable version" }, { label: "Export FAIR", hint: "schema.org / DataCite / PROV-O" }],
 };
 </script>
 
@@ -203,6 +206,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
         <StudioQuery v-else-if="section === 'query'" :project="project" />
         <!-- Experiments = runs as proof-carrying graph facts (WS#32) -->
         <StudioExperiments v-else-if="section === 'experiments'" :project="project" />
+        <!-- Commons = the proof-carrying knowledge commons (WS#36–39) -->
+        <StudioCommons v-else-if="section === 'commons'" :project="project" />
 
         <!-- skeletons -->
         <div v-else-if="loading" class="grid">

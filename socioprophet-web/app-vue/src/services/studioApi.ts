@@ -9,7 +9,8 @@ const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_
 
 export type StudioSection =
   | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench
-  | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation"; // Knowledge engineering
+  | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation" // Knowledge engineering
+  | "commons";                                                                  // Commons (WS#36–39)
 
 export interface Notebook {
   id: string; name: string; runtime: string; kernel: string;
@@ -352,6 +353,103 @@ export async function mintCitation(
   });
   if (!res.ok) throw writeError("cite failed", res.status);
   return (await res.json()) as Citation;
+}
+
+// ── WS#36–39: the proof-carrying knowledge COMMONS — preservation, FAIR, scholarly/agent hooks, curation. ──
+export interface SnapshotVersion { snapshot_id: string; version: number; content_hash: string; sealed_at?: string | null; parent?: string | null; note?: string | null; epistemic_mode?: string }
+export interface Versions { project: string; target: string; versions: SnapshotVersion[]; count: number; degraded?: string | null }
+
+export interface Fair {
+  project: string; target: string; title: string; pid?: string | null; doi?: string | null;
+  version?: number | null; content_hash?: string | null;
+  fair: { findable: boolean; accessible: boolean; interoperable: boolean; reusable: boolean; score: number };
+  fair_plus: { epistemic: boolean; provenance_chain: boolean; hash_sealed: boolean };
+  hint?: string | null;
+}
+
+export interface OrcidContributor { name: string; orcid: string; orcid_url: string }
+export interface AgentVerb { name: string; endpoint: string | null; verifiable: boolean }
+export interface Ecosystem {
+  project: string; target: string;
+  scholarly: { doi?: string | null; doi_url?: string | null; orcid_contributors: OrcidContributor[]; openaire: { harvestable: boolean; datacite_doi?: string | null; metadata: string } };
+  agent_manifest: { "@type": string; identifier?: string | null; proof_carrying: boolean; epistemic_status: boolean; sovereign: boolean; access: AgentVerb[]; consume_note: string };
+}
+
+export interface Commons {
+  project: string; collection: string;
+  scale: { facts: number; citations: number; preserved_versions: number; endorsements: number; contributors: number };
+  epistemic_distribution: Record<string, number>; epistemic_quality_index?: number | null; degraded?: string | null;
+}
+
+export interface Endorsement { target: string; endorser: string; note?: string | null; at?: string | null }
+export interface Curation { project: string; target?: string | null; endorsements: Endorsement[]; count: number; curation_score: number; epistemic_weighted: boolean; degraded?: string | null }
+
+const STUB_COMMONS: Commons = {
+  project: "demo", collection: "proj-demo",
+  scale: { facts: 128, citations: 3, preserved_versions: 4, endorsements: 7, contributors: 2 },
+  epistemic_distribution: { attested: 18, verified: 41, observed: 63, hypothesis: 6 }, epistemic_quality_index: 0.71,
+};
+const STUB_FAIR: Fair = {
+  project: "demo", target: "proj-demo", title: "demo — knowledge graph", pid: "sp:proj-demo/graph/8f2ad4c1b9e0",
+  doi: "10.82044/proj-demo.graph.8f2ad4c1", version: 4, content_hash: "8f2ad4c1b9e0",
+  fair: { findable: true, accessible: true, interoperable: true, reusable: true, score: 1.0 },
+  fair_plus: { epistemic: true, provenance_chain: true, hash_sealed: true }, hint: null,
+};
+const STUB_ECOSYSTEM: Ecosystem = {
+  project: "demo", target: "proj-demo",
+  scholarly: { doi: "10.82044/proj-demo.graph.8f2ad4c1", doi_url: "https://doi.org/10.82044/proj-demo.graph.8f2ad4c1",
+    orcid_contributors: [{ name: "M. Heller", orcid: "0000-0002-1825-0097", orcid_url: "https://orcid.org/0000-0002-1825-0097" }],
+    openaire: { harvestable: true, datacite_doi: "10.82044/proj-demo.graph.8f2ad4c1", metadata: "/api/studio/fair?project=demo" } },
+  agent_manifest: { "@type": "AgentCapabilityManifest", identifier: "sp:proj-demo/graph/8f2ad4c1b9e0", proof_carrying: true, epistemic_status: true, sovereign: true,
+    access: [
+      { name: "resolve", endpoint: "/api/studio/resolve?pid=sp:proj-demo/graph/8f2ad4c1b9e0", verifiable: true },
+      { name: "query", endpoint: "/api/studio/query", verifiable: true },
+      { name: "provenance", endpoint: "/api/studio/provenance", verifiable: true },
+      { name: "receipts", endpoint: "/api/studio/receipts", verifiable: true },
+      { name: "rdf", endpoint: "/api/studio/graph.ttl?project=demo", verifiable: true },
+      { name: "fair", endpoint: "/api/studio/fair?project=demo", verifiable: true },
+    ], consume_note: "every result carries a queryHash + epistemic status; verify via the receipts/provenance verbs" },
+};
+const STUB_VERSIONS: Versions = {
+  project: "demo", target: "proj-demo", count: 2,
+  versions: [
+    { snapshot_id: "proj-demo:snap:8f2ad4c1b9e0", version: 2, content_hash: "8f2ad4c1b9e0", sealed_at: "2m ago", parent: "proj-demo:snap:71c9", note: "post-review", epistemic_mode: "attested" },
+    { snapshot_id: "proj-demo:snap:71c9", version: 1, content_hash: "71c9aa02", sealed_at: "1h ago", parent: null, note: "initial", epistemic_mode: "attested" },
+  ],
+};
+const STUB_CURATION: Curation = {
+  project: "demo", target: null, epistemic_weighted: true, count: 2, curation_score: 1.6,
+  endorsements: [
+    { target: "proj-demo:ent:hellgraph", endorser: "0000-0002-1825-0097", note: "verified independently", at: "5m ago" },
+    { target: "proj-demo:ent:provenance", endorser: "curator:noetica", note: null, at: "1h ago" },
+  ],
+};
+
+async function _read<T>(path: string, stub: T): Promise<T> {
+  if (!BASE) return stub;
+  const res = await fetch(`${BASE.replace(/\/$/, "")}${path}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+  return (await res.json()) as T;
+}
+
+export const loadCommons = (project: string) => _read(`/api/studio/commons?project=${encodeURIComponent(project)}`, STUB_COMMONS);
+export const loadFair = (project: string) => _read(`/api/studio/fair?project=${encodeURIComponent(project)}`, STUB_FAIR);
+export const loadEcosystem = (project: string) => _read(`/api/studio/ecosystem?project=${encodeURIComponent(project)}`, STUB_ECOSYSTEM);
+export const loadVersions = (project: string) => _read(`/api/studio/versions?project=${encodeURIComponent(project)}`, STUB_VERSIONS);
+export const loadCuration = (project: string, target?: string) =>
+  _read(`/api/studio/curation?project=${encodeURIComponent(project)}${target ? `&target=${encodeURIComponent(target)}` : ""}`, STUB_CURATION);
+
+export async function endorse(
+  input: { project: string; target: string; endorser: string; note?: string; revoke?: boolean },
+  token: string,
+): Promise<{ endorsement_id: string; target: string; endorser: string; revoked: boolean; proof_carrying: boolean }> {
+  if (!BASE) return { endorsement_id: `stub:endorse:${input.target}`, target: input.target, endorser: input.endorser, revoked: !!input.revoke, proof_carrying: true };
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/endorse`, {
+    method: "POST", headers: writeHeaders(token), body: JSON.stringify(input),
+  });
+  if (!res.ok) throw writeError("endorse failed", res.status);
+  return await res.json();
 }
 
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
