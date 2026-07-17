@@ -8,8 +8,8 @@
 const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_API;
 
 export type StudioSection =
-  | "notebooks" | "data" | "models" | "tuning" | "experiments"          // Workbench
-  | "extraction" | "ontology" | "graph" | "retrieval" | "generation";   // Knowledge engineering
+  | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench
+  | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation"; // Knowledge engineering
 
 export interface Notebook {
   id: string; name: string; runtime: string; kernel: string;
@@ -64,7 +64,8 @@ export interface StudioBundle {
   moat?: Moat; stub?: boolean;
 }
 
-export const SECTION_COUNT = (b: StudioBundle | null, s: StudioSection): number => (b ? (b[s]?.length ?? 0) : 0);
+// graph/query are custom-rendered sections with no list payload in the bundle → defensive index.
+export const SECTION_COUNT = (b: StudioBundle | null, s: StudioSection): number => (b ? ((b as unknown as Record<string, unknown[]>)[s]?.length ?? 0) : 0);
 
 const now = () => new Date().toISOString();
 const STUB: StudioBundle = {
@@ -250,6 +251,41 @@ export async function loadReceipts(limit = 12): Promise<Receipts> {
   const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/receipts?limit=${limit}`, { headers: { accept: "application/json" } });
   if (!res.ok) throw new Error(`receipts failed: ${res.status}`);
   return (await res.json()) as Receipts;
+}
+
+// ── WS#30: the proof-carrying query IDE (SPARQL/Cypher/Gremlin). Results carry replay proof + per-fact epistemic. ──
+export type QueryLang = "sparql" | "cypher" | "gremlin";
+export interface QueryProof { query_hash?: string | null; evaluated_at_seq?: number | null; replayable: boolean }
+export interface QueryResult {
+  project: string; lang: QueryLang; columns: string[]; rows: Record<string, unknown>[]; row_count: number;
+  epistemic: Record<string, string>; proof: QueryProof; raw?: unknown;
+}
+
+const STUB_QUERY = (lang: QueryLang): QueryResult => ({
+  project: "demo", lang,
+  columns: ["entity", "epistemic"],
+  rows: [
+    { entity: "proj-demo:ent:hellgraph", epistemic: "verified" },
+    { entity: "proj-demo:ent:neo4j", epistemic: "observed" },
+    { entity: "proj-demo:ent:anzo", epistemic: "observed" },
+  ],
+  row_count: 3,
+  epistemic: { "proj-demo:ent:hellgraph": "verified", "proj-demo:ent:neo4j": "observed", "proj-demo:ent:anzo": "observed" },
+  proof: { query_hash: "qh-demo-8f2a", evaluated_at_seq: 128, replayable: true },
+});
+
+export async function runQuery(project: string, lang: QueryLang, query: string, params?: Record<string, string>): Promise<QueryResult> {
+  if (!BASE) return STUB_QUERY(lang);
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/query`, {
+    method: "POST", headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({ project, lang, query, params }),
+  });
+  if (!res.ok) {
+    let detail = `${res.status}`;
+    try { const j = await res.json(); detail = (j as { detail?: string }).detail ?? detail; } catch { /* */ }
+    throw new Error(`query failed: ${detail}`);
+  }
+  return (await res.json()) as QueryResult;
 }
 
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {

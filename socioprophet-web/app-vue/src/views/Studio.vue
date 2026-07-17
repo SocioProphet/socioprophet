@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { loadStudio, loadReceipts, SECTION_COUNT, EPISTEMIC_COLORS, type StudioBundle, type StudioSection, type Receipts } from "../services/studioApi";
 import StudioGraph from "../components/StudioGraph.vue";
+import StudioQuery from "../components/StudioQuery.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -33,6 +34,7 @@ const sections: { id: StudioSection; label: string; icon: string; group: string;
   { id: "extraction",  label: "Extraction",    icon: "⛏", group: "Knowledge engineering", blurb: "Pull knowledge into the project graph — Holmes entities/relations, Sherlock federated search, governed ingest." },
   { id: "ontology",    label: "Ontology",      icon: "⬡", group: "Knowledge engineering", blurb: "The schema & alignment layer — Ontogenesis classes, relations, KKO alignment." },
   { id: "graph",       label: "Graph",         icon: "⧉", group: "Knowledge engineering", blurb: "The project knowledge graph — HellGraph, gremlin/sparql, grounded to your docs." },
+  { id: "query",       label: "Query",         icon: "⌗", group: "Knowledge engineering", blurb: "SPARQL / Cypher / Gremlin over the live kernel — results you can replay (proof-carrying) and whose facts carry epistemic status." },
   { id: "retrieval",   label: "Retrieval",     icon: "◎", group: "Knowledge engineering", blurb: "Fibered retrieval (PageIndex ⊕ HellGraph) · Graph-RAG · topic & semantic indexes." },
   { id: "generation",  label: "Generation",    icon: "✦", group: "Knowledge engineering", blurb: "Grounded generation & generation-tuning — New-Hope synthesis over the graph." },
 ];
@@ -49,7 +51,7 @@ function onKey(e: KeyboardEvent) { if (e.key === "Escape") selected.value = null
 
 const items = computed<Record<string, any>[]>(() => {
   const b = bundle.value; if (!b) return [];
-  const list = (b[section.value] ?? []) as Record<string, any>[];
+  const list = ((b as Record<string, any>)[section.value] ?? []) as Record<string, any>[];
   const q = query.value.trim().toLowerCase();
   if (!q) return list;
   return list.filter((it) => JSON.stringify(it).toLowerCase().includes(q));
@@ -67,6 +69,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   extraction:  [{ label: "Run extraction", hint: "Holmes/Sherlock → project graph" }, { label: "View in graph", hint: "open the graph" }, { label: "Share to team", hint: "in the project collection" }],
   ontology:    [{ label: "Edit ontology", hint: "Ontogenesis" }, { label: "Align", hint: "map to KKO / project" }, { label: "Apply to graph", hint: "re-type entities" }],
   graph:       [{ label: "Open graph", hint: "HellGraph gremlin/sparql" }, { label: "Query", hint: "graph-RAG" }, { label: "Export", hint: "sub-graph" }],
+  query:       [{ label: "Run", hint: "SPARQL/Cypher/Gremlin over the kernel" }, { label: "Replay", hint: "re-evaluate by query hash" }, { label: "Export", hint: "results + proof" }],
   retrieval:   [{ label: "Query", hint: "run fibered retrieval" }, { label: "Rebuild index", hint: "re-embed" }, { label: "Use in notebook", hint: "attach retriever" }],
   generation:  [{ label: "Run", hint: "New-Hope grounded synthesis" }, { label: "→ Annotation set", hint: "into the workbench" }, { label: "→ Tune", hint: "generation-tuning" }],
 };
@@ -150,6 +153,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 
         <!-- Graph section = the provenance-first explorer (KE-2) -->
         <StudioGraph v-if="section === 'graph'" :project="project" />
+        <!-- Query section = the proof-carrying query IDE (WS#30) -->
+        <StudioQuery v-else-if="section === 'query'" :project="project" />
 
         <!-- skeletons -->
         <div v-else-if="loading" class="grid">
