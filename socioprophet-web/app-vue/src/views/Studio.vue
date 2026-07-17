@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { loadStudio, loadReceipts, SECTION_COUNT, EPISTEMIC_COLORS, type StudioBundle, type StudioSection, type Receipts } from "../services/studioApi";
 import StudioGraph from "../components/StudioGraph.vue";
 import StudioQuery from "../components/StudioQuery.vue";
+import StudioExperiments from "../components/StudioExperiments.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -155,6 +156,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
         <StudioGraph v-if="section === 'graph'" :project="project" />
         <!-- Query section = the proof-carrying query IDE (WS#30) -->
         <StudioQuery v-else-if="section === 'query'" :project="project" />
+        <!-- Experiments = runs as proof-carrying graph facts (WS#32) -->
+        <StudioExperiments v-else-if="section === 'experiments'" :project="project" />
 
         <!-- skeletons -->
         <div v-else-if="loading" class="grid">
@@ -193,12 +196,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
               <div v-if="it.progress != null" class="bar"><span :style="{ width: Math.round(it.progress * 100) + '%' }" /></div>
               <div v-if="it.metric" class="sub">{{ it.metric.name }}: <b>{{ it.metric.value }}</b></div>
             </template>
-            <!-- experiments -->
-            <template v-else-if="section === 'experiments'">
-              <div class="row"><span class="name">{{ it.title }}</span><span v-if="it.reproducible" class="pill ok">reproducible</span></div>
-              <div class="sub">{{ it.provenance }}</div>
-              <div v-if="it.steps" class="prov"><span v-for="st in it.steps" :key="st.label" class="pstep" :title="st.hash">{{ st.label }}</span></div>
-            </template>
+            <!-- experiments now render via the StudioExperiments panel (WS#32) -->
             <!-- extraction (holmes / sherlock / ingest → graph) -->
             <template v-else-if="section === 'extraction'">
               <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="it.status">{{ it.status }}</span></div>

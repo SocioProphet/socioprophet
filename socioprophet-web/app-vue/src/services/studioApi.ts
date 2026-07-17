@@ -288,6 +288,41 @@ export async function runQuery(project: string, lang: QueryLang, query: string, 
   return (await res.json()) as QueryResult;
 }
 
+// ── WS#32: experiment tracking — runs are first-class proof-carrying graph facts (params/metrics + epistemic). ──
+export interface ExperimentRun {
+  run_id: string; name: string; status: string; params: Record<string, unknown>; metrics: Record<string, number>;
+  created_at?: string | null; epistemic_mode?: string; extractor?: string | null; source?: string | null;
+}
+export interface Experiments { project: string; runs: ExperimentRun[]; count: number; degraded?: string | null }
+
+const STUB_EXPERIMENTS: Experiments = {
+  project: "demo", count: 2,
+  runs: [
+    { run_id: "proj-demo:run:8f2a", name: "sweep-lr", status: "finished", params: { lr: 0.01, batch: 64 }, metrics: { acc: 0.912, loss: 0.28 }, created_at: "2m ago", epistemic_mode: "observed", extractor: "studio/experiment-v0" },
+    { run_id: "proj-demo:run:71c9", name: "baseline", status: "finished", params: { lr: 0.001 }, metrics: { acc: 0.874 }, created_at: "1h ago", epistemic_mode: "observed", extractor: "studio/experiment-v0" },
+  ],
+};
+
+export async function loadExperiments(project: string): Promise<Experiments> {
+  if (!BASE) return STUB_EXPERIMENTS;
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/experiments?project=${encodeURIComponent(project)}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`experiments failed: ${res.status}`);
+  return (await res.json()) as Experiments;
+}
+
+export async function logExperiment(
+  input: { project: string; name: string; params?: Record<string, unknown>; metrics?: Record<string, number>; status?: string },
+  token: string,
+): Promise<ExperimentRun> {
+  if (!BASE) throw new Error("Studio backend not connected (set VITE_STUDIO_API)");
+  if (!token) throw new Error("write token required");
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/experiments`, {
+    method: "POST", headers: writeHeaders(token), body: JSON.stringify(input),
+  });
+  if (!res.ok) throw writeError("log experiment failed", res.status);
+  return (await res.json()) as ExperimentRun;
+}
+
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!BASE) return STUB;
   const q = projectId ? `?project=${encodeURIComponent(projectId)}` : "";
