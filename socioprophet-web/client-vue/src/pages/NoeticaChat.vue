@@ -139,6 +139,13 @@
           <button type="button" class="nx-toggle" :class="{ on: chat.webMode.value }"
             @click="chat.webMode.value = !chat.webMode.value" :aria-pressed="chat.webMode.value" title="Search the web">web</button>
 
+          <!-- attach files to the active knowledge base -->
+          <button type="button" class="nx-toggle" :disabled="ingesting" @click="attachRef?.click()"
+            title="Attach files to the knowledge base">📎</button>
+          <input ref="attachRef" type="file" multiple class="nx-hidden" @change="onAttach" />
+          <span v-if="ingesting" class="nx-ingest">ingesting…</span>
+          <span v-else-if="ingestedCount" class="nx-ingest" :title="ingestedCount + ' files ingested this session'">✓ {{ ingestedCount }}</span>
+
           <span class="nx-spacer" />
           <span class="nx-toolbar-hint">⏎ send</span>
           <button v-if="chat.busy.value" type="button" class="nx-send nx-stopbtn" @click="chat.stop()" aria-label="Stop">
@@ -159,7 +166,8 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
-import { useProjects } from '../stores/projects';
+import { useProjects, projectCollectionId } from '../stores/projects';
+import { AM_BASE } from '../services/agentMachineApi';
 import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
 import NoeticaTrace from '../components/NoeticaTrace.vue';
@@ -190,6 +198,39 @@ function newProject() {
   const name = window.prompt('New project name');
   if (name && name.trim()) { const p = projects.create(name); chat.retrievalScope.value = 'project'; void p; }
   showScope.value = false;
+}
+
+// ── attachments → the agent-machine ingest queue, bound to the active collection ──
+const attachRef = ref<HTMLInputElement | null>(null);
+const ingesting = ref(false);
+const ingestedCount = ref(0);
+function uploadCollection(): string {
+  if (chat.retrievalScope.value === 'project' && projects.active) return projectCollectionId(projects.active.id);
+  return `chat-${chat.sessionId.replace(/-/g, '').slice(0, 8)}`;   // mirrors Noetica chatCollectionId
+}
+async function onAttach(e: Event) {
+  const files = Array.from((e.target as HTMLInputElement).files ?? []);
+  if (!files.length) return;
+  ingesting.value = true;
+  const collection = uploadCollection();
+  const results = await Promise.all(files.map((f) => new Promise<boolean>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataBase64 = (reader.result as string).split(',')[1] ?? '';
+      try {
+        const r = await fetch(`${AM_BASE}/api/ingest/queue`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: f.name, mimeType: f.type, dataBase64, collection }),
+        });
+        resolve(r.ok);
+      } catch { resolve(false); }
+    };
+    reader.onerror = () => resolve(false);
+    reader.readAsDataURL(f);
+  })));
+  ingestedCount.value += results.filter(Boolean).length;
+  ingesting.value = false;
+  if (attachRef.value) attachRef.value.value = '';
 }
 const expanded = ref<Set<number>>(new Set());
 function toggleTrace(i: number) { if (expanded.value.has(i)) expanded.value.delete(i); else expanded.value.add(i); }
@@ -443,6 +484,8 @@ onMounted(() => inputEl.value?.focus());
 .nx-toolbar { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--nline-weak); padding: 6px 8px; flex-wrap: wrap; }
 .nx-toolbar-hint { font-size: 10px; color: var(--ntext3); padding-left: 4px; }
 .nx-spacer { flex: 1 1 auto; }
+.nx-hidden { display: none; }
+.nx-ingest { font-size: 10px; color: var(--nblue); }
 .nx-scope { position: relative; }
 .nx-scope-btn { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--nline-weak); background: transparent;
   color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 7px; cursor: pointer; }
