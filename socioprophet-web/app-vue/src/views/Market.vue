@@ -7,7 +7,7 @@ const kind = ref<PackageKind | "">("");
 const results = computed(() => searchApps(CATALOG, q.value, kind.value || undefined));
 function assess(m: AppManifest) { return validateManifest(m); }
 const kindLabel: Record<PackageKind, string> = { flatpak: "Flatpak", appimage: "AppImage", oci: "OCI", "mcp-plugin": "MCP" };
-const riskColor: Record<string, string> = { low: "#137333", elevated: "#b06000", high: "#c5221f" };
+const riskColor: Record<string, string> = { low: "var(--ok)", elevated: "var(--warn)", high: "var(--fail)" };
 </script>
 
 <template>
@@ -50,22 +50,22 @@ const riskColor: Record<string, string> = { low: "#137333", elevated: "#b06000",
 </template>
 
 <style scoped>
-.mkt { padding: 24px 32px; font: 14px/1.5 system-ui, sans-serif; color: #202124; overflow: auto; height: 100%; }
-h1 { font-size: 26px; margin: 0 0 4px; } .tag { font-size: 12px; background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; }
-.lede { color: #5f6368; max-width: 720px; margin: 0 0 14px; }
+.mkt { padding: 24px 32px; font: 14px/1.5 var(--ui); color: var(--ink); overflow: auto; height: 100%; }
+h1 { font-size: 26px; margin: 0 0 4px; } .tag { font-size: 12px; background: var(--accent-wash); color: var(--accent); padding: 2px 8px; border-radius: 10px; }
+.lede { color: var(--muted); max-width: 720px; margin: 0 0 14px; }
 .controls { display: flex; gap: 10px; margin-bottom: 18px; }
-.controls input { flex: 1; max-width: 360px; padding: 6px 10px; border: 1px solid #dadce0; border-radius: 8px; }
-.controls select { padding: 6px 10px; border: 1px solid #dadce0; border-radius: 8px; }
+.controls input { flex: 1; max-width: 360px; padding: 6px 10px; border: 1px solid var(--hairline-strong); border-radius: 8px; }
+.controls select { padding: 6px 10px; border: 1px solid var(--hairline-strong); border-radius: 8px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-.card { border: 1px solid #e8eaed; border-radius: 10px; padding: 14px; background: #fff; }
+.card { border: 1px solid var(--hairline); border-radius: 10px; padding: 14px; background: #fff; }
 .top { display: flex; justify-content: space-between; align-items: center; }
-.name { font-weight: 600; font-size: 16px; } .badge { font-size: 11px; background: #f1f3f4; padding: 2px 8px; border-radius: 8px; }
-.pub { color: #5f6368; font-size: 13px; } .remote { color: #1a73e8; }
+.name { font-weight: 600; font-size: 16px; } .badge { font-size: 11px; background: var(--sunken); padding: 2px 8px; border-radius: 8px; }
+.pub { color: var(--muted); font-size: 13px; } .remote { color: var(--accent); }
 .sum { font-size: 13px; margin: 8px 0; min-height: 32px; }
 .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-.pill { font-size: 11px; border: 1px solid #dadce0; border-radius: 10px; padding: 1px 7px; }
-.pill.ok { color: #137333; border-color: #cde8d4; } .pill.warn { color: #b06000; border-color: #fde293; }
-.warns { margin: 4px 0; padding-left: 16px; font-size: 12px; color: #c5221f; }
-.install { display: block; background: #202124; color: #e8eaed; padding: 6px 8px; border-radius: 6px; font-size: 12px; overflow-x: auto; }
-.none { color: #5f6368; padding: 20px 0; }
+.pill { font-size: 11px; border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 1px 7px; }
+.pill.ok { color: var(--ok); border-color: #cde8d4; } .pill.warn { color: var(--warn); border-color: #fde293; }
+.warns { margin: 4px 0; padding-left: 16px; font-size: 12px; color: var(--fail); }
+.install { display: block; background: var(--ink); color: var(--hairline); padding: 6px 8px; border-radius: 6px; font-size: 12px; overflow-x: auto; }
+.none { color: var(--muted); padding: 20px 0; }
 </style>

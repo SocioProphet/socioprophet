@@ -1,0 +1,164 @@
+/* ============================================================================
+   Prophet Studio — design tokens (Layer 0)
+   The single foundation every Studio surface inherits.
+
+   Doctrine (Tufte · Bostock · Carbon):
+   - Grayscale carries ALL structure. Neutrals are chosen (biased toward our
+     brand blue), never a default mid-grey.
+   - The EPISTEMIC ramp is the one saturated dimension worth spending —
+     observed → derived → verified → attested. It is the moat, made visible.
+   - Semantic status (running/ok/warn/fail) is a SEPARATE small palette and is
+     rendered as a *filled* form, never the accent, so it can never be
+     confused with epistemic status (which is rendered as a stripe/dot).
+   - Carbon density: a 4px spacing grid, hairline borders, near-square radii.
+   - TYPE: deliberately a neutral system stack — no distinctive vendored face.
+     A single shipped webfont is a browser-fingerprint surface (kerning/metrics
+     are identifiable); until a non-fingerprintable face is chosen we ride the
+     viewer's own system font. Do NOT add a webfont here without that review.
+   ========================================================================== */
+
+:root {
+  /* — neutrals: light (default). Blue-biased, not neutral grey. — */
+  --ground:   #f4f6f9;
+  --sunken:   #eef1f5;
+  --surface:  #ffffff;
+  --surface-2:#fbfcfe;
+  --hairline: #dce1e8;
+  --hairline-strong:#c6cdd8;
+  --ink:      #141a22;
+  --ink-2:    #3a4552;
+  --muted:    #64707e;
+  --faint:    #98a3b0;
+
+  /* — app-bar is dark in both themes (Carbon app shell) — */
+  --bar:      #10151c;
+  --bar-ink:  #eef2f7;
+  --bar-muted:#8a96a4;
+  --bar-line: #232c38;
+
+  /* — brand accent (ours). Interactive + selection only, used sparingly. — */
+  --accent:    #3f83f8;
+  --accent-2:  #2f6fe0;
+  --accent-wash:#e8f0fe;
+  --accent-ink:#0b3d91;
+
+  /* — EPISTEMIC ordered ramp (grey→blue→violet→teal→emerald): the warrant ladder — */
+  --epi-hypothesis:#94a1b2;
+  --epi-observed:  #4a90e2;
+  --epi-derived:   #8b5cf6;
+  --epi-verified:  #14b8a6;
+  --epi-attested:  #059669;
+  --epi-simulated: #d98324;
+  --epi-unknown:   #b6bec9;
+  --epi-hypothesis-wash:#eef0f3;
+  --epi-observed-wash:  #e7f0fc;
+  --epi-derived-wash:   #f0ebfe;
+  --epi-verified-wash:  #e3f7f4;
+  --epi-attested-wash:  #e2f5ec;
+
+  /* — semantic status: separate palette, filled form only — */
+  --ok:      #2f9e44;
+  --warn:    #e0a800;
+  --fail:    #e5484d;
+  --run:     #4a90e2;
+  --idle:    #8a94a3;
+  --ok-wash: #e6f4ea; --warn-wash:#fbf3d9; --fail-wash:#fce9ea; --run-wash:#e7f0fc;
+
+  /* — grid, radius, elevation (Carbon: tight + flat) — */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px;
+  --r-1:3px; --r-2:5px; --r-3:8px;
+  --pill:999px;
+  --e-1:0 1px 2px rgba(20,26,34,.06);
+  --e-2:0 4px 14px rgba(20,26,34,.10);
+  --e-3:0 12px 40px rgba(20,26,34,.16);
+
+  /* — type: neutral system stack (see header note — no vendored face) — */
+  --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --canvas-dot: #e7ebf1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:  #0b0f15;
+    --sunken:  #080b10;
+    --surface: #141b24;
+    --surface-2:#18202a;
+    --hairline:#232c38;
+    --hairline-strong:#33404f;
+    --ink:     #e8eef5;
+    --ink-2:   #b4c0cd;
+    --muted:   #8a97a5;
+    --faint:   #5d6a78;
+
+    --bar:     #080b10;
+    --bar-ink: #e8eef5;
+    --bar-muted:#8a97a5;
+    --bar-line:#1c242f;
+
+    --accent:  #5b95f9;
+    --accent-2:#3f83f8;
+    --accent-wash:#16233b;
+    --accent-ink:#bcd4ff;
+
+    --epi-hypothesis:#8592a3;
+    --epi-observed:  #5b95f9;
+    --epi-derived:   #a082f8;
+    --epi-verified:  #2dd4bf;
+    --epi-attested:  #34d399;
+    --epi-simulated: #e0975a;
+    --epi-unknown:   #4a5568;
+    --epi-hypothesis-wash:#1a2029;
+    --epi-observed-wash:  #14243c;
+    --epi-derived-wash:   #211a3a;
+    --epi-verified-wash:  #0e2c2b;
+    --epi-attested-wash:  #0e2a22;
+
+    --ok:#3fb950; --warn:#d29922; --fail:#e5534b; --run:#5b95f9; --idle:#6b7684;
+    --ok-wash:#0f2417; --warn-wash:#241d0a; --fail-wash:#2a1315; --run-wash:#14243c;
+
+    --canvas-dot:#1a212b;
+    --e-1:0 1px 2px rgba(0,0,0,.4);--e-2:0 4px 14px rgba(0,0,0,.5);--e-3:0 12px 40px rgba(0,0,0,.6);
+  }
+}
+
+/* explicit theme override (viewer toggle stamps data-theme on <html>) — must win both ways */
+:root[data-theme="light"] {
+  --ground:#f4f6f9; --sunken:#eef1f5; --surface:#fff; --surface-2:#fbfcfe;
+  --hairline:#dce1e8; --hairline-strong:#c6cdd8;
+  --ink:#141a22; --ink-2:#3a4552; --muted:#64707e; --faint:#98a3b0;
+  --accent:#3f83f8; --accent-2:#2f6fe0; --accent-wash:#e8f0fe; --accent-ink:#0b3d91;
+  --epi-hypothesis:#94a1b2; --epi-observed:#4a90e2; --epi-derived:#8b5cf6;
+  --epi-verified:#14b8a6; --epi-attested:#059669; --epi-simulated:#d98324; --epi-unknown:#b6bec9;
+  --ok:#2f9e44; --warn:#e0a800; --fail:#e5484d; --run:#4a90e2; --idle:#8a94a3;
+  --canvas-dot:#e7ebf1;
+}
+:root[data-theme="dark"] {
+  --ground:#0b0f15; --sunken:#080b10; --surface:#141b24; --surface-2:#18202a;
+  --hairline:#232c38; --hairline-strong:#33404f;
+  --ink:#e8eef5; --ink-2:#b4c0cd; --muted:#8a97a5; --faint:#5d6a78;
+  --accent:#5b95f9; --accent-2:#3f83f8; --accent-wash:#16233b; --accent-ink:#bcd4ff;
+  --epi-hypothesis:#8592a3; --epi-observed:#5b95f9; --epi-derived:#a082f8;
+  --epi-verified:#2dd4bf; --epi-attested:#34d399; --epi-simulated:#e0975a; --epi-unknown:#4a5568;
+  --ok:#3fb950; --warn:#d29922; --fail:#e5534b; --run:#5b95f9; --idle:#6b7684;
+  --canvas-dot:#1a212b;
+}
+
+/* ---- shared primitive utilities ------------------------------------------- */
+.epi-stripe { position:relative; }
+.epi-stripe::before {
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--epi, var(--epi-unknown)); border-radius:var(--r-1) 0 0 var(--r-1);
+}
+.epi-dot { display:inline-block; width:8px; height:8px; border-radius:var(--pill);
+  background:var(--epi, var(--epi-unknown)); flex:0 0 auto; }
+.epi-chip { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
+  letter-spacing:.01em; padding:1px 8px 1px 7px; border-radius:var(--r-1);
+  color:var(--epi, var(--epi-unknown)); background:var(--epi-wash, transparent);
+  border:1px solid color-mix(in srgb, var(--epi, var(--epi-unknown)) 40%, transparent); }
+.stat-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600;
+  padding:1px 8px; border-radius:var(--pill); color:#fff; background:var(--stat, var(--idle)); }
+.stat-chip.soft { color:var(--stat, var(--idle)); background:var(--stat-wash, var(--sunken)); }
+.tnum { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }

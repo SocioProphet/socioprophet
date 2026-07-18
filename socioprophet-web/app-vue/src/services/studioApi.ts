@@ -139,9 +139,23 @@ export interface GraphView {
 
 // Epistemic-mode → colour (the ladder hypothesis→…→attested). This colouring IS the feature: Bloom shows topology,
 // we show epistemic status per node.
+// Resolve from the token ramp so the graph, membrane, and chips share one ink.
+// (Falls back to literals when read outside the DOM, e.g. SSR/tests.)
+function epiVar(name: string, fallback: string): string {
+  if (typeof getComputedStyle === "function" && typeof document !== "undefined") {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if (v) return v;
+  }
+  return fallback;
+}
 export const EPISTEMIC_COLORS: Record<string, string> = {
-  hypothesis: "#9aa0a6", observed: "#1a73e8", derived: "#8b5cf6",
-  verified: "#137333", attested: "#00897b", simulated: "#b06000", unknown: "#c0c4c9",
+  get hypothesis() { return epiVar("--epi-hypothesis", "#94a1b2"); },
+  get observed()   { return epiVar("--epi-observed",   "#4a90e2"); },
+  get derived()    { return epiVar("--epi-derived",    "#8b5cf6"); },
+  get verified()   { return epiVar("--epi-verified",   "#14b8a6"); },
+  get attested()   { return epiVar("--epi-attested",   "#059669"); },
+  get simulated()  { return epiVar("--epi-simulated",  "#d98324"); },
+  get unknown()    { return epiVar("--epi-unknown",    "#b6bec9"); },
 };
 
 const STUB_GRAPH: GraphView = {

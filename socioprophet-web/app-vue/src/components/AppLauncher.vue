@@ -20,13 +20,13 @@ const open = ref(false);
 
 <style scoped>
 .launcher { position: relative; display: inline-flex; }
-.waffle { background: none; border: 0; cursor: pointer; color: #1a73e8; font-size: 21px; line-height: 1; padding: 4px; }
+.waffle { background: none; border: 0; cursor: pointer; color: var(--accent); font-size: 21px; line-height: 1; padding: 4px; }
 .backdrop { position: fixed; inset: 0; z-index: 40; }
-.grid { position: absolute; top: 36px; right: 0; z-index: 50; width: 312px; background: #fff; border: 0.5px solid #e0e0e0;
+.grid { position: absolute; top: 36px; right: 0; z-index: 50; width: 312px; background: #fff; border: 0.5px solid var(--hairline);
   border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); padding: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
 .tile { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 4px; border-radius: 8px;
-  text-decoration: none; color: #3c4043; font-size: 12px; position: relative; }
-.tile:hover { background: #f5f5f5; }
+  text-decoration: none; color: var(--ink-2); font-size: 12px; position: relative; }
+.tile:hover { background: var(--sunken); }
 .tile .ti { font-size: 26px; }
-.st { position: absolute; top: 4px; right: 6px; font-size: 9px; color: #b0b0b0; font-style: normal; }
+.st { position: absolute; top: 4px; right: 6px; font-size: 9px; color: var(--faint); font-style: normal; }
 </style>

@@ -31,7 +31,7 @@ async function run() {
 }
 
 function epiOf(v: unknown): string | null { return result.value?.epistemic[String(v)] ?? null; }
-function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "#c0c4c9"; }
+function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "var(--faint)"; }
 </script>
 
 <template>
@@ -86,30 +86,30 @@ function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "#c0c4c9
 </template>
 
 <style scoped>
-.qide { font: 14px/1.5 system-ui, sans-serif; color: #202124; }
+.qide { font: 14px/1.5 var(--ui); color: var(--ink); }
 .qbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .qbar .spacer { flex: 1; }
-.seg { display: inline-flex; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: #fff; padding: 6px 12px; font-size: 12px; text-transform: capitalize; cursor: pointer; color: #5f6368; }
-.seg button.on { background: #1a73e8; color: #fff; }
-.run { border: 1px solid #1a73e8; background: #1a73e8; color: #fff; border-radius: 8px; padding: 6px 16px; font-size: 13px; cursor: pointer; }
+.seg { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: #fff; padding: 6px 12px; font-size: 12px; text-transform: capitalize; cursor: pointer; color: var(--muted); }
+.seg button.on { background: var(--accent); color: #fff; }
+.run { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 8px; padding: 6px 16px; font-size: 13px; cursor: pointer; }
 .run:disabled { opacity: .6; cursor: default; }
-.qed { width: 100%; resize: vertical; border: 1px solid #dadce0; border-radius: 10px; padding: 12px; font-size: 13px; background: #fbfcfe; box-sizing: border-box; }
+.qed { width: 100%; resize: vertical; border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 12px; font-size: 13px; background: var(--surface-2); box-sizing: border-box; }
 .mono { font-family: "SF Mono", ui-monospace, Menlo, monospace; }
-.qerr { color: #c5221f; font-size: 13px; margin: 10px 0 0; }
+.qerr { color: var(--fail); font-size: 13px; margin: 10px 0 0; }
 .qres { margin-top: 12px; }
-.qproof { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #f1f6ee; border: 1px solid #d7e8cf; border-radius: 9px; font-size: 12px; }
+.qproof { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--ok-wash); border: 1px solid var(--ok-wash); border-radius: 9px; font-size: 12px; }
 .qproof .spacer { flex: 1; }
-.pf { font-weight: 700; color: #5f6368; } .pf.ok { color: #137333; }
-.pfh { color: #137333; } .pfs { color: #5f6368; } .rc { color: #5f6368; }
-.qscroll { overflow-x: auto; margin-top: 10px; border: 1px solid #e8eaed; border-radius: 10px; }
+.pf { font-weight: 700; color: var(--muted); } .pf.ok { color: var(--ok); }
+.pfh { color: var(--ok); } .pfs { color: var(--muted); } .rc { color: var(--muted); }
+.qscroll { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hairline); border-radius: 10px; }
 .qgrid { border-collapse: collapse; width: 100%; font-size: 13px; }
-.qgrid th { text-align: left; padding: 8px 12px; background: #f8f9fa; border-bottom: 1px solid #e8eaed; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #5f6368; }
-.qgrid td { padding: 8px 12px; border-bottom: 1px solid #f1f3f4; white-space: nowrap; }
+.qgrid th { text-align: left; padding: 8px 12px; background: var(--sunken); border-bottom: 1px solid var(--hairline); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.qgrid td { padding: 8px 12px; border-bottom: 1px solid var(--sunken); white-space: nowrap; }
 .qgrid tr:last-child td { border-bottom: 0; }
 .qgrid td .epi { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
-.qraw { margin-top: 10px; background: #0e1116; color: #d7e0ea; padding: 12px; border-radius: 10px; overflow-x: auto; font-size: 12px; max-height: 320px; }
-.qempty, .qhint, .qnote { color: #5f6368; font-size: 12.5px; }
-.qnote { margin-top: 8px; } .qnote b { color: #202124; } .qhint b { color: #202124; }
+.qraw { margin-top: 10px; background: var(--ground); color: var(--hairline); padding: 12px; border-radius: 10px; overflow-x: auto; font-size: 12px; max-height: 320px; }
+.qempty, .qhint, .qnote { color: var(--muted); font-size: 12.5px; }
+.qnote { margin-top: 8px; } .qnote b { color: var(--ink); } .qhint b { color: var(--ink); }
 .qhint { margin-top: 12px; }
 </style>

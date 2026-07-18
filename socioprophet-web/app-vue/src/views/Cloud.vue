@@ -57,19 +57,19 @@ const fmt = (n: number) => (n === 0 ? "free" : `$${n}`);
 </template>
 
 <style scoped>
-.cloud { padding: 24px 32px; font: 14px/1.5 system-ui, sans-serif; color: #202124; overflow: auto; height: 100%; }
-h1 { font-size: 26px; margin: 0 0 4px; } .tag { font-size: 12px; background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; vertical-align: middle; }
-.lede { color: #5f6368; margin: 0 0 14px; max-width: 720px; }
+.cloud { padding: 24px 32px; font: 14px/1.5 var(--ui); color: var(--ink); overflow: auto; height: 100%; }
+h1 { font-size: 26px; margin: 0 0 4px; } .tag { font-size: 12px; background: var(--accent-wash); color: var(--accent); padding: 2px 8px; border-radius: 10px; vertical-align: middle; }
+.lede { color: var(--muted); margin: 0 0 14px; max-width: 720px; }
 .controls { display: flex; gap: 24px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-.controls select { padding: 4px 8px; border: 1px solid #dadce0; border-radius: 6px; }
-.vbtn { border: 1px solid #dadce0; background: #fff; border-radius: 14px; padding: 2px 10px; margin: 0 3px; cursor: pointer; font-size: 12px; }
-.vbtn.off { background: #fce8e6; color: #c5221f; text-decoration: line-through; }
+.controls select { padding: 4px 8px; border: 1px solid var(--hairline-strong); border-radius: 6px; }
+.vbtn { border: 1px solid var(--hairline-strong); background: #fff; border-radius: 14px; padding: 2px 10px; margin: 0 3px; cursor: pointer; font-size: 12px; }
+.vbtn.off { background: var(--fail-wash); color: var(--fail); text-decoration: line-through; }
 .grid { width: 100%; border-collapse: collapse; }
-.grid th, .grid td { border: 1px solid #e8eaed; padding: 8px 10px; text-align: left; vertical-align: top; }
-.grid th { background: #f1f3f4; font-weight: 500; text-transform: capitalize; }
+.grid th, .grid td { border: 1px solid var(--hairline); padding: 8px 10px; text-align: left; vertical-align: top; }
+.grid th { background: var(--sunken); font-weight: 500; text-transform: capitalize; }
 .kind { font-weight: 600; text-transform: capitalize; }
-.prim { font-size: 13px; } .price { font-size: 12px; color: #5f6368; }
-.best { background: #e6f4ea; outline: 2px solid #137333; }
-.pick strong { color: #137333; text-transform: uppercase; }
-.na { color: #bdc1c6; } .foot { color: #5f6368; margin-top: 16px; font-size: 13px; }
+.prim { font-size: 13px; } .price { font-size: 12px; color: var(--muted); }
+.best { background: var(--ok-wash); outline: 2px solid var(--ok); }
+.pick strong { color: var(--ok); text-transform: uppercase; }
+.na { color: #bdc1c6; } .foot { color: var(--muted); margin-top: 16px; font-size: 13px; }
 </style>
