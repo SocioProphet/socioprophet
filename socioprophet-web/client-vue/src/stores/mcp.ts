@@ -19,12 +19,27 @@ function load(): McpServerConfig[] {
   return [];
 }
 
+export function toolKey(t: { serverId: string; name: string }): string { return `${t.serverId}:${t.name}`; }
+
 export const useMcp = defineStore('mcp', () => {
   const servers = ref<McpServerConfig[]>(load());
   const status = ref<Record<string, McpStatus>>({});
   const errors = ref<Record<string, string>>({});
   const tools = ref<McpToolInfo[]>([]);
+  const enabled = ref<Set<string>>(new Set());   // tool keys the model may call this session
   const clients = new Map<string, Client>();   // non-reactive live connections
+
+  function toggleTool(key: string) {
+    const s = new Set(enabled.value);
+    if (s.has(key)) s.delete(key); else s.add(key);
+    enabled.value = s;
+  }
+  // the selected tools as definitions passed into /api/chat. When the agent-machine is
+  // driving the loop it executes them server-side and emits tool_calls for display.
+  function selectedDefs(): Array<{ name: string; description?: string; inputSchema?: unknown; serverId: string }> {
+    return tools.value.filter((t) => enabled.value.has(toolKey(t)))
+      .map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema, serverId: t.serverId }));
+  }
 
   function persist() {
     try { localStorage.setItem(LS_KEY, JSON.stringify(servers.value)); } catch { /* */ }
@@ -78,5 +93,6 @@ export const useMcp = defineStore('mcp', () => {
   }
   function connectAll() { servers.value.forEach((s) => void connect(s)); }
 
-  return { servers, status, errors, tools, addServer, removeServer, connect, disconnect, connectAll };
+  return { servers, status, errors, tools, enabled, toggleTool, selectedDefs,
+    addServer, removeServer, connect, disconnect, connectAll };
 });

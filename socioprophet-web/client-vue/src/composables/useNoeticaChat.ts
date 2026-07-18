@@ -7,6 +7,7 @@ import { ref, watch } from 'vue';
 import { AM_BASE } from '../services/agentMachineApi';
 import { useSettings } from '../stores/settings';
 import { useProjects, projectCollectionId } from '../stores/projects';
+import { useMcp } from '../stores/mcp';
 import { meshChatStream } from '../config/mesh';
 
 const STORE_KEY = 'noetica-chat-v1';
@@ -52,6 +53,7 @@ export interface ChatTurn {
   rating?: 'up' | 'down';   // user feedback on an assistant turn
   awaitingApproval?: boolean;   // plan-mode: produced a plan, waiting for approve/reject
   fanoutModel?: string;   // when set, this turn is one column of a multi-model compare
+  toolCalls?: Array<{ name: string; input?: unknown }>;   // MCP tool calls the agent made
 }
 
 const TRACE_EVENTS = new Set(['intent', 'plan', 'step', 'narration', 'grounding', 'retrieval', 'deliberation', 'action', 'effort', 'decidable', 'discipline', 'safety', 'escalation']);
@@ -93,6 +95,7 @@ export function createNoeticaChat() {
     if (busy.value) return;
     const modeAtSend = agentMode.value;   // plan-mode turns gate on approval when done
     const activeProject = retrievalScope.value === 'project' ? useProjects().active : null;
+    const toolDefs = useMcp().selectedDefs();   // MCP tools the agent may call this turn
     const assistant: ChatTurn = { role: 'assistant', content: '', streaming: true, trace: [] };
     turns.value.push(assistant);
     busy.value = true;
@@ -131,6 +134,7 @@ export function createNoeticaChat() {
           web: webMode.value, ...(systemPrompt.value.trim() ? { system_prompt: systemPrompt.value.trim() } : {}),
           retrieval_scope: retrievalScope.value,
           ...(activeProject ? { collection_id: projectCollectionId(activeProject.id) } : {}),
+          ...(toolDefs.length ? { tools: toolDefs } : {}),
         }),
       });
       if (!res.ok || !res.body) throw new Error(res.status === 423 ? 'agent halted (kill-switch armed)' : `chat unavailable (${res.status})`);
@@ -182,6 +186,10 @@ export function createNoeticaChat() {
               assistant.judgment = d.value_judgment as JudgmentT;
             } else if (event === 'intent' && d.intent) {
               assistant.intentName = (d.intent as { name?: string }).name;
+            } else if (event === 'tool_calls' && Array.isArray(d.tool_calls)) {
+              // informational when the AM drives the loop server-side: show what it called
+              assistant.toolCalls = (d.tool_calls as Array<{ name?: string; input?: unknown }>)
+                .map((c) => ({ name: c.name ?? 'tool', input: c.input }));
             } else if (TRACE_EVENTS.has(event)) {
               const t = (d.label ?? d.text ?? d.name ?? d.message ?? d.status ?? '') as string;
               if (t) assistant.trace!.push({ kind: event, text: String(t) });

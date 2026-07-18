@@ -73,6 +73,11 @@
                 </span>
               </div>
 
+              <!-- MCP tool calls the agent made -->
+              <div v-if="t.toolCalls?.length" class="nx-tools-used">
+                🔧 <span v-for="(tc, k) in t.toolCalls" :key="k" class="nx-tool-chip">{{ tc.name }}</span>
+              </div>
+
               <!-- Plan-mode approval gate -->
               <div v-if="t.awaitingApproval && !t.streaming" class="nx-gate">
                 <span class="nx-gate-txt">Ready to execute — approve to run this plan, or reject to revise.</span>
@@ -175,10 +180,11 @@
               <div v-if="!mcp.servers.length" class="nx-mcp-empty">No MCP servers configured.</div>
               <button type="button" class="nx-scope-new" @click="addMcpServer">+ Add MCP server</button>
               <template v-if="mcp.tools.length">
-                <div class="nx-scope-sec">Discovered tools</div>
-                <div v-for="t in mcp.tools" :key="t.serverId + t.name" class="nx-mcp-tool" :title="t.description">
-                  <b>{{ t.name }}</b> <span class="nx-dim">· {{ t.serverName }}</span>
-                </div>
+                <div class="nx-scope-sec">Tools — tick to let the agent use them</div>
+                <button v-for="t in mcp.tools" :key="t.serverId + t.name" type="button"
+                  :class="{ on: mcp.enabled.has(toolKey(t)) }" @click="mcp.toggleTool(toolKey(t))" :title="t.description">
+                  {{ mcp.enabled.has(toolKey(t)) ? '☑' : '☐' }} <b>{{ t.name }}</b> <span class="nx-dim">· {{ t.serverName }}</span>
+                </button>
               </template>
             </div>
           </div>
@@ -204,7 +210,7 @@
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
 import { useProjects, projectCollectionId } from '../stores/projects';
-import { useMcp } from '../stores/mcp';
+import { useMcp, toolKey } from '../stores/mcp';
 import { AM_BASE, labsCatalog, type ModelEntry } from '../services/agentMachineApi';
 import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
@@ -573,6 +579,8 @@ onMounted(() => inputEl.value?.focus());
 .nx-mcp-empty { padding: 4px 10px; font-size: 11px; color: var(--ntext3); }
 .nx-mcp-tool { padding: 3px 10px; font-size: 11px; color: var(--ntext2, var(--ntext)); }
 .nx-mcp-tool .nx-dim { color: var(--ntext3); }
+.nx-tools-used { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 6px; font-size: 11px; color: var(--ntext3); }
+.nx-tool-chip { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; background: var(--nline-weak); color: var(--ntext); border-radius: 5px; padding: 1px 7px; }
 .nx-seg { display: inline-flex; border: 1px solid var(--nline-weak); border-radius: 7px; overflow: hidden; }
 .nx-seg button { border: 0; background: transparent; color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600;
   padding: 3px 8px; cursor: pointer; text-transform: capitalize; }
