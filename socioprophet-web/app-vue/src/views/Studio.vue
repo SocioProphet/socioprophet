@@ -7,6 +7,7 @@ import StudioExperiments from "../components/StudioExperiments.vue";
 import StudioCommons from "../components/StudioCommons.vue";
 import StudioOps from "../components/StudioOps.vue";
 import StudioGovernance from "../components/StudioGovernance.vue";
+import StudioNotebooks from "../components/StudioNotebooks.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -201,13 +202,15 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 
       <!-- main panel -->
       <main class="panel">
-        <div class="sec-head" v-if="section !== 'graph'">
+        <div class="sec-head" v-if="!['graph', 'notebooks'].includes(section)">
           <h1>{{ activeMeta.icon }} {{ activeMeta.label }}</h1>
           <p class="blurb">{{ activeMeta.blurb }}</p>
         </div>
 
+        <!-- Notebooks = the governed notebook IDE (lattice-forge · receipt-per-cell) (#31) -->
+        <StudioNotebooks v-if="section === 'notebooks'" :project="project" />
         <!-- Graph section = the provenance-first explorer (KE-2) -->
-        <StudioGraph v-if="section === 'graph'" :project="project" />
+        <StudioGraph v-else-if="section === 'graph'" :project="project" />
         <!-- Query section = the proof-carrying query IDE (WS#30) -->
         <StudioQuery v-else-if="section === 'query'" :project="project" />
         <!-- Experiments = runs as proof-carrying graph facts (WS#32) -->
