@@ -160,6 +160,29 @@
             </div>
           </div>
 
+          <!-- MCP tools -->
+          <div class="nx-scope">
+            <button type="button" class="nx-toggle" :class="{ on: mcp.tools.length }" @click="showTools = !showTools" title="MCP tools">
+              🔧 tools<span v-if="mcp.tools.length"> ({{ mcp.tools.length }})</span>
+            </button>
+            <div v-if="showTools" class="nx-scope-menu">
+              <div class="nx-scope-sec">MCP servers</div>
+              <div v-for="s in mcp.servers" :key="s.id" class="nx-mcp-srv">
+                <span class="nx-mcp-dot" :class="mcp.status[s.id] || 'idle'" />
+                <span class="nx-mcp-name" :title="mcp.errors[s.id] || s.url">{{ s.name }}</span>
+                <button type="button" class="nx-mcp-x" @click="mcp.removeServer(s.id)" title="Remove">✕</button>
+              </div>
+              <div v-if="!mcp.servers.length" class="nx-mcp-empty">No MCP servers configured.</div>
+              <button type="button" class="nx-scope-new" @click="addMcpServer">+ Add MCP server</button>
+              <template v-if="mcp.tools.length">
+                <div class="nx-scope-sec">Discovered tools</div>
+                <div v-for="t in mcp.tools" :key="t.serverId + t.name" class="nx-mcp-tool" :title="t.description">
+                  <b>{{ t.name }}</b> <span class="nx-dim">· {{ t.serverName }}</span>
+                </div>
+              </template>
+            </div>
+          </div>
+
           <span class="nx-spacer" />
           <span class="nx-toolbar-hint">⏎ send</span>
           <button v-if="chat.busy.value" type="button" class="nx-send nx-stopbtn" @click="chat.stop()" aria-label="Stop">
@@ -181,6 +204,7 @@
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
 import { useProjects, projectCollectionId } from '../stores/projects';
+import { useMcp } from '../stores/mcp';
 import { AM_BASE, labsCatalog, type ModelEntry } from '../services/agentMachineApi';
 import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
@@ -305,6 +329,17 @@ function toggleModel(id: string) {
   const s = new Set(selectedModels.value);
   if (s.has(id)) s.delete(id); else if (s.size < 4) s.add(id);   // cap at 4 columns
   selectedModels.value = s;
+}
+
+// ── MCP tools ──
+const mcp = useMcp();
+const showTools = ref(false);
+onMounted(() => mcp.connectAll());
+function addMcpServer() {
+  const url = window.prompt('MCP server URL (SSE endpoint)');
+  if (!url || !url.trim()) return;
+  const name = window.prompt('Name for this server', new URL(url.trim()).hostname) ?? url;
+  mcp.addServer(name ?? url, url);
 }
 const speakingIdx = ref<number | null>(null);
 function speakTurn(i: number, t: ChatTurn) {
@@ -527,6 +562,17 @@ onMounted(() => inputEl.value?.focus());
 .nx-scope-menu button.on { color: var(--nblue); }
 .nx-scope-sec { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ntext3); padding: 5px 10px 2px; }
 .nx-scope-new { color: var(--nblue) !important; border-top: 1px solid var(--nline-weak); margin-top: 3px; }
+.nx-mcp-srv { display: flex; align-items: center; gap: 7px; padding: 4px 10px; font-size: 12px; color: var(--ntext); }
+.nx-mcp-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; background: var(--ntext3); }
+.nx-mcp-dot.connecting { background: #d9a63a; }
+.nx-mcp-dot.connected { background: #22c55e; }
+.nx-mcp-dot.error { background: #ef4444; }
+.nx-mcp-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-mcp-x { border: 0; background: transparent; color: var(--ntext3); cursor: pointer; font-size: 11px; }
+.nx-mcp-x:hover { color: #ef4444; }
+.nx-mcp-empty { padding: 4px 10px; font-size: 11px; color: var(--ntext3); }
+.nx-mcp-tool { padding: 3px 10px; font-size: 11px; color: var(--ntext2, var(--ntext)); }
+.nx-mcp-tool .nx-dim { color: var(--ntext3); }
 .nx-seg { display: inline-flex; border: 1px solid var(--nline-weak); border-radius: 7px; overflow: hidden; }
 .nx-seg button { border: 0; background: transparent; color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600;
   padding: 3px 8px; cursor: pointer; text-transform: capitalize; }
