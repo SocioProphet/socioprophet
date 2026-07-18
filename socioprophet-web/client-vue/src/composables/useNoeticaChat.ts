@@ -32,10 +32,21 @@ export interface ChatTurn {
 
 const TRACE_EVENTS = new Set(['intent', 'plan', 'step', 'narration', 'grounding', 'retrieval', 'deliberation', 'action', 'effort', 'decidable', 'discipline', 'safety', 'escalation']);
 
+export type AgentMode = 'auto' | 'plan' | 'ask';
+export type ReplyLength = 'short' | 'medium' | 'long';
+
 export function createNoeticaChat() {
   const sessionId = (globalThis.crypto?.randomUUID?.() ?? `sess-${Date.now()}`);
   const turns = ref<ChatTurn[]>(loadPersisted());
   const busy = ref(false);
+  // composer request-shaping — all map to fields the agent-machine /api/chat already reads.
+  const agentMode = ref<AgentMode>('auto');
+  const replyLength = ref<ReplyLength>('medium');
+  const webMode = ref(false);
+  const systemPrompt = ref('');
+  // the in-flight request, so Stop can abort it.
+  let controller: AbortController | null = null;
+  function stop() { controller?.abort(); }
 
   // Persist finalized history so a reload keeps the conversation.
   watch(turns, (t) => {
@@ -74,11 +85,17 @@ export function createNoeticaChat() {
       return;
     }
 
+    controller = new AbortController();
     try {
       const res = await fetch(`${AM_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, messages: history, reply_length: 'medium', agent_mode: 'auto' }),
+        signal: controller.signal,
+        body: JSON.stringify({
+          session_id: sessionId, messages: history,
+          reply_length: replyLength.value, agent_mode: agentMode.value,
+          web: webMode.value, ...(systemPrompt.value.trim() ? { system_prompt: systemPrompt.value.trim() } : {}),
+        }),
       });
       if (!res.ok || !res.body) throw new Error(res.status === 423 ? 'agent halted (kill-switch armed)' : `chat unavailable (${res.status})`);
       const reader = res.body.getReader();
@@ -120,15 +137,21 @@ export function createNoeticaChat() {
         }
       }
     } catch (e) {
-      assistant.content = assistant.content || `⚠ ${e instanceof Error ? e.message : 'chat failed'} — start the Agent Machine (dev:app) with a model available.`;
-      assistant.error = true;
+      // an abort is a user Stop, not a failure — keep whatever streamed so far.
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        if (!assistant.content) assistant.content = '⏹ stopped';
+      } else {
+        assistant.content = assistant.content || `⚠ ${e instanceof Error ? e.message : 'chat failed'} — start the Agent Machine (dev:app) with a model available.`;
+        assistant.error = true;
+      }
     } finally {
+      controller = null;
       assistant.streaming = false;
       busy.value = false;
     }
   }
 
-  return { sessionId, turns, busy, send, reset };
+  return { sessionId, turns, busy, send, stop, reset, agentMode, replyLength, webMode, systemPrompt };
 }
 
 export type NoeticaChat = ReturnType<typeof createNoeticaChat>;

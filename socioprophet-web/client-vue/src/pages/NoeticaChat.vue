@@ -99,18 +99,28 @@
           @keydown="onKey"
         />
         <div class="nx-toolbar">
+          <!-- composer controls — all just shape the /api/chat request -->
+          <div class="nx-seg" role="group" aria-label="Agent mode">
+            <button v-for="m in agentModes" :key="m" type="button" :class="{ on: chat.agentMode.value === m }"
+              @click="chat.agentMode.value = m" :title="'Agent mode: ' + m">{{ m }}</button>
+          </div>
+          <div class="nx-seg" role="group" aria-label="Reply length">
+            <button v-for="l in replyLengths" :key="l" type="button" :class="{ on: chat.replyLength.value === l }"
+              @click="chat.replyLength.value = l" :title="'Reply length: ' + l">{{ l[0].toUpperCase() }}</button>
+          </div>
+          <button type="button" class="nx-toggle" :class="{ on: chat.webMode.value }"
+            @click="chat.webMode.value = !chat.webMode.value" :aria-pressed="chat.webMode.value" title="Search the web">web</button>
+
+          <span class="nx-spacer" />
           <span class="nx-toolbar-hint">⏎ send</span>
-          <button
-            type="submit"
-            class="nx-send"
-            :disabled="chat.busy.value || !draft.trim()"
-            :aria-label="chat.busy.value ? 'Working' : 'Send'"
-          >
-            <svg v-if="!chat.busy.value" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <button v-if="chat.busy.value" type="button" class="nx-send nx-stopbtn" @click="chat.stop()" aria-label="Stop">
+            <span class="nx-stop" aria-hidden="true" />
+          </button>
+          <button v-else type="submit" class="nx-send" :disabled="!draft.trim()" aria-label="Send">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
               <path d="M12 19V5M12 5l-6 6M12 5l6 6" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <span v-else class="nx-stop" aria-hidden="true" />
           </button>
         </div>
       </form>
@@ -124,6 +134,8 @@ import { useNoeticaChat } from '../composables/useNoeticaChat';
 import NoeticaMark from '../components/NoeticaMark.vue';
 
 const chat = useNoeticaChat();
+const agentModes = ['auto', 'plan', 'ask'] as const;
+const replyLengths = ['short', 'medium', 'long'] as const;
 const draft = ref('');
 const expanded = ref<Set<number>>(new Set());
 function toggleTrace(i: number) { if (expanded.value.has(i)) expanded.value.delete(i); else expanded.value.add(i); }
@@ -310,8 +322,17 @@ onMounted(() => inputEl.value?.focus());
   padding: 12px; outline: none;
 }
 .nx-input textarea::placeholder { color: var(--ntext3); }
-.nx-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--nline-weak); padding: 6px 8px; }
-.nx-toolbar-hint { font-size: 10px; color: var(--ntext3); margin-right: auto; padding-left: 4px; }
+.nx-toolbar { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--nline-weak); padding: 6px 8px; flex-wrap: wrap; }
+.nx-toolbar-hint { font-size: 10px; color: var(--ntext3); padding-left: 4px; }
+.nx-spacer { flex: 1 1 auto; }
+.nx-seg { display: inline-flex; border: 1px solid var(--nline-weak); border-radius: 7px; overflow: hidden; }
+.nx-seg button { border: 0; background: transparent; color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600;
+  padding: 3px 8px; cursor: pointer; text-transform: capitalize; }
+.nx-seg button.on { background: var(--nblue); color: #fff; }
+.nx-toggle { border: 1px solid var(--nline-weak); background: transparent; color: var(--ntext3); font: inherit; font-size: 10.5px;
+  font-weight: 600; padding: 3px 9px; border-radius: 7px; cursor: pointer; }
+.nx-toggle.on { background: var(--nblue); color: #fff; border-color: var(--nblue); }
+.nx-stopbtn { background: var(--nsurface, transparent); color: #dc2626; }
 .nx-send {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px; border: none; border-radius: 8px; cursor: pointer;
