@@ -211,9 +211,9 @@ async function loadDerived() {
         <p class="sub">A force-directed explorer where every node carries its <b>epistemic status</b> and <b>provenance</b> — what a graph explorer shows that Neo4j Bloom can't.</p>
       </div>
       <div class="tools">
-        <button class="tbtn" :class="{ on: showAdd }" @click="showAdd = !showAdd" title="hand-author a node or edge (KE-1 workbench)">＋</button>
-        <button class="tbtn" @click="resetView" title="reset pan/zoom">⤢</button>
-        <button class="tbtn" @click="load" :disabled="loading" title="reload">↻</button>
+        <button class="tbtn" :class="{ on: showAdd }" @click="showAdd = !showAdd" title="hand-author a node or edge (KE-1 workbench)" aria-label="Add a node or edge">＋</button>
+        <button class="tbtn" @click="resetView" title="reset pan/zoom" aria-label="Reset pan and zoom">⤢</button>
+        <button class="tbtn" @click="load" :disabled="loading" title="reload" aria-label="Reload graph">↻</button>
       </div>
     </header>
 
@@ -272,7 +272,7 @@ async function loadDerived() {
                :transform="`translate(${n.x},${n.y})`" @pointerdown="onNodeDown(n, $event)"
                @pointerenter="hovered = n" @pointerleave="hovered = null" @click.stop="selected = n">
               <circle :r="n.r" :fill="color(n.epistemic_mode)"
-                      :stroke="selected?.id === n.id ? 'var(--ink)' : '#fff'" :stroke-width="selected?.id === n.id ? 2 : 1.2" />
+                      :stroke="selected?.id === n.id ? 'var(--ink)' : 'var(--surface)'" :stroke-width="selected?.id === n.id ? 2 : 1.2" />
               <text v-if="showLabels || hovered?.id === n.id || selected?.id === n.id"
                     :x="n.r + 4" y="4" class="lbl">{{ n.name }}</text>
             </g>
@@ -284,7 +284,7 @@ async function loadDerived() {
 
     <transition name="slide">
       <aside v-if="selected" class="prov">
-        <button class="x" @click="selected = null">✕</button>
+        <button class="x" @click="selected = null" aria-label="Close node panel">✕</button>
         <div class="pk">Node</div>
         <h3>{{ selected.name }}</h3>
         <dl>
@@ -321,70 +321,75 @@ async function loadDerived() {
 
 <style scoped>
 .ge { font: 14px/1.5 var(--ui); color: var(--ink); position: relative; }
+.ge :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-1); }
 .ge-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.ge-head h2 { font-size: 18px; margin: 0; } .ge-head .cnt { font-size: 12px; color: var(--muted); font-weight: 400; }
+.ge-head h2 { font-size: 18px; margin: 0; } .ge-head .cnt { font-size: 12px; color: var(--muted); font-weight: 400; font-variant-numeric: tabular-nums; }
 .ge-head .sub { color: var(--muted); margin: 4px 0 12px; max-width: 640px; } .ge-head .sub b { color: var(--ink); }
 .tools { display: flex; gap: 6px; }
-.tbtn { border: 1px solid var(--hairline-strong); background: #fff; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 14px; }
+.tbtn { border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--ink-2); border-radius: var(--r-2); width: 30px; height: 30px; cursor: pointer; font-size: 14px; }
 .tbtn:hover { background: var(--sunken); }
 .tbtn.on { background: var(--accent-wash); border-color: var(--accent); color: var(--accent); }
-.addbox { border: 1px solid var(--hairline-strong); border-radius: 10px; background: var(--sunken); padding: 10px 12px; margin: 0 0 12px; }
+.addbox { border: 1px solid var(--hairline-strong); border-radius: var(--r-3); background: var(--sunken); padding: 10px 12px; margin: 0 0 12px; }
 .addrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.addrow input, .addrow select { border: 1px solid var(--hairline-strong); border-radius: 8px; padding: 6px 8px; font-size: 13px; background: #fff; min-width: 120px; }
+.addrow input, .addrow select { border: 1px solid var(--hairline-strong); border-radius: var(--r-2); padding: 6px 8px; font-size: 13px; background: var(--surface); color: var(--ink); min-width: 120px; }
 .addrow input.short { min-width: 90px; width: 110px; }
 .addrow .arr { color: var(--muted); }
-.addrow .seg { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 8px; overflow: hidden; }
-.addrow .seg button { border: 0; background: #fff; padding: 6px 10px; font-size: 12px; cursor: pointer; color: var(--muted); }
+.addrow .seg { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: var(--r-2); overflow: hidden; }
+.addrow .seg button { border: 0; background: var(--surface); padding: 6px 10px; font-size: 12px; cursor: pointer; color: var(--muted); }
 .addrow .seg button.on { background: var(--accent); color: #fff; }
-.addrow button.primary { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
+.addrow button.primary { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: var(--r-2); padding: 6px 14px; font-size: 13px; cursor: pointer; }
 .addrow button.primary:disabled { opacity: .6; cursor: default; }
 .addfeedback { margin: 8px 0 0; font-size: 12.5px; } .addfeedback.ok { color: var(--ok); } .addfeedback.err { color: var(--fail); }
 .addnote { margin: 6px 0 0; font-size: 11px; color: var(--muted); }
 
 .dist { margin: 4px 0 12px; }
-.dist .bar { display: flex; height: 8px; border-radius: 5px; overflow: hidden; background: var(--sunken); }
+.dist .bar { display: flex; height: 8px; border-radius: var(--r-1); overflow: hidden; background: var(--sunken); }
 .dist .bar span { display: block; }
 .dist .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--muted); }
-.dist .lg i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
+.dist .lg i { display: inline-block; width: 9px; height: 9px; border-radius: var(--r-1); margin-right: 4px; vertical-align: middle; }
 
-.canvas-wrap { position: relative; border: 1px solid var(--hairline); border-radius: 12px; background:
-  radial-gradient(circle at 1px 1px, var(--sunken) 1px, transparent 0) 0 0 / 22px 22px, #fff; overflow: hidden; }
+.canvas-wrap { position: relative; border: 1px solid var(--hairline); border-radius: var(--r-3); background:
+  radial-gradient(circle at 1px 1px, var(--canvas-dot) 1px, transparent 0) 0 0 / 22px 22px, var(--surface); overflow: hidden; }
 .canvas { display: block; width: 100%; height: 560px; touch-action: none; cursor: grab; }
 .canvas:active { cursor: grabbing; }
 .edges line { stroke: var(--hairline-strong); transition: opacity .15s; }
 .edges line.dim { opacity: .12; }
 .nodes g { cursor: pointer; transition: opacity .15s; }
 .nodes g.dim { opacity: .18; }
-.nodes .lbl { font: 500 11px/1 var(--ui); fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.nodes .lbl { font: 500 11px/1 var(--ui); fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
 .hint { position: absolute; bottom: 8px; left: 10px; font-size: 11px; color: var(--faint); pointer-events: none; }
 
-.note { font-size: 12px; color: var(--warn); background: var(--warn-wash); border-radius: 8px; padding: 6px 10px; margin: 0 0 12px; }
+.note { font-size: 12px; color: var(--warn); background: var(--warn-wash); border-radius: var(--r-2); padding: 6px 10px; margin: 0 0 12px; }
 .msg { color: var(--muted); } .msg.err { color: var(--fail); }
 
-.prov { position: absolute; top: 74px; right: 8px; width: 300px; background: #fff; border: 1px solid var(--hairline); border-radius: 12px; padding: 16px 18px; box-shadow: -2px 2px 16px rgba(60,64,67,.14); }
+.prov { position: absolute; top: 74px; right: 8px; width: 300px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-3); padding: 16px 18px; box-shadow: var(--e-2); }
 .prov .x { position: absolute; top: 10px; right: 12px; border: none; background: none; cursor: pointer; color: var(--muted); }
 .prov .pk { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .prov h3 { margin: 4px 0 12px; font-size: 17px; }
 .prov dl { margin: 0; } .prov dl > div { display: flex; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--sunken); }
 .prov dt { color: var(--muted); min-width: 96px; font-size: 12px; } .prov dd { margin: 0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
-.prov .mono { font-family: ui-monospace, monospace; font-size: 11px; }
-.prov .pill { border: 1.5px solid; border-radius: 8px; padding: 0 8px; font-size: 12px; font-weight: 600; }
+.prov .mono { font-family: var(--mono); font-size: 11px; }
+.prov .pill { border: 1.5px solid; border-radius: var(--r-2); padding: 0 8px; font-size: 12px; font-weight: 600; }
 .prov .acts { display: flex; gap: 8px; margin-top: 14px; }
-.prov .acts button { border: 1px solid var(--hairline-strong); background: #fff; border-radius: 16px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+.prov .acts button { border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--ink-2); border-radius: var(--r-2); padding: 5px 12px; font-size: 12px; cursor: pointer; }
 .prov .acts button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .prov .acts button.primary:disabled { opacity: .6; cursor: default; }
 .derived { margin-top: 10px; border-top: 1px solid var(--hairline); padding-top: 10px; }
 .derived.err { color: var(--fail); font-size: 12px; }
 .derived .dsum { margin: 0 0 6px; font-size: 12.5px; color: var(--ink); }
 .derived .dmeta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.derived .kko { font-size: 10px; border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 1px 7px; color: var(--muted); }
+.derived .kko { font-size: 10px; border: 1px solid var(--hairline-strong); border-radius: var(--pill); padding: 1px 7px; color: var(--muted); }
 .derived .ex { font-size: 10px; color: var(--muted); }
 .derived .dlbl { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
 .derived .drow { display: flex; align-items: center; gap: 6px; padding: 3px 0; font-size: 12px; }
 .derived .rel { color: var(--muted); min-width: 92px; }
 .derived .dwith { flex: 1; color: var(--ink); }
-.derived .dpill { font-size: 10px; border: 1px solid; border-radius: 10px; padding: 0 6px; }
+.derived .dpill { font-size: 10px; border: 1px solid; border-radius: var(--r-1); padding: 0 6px; }
 .derived .dnone { font-size: 12px; color: var(--muted); }
 .slide-enter-active, .slide-leave-active { transition: transform .18s, opacity .18s; }
 .slide-enter-from, .slide-leave-to { transform: translateX(16px); opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .edges line, .nodes g { transition: none; }
+  .slide-enter-active, .slide-leave-active { transition: none; }
+}
 </style>

@@ -87,28 +87,29 @@ function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "var(--f
 
 <style scoped>
 .qide { font: 14px/1.5 var(--ui); color: var(--ink); }
-.qbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.qide :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-1); }
+.qbar { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: 8px; }
 .qbar .spacer { flex: 1; }
-.seg { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: #fff; padding: 6px 12px; font-size: 12px; text-transform: capitalize; cursor: pointer; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--hairline-strong); border-radius: var(--r-2); overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 6px 12px; font-size: 12px; text-transform: capitalize; cursor: pointer; color: var(--muted); }
 .seg button.on { background: var(--accent); color: #fff; }
-.run { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 8px; padding: 6px 16px; font-size: 13px; cursor: pointer; }
+.run { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: var(--r-2); padding: 6px 16px; font-size: 13px; cursor: pointer; }
 .run:disabled { opacity: .6; cursor: default; }
-.qed { width: 100%; resize: vertical; border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 12px; font-size: 13px; background: var(--surface-2); box-sizing: border-box; }
-.mono { font-family: "SF Mono", ui-monospace, Menlo, monospace; }
+.qed { width: 100%; resize: vertical; border: 1px solid var(--hairline-strong); border-radius: var(--r-3); padding: 12px; font-size: 13px; background: var(--surface-2); color: var(--ink); box-sizing: border-box; }
+.mono { font-family: var(--mono); }
 .qerr { color: var(--fail); font-size: 13px; margin: 10px 0 0; }
 .qres { margin-top: 12px; }
-.qproof { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--ok-wash); border: 1px solid var(--ok-wash); border-radius: 9px; font-size: 12px; }
+.qproof { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--ok-wash); border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent); border-radius: var(--r-3); font-size: 12px; }
 .qproof .spacer { flex: 1; }
 .pf { font-weight: 700; color: var(--muted); } .pf.ok { color: var(--ok); }
-.pfh { color: var(--ok); } .pfs { color: var(--muted); } .rc { color: var(--muted); }
-.qscroll { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hairline); border-radius: 10px; }
+.pfh { color: var(--ok); } .pfs { color: var(--muted); } .rc { color: var(--muted); font-variant-numeric: tabular-nums; }
+.qscroll { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hairline); border-radius: var(--r-3); }
 .qgrid { border-collapse: collapse; width: 100%; font-size: 13px; }
 .qgrid th { text-align: left; padding: 8px 12px; background: var(--sunken); border-bottom: 1px solid var(--hairline); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .qgrid td { padding: 8px 12px; border-bottom: 1px solid var(--sunken); white-space: nowrap; }
 .qgrid tr:last-child td { border-bottom: 0; }
-.qgrid td .epi { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
-.qraw { margin-top: 10px; background: var(--ground); color: var(--hairline); padding: 12px; border-radius: 10px; overflow-x: auto; font-size: 12px; max-height: 320px; }
+.qgrid td .epi { display: inline-block; width: 8px; height: 8px; border-radius: var(--pill); margin-left: 6px; vertical-align: middle; }
+.qraw { margin-top: 10px; background: var(--sunken); color: var(--ink-2); padding: 12px; border-radius: var(--r-3); overflow-x: auto; font-size: 12px; max-height: 320px; }
 .qempty, .qhint, .qnote { color: var(--muted); font-size: 12.5px; }
 .qnote { margin-top: 8px; } .qnote b { color: var(--ink); } .qhint b { color: var(--ink); }
 .qhint { margin-top: 12px; }
