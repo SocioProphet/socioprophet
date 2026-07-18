@@ -618,6 +618,69 @@ export async function loadNotebookReceipts(project: string): Promise<{ project: 
   return r.json();
 }
 
+// ── Attested AI assistant — the moat applied to AI (Genie-parity, but proof-carrying) ──
+// A model (or, offline, a deterministic heuristic) PROPOSES a cell. That proposal is epistemically a
+// HYPOTHESIS — unproven — until the user RUNS it, at which point its sealed receipt attests it. We never
+// pretend a heuristic is a model: source is labelled honestly so the surface can say "offline heuristic".
+export interface NbProposal { code: string; rationale: string; source: "model" | "heuristic"; epistemic: "hypothesis" }
+
+// Deterministic keyword scaffold — the honest offline fallback. Maps a natural-language prompt to a
+// starter cell + a short rationale explaining the mapping. Never dressed up as a model answer.
+function heuristicProposal(prompt: string): NbProposal {
+  const p = prompt.trim();
+  const low = p.toLowerCase();
+  const has = (...ws: string[]) => ws.some((w) => low.includes(w));
+  let code: string;
+  let rationale: string;
+  if (has("plot", "chart", "distribution", "bar", "histogram")) {
+    code = "import matplotlib.pyplot as plt\ndf['<column>'].value_counts().plot.barh()\nplt.show()";
+    rationale = "‘plot/chart’ → a matplotlib bar of a column’s value counts. Set <column> and run to attest it.";
+  } else if (has("load", "dataset", "data")) {
+    // pull a plausible dataset name out of the prompt (quoted, or the longest word-ish token)
+    const quoted = p.match(/['"`]([^'"`]+)['"`]/)?.[1];
+    const guess = quoted || (p.match(/[A-Za-z][A-Za-z0-9_]{3,}/g) || [])
+      .filter((w) => !["load", "dataset", "data", "the", "please", "into", "from"].includes(w.toLowerCase()))
+      .sort((a, b) => b.length - a.length)[0] || "my_dataset";
+    code = `df = load('${guess}')   # governed dataset\ndf.head()`;
+    rationale = `‘load/data’ → a governed load() scaffold; guessed dataset ‘${guess}’ from your prompt. Run to seal a receipt.`;
+  } else if (has("count", "value")) {
+    code = "df['<column>'].value_counts()";
+    rationale = "‘count/value’ → value_counts() on a column. Set <column> and run to attest it.";
+  } else if (has("shape", "rows", "columns", "size")) {
+    code = "df.shape";
+    rationale = "‘shape/rows’ → df.shape (rows, columns). Run to attest it.";
+  } else if (has("head", "preview", "peek", "first")) {
+    code = "df.head()";
+    rationale = "‘head/preview’ → df.head() to inspect the first rows. Run to attest it.";
+  } else if (has("describe", "summary", "summarize", "stats", "statistics")) {
+    code = "df.describe()";
+    rationale = "‘describe/summary’ → df.describe() for summary statistics. Run to attest it.";
+  } else {
+    const echo = p.replace(/\n/g, " ").slice(0, 120) || "your request";
+    code = `# ${echo}\n# offline scaffold — no runtime wired to author this. Edit, then run to seal a receipt.\n`;
+    rationale = "No keyword matched, so this is a commented scaffold echoing your request — nothing was inferred.";
+  }
+  return { code, rationale, source: "heuristic", epistemic: "hypothesis" };
+}
+
+export async function proposeCell(input: { project: string; prompt: string; context?: string }): Promise<NbProposal> {
+  const b = nbBase();
+  // Offline → deterministic heuristic, labelled honestly (never a fabricated "model" answer).
+  if (!b) return heuristicProposal(input.prompt);
+  try {
+    const r = await fetch(`${b}/api/studio/notebook/assist`, {
+      method: "POST", headers: { "Content-Type": "application/json", accept: "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (!r.ok) return heuristicProposal(input.prompt);
+    const d = (await r.json()) as { code?: string; rationale?: string };
+    if (!d || typeof d.code !== "string") return heuristicProposal(input.prompt);
+    return { code: d.code, rationale: d.rationale || "Proposed by the Studio assistant model.", source: "model", epistemic: "hypothesis" };
+  } catch {
+    return heuristicProposal(input.prompt);
+  }
+}
+
 // ── Governance panel: the real ontology (Ontogenesis) · typed actions (Foundry-Workshop) · GAIA world-signals ──
 export interface OntologyClassLite { iri: string; label?: string; subClassOf: string[]; property_count: number }
 export interface OntologyProperty { iri: string; label?: string; kind: string; range?: string | null }

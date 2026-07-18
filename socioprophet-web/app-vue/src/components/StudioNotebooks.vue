@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import {
-  loadNotebookAdapters, createNotebookSession, executeCell, loadNotebookReceipts,
+  loadNotebookAdapters, createNotebookSession, executeCell, loadNotebookReceipts, proposeCell,
   type NbAdapter, type NbSession, type NbOutput, type NbReceipt,
 } from "../services/studioApi";
 
@@ -17,6 +17,8 @@ interface Cell {
   id: string; code: string; language: string;
   outputs: NbOutput[]; status: "idle" | "running" | "ok" | "error" | "degraded";
   receipt: NbReceipt | null; count: number | null; preview?: boolean;
+  // AI-proposed cells: a hypothesis until the user runs it (its receipt then attests it).
+  proposed?: boolean; rationale?: string; proposedSource?: "model" | "heuristic";
 }
 
 const adapters = ref<Record<string, NbAdapter>>({});
@@ -68,7 +70,8 @@ onMounted(async () => {
 
 async function run(cell: Cell) {
   if (!cell.code.trim()) return;
-  cell.status = "running"; cell.preview = false;
+  // running a proposed cell is the act that attests it: the hypothesis earns a receipt.
+  cell.status = "running"; cell.preview = false; cell.proposed = false;
   try {
     const r = await executeCell({ project: props.project, code: cell.code, language: cell.language, adapter: adapter.value, session_id: session.value?.id });
     cell.outputs = r.outputs ?? [];
@@ -91,6 +94,35 @@ function onKey(e: KeyboardEvent, cell: Cell) {
 }
 function short(id?: string | null) { return id ? id.replace("sha256:", "").slice(0, 8) : ""; }
 const statColor: Record<string, string> = { ok: "var(--ok)", error: "var(--fail)", running: "var(--run)", degraded: "var(--warn)", idle: "var(--idle)" };
+
+// ── attested AI assistant: a model PROPOSES a cell (a hypothesis); running it seals a receipt → attested ──
+const assistPrompt = ref("");
+const assisting = ref(false);
+const assistErr = ref("");
+async function propose() {
+  const prompt = assistPrompt.value.trim();
+  if (!prompt || assisting.value) return;
+  assisting.value = true; assistErr.value = "";
+  try {
+    const p = await proposeCell({ project: props.project, prompt });
+    // insert the proposed cell before a trailing empty scratch cell if there is one, else append.
+    const cell: Cell = {
+      id: uid(), language: "python", status: "idle", count: null, code: p.code, outputs: [], receipt: null,
+      proposed: true, rationale: p.rationale, proposedSource: p.source,
+    };
+    const last = cells.value[cells.value.length - 1];
+    if (last && !last.code.trim() && last.status === "idle" && !last.proposed) {
+      cells.value.splice(cells.value.length - 1, 0, cell);
+    } else {
+      cells.value.push(cell);
+    }
+    assistPrompt.value = "";
+  } catch (e) {
+    assistErr.value = e instanceof Error ? e.message : "proposal failed";
+  } finally {
+    assisting.value = false;
+  }
+}
 
 // ── session provenance: the tamper-evident receipt chain across all cells (the moat) ──
 const chainOpen = ref(false);
@@ -129,12 +161,21 @@ async function toggleChain() {
 
     <!-- cells -->
     <div class="cells">
-      <div v-for="cell in cells" :key="cell.id" class="cell" :class="cell.status">
+      <div v-for="cell in cells" :key="cell.id" class="cell" :class="[cell.status, { proposed: cell.proposed }]">
         <div class="gutter">
           <button class="run" :title="'Run (⇧⏎)'" @click="run(cell)"><span v-if="cell.status === 'running'" class="spin" />{{ cell.status === 'running' ? '' : '▸' }}</button>
           <span class="cnt">{{ cell.count != null ? '[' + cell.count + ']' : '[ ]' }}</span>
         </div>
         <div class="body">
+          <!-- AI proposal: an epistemic hypothesis until the user runs it (its receipt then attests it) -->
+          <div v-if="cell.proposed" class="prop">
+            <span class="pbadge">✦ proposed · hypothesis</span>
+            <span class="psrc" :class="cell.proposedSource">
+              {{ cell.proposedSource === 'model' ? 'assistant model' : 'offline heuristic — no model wired' }}
+            </span>
+            <span class="prat">{{ cell.rationale }}</span>
+            <span class="phint">unproven — <b>run it</b> to seal a receipt and attest it ⛨</span>
+          </div>
           <textarea class="editor" :class="cell.language" v-model="cell.code" spellcheck="false"
                     :placeholder="'# ' + runtime + ' — ⇧⏎ to run'" rows="2"
                     @keydown="onKey($event, cell)" @input="(e:any)=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px'}" />
@@ -166,6 +207,22 @@ async function toggleChain() {
         <button class="x" title="delete cell" @click="removeCell(cell.id)">✕</button>
       </div>
     </div>
+
+    <!-- attested AI assistant — Genie-parity, but a proposal is only a HYPOTHESIS until you run it -->
+    <div class="assist">
+      <span class="amark" aria-hidden="true">✦</span>
+      <input class="ainput" v-model="assistPrompt" :disabled="assisting"
+             placeholder="Ask the assistant to draft a cell — e.g. ‘load the breach dataset and plot the warrant distribution’"
+             @keydown.enter="propose" />
+      <button class="apropose" :disabled="assisting || !assistPrompt.trim()" @click="propose">
+        <span v-if="assisting" class="spin" />{{ assisting ? 'Proposing…' : '✦ Propose' }}
+      </button>
+    </div>
+    <p class="ahint">
+      The assistant <b>proposes</b> a cell as an epistemic <b>hypothesis</b> — a model may propose, but only
+      <b>execution</b> (a sealed receipt) makes it real. {{ wired ? 'Backed by the Studio assistant model.' : 'No model wired to this build — proposals come from a deterministic offline heuristic, labelled as such. Never a fabricated model answer.' }}
+    </p>
+    <p v-if="assistErr" class="note err amsg">assistant: {{ assistErr }}</p>
 
     <!-- session provenance chain — the tamper-evident record Databricks can't produce -->
     <transition name="slide">
@@ -277,4 +334,33 @@ async function toggleChain() {
 
 .cell .x { position: absolute; top: 8px; right: 6px; border: 0; background: none; color: var(--muted); cursor: pointer; opacity: 0; font-size: 12px; transition: opacity .15s; }
 .cell .x:hover { opacity: 1 !important; color: var(--fail); }
+
+/* proposed cell — a hypothesis until run. Coloured with the hypothesis ink so it reads as unproven. */
+.cell.proposed { border-color: color-mix(in srgb, var(--epi-hypothesis) 55%, var(--hairline)); box-shadow: 0 0 0 3px var(--epi-hypothesis-wash); }
+.cell.proposed .gutter .run { color: var(--epi-hypothesis); border-color: color-mix(in srgb, var(--epi-hypothesis) 45%, transparent); }
+.prop { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-bottom: 8px; font-size: 11px; }
+.prop .pbadge { color: #fff; background: var(--epi-hypothesis); border-radius: var(--r-1); padding: 1px 8px; font-weight: 600; letter-spacing: .02em; }
+.prop .psrc { font-family: var(--mono); font-size: 10.5px; border-radius: var(--r-1); padding: 1px 7px; border: 1px solid var(--hairline); color: var(--muted); }
+.prop .psrc.model { color: var(--epi-verified); border-color: color-mix(in srgb, var(--epi-verified) 40%, transparent); background: var(--epi-verified-wash); }
+.prop .psrc.heuristic { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, transparent); background: var(--warn-wash); }
+.prop .prat { color: var(--muted); flex: 1 1 240px; min-width: 0; }
+.prop .phint { color: var(--epi-hypothesis); font-weight: 500; }
+.prop .phint b { color: var(--epi-attested); }
+
+/* attested AI assistant bar — Genie-parity, proof-carrying */
+.assist { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 8px 10px 8px 14px;
+  background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--r-3);
+  box-shadow: 0 0 0 3px var(--epi-hypothesis-wash); }
+.assist .amark { color: var(--epi-hypothesis); font-size: 16px; flex: 0 0 auto; }
+.assist .ainput { flex: 1; border: 0; background: none; outline: none; color: var(--ink); font: 13px/1.5 var(--ui); min-width: 0; }
+.assist .ainput::placeholder { color: var(--faint); }
+.assist .ainput:disabled { color: var(--muted); }
+.assist .apropose { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; border: 0;
+  background: var(--epi-hypothesis); color: #fff; border-radius: var(--r-2); padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.assist .apropose:hover:not(:disabled) { background: color-mix(in srgb, var(--epi-hypothesis) 82%, #000); }
+.assist .apropose:disabled { opacity: .55; cursor: default; }
+.assist .apropose .spin { border-color: #fff; border-top-color: transparent; }
+.ahint { font-size: 11px; color: var(--muted); margin: 8px 2px 0; }
+.ahint b { color: var(--ink-2); font-weight: 600; }
+.amsg { margin-top: 10px; }
 </style>
