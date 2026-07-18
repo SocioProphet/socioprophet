@@ -6,7 +6,6 @@ regexes = [
   '''integrity sha(256|512)-''',
 ]
 paths = [
-  '''socioprophet-web/client/yarn\.lock''',
   '''yarn\.lock''',
   '''package-lock\.json''',
   '''pnpm-lock\.yaml''',
