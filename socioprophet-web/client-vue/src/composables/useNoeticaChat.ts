@@ -49,6 +49,7 @@ export interface ChatTurn {
   model?: string;   // model_routed from the done event
   badge?: string;   // verification badge (e.g. "Generated · best-effort · attested")
   rating?: 'up' | 'down';   // user feedback on an assistant turn
+  awaitingApproval?: boolean;   // plan-mode: produced a plan, waiting for approve/reject
 }
 
 const TRACE_EVENTS = new Set(['intent', 'plan', 'step', 'narration', 'grounding', 'retrieval', 'deliberation', 'action', 'effort', 'decidable', 'discipline', 'safety', 'escalation']);
@@ -87,6 +88,7 @@ export function createNoeticaChat() {
   // Shared by send() and regenerate().
   async function stream() {
     if (busy.value) return;
+    const modeAtSend = agentMode.value;   // plan-mode turns gate on approval when done
     const assistant: ChatTurn = { role: 'assistant', content: '', streaming: true, trace: [] };
     turns.value.push(assistant);
     busy.value = true;
@@ -154,6 +156,7 @@ export function createNoeticaChat() {
               assistant.content = assistant.content.replace(/\n?<!--\s*c2pa:[^>]*-->\s*$/i, '').trimEnd();
               if (result?.model_routed) assistant.model = result.model_routed;
               if (result?.verification?.badge) assistant.badge = result.verification.badge;
+              if (modeAtSend === 'plan') assistant.awaitingApproval = true;
               assistant.streaming = false;
             } else if (event === 'error') {
               assistant.content = assistant.content || `⚠ ${(d.error as string) ?? 'chat error'}`;
@@ -215,7 +218,22 @@ export function createNoeticaChat() {
     } catch { /* best-effort — the rating still shows locally */ }
   }
 
-  return { sessionId, turns, busy, send, stop, reset, regenerate, feedback,
+  // Plan-mode gate: approve → execute the plan in auto mode; reject → discard.
+  async function approvePlan(index: number) {
+    const t = turns.value[index];
+    if (!t || !t.awaitingApproval) return;
+    t.awaitingApproval = false;
+    const prev = agentMode.value;
+    agentMode.value = 'auto';
+    try { await send('Approved. Execute the plan exactly as outlined, step by step.'); }
+    finally { agentMode.value = prev; }
+  }
+  function rejectPlan(index: number) {
+    const t = turns.value[index];
+    if (t) t.awaitingApproval = false;
+  }
+
+  return { sessionId, turns, busy, send, stop, reset, regenerate, feedback, approvePlan, rejectPlan,
     agentMode, replyLength, webMode, systemPrompt };
 }
 

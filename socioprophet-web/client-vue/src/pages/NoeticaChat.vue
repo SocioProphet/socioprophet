@@ -73,6 +73,13 @@
                 </span>
               </div>
 
+              <!-- Plan-mode approval gate -->
+              <div v-if="t.awaitingApproval && !t.streaming" class="nx-gate">
+                <span class="nx-gate-txt">Ready to execute — approve to run this plan, or reject to revise.</span>
+                <button class="nx-gate-reject" @click="chat.rejectPlan(i)">Reject</button>
+                <button class="nx-gate-approve" :disabled="chat.busy.value" @click="chat.approvePlan(i)">Approve &amp; Execute</button>
+              </div>
+
               <!-- Governance / model footer -->
               <div v-if="t.model || t.badge" class="nx-meta">
                 <span v-if="t.badge" class="nx-badge">◆ {{ t.badge }}</span>
@@ -369,6 +376,15 @@ onMounted(() => inputEl.value?.focus());
 .nx-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 6px; font-size: 10px; color: var(--ntext3); }
 .nx-model { font-family: ui-monospace, 'SF Mono', monospace; }
 .nx-badge { display: inline-flex; align-items: center; gap: 4px; color: #22c55e; }
+.nx-gate { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding: 8px 12px;
+  border: 1px solid var(--nline-weak); border-radius: 8px; background: var(--nline-weak); }
+.nx-gate-txt { flex: 1 1 auto; font-size: 11px; color: var(--ntext3); }
+.nx-gate-reject, .nx-gate-approve { border: 1px solid transparent; border-radius: 6px; padding: 4px 10px;
+  font-size: 11px; font-weight: 600; cursor: pointer; }
+.nx-gate-reject { background: transparent; border-color: var(--nline-strong, var(--nline-weak)); color: var(--ntext3); }
+.nx-gate-reject:hover { color: var(--ntext); }
+.nx-gate-approve { background: var(--nblue); color: #fff; }
+.nx-gate-approve:disabled { opacity: .5; cursor: default; }
 .nx-actions { display: flex; gap: 4px; margin-top: 6px; opacity: 0; transition: opacity .12s; }
 .nx-turn:hover .nx-actions, .nx-actions:focus-within { opacity: 1; }
 .nx-act { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
