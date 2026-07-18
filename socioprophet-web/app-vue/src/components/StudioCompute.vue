@@ -40,7 +40,11 @@ function epiStyle(mode: string) {
 }
 
 // ── spec editor — fields driven off the selected kind ──
-interface SpecField { key: string; label: string; type: "code" | "text" | "select"; placeholder?: string; options?: string[]; rows?: number }
+interface SpecField { key: string; label: string; type: "code" | "text" | "select" | "json"; placeholder?: string; options?: string[]; rows?: number }
+const WORKFLOW_EXAMPLE = `[
+  { "id": "read",  "kind": "graph-stats", "spec": {} },
+  { "id": "cell",  "kind": "notebook",    "spec": { "code": "df.shape" }, "needs": ["read"] }
+]`;
 function fieldsFor(k: ComputeKind | null): SpecField[] {
   if (!k) return [];
   switch (k.kind) {
@@ -52,6 +56,8 @@ function fieldsFor(k: ComputeKind | null): SpecField[] {
     ];
     case "graph-stats": return [{ key: "metric", label: "Metric", type: "select", options: ["degree", "centrality", "communities"] }];
     case "inference": return [{ key: "prompt", label: "Prompt", type: "code", rows: 4, placeholder: "Summarize the warrant distribution across the corpus…" }];
+    // the composite kind — a DAG of governed sub-computes; each step gets its own receipt.
+    case "workflow": return [{ key: "steps", label: "Workflow steps (DAG · id · kind · spec · needs)", type: "json", rows: 8, placeholder: WORKFLOW_EXAMPLE }];
     default: return [{ key: "input", label: "Input", type: "text", placeholder: "spec…" }];
   }
 }
@@ -63,7 +69,7 @@ function pick(kind: string | null) {
   selectedKind.value = kind;
   // reset the spec to this kind's field defaults
   for (const key of Object.keys(spec)) delete spec[key];
-  for (const f of fieldsFor(selected.value)) spec[f.key] = f.type === "select" ? (f.options?.[0] ?? "") : "";
+  for (const f of fieldsFor(selected.value)) spec[f.key] = f.type === "select" ? (f.options?.[0] ?? "") : (f.type === "json" ? (f.placeholder ?? "") : "");
   backend.value = selected.value?.default ?? "";
 }
 
@@ -83,12 +89,33 @@ const deltaCounts = computed(() => {
   return (n || e) ? { n, e } : null;
 });
 
+// a workflow result carries its per-step summaries — the DAG execution, each step its own receipt.
+interface WfStep { id: string; kind: string; backend: string; status: string; epistemic_status: string; receipt?: string | null; memoized?: boolean }
+const wfSteps = computed<WfStep[]>(() => {
+  const r = result.value;
+  if (!r || r.kind !== "workflow") return [];
+  const data = r.outputs?.[0]?.data as { steps?: WfStep[] } | undefined;
+  return data?.steps ?? [];
+});
+
 async function run() {
   const k = selected.value;
   if (!k || running.value) return;
+  // a workflow's spec is a parsed DAG; everything else passes its fields straight through.
+  let payloadSpec: Record<string, unknown> = { ...spec };
+  if (k.kind === "workflow") {
+    try {
+      const steps = JSON.parse(spec.steps || "[]");
+      if (!Array.isArray(steps)) throw new Error("steps must be a JSON array");
+      payloadSpec = { steps };
+    } catch (e) {
+      runErr.value = `workflow steps: ${e instanceof Error ? e.message : "invalid JSON"}`;
+      return;
+    }
+  }
   running.value = true; runErr.value = ""; result.value = null;
   try {
-    const res = await runCompute({ kind: k.kind, spec: { ...spec }, project: props.project, backend: backend.value || undefined });
+    const res = await runCompute({ kind: k.kind, spec: payloadSpec, project: props.project, backend: backend.value || undefined });
     result.value = res;
     if (res.status === "ok" || res.status === "degraded") chain.value.unshift(res);
   } catch (e) {
@@ -177,7 +204,7 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
           <select v-if="f.type === 'select'" :id="'f-' + f.key" v-model="spec[f.key]">
             <option v-for="o in f.options" :key="o" :value="o">{{ o }}</option>
           </select>
-          <textarea v-else-if="f.type === 'code'" :id="'f-' + f.key" v-model="spec[f.key]" class="code"
+          <textarea v-else-if="f.type === 'code' || f.type === 'json'" :id="'f-' + f.key" v-model="spec[f.key]" class="code"
                     :rows="f.rows || 4" :placeholder="f.placeholder" spellcheck="false" @keydown="onKey" />
           <input v-else :id="'f-' + f.key" v-model="spec[f.key]" :placeholder="f.placeholder" @keydown="onKey" />
         </div>
@@ -222,7 +249,26 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
           </div>
 
           <div v-if="result.error" class="oerr">{{ result.error }}</div>
-          <div v-if="result.outputs.length" class="out">
+
+          <!-- workflow: the DAG execution — each step is its own governed, sealed compute -->
+          <div v-if="wfSteps.length" class="wf">
+            <div class="wf-head">⛓ Workflow steps <span class="wf-n">{{ wfSteps.length }}</span></div>
+            <ol class="wf-list">
+              <li v-for="(s, i) in wfSteps" :key="s.id" class="wf-step" :class="s.status">
+                <span class="wf-idx">{{ i + 1 }}</span>
+                <span class="wf-id">{{ s.id }}</span>
+                <span class="wf-kind">{{ s.kind }} · {{ s.backend }}</span>
+                <span class="epi-chip sm" :style="epiStyle(s.epistemic_status)">
+                  <i class="dot" :style="{ background: EPISTEMIC_COLORS[s.epistemic_status] }" />{{ s.epistemic_status }}
+                </span>
+                <span class="wf-stat" :class="s.status">{{ s.status === 'ok' ? '✓' : '✕' }} {{ s.status }}</span>
+                <span v-if="s.memoized" class="memo sm" title="step served from the memo">⚡</span>
+                <span v-if="s.receipt" class="mono dim wf-rc">⛨ {{ short(s.receipt) }}</span>
+              </li>
+            </ol>
+          </div>
+
+          <div v-if="result.outputs.length && !wfSteps.length" class="out">
             <template v-for="(o, i) in result.outputs" :key="i">
               <div v-if="imageMime(o.mime) && typeof o.data === 'string'" class="rich">
                 <img :src="`data:${imageMime(o.mime)};base64,${o.data}`" alt="compute output" />
@@ -230,7 +276,7 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
               <pre v-else class="stream">{{ o.text ?? (o.data != null ? JSON.stringify(o.data, null, 2) : '') }}</pre>
             </template>
           </div>
-          <p v-else class="empty">No outputs.</p>
+          <p v-else-if="!wfSteps.length" class="empty">No outputs.</p>
 
           <!-- receipt strip — the moat (reuses the notebook receipt-strip idea) -->
           <div v-if="result.receipt" class="rcpt">
@@ -358,6 +404,24 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
 .rcpt .unsigned { color: var(--warn); background: var(--warn-wash); border-radius: var(--r-1); padding: 0 6px; }
 .rcpt .grow { flex: 1; }
 .rcpt .replay { color: var(--epi-attested); background: var(--epi-attested-wash); border-radius: var(--r-1); padding: 0 6px; font-weight: 600; }
+
+/* workflow step chain */
+.wf { margin: 4px 0 10px; }
+.wf-head { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.wf-head .wf-n { background: var(--epi-derived); color: #fff; border-radius: var(--pill); padding: 0 7px; font-size: 10px; }
+.wf-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.wf-step { display: flex; align-items: center; gap: 10px; font-size: 11.5px; padding: 6px 10px; border: 1px solid var(--hairline);
+  border-left-width: 3px; border-radius: var(--r-2); background: var(--surface); }
+.wf-step.ok { border-left-color: var(--ok); }
+.wf-step.error { border-left-color: var(--fail); }
+.wf-step.degraded { border-left-color: var(--warn); }
+.wf-idx { font-family: var(--mono); font-size: 10px; color: var(--faint); width: 14px; }
+.wf-id { font-weight: 700; color: var(--ink); }
+.wf-kind { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
+.wf-stat { font-size: 10.5px; font-weight: 600; }
+.wf-step.ok .wf-stat { color: var(--ok); }
+.wf-step.error .wf-stat { color: var(--fail); }
+.wf-rc { margin-left: auto; color: var(--epi-attested); }
 
 /* pay-gate 402 */
 .paygate { color: var(--ink); }

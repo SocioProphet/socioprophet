@@ -872,6 +872,9 @@ const STUB_COMPUTE_REGISTRY: { kinds: ComputeKind[] } = {
     { kind: "inference", backends: ["model-server"], default: "model-server",
       capabilities: ["chat", "embed"], epistemic: "derived",
       executes_user_code: false, status: "declared", entitled: false },
+    { kind: "workflow", backends: ["gateway"], default: "gateway",
+      capabilities: ["dag", "compose", "fan-in", "memoized-steps"], epistemic: "derived",
+      executes_user_code: false, status: "live", entitled: true },
   ],
 };
 
