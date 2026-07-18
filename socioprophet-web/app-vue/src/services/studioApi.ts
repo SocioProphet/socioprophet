@@ -551,6 +551,73 @@ export async function execute(
   return { ok: true, ...(await res.json()) };
 }
 
+// ── Notebook runtime (lattice-forge, via the BFF) — governed, adapter-based, receipt-per-cell ──
+export interface NbAdapter { role: string; capabilities: string[]; kernels: string[]; mode: string }
+export interface NbSession {
+  id: string; project: string; adapter: string; role: string; mode: string;
+  kernel: string; name: string; status: string; url?: string | null;
+}
+export interface NbOutput { type: string; name?: string; text?: string; ename?: string; evalue?: string; mime?: string[] }
+export interface NbReceipt {
+  id: string; project: string; adapter: string; language: string; runtime: string;
+  code_sha: string; outputs_sha: string; status: string; actor: string; prev?: string | null; ts: number;
+}
+export interface NbExecResult {
+  status: string; outputs: NbOutput[]; error?: string | null; degraded?: string | null;
+  receipt?: NbReceipt | null; adapter?: string; runtime?: string;
+}
+
+const NB_ADAPTERS_STUB: { default: string; adapters: Record<string, NbAdapter> } = {
+  default: "jupyterlab",
+  adapters: {
+    jupyterlab: { role: "scientific-notebook", capabilities: ["python", "r", "julia", "terminal"], kernels: ["python3", "ir", "julia"], mode: "session" },
+    zeppelin:   { role: "collaborative-analytics", capabilities: ["spark", "sql", "scala", "python"], kernels: ["spark", "python3"], mode: "session" },
+    observable: { role: "reactive-visualization", capabilities: ["javascript", "sql", "markdown"], kernels: ["javascript"], mode: "reactive" },
+    quarto:     { role: "publishing", capabilities: ["python", "r", "markdown", "slides"], kernels: ["python3"], mode: "headless" },
+  },
+};
+
+function nbBase(): string | null { return BASE ? BASE.replace(/\/$/, "") : null; }
+
+export async function loadNotebookAdapters(): Promise<{ default: string; adapters: Record<string, NbAdapter> }> {
+  const b = nbBase(); if (!b) return NB_ADAPTERS_STUB;
+  const r = await fetch(`${b}/api/studio/notebook/adapters`).catch(() => null);
+  if (!r || !r.ok) return NB_ADAPTERS_STUB;
+  const d = await r.json(); return d.adapters ? d : NB_ADAPTERS_STUB;
+}
+
+export async function createNotebookSession(input: { project: string; adapter?: string; name?: string }): Promise<NbSession> {
+  const b = nbBase();
+  if (!b) return { id: "stub-" + Math.random().toString(16).slice(2, 8), project: input.project, adapter: input.adapter || "jupyterlab",
+                   role: "scientific-notebook", mode: "session", kernel: "python3", name: input.name || "Notebook session", status: "stub", url: null };
+  const r = await fetch(`${b}/api/studio/notebook/session`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
+  if (!r.ok) throw new Error(`session failed (HTTP ${r.status})`);
+  return r.json();
+}
+
+export async function loadNotebookSessions(project: string): Promise<{ project: string; sessions: NbSession[]; degraded?: string }> {
+  const b = nbBase(); if (!b) return { project, sessions: [] };
+  const r = await fetch(`${b}/api/studio/notebook/sessions?project=${encodeURIComponent(project)}`).catch(() => null);
+  if (!r || !r.ok) return { project, sessions: [], degraded: "runtime unreachable" };
+  return r.json();
+}
+
+export async function executeCell(input: { project: string; code: string; language?: string; adapter?: string; session_id?: string }): Promise<NbExecResult> {
+  const b = nbBase();
+  // honest stub: no BASE → we do NOT fake compute; the surface shows "runtime not wired".
+  if (!b) return { status: "degraded", outputs: [], error: null, degraded: "notebook runtime not wired (dev preview)", receipt: null };
+  const r = await fetch(`${b}/api/studio/notebook/execute`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
+  if (!r.ok) throw new Error(`execute failed (HTTP ${r.status})`);
+  return r.json();
+}
+
+export async function loadNotebookReceipts(project: string): Promise<{ project: string; count: number; receipts: NbReceipt[]; degraded?: string }> {
+  const b = nbBase(); if (!b) return { project, count: 0, receipts: [] };
+  const r = await fetch(`${b}/api/studio/notebook/receipts?project=${encodeURIComponent(project)}`).catch(() => null);
+  if (!r || !r.ok) return { project, count: 0, receipts: [], degraded: "runtime unreachable" };
+  return r.json();
+}
+
 // ── Governance panel: the real ontology (Ontogenesis) · typed actions (Foundry-Workshop) · GAIA world-signals ──
 export interface OntologyClassLite { iri: string; label?: string; subClassOf: string[]; property_count: number }
 export interface OntologyProperty { iri: string; label?: string; kind: string; range?: string | null }
