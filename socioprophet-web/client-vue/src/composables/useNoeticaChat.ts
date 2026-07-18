@@ -51,6 +51,7 @@ export interface ChatTurn {
   badge?: string;   // verification badge (e.g. "Generated · best-effort · attested")
   rating?: 'up' | 'down';   // user feedback on an assistant turn
   awaitingApproval?: boolean;   // plan-mode: produced a plan, waiting for approve/reject
+  fanoutModel?: string;   // when set, this turn is one column of a multi-model compare
 }
 
 const TRACE_EVENTS = new Set(['intent', 'plan', 'step', 'narration', 'grounding', 'retrieval', 'deliberation', 'action', 'effort', 'decidable', 'discipline', 'safety', 'escalation']);
@@ -70,7 +71,7 @@ export function createNoeticaChat() {
   const retrievalScope = ref<'chat' | 'project' | 'everything'>('chat');   // knowledge scope
   // the in-flight request, so Stop can abort it.
   let controller: AbortController | null = null;
-  function stop() { controller?.abort(); }
+  function stop() { controller?.abort(); stopFanout(); }
 
   // Persist finalized history so a reload keeps the conversation.
   watch(turns, (t) => {
@@ -223,6 +224,72 @@ export function createNoeticaChat() {
     } catch { /* best-effort — the rating still shows locally */ }
   }
 
+  // ── fan-out: one prompt → several models, side by side ──
+  // Self-contained (does NOT touch stream()): a minimal SSE consumer per compare slot,
+  // reading just the text + model so the single-chat path carries zero regression risk.
+  let fanControllers: AbortController[] = [];
+  function stopFanout() { fanControllers.forEach((c) => c.abort()); fanControllers = []; }
+
+  async function fanoutSlot(history: Array<{ role: Role; content: string }>, modelId: string, assistant: ChatTurn) {
+    const ctrl = new AbortController();
+    fanControllers.push(ctrl);
+    try {
+      const res = await fetch(`${AM_BASE}/api/chat`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal,
+        body: JSON.stringify({ session_id: sessionId, messages: history, reply_length: replyLength.value,
+          agent_mode: 'auto', model_id: modelId }),
+      });
+      if (!res.ok || !res.body) throw new Error(`model unavailable (${res.status})`);
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '', event = 'message';
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() ?? '';
+        for (const line of lines) {
+          if (line.startsWith('event:')) { event = line.slice(6).trim(); continue; }
+          if (!line.startsWith('data:')) { if (line.trim() === '') event = 'message'; continue; }
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
+          try {
+            const d = JSON.parse(payload) as Record<string, unknown>;
+            if (event === 'delta' && typeof d.delta === 'string') assistant.content += d.delta;
+            else if (event === 'done') {
+              const r = d.result as { content?: string; model_routed?: string } | undefined;
+              if (r?.content && !assistant.content) assistant.content = r.content;
+              assistant.content = assistant.content.replace(/\n?<!--\s*c2pa:[^>]*-->\s*$/i, '').trimEnd();
+              if (r?.model_routed) assistant.model = r.model_routed;
+            } else if (event === 'error') { assistant.error = true; assistant.content ||= `⚠ ${(d.error as string) ?? 'error'}`; }
+          } catch { /* skip */ }
+        }
+      }
+    } catch (e) {
+      if (!(e instanceof DOMException && e.name === 'AbortError')) {
+        assistant.error = true; assistant.content ||= `⚠ ${e instanceof Error ? e.message : 'failed'}`;
+      }
+    } finally {
+      assistant.streaming = false;
+    }
+  }
+
+  async function fanout(text: string, modelIds: string[]) {
+    const msg = text.trim();
+    if (!msg || busy.value || modelIds.length === 0) return;
+    turns.value.push({ role: 'user', content: msg });
+    const history = turns.value.filter((t) => t.role === 'user').map((t) => ({ role: t.role, content: t.content }));
+    const slots = modelIds.map((mid) => {
+      const a: ChatTurn = { role: 'assistant', content: '', streaming: true, fanoutModel: mid };
+      turns.value.push(a);
+      return { mid, a };
+    });
+    busy.value = true;
+    try { await Promise.all(slots.map(({ mid, a }) => fanoutSlot(history, mid, a))); }
+    finally { fanControllers = []; busy.value = false; }
+  }
+
   // Plan-mode gate: approve → execute the plan in auto mode; reject → discard.
   async function approvePlan(index: number) {
     const t = turns.value[index];
@@ -238,7 +305,7 @@ export function createNoeticaChat() {
     if (t) t.awaitingApproval = false;
   }
 
-  return { sessionId, turns, busy, send, stop, reset, regenerate, feedback, approvePlan, rejectPlan,
+  return { sessionId, turns, busy, send, stop, reset, regenerate, feedback, approvePlan, rejectPlan, fanout,
     agentMode, replyLength, webMode, systemPrompt, retrievalScope };
 }
 

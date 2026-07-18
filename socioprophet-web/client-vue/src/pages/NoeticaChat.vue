@@ -44,7 +44,7 @@
           <article v-else class="nx-turn nx-turn--assistant">
             <div class="nx-avatar"><NoeticaMark /></div>
             <div class="nx-a-col">
-              <div class="nx-a-label">Noetica</div>
+              <div class="nx-a-label">{{ t.fanoutModel ? '⧉ ' + t.fanoutModel : 'Noetica' }}</div>
 
               <!-- Reasoning trace disclosure (the moat, made visible) — structured -->
               <details v-if="hasTrace(t)" class="nx-trace" :open="t.streaming || expanded.has(i)">
@@ -146,6 +146,20 @@
           <span v-if="ingesting" class="nx-ingest">ingesting…</span>
           <span v-else-if="ingestedCount" class="nx-ingest" :title="ingestedCount + ' files ingested this session'">✓ {{ ingestedCount }}</span>
 
+          <!-- fan-out: compare multiple models -->
+          <div v-if="models.length" class="nx-scope">
+            <button type="button" class="nx-toggle" :class="{ on: compareMode }"
+              @click="compareMode = !compareMode; showModels = compareMode" title="Compare several models">
+              ⧉ compare<span v-if="compareMode && selectedModels.size"> ({{ selectedModels.size }})</span>
+            </button>
+            <div v-if="compareMode && showModels" class="nx-scope-menu">
+              <div class="nx-scope-sec">Compare models — {{ selectedModels.size }}/4</div>
+              <button v-for="m in models" :key="m.id" type="button" :class="{ on: selectedModels.has(m.id) }" @click="toggleModel(m.id)">
+                {{ selectedModels.has(m.id) ? '✓ ' : '' }}{{ m.id }}
+              </button>
+            </div>
+          </div>
+
           <span class="nx-spacer" />
           <span class="nx-toolbar-hint">⏎ send</span>
           <button v-if="chat.busy.value" type="button" class="nx-send nx-stopbtn" @click="chat.stop()" aria-label="Stop">
@@ -167,7 +181,7 @@
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
 import { useProjects, projectCollectionId } from '../stores/projects';
-import { AM_BASE } from '../services/agentMachineApi';
+import { AM_BASE, labsCatalog, type ModelEntry } from '../services/agentMachineApi';
 import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
 import NoeticaTrace from '../components/NoeticaTrace.vue';
@@ -278,6 +292,20 @@ const lastAsstIdx = computed(() => {
   return -1;
 });
 function copyTurn(t: ChatTurn) { void navigator.clipboard?.writeText(mparts(t).answer || t.content); }
+
+// ── fan-out (compare N models) ──
+const compareMode = ref(false);
+const showModels = ref(false);
+const models = ref<ModelEntry[]>([]);
+const selectedModels = ref<Set<string>>(new Set());
+onMounted(async () => {
+  try { models.value = (await labsCatalog()).models.filter((m) => m.kind === 'base'); } catch { /* AM offline */ }
+});
+function toggleModel(id: string) {
+  const s = new Set(selectedModels.value);
+  if (s.has(id)) s.delete(id); else if (s.size < 4) s.add(id);   // cap at 4 columns
+  selectedModels.value = s;
+}
 const speakingIdx = ref<number | null>(null);
 function speakTurn(i: number, t: ChatTurn) {
   const synth = window.speechSynthesis;
@@ -299,7 +327,8 @@ async function submit() {
   if (!text || chat.busy.value) return;
   draft.value = '';
   nextTick(autoGrow);
-  await chat.send(text);
+  if (compareMode.value && selectedModels.value.size) await chat.fanout(text, [...selectedModels.value]);
+  else await chat.send(text);
 }
 function fillAndSend(s: string) { draft.value = s; submit(); }
 function onKey(e: KeyboardEvent) {
