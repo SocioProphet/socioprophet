@@ -20,12 +20,31 @@ function loadPersisted(): ChatTurn[] {
 
 export type Role = 'user' | 'assistant';
 export interface TraceItem { kind: string; text: string }
+// Structured trace payloads (mirrors Noetica's message types; the agent-machine emits
+// each under an event-specific key: plan→plan, retrieval→trace, grounding→grounding…).
+export interface PlanStepT { id: string; label: string; status: string; detail?: string }
+export interface PlanT { capability?: string; skill?: string; steps: PlanStepT[] }
+export interface RetrievalT {
+  patterns?: string[]; token_estimate?: number; beliefs_injected?: number;
+  sources?: Array<{ id: string; label: string; score: number }>;
+  document_sources?: Array<{ id: string; label: string; score: number }>;
+}
+export interface GroundingT { domain?: string; topics?: string[]; terms?: string[] }
+export interface JudgmentT {
+  verdict?: 'grounded' | 'speculative' | 'contradiction'; worth?: number; grounding?: number;
+  notes?: string[]; contradictions?: Array<{ statement: string; detail?: string }>;
+}
 export interface ChatTurn {
   role: Role;
   content: string;
   streaming?: boolean;
   thinking?: string;   // streamed reasoning (thinking_delta), if the model emits it
-  trace?: TraceItem[];
+  trace?: TraceItem[]; // remaining trace kinds (narration/discipline/…) as text chips
+  intentName?: string;
+  plan?: PlanT;
+  retrieval?: RetrievalT;
+  grounding?: GroundingT;
+  judgment?: JudgmentT;
   error?: boolean;
   model?: string;   // model_routed from the done event
   badge?: string;   // verification badge (e.g. "Generated · best-effort · attested")
@@ -140,6 +159,20 @@ export function createNoeticaChat() {
               assistant.content = assistant.content || `⚠ ${(d.error as string) ?? 'chat error'}`;
               assistant.error = true;
               assistant.streaming = false;
+            } else if (event === 'plan' && d.plan) {
+              assistant.plan = d.plan as PlanT;
+            } else if (event === 'step' && d.step) {
+              const su = d.step as { id: string; status: string; detail?: string };
+              const step = assistant.plan?.steps.find((x) => x.id === su.id);
+              if (step) { step.status = su.status; if (su.detail) step.detail = su.detail; }
+            } else if (event === 'retrieval' && d.trace) {
+              assistant.retrieval = d.trace as RetrievalT;
+            } else if (event === 'grounding' && d.grounding) {
+              assistant.grounding = d.grounding as GroundingT;
+            } else if (event === 'value_judgment' && d.value_judgment) {
+              assistant.judgment = d.value_judgment as JudgmentT;
+            } else if (event === 'intent' && d.intent) {
+              assistant.intentName = (d.intent as { name?: string }).name;
             } else if (TRACE_EVENTS.has(event)) {
               const t = (d.label ?? d.text ?? d.name ?? d.message ?? d.status ?? '') as string;
               if (t) assistant.trace!.push({ kind: event, text: String(t) });

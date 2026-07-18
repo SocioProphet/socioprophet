@@ -46,18 +46,15 @@
             <div class="nx-a-col">
               <div class="nx-a-label">Noetica</div>
 
-              <!-- Reasoning trace disclosure (the moat, made visible) -->
-              <details v-if="t.trace && t.trace.length" class="nx-trace" :open="t.streaming || expanded.has(i)">
+              <!-- Reasoning trace disclosure (the moat, made visible) — structured -->
+              <details v-if="hasTrace(t)" class="nx-trace" :open="t.streaming || expanded.has(i)">
                 <summary class="nx-trace-summary" @click.prevent="toggleTrace(i)">
                   <span class="nx-trace-caret" :class="{ open: t.streaming || expanded.has(i) }">▶</span>
-                  <span class="nx-trace-title">Trace</span>
-                  <span class="nx-trace-count">{{ t.trace.length }}</span>
+                  <span class="nx-trace-title">Reasoning</span>
+                  <span v-if="traceCount(t)" class="nx-trace-count">{{ traceCount(t) }}</span>
                 </summary>
                 <div class="nx-trace-body">
-                  <div v-for="(tr, j) in t.trace" :key="j" class="nx-tr">
-                    <span class="nx-tr-kind">{{ tr.kind }}</span>
-                    <span class="nx-tr-text">{{ tr.text }}</span>
-                  </div>
+                  <NoeticaTrace :turn="t" />
                 </div>
               </details>
 
@@ -142,6 +139,14 @@ import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
 import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
+import NoeticaTrace from '../components/NoeticaTrace.vue';
+
+function hasTrace(t: ChatTurn): boolean {
+  return !!(t.trace?.length || t.plan?.steps?.length || t.retrieval || t.grounding || t.judgment?.verdict || t.intentName);
+}
+function traceCount(t: ChatTurn): number {
+  return (t.trace?.length ?? 0) + (t.plan?.steps?.length ?? 0);
+}
 
 const chat = useNoeticaChat();
 const agentModes = ['auto', 'plan', 'ask'] as const;
