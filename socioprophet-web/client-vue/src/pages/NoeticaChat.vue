@@ -81,6 +81,15 @@
                 <span v-if="t.badge" class="nx-badge">◆ {{ t.badge }}</span>
                 <span v-if="t.model" class="nx-model">{{ t.model }}</span>
               </div>
+
+              <!-- Message actions -->
+              <div v-if="!t.streaming && (t.content || t.thinking)" class="nx-actions">
+                <button class="nx-act" @click="copyTurn(t)" title="Copy">⧉</button>
+                <button class="nx-act" :class="{ on: speakingIdx === i }" @click="speakTurn(i, t)" title="Read aloud">🔊</button>
+                <button class="nx-act" :class="{ on: t.rating === 'up' }" @click="chat.feedback(i, 'up')" title="Good answer" aria-label="Good answer">▲</button>
+                <button class="nx-act" :class="{ on: t.rating === 'down' }" @click="chat.feedback(i, 'down')" title="Poor answer" aria-label="Poor answer">▼</button>
+                <button v-if="i === lastAsstIdx" class="nx-act" :disabled="chat.busy.value" @click="chat.regenerate()" title="Regenerate">⟳</button>
+              </div>
             </div>
           </article>
         </template>
@@ -175,6 +184,25 @@ function mparts(t: ChatTurn): { reasoning: string; answer: string; thinkingOpen:
   if (t.thinking) return { reasoning: t.thinking, answer: t.content, thinkingOpen: !!t.streaming && !t.content };
   const s = splitThink(t.content);
   return { reasoning: s.reasoning, answer: s.answer, thinkingOpen: s.thinking };
+}
+
+// ── message actions ──
+const lastAsstIdx = computed(() => {
+  const ts = chat.turns.value;
+  for (let i = ts.length - 1; i >= 0; i--) if (ts[i].role === 'assistant') return i;
+  return -1;
+});
+function copyTurn(t: ChatTurn) { void navigator.clipboard?.writeText(mparts(t).answer || t.content); }
+const speakingIdx = ref<number | null>(null);
+function speakTurn(i: number, t: ChatTurn) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  if (speakingIdx.value === i) { synth.cancel(); speakingIdx.value = null; return; }
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(mparts(t).answer || t.content);
+  u.onend = () => { if (speakingIdx.value === i) speakingIdx.value = null; };
+  speakingIdx.value = i;
+  synth.speak(u);
 }
 
 function scrollToEnd() { const el = scrollEl.value; if (el) el.scrollTop = el.scrollHeight; }
@@ -336,6 +364,14 @@ onMounted(() => inputEl.value?.focus());
 .nx-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 6px; font-size: 10px; color: var(--ntext3); }
 .nx-model { font-family: ui-monospace, 'SF Mono', monospace; }
 .nx-badge { display: inline-flex; align-items: center; gap: 4px; color: #22c55e; }
+.nx-actions { display: flex; gap: 4px; margin-top: 6px; opacity: 0; transition: opacity .12s; }
+.nx-turn:hover .nx-actions, .nx-actions:focus-within { opacity: 1; }
+.nx-act { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+  border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--ntext3); font-size: 12px;
+  cursor: pointer; transition: background .12s, color .12s; }
+.nx-act:hover:not(:disabled) { background: var(--nline-weak); color: var(--ntext); }
+.nx-act.on { color: var(--nblue); }
+.nx-act:disabled { opacity: .4; cursor: default; }
 
 /* ── Composer ── */
 .nx-composer { padding: 8px 16px 20px; }

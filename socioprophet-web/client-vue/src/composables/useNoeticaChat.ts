@@ -29,6 +29,7 @@ export interface ChatTurn {
   error?: boolean;
   model?: string;   // model_routed from the done event
   badge?: string;   // verification badge (e.g. "Generated · best-effort · attested")
+  rating?: 'up' | 'down';   // user feedback on an assistant turn
 }
 
 const TRACE_EVENTS = new Set(['intent', 'plan', 'step', 'narration', 'grounding', 'retrieval', 'deliberation', 'action', 'effort', 'decidable', 'discipline', 'safety', 'escalation']);
@@ -60,6 +61,13 @@ export function createNoeticaChat() {
     const msg = text.trim();
     if (!msg || busy.value) return;
     turns.value.push({ role: 'user', content: msg });
+    await stream();
+  }
+
+  // Re-run the model against the current history, appending a fresh assistant turn.
+  // Shared by send() and regenerate().
+  async function stream() {
+    if (busy.value) return;
     const assistant: ChatTurn = { role: 'assistant', content: '', streaming: true, trace: [] };
     turns.value.push(assistant);
     busy.value = true;
@@ -154,7 +162,28 @@ export function createNoeticaChat() {
     }
   }
 
-  return { sessionId, turns, busy, send, stop, reset, agentMode, replyLength, webMode, systemPrompt };
+  // Regenerate: drop the last assistant turn and re-run against the history.
+  function regenerate() {
+    if (busy.value) return;
+    if (turns.value.at(-1)?.role === 'assistant') turns.value.pop();
+    void stream();
+  }
+
+  // Feedback on an assistant turn → the agent-machine learning loop (best-effort).
+  async function feedback(index: number, rating: 'up' | 'down') {
+    const t = turns.value[index];
+    if (!t || t.role !== 'assistant') return;
+    t.rating = t.rating === rating ? undefined : rating;
+    try {
+      await fetch(`${AM_BASE}/api/learning/feedback`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, rating, content: t.content }),
+      });
+    } catch { /* best-effort — the rating still shows locally */ }
+  }
+
+  return { sessionId, turns, busy, send, stop, reset, regenerate, feedback,
+    agentMode, replyLength, webMode, systemPrompt };
 }
 
 export type NoeticaChat = ReturnType<typeof createNoeticaChat>;
