@@ -8,6 +8,7 @@ import StudioCommons from "../components/StudioCommons.vue";
 import StudioOps from "../components/StudioOps.vue";
 import StudioGovernance from "../components/StudioGovernance.vue";
 import StudioNotebooks from "../components/StudioNotebooks.vue";
+import LineageStrip from "../components/LineageStrip.vue";
 
 const bundle = ref<StudioBundle | null>(null);
 const error = ref("");
@@ -242,7 +243,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
             <template v-else-if="section === 'data'">
               <div class="row"><span class="name">{{ it.name }}</span><span v-if="it.governed" class="pill ok">governed</span><span v-else class="pill warn">ungoverned</span></div>
               <div class="sub">{{ it.kind }}<span v-if="it.rows"> · {{ it.rows.toLocaleString() }} rows</span><span v-if="it.columns"> · {{ it.columns }} cols</span></div>
-              <div v-if="it.lineage" class="lineage">{{ it.lineage.join(" ") }}</div>
+              <LineageStrip v-if="it.lineage" :steps="it.lineage" />
             </template>
             <!-- models -->
             <template v-else-if="section === 'models'">
@@ -298,8 +299,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
               <div v-if="k !== 'id' && typeof v !== 'object'" class="mrow"><dt>{{ k }}</dt><dd>{{ v }}</dd></div>
             </template>
           </dl>
-          <div v-if="selected.item.lineage" class="d-block"><h3>Lineage</h3><div class="lineage">{{ selected.item.lineage.join(" ") }}</div></div>
-          <div v-if="selected.item.steps" class="d-block"><h3>Provenance</h3><div class="prov"><span v-for="st in selected.item.steps" :key="st.label" class="pstep">{{ st.label }} · {{ st.hash }}</span></div></div>
+          <div v-if="selected.item.lineage" class="d-block"><h3>Lineage</h3><LineageStrip :steps="selected.item.lineage" title="Lineage" /></div>
+          <div v-if="selected.item.steps" class="d-block"><h3>Provenance</h3><LineageStrip :steps="selected.item.steps" title="Provenance" /></div>
           <div class="d-actions">
             <button v-for="a in actionsFor[selected.kind]" :key="a.label" :title="a.hint" :class="{ primary: a.label === actionsFor[selected.kind][0].label }">{{ a.label }}</button>
           </div>
