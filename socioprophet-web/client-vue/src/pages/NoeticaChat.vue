@@ -112,6 +112,21 @@
           @keydown="onKey"
         />
         <div class="nx-toolbar">
+          <!-- knowledge scope -->
+          <div class="nx-scope">
+            <button type="button" class="nx-scope-btn" @click="showScope = !showScope" :title="'Knowledge scope'">
+              ⌾ <span class="nx-scope-label">{{ scopeLabel }}</span> ▾
+            </button>
+            <div v-if="showScope" class="nx-scope-menu">
+              <button type="button" :class="{ on: chat.retrievalScope.value === 'chat' }" @click="pickScope('chat')">This chat only</button>
+              <div v-if="projects.projects.length" class="nx-scope-sec">Projects</div>
+              <button v-for="p in projects.projects" :key="p.id"
+                :class="{ on: chat.retrievalScope.value === 'project' && projects.activeId === p.id }" @click="pickProject(p.id)">{{ p.title }}</button>
+              <button type="button" :class="{ on: chat.retrievalScope.value === 'everything' }" @click="pickScope('everything')">Everything</button>
+              <button type="button" class="nx-scope-new" @click="newProject">+ New project</button>
+            </div>
+          </div>
+
           <!-- composer controls — all just shape the /api/chat request -->
           <div class="nx-seg" role="group" aria-label="Agent mode">
             <button v-for="m in agentModes" :key="m" type="button" :class="{ on: chat.agentMode.value === m }"
@@ -144,6 +159,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
+import { useProjects } from '../stores/projects';
 import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
 import NoeticaTrace from '../components/NoeticaTrace.vue';
@@ -156,9 +172,25 @@ function traceCount(t: ChatTurn): number {
 }
 
 const chat = useNoeticaChat();
+const projects = useProjects();
 const agentModes = ['auto', 'plan', 'ask'] as const;
 const replyLengths = ['short', 'medium', 'long'] as const;
 const draft = ref('');
+
+// ── knowledge-scope picker ──
+const showScope = ref(false);
+const scopeLabel = computed(() => {
+  if (chat.retrievalScope.value === 'everything') return 'Everything';
+  if (chat.retrievalScope.value === 'project') return projects.active?.title ?? 'This chat';
+  return 'This chat';
+});
+function pickScope(s: 'chat' | 'project' | 'everything') { chat.retrievalScope.value = s; showScope.value = false; }
+function pickProject(id: string) { projects.setActive(id); chat.retrievalScope.value = 'project'; showScope.value = false; }
+function newProject() {
+  const name = window.prompt('New project name');
+  if (name && name.trim()) { const p = projects.create(name); chat.retrievalScope.value = 'project'; void p; }
+  showScope.value = false;
+}
 const expanded = ref<Set<number>>(new Set());
 function toggleTrace(i: number) { if (expanded.value.has(i)) expanded.value.delete(i); else expanded.value.add(i); }
 const scrollEl = ref<HTMLElement | null>(null);
@@ -411,6 +443,18 @@ onMounted(() => inputEl.value?.focus());
 .nx-toolbar { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--nline-weak); padding: 6px 8px; flex-wrap: wrap; }
 .nx-toolbar-hint { font-size: 10px; color: var(--ntext3); padding-left: 4px; }
 .nx-spacer { flex: 1 1 auto; }
+.nx-scope { position: relative; }
+.nx-scope-btn { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--nline-weak); background: transparent;
+  color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 7px; cursor: pointer; }
+.nx-scope-label { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-scope-menu { position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 20; min-width: 180px; max-height: 260px; overflow-y: auto;
+  background: var(--nsurface, #14161c); border: 1px solid var(--nline-weak); border-radius: 10px; padding: 4px; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.nx-scope-menu button { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--ntext2, var(--ntext));
+  font: inherit; font-size: 12px; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.nx-scope-menu button:hover { background: var(--nline-weak); }
+.nx-scope-menu button.on { color: var(--nblue); }
+.nx-scope-sec { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ntext3); padding: 5px 10px 2px; }
+.nx-scope-new { color: var(--nblue) !important; border-top: 1px solid var(--nline-weak); margin-top: 3px; }
 .nx-seg { display: inline-flex; border: 1px solid var(--nline-weak); border-radius: 7px; overflow: hidden; }
 .nx-seg button { border: 0; background: transparent; color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600;
   padding: 3px 8px; cursor: pointer; text-transform: capitalize; }

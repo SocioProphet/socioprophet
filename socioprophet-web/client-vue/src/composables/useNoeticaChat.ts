@@ -6,6 +6,7 @@
 import { ref, watch } from 'vue';
 import { AM_BASE } from '../services/agentMachineApi';
 import { useSettings } from '../stores/settings';
+import { useProjects, projectCollectionId } from '../stores/projects';
 import { meshChatStream } from '../config/mesh';
 
 const STORE_KEY = 'noetica-chat-v1';
@@ -66,6 +67,7 @@ export function createNoeticaChat() {
   const replyLength = ref<ReplyLength>('medium');
   const webMode = ref(false);
   const systemPrompt = ref('');
+  const retrievalScope = ref<'chat' | 'project' | 'everything'>('chat');   // knowledge scope
   // the in-flight request, so Stop can abort it.
   let controller: AbortController | null = null;
   function stop() { controller?.abort(); }
@@ -89,6 +91,7 @@ export function createNoeticaChat() {
   async function stream() {
     if (busy.value) return;
     const modeAtSend = agentMode.value;   // plan-mode turns gate on approval when done
+    const activeProject = retrievalScope.value === 'project' ? useProjects().active : null;
     const assistant: ChatTurn = { role: 'assistant', content: '', streaming: true, trace: [] };
     turns.value.push(assistant);
     busy.value = true;
@@ -125,6 +128,8 @@ export function createNoeticaChat() {
           session_id: sessionId, messages: history,
           reply_length: replyLength.value, agent_mode: agentMode.value,
           web: webMode.value, ...(systemPrompt.value.trim() ? { system_prompt: systemPrompt.value.trim() } : {}),
+          retrieval_scope: retrievalScope.value,
+          ...(activeProject ? { collection_id: projectCollectionId(activeProject.id) } : {}),
         }),
       });
       if (!res.ok || !res.body) throw new Error(res.status === 423 ? 'agent halted (kill-switch armed)' : `chat unavailable (${res.status})`);
@@ -234,7 +239,7 @@ export function createNoeticaChat() {
   }
 
   return { sessionId, turns, busy, send, stop, reset, regenerate, feedback, approvePlan, rejectPlan,
-    agentMode, replyLength, webMode, systemPrompt };
+    agentMode, replyLength, webMode, systemPrompt, retrievalScope };
 }
 
 export type NoeticaChat = ReturnType<typeof createNoeticaChat>;
