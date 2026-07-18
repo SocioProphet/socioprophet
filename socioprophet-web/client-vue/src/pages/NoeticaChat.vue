@@ -63,13 +63,13 @@
 
               <!-- Main content (reasoning split into a collapsible block) -->
               <div class="nx-a-body" :class="{ err: t.error }">
-                <template v-if="t.content">
-                  <details v-if="splitThink(t.content).reasoning" class="nx-think" :open="splitThink(t.content).thinking">
-                    <summary>{{ splitThink(t.content).thinking ? 'Thinking…' : 'Reasoning' }}</summary>
-                    <div class="nx-think-body">{{ splitThink(t.content).reasoning }}</div>
+                <template v-if="t.content || t.thinking">
+                  <details v-if="mparts(t).reasoning" class="nx-think" :open="mparts(t).thinkingOpen">
+                    <summary>{{ mparts(t).thinkingOpen ? 'Thinking…' : 'Reasoning' }}</summary>
+                    <div class="nx-think-body">{{ mparts(t).reasoning }}</div>
                   </details>
-                  <template v-if="splitThink(t.content).answer">{{ splitThink(t.content).answer }}<span v-if="t.streaming" class="nx-cursor">▍</span></template>
-                  <span v-else-if="t.streaming && !splitThink(t.content).reasoning" class="nx-cursor">▍</span>
+                  <div v-if="mparts(t).answer" class="nx-md" v-html="renderMarkdown(mparts(t).answer)" />
+                  <span v-if="t.streaming" class="nx-cursor">▍</span>
                 </template>
                 <span v-else-if="t.streaming" class="nx-thinking">
                   <span class="nx-dot" /><span class="nx-dot" /><span class="nx-dot" /> thinking…
@@ -130,7 +130,8 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
-import { useNoeticaChat } from '../composables/useNoeticaChat';
+import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
+import { renderMarkdown } from '../utils/markdown';
 import NoeticaMark from '../components/NoeticaMark.vue';
 
 const chat = useNoeticaChat();
@@ -166,6 +167,14 @@ function splitThink(content: string): { reasoning: string; answer: string; think
   const close = content.indexOf('</think>');
   if (close === -1) return { reasoning: content.slice(open + 7), answer: '', thinking: true };
   return { reasoning: content.slice(open + 7, close).trim(), answer: content.slice(close + 8).trim(), thinking: false };
+}
+
+// Reasoning + answer for a turn: prefer the separately-streamed `thinking` channel
+// (thinking_delta); fall back to splitting an inline <think> block out of the content.
+function mparts(t: ChatTurn): { reasoning: string; answer: string; thinkingOpen: boolean } {
+  if (t.thinking) return { reasoning: t.thinking, answer: t.content, thinkingOpen: !!t.streaming && !t.content };
+  const s = splitThink(t.content);
+  return { reasoning: s.reasoning, answer: s.answer, thinkingOpen: s.thinking };
 }
 
 function scrollToEnd() { const el = scrollEl.value; if (el) el.scrollTop = el.scrollHeight; }
@@ -278,6 +287,26 @@ onMounted(() => inputEl.value?.focus());
 .nx-a-body { font-size: 14px; line-height: 1.75; color: var(--ntext); white-space: pre-wrap; word-break: break-word; }
 .nx-a-body.err { color: #fca5a5; }
 .nx-cursor { color: var(--nblue); }
+
+/* rendered markdown (sanitized) */
+.nx-md { white-space: normal; }
+.nx-md > :first-child { margin-top: 0; }
+.nx-md > :last-child { margin-bottom: 0; }
+.nx-md p { margin: 0 0 10px; }
+.nx-md ul, .nx-md ol { margin: 0 0 10px; padding-left: 22px; }
+.nx-md li { margin: 2px 0; }
+.nx-md code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+  background: rgba(127,127,127,.18); padding: 1px 5px; border-radius: 5px; }
+.nx-md pre { background: rgba(0,0,0,.28); border: 1px solid var(--nline-weak); border-radius: 8px;
+  padding: 10px 12px; overflow-x: auto; margin: 0 0 10px; }
+.nx-md pre code { background: none; padding: 0; }
+.nx-md a { color: var(--nblue); text-decoration: underline; }
+.nx-md h1, .nx-md h2, .nx-md h3 { margin: 12px 0 6px; line-height: 1.3; }
+.nx-md h1 { font-size: 18px; } .nx-md h2 { font-size: 16px; } .nx-md h3 { font-size: 14.5px; }
+.nx-md blockquote { border-left: 3px solid var(--nline-weak); margin: 0 0 10px; padding: 2px 0 2px 12px; color: var(--ntext3); }
+.nx-md table { border-collapse: collapse; margin: 0 0 10px; font-size: 13px; display: block; overflow-x: auto; }
+.nx-md th, .nx-md td { border: 1px solid var(--nline-weak); padding: 5px 9px; text-align: left; }
+.nx-md hr { border: 0; border-top: 1px solid var(--nline-weak); margin: 12px 0; }
 .nx-thinking { display: inline-flex; align-items: center; gap: 5px; color: var(--ntext3); font-size: 13px; }
 .nx-think { margin: 0 0 8px; border-left: 2px solid var(--nline-weak); padding-left: 10px; }
 .nx-think > summary { cursor: pointer; color: var(--ntext3); font-size: 12px; list-style: none; user-select: none; }

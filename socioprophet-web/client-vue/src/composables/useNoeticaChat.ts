@@ -24,6 +24,7 @@ export interface ChatTurn {
   role: Role;
   content: string;
   streaming?: boolean;
+  thinking?: string;   // streamed reasoning (thinking_delta), if the model emits it
   trace?: TraceItem[];
   error?: boolean;
   model?: string;   // model_routed from the done event
@@ -118,6 +119,8 @@ export function createNoeticaChat() {
             const d = JSON.parse(payload) as Record<string, unknown>;
             if (event === 'delta' && typeof d.delta === 'string') {
               assistant.content += d.delta;
+            } else if (event === 'thinking_delta' && typeof d.delta === 'string') {
+              assistant.thinking = (assistant.thinking ?? '') + d.delta;
             } else if (event === 'done') {
               const result = d.result as { content?: string; model_routed?: string; verification?: { badge?: string } } | undefined;
               if (result?.content && !assistant.content) assistant.content = result.content;
