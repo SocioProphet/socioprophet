@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import {
-  loadNotebookAdapters, createNotebookSession, executeCell,
+  loadNotebookAdapters, createNotebookSession, executeCell, loadNotebookReceipts,
   type NbAdapter, type NbSession, type NbOutput, type NbReceipt,
 } from "../services/studioApi";
+
+// a tiny inline bar chart (epistemic-coloured) to demonstrate rich output rendering in the preview
+const MINI_SVG = `<svg viewBox="0 0 260 120" width="260" height="120" xmlns="http://www.w3.org/2000/svg">
+${[["attested", 52, "#059669"], ["verified", 41, "#14b8a6"], ["derived", 19, "#8b5cf6"], ["observed", 12, "#4a90e2"], ["hypothesis", 4, "#94a1b2"]]
+  .map((r, i) => `<rect x="76" y="${8 + i * 22}" width="${(r[1] as number) * 3}" height="16" rx="2" fill="${r[2]}"/><text x="70" y="${20 + i * 22}" text-anchor="end" font-size="10" fill="#64707e" font-family="sans-serif">${r[0]}</text>`).join("")}
+</svg>`;
 
 const props = defineProps<{ project: string }>();
 
@@ -31,8 +37,12 @@ function seed(): Cell[] {
       receipt: fakeReceipt("import…shape", "ok") },
     { id: uid(), language: "python", status: "ok", count: 2, preview: true,
       code: "# state carries across cells — one persistent kernel per session\ndf['warrant'].value_counts()",
-      outputs: [{ type: "stream", name: "stdout", text: "attested    41\nverified    52\nderived     19\nobserved    12\nhypothesis   4\nName: warrant, dtype: int64" }],
+      outputs: [{ type: "execute_result", html: "<table class='df'><tr><th>warrant</th><th>n</th></tr><tr><td>attested</td><td>41</td></tr><tr><td>verified</td><td>52</td></tr><tr><td>derived</td><td>19</td></tr></table>" }],
       receipt: fakeReceipt("value_counts", "ok") },
+    { id: uid(), language: "python", status: "ok", count: 3, preview: true,
+      code: "import matplotlib.pyplot as plt\ndf['warrant'].value_counts().plot.barh()   # real plots render inline\nplt.show()",
+      outputs: [{ type: "display_data", svg: MINI_SVG }],
+      receipt: fakeReceipt("plot", "ok") },
     { id: uid(), language: "python", status: "idle", count: null, code: "", outputs: [], receipt: null },
   ];
 }
@@ -81,6 +91,15 @@ function onKey(e: KeyboardEvent, cell: Cell) {
 }
 function short(id?: string | null) { return id ? id.replace("sha256:", "").slice(0, 8) : ""; }
 const statColor: Record<string, string> = { ok: "var(--ok)", error: "var(--fail)", running: "var(--run)", degraded: "var(--warn)", idle: "var(--idle)" };
+
+// ── session provenance: the tamper-evident receipt chain across all cells (the moat) ──
+const chainOpen = ref(false);
+const serverCount = ref<number | null>(null);
+const chain = computed<NbReceipt[]>(() => cells.value.filter((c) => c.receipt).map((c) => c.receipt!));
+async function toggleChain() {
+  chainOpen.value = !chainOpen.value;
+  if (chainOpen.value) { const r = await loadNotebookReceipts(props.project); serverCount.value = r.degraded ? null : (r.count ?? null); }
+}
 </script>
 
 <template>
@@ -97,6 +116,7 @@ const statColor: Record<string, string> = { ok: "var(--ok)", error: "var(--fail)
       <div class="sp" />
       <a v-if="session?.url" class="ghost" :href="session.url" target="_blank" rel="noopener">Open JupyterLab ↗</a>
       <button class="ghost" @click="addCell">＋ Cell</button>
+      <button class="ghost prov-btn" :class="{ on: chainOpen }" @click="toggleChain" title="Tamper-evident receipt chain">⛨ Provenance<span v-if="chain.length" class="cnt2">{{ chain.length }}</span></button>
       <button class="primary" @click="runAll">▸ Run all</button>
     </header>
 
@@ -121,9 +141,13 @@ const statColor: Record<string, string> = { ok: "var(--ok)", error: "var(--fail)
           <!-- outputs -->
           <div v-if="cell.outputs.length" class="out">
             <template v-for="(o, i) in cell.outputs" :key="i">
-              <pre v-if="o.type === 'stream' || o.type === 'execute_result' || o.type === 'display_data'" class="stream">{{ o.text }}</pre>
+              <!-- rich: plots (png/svg) and tables/HTML (DataFrame._repr_html_) — real DS output -->
+              <img v-if="o.png" class="rich" :src="'data:image/png;base64,' + o.png" alt="cell output" />
+              <div v-else-if="o.svg" class="rich" v-html="o.svg" />
+              <div v-else-if="o.html" class="rich htmlout" v-html="o.html" />
               <pre v-else-if="o.type === 'error'" class="oerr">{{ o.ename }}: {{ o.evalue }}</pre>
               <div v-else-if="o.type === 'degraded'" class="odeg">⚠ {{ o.text }}</div>
+              <pre v-else class="stream">{{ o.text }}</pre>
             </template>
           </div>
           <!-- governed receipt strip — the moat, per cell -->
@@ -142,11 +166,67 @@ const statColor: Record<string, string> = { ok: "var(--ok)", error: "var(--fail)
         <button class="x" title="delete cell" @click="removeCell(cell.id)">✕</button>
       </div>
     </div>
+
+    <!-- session provenance chain — the tamper-evident record Databricks can't produce -->
+    <transition name="slide">
+      <aside v-if="chainOpen" class="prov-drawer">
+        <button class="x2" @click="chainOpen = false" aria-label="Close">✕</button>
+        <div class="pk">Session provenance</div>
+        <h3>Tamper-evident receipt chain</h3>
+        <p class="pcap">Every cell run is sealed and hash-chained to the one before it. Reorder a cell, edit an output, or forge a result and the chain breaks. This is the record a Databricks notebook can’t produce.</p>
+        <div v-if="!chain.length" class="empty2">Run a cell to start the chain.</div>
+        <div v-else class="chainlist">
+          <div v-for="(r, i) in chain" :key="r.id" class="crow">
+            <span class="cdot" :style="{ background: statColor[r.status] || 'var(--idle)' }" />
+            <div class="cinfo">
+              <div class="cid mono">{{ short(r.id) }}<span class="crt">{{ r.runtime }}</span></div>
+              <div class="cmeta"><span class="mono">code {{ short(r.code_sha) }}</span> · <span class="mono">out {{ short(r.outputs_sha) }}</span></div>
+              <div v-if="i > 0" class="clink mono">↩ prev {{ short(r.prev || chain[i - 1].id) }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="pfoot">
+          <span v-if="serverCount != null">✓ server chain: <b>{{ serverCount }}</b> sealed · replayable</span>
+          <span v-else>preview chain — runtime not wired</span>
+        </div>
+      </aside>
+    </transition>
   </div>
 </template>
 
 <style scoped>
-.nb { font: 14px/1.5 var(--ui); color: var(--ink); }
+.nb { font: 14px/1.5 var(--ui); color: var(--ink); position: relative; }
+.prov-btn.on { background: var(--accent-wash); border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent-ink); }
+.prov-btn .cnt2 { margin-left: 6px; background: var(--epi-attested); color: #fff; border-radius: 999px; padding: 0 6px; font-size: 11px; }
+
+/* rich outputs — plots (png/svg) + tables (DataFrame HTML) */
+.rich { max-width: 100%; margin: 4px 0; }
+.rich :deep(svg) { max-width: 100%; height: auto; }
+.htmlout { overflow-x: auto; }
+.htmlout :deep(table) { border-collapse: collapse; font: 12px/1.4 var(--mono); }
+.htmlout :deep(th), .htmlout :deep(td) { border: 1px solid var(--hairline); padding: 3px 10px; text-align: right; }
+.htmlout :deep(th) { background: var(--sunken); color: var(--muted); font-weight: 600; }
+
+/* provenance chain drawer */
+.prov-drawer { position: absolute; top: 0; right: 0; width: 320px; max-height: 100%; overflow: auto; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-3); box-shadow: var(--e-3); padding: 18px 20px; z-index: 20; }
+.prov-drawer .x2 { position: absolute; top: 12px; right: 14px; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 15px; }
+.prov-drawer .pk { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.prov-drawer h3 { margin: 4px 0 6px; font-size: 15px; }
+.prov-drawer .pcap { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+.prov-drawer .empty2 { font-size: 12px; color: var(--faint); padding: 20px 0; text-align: center; }
+.chainlist { display: flex; flex-direction: column; gap: 0; }
+.crow { display: flex; gap: 10px; position: relative; padding-bottom: 14px; }
+.crow::before { content: ""; position: absolute; left: 4px; top: 12px; bottom: -2px; width: 2px; background: var(--epi-attested); opacity: .35; }
+.crow:last-child::before { display: none; }
+.crow .cdot { width: 10px; height: 10px; border-radius: 999px; margin-top: 2px; flex: 0 0 auto; z-index: 2; }
+.crow .cid { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.crow .crt { font-size: 10px; color: var(--faint); font-weight: 400; text-transform: none; }
+.crow .cmeta { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+.crow .clink { font-size: 10px; color: var(--faint); margin-top: 2px; }
+.prov-drawer .pfoot { margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--muted); }
+.prov-drawer .pfoot b { color: var(--epi-attested); }
+.slide-enter-active, .slide-leave-active { transition: transform .2s ease, opacity .2s ease; }
+.slide-enter-from, .slide-leave-to { transform: translateX(14px); opacity: 0; }
 .nb-bar { display: flex; align-items: center; gap: 12px; padding: 4px 0 12px; flex-wrap: wrap; }
 .nb-title { font-size: 15px; font-weight: 600; } .nb-title .proj { color: var(--muted); font-weight: 400; margin-left: 6px; font-size: 13px; }
 .rt { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); display: flex; align-items: center; gap: 6px; }

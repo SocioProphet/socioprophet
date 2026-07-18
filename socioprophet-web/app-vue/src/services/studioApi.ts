@@ -557,7 +557,7 @@ export interface NbSession {
   id: string; project: string; adapter: string; role: string; mode: string;
   kernel: string; name: string; status: string; url?: string | null;
 }
-export interface NbOutput { type: string; name?: string; text?: string; ename?: string; evalue?: string; mime?: string[] }
+export interface NbOutput { type: string; name?: string; text?: string; ename?: string; evalue?: string; mime?: string[]; png?: string; svg?: string; html?: string }
 export interface NbReceipt {
   id: string; project: string; adapter: string; language: string; runtime: string;
   code_sha: string; outputs_sha: string; status: string; actor: string; prev?: string | null; ts: number;
