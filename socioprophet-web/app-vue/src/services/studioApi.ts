@@ -907,6 +907,37 @@ export async function runCompute(input: { kind: string; spec: Record<string, unk
   return (await r.json()) as ComputeResultLite;
 }
 
+// ── Planner — the capability registry as an agent ACTION SPACE (layer 6) ──
+// Desired capabilities → a governed workflow PLAN (preview, free): observed reads fan
+// out, then derivations fan in. The surface hands `plan` straight to runCompute to
+// execute it under full governance. Deterministic (strategy=capability-dag).
+export interface ComputePlanStep {
+  id: string; kind: string; backend: string; satisfies: string;
+  epistemic: string; executes_user_code?: boolean; status?: string; entitled: boolean;
+}
+export interface ComputePlan {
+  strategy: string; intent?: string | null;
+  plan?: { kind: string; project: string; spec: { steps: unknown[] } } | null;
+  steps: ComputePlanStep[];
+  warrant_preview?: string;
+  unmet_capabilities?: string[];
+  unmet_entitlements?: string[];
+  runnable?: boolean;
+  degraded?: string;
+}
+
+export async function planCompute(input: { capabilities: string[]; project: string; intent?: string }): Promise<ComputePlan> {
+  const b = nbBase();
+  if (!b) return { strategy: "stub", steps: [], plan: null, runnable: false,
+    degraded: "planner not wired (dev preview)" };
+  const r = await fetch(`${b}/api/studio/compute/plan`, {
+    method: "POST", headers: { "Content-Type": "application/json", accept: "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!r.ok) throw new Error(`plan failed (HTTP ${r.status})`);
+  return (await r.json()) as ComputePlan;
+}
+
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!BASE) return STUB;
   const q = projectId ? `?project=${encodeURIComponent(projectId)}` : "";

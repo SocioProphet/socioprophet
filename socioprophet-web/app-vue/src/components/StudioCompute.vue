@@ -1,11 +1,44 @@
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted } from "vue";
 import {
-  loadComputeRegistry, runCompute, EPISTEMIC_COLORS,
-  type ComputeKind, type ComputeResultLite,
+  loadComputeRegistry, runCompute, planCompute, EPISTEMIC_COLORS,
+  type ComputeKind, type ComputeResultLite, type ComputePlan,
 } from "../services/studioApi";
 
 const props = defineProps<{ project: string }>();
+
+// ── planner: the registry as an agent action space (capabilities → governed plan) ──
+const planCaps = ref("");
+const plan = ref<ComputePlan | null>(null);
+const planning = ref(false);
+const planErr = ref("");
+
+async function doPlan() {
+  const caps = planCaps.value.split(",").map((c) => c.trim()).filter(Boolean);
+  if (!caps.length || planning.value) return;
+  planning.value = true; planErr.value = ""; plan.value = null;
+  try {
+    plan.value = await planCompute({ capabilities: caps, project: props.project });
+  } catch (e) {
+    planErr.value = e instanceof Error ? e.message : "plan failed";
+  } finally {
+    planning.value = false;
+  }
+}
+async function runPlan() {
+  const p = plan.value?.plan;
+  if (!p || running.value) return;
+  running.value = true; runErr.value = ""; result.value = null;
+  try {
+    const res = await runCompute({ kind: "workflow", spec: p.spec as Record<string, unknown>, project: props.project });
+    result.value = res;
+    if (res.status === "ok" || res.status === "degraded") chain.value.unshift(res);
+  } catch (e) {
+    runErr.value = e instanceof Error ? e.message : "run failed";
+  } finally {
+    running.value = false;
+  }
+}
 
 // ── registry (the catalog: "any compute, one door") ──
 const kinds = ref<ComputeKind[]>([]);
@@ -136,6 +169,59 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
 
 <template>
   <div class="cp">
+    <!-- ─────────────── planner: the registry as an agent action space ─────────────── -->
+    <section class="planner">
+      <div class="pl-head">
+        <div>
+          <h2>Plan a governed pipeline</h2>
+          <p class="sub">Name the <b>capabilities</b> you want and the planner composes a governed workflow over the
+            registry — observed reads first, then derivations — as a <b>preview you can run</b>. Planning is free;
+            only execution is gated.</p>
+        </div>
+        <span class="wand" aria-hidden="true">✦</span>
+      </div>
+      <div class="pl-in">
+        <input v-model="planCaps" placeholder="counts, python, embed  —  comma-separated capabilities"
+               @keydown.enter="doPlan" />
+        <button class="primary" :disabled="!planCaps.trim() || planning" @click="doPlan">
+          <span v-if="planning" class="spin" />{{ planning ? 'Planning…' : 'Plan' }}
+        </button>
+      </div>
+      <p v-if="planErr" class="note err">plan: {{ planErr }}</p>
+
+      <div v-if="plan" class="pl-out" :class="{ nope: !plan.runnable }">
+        <template v-if="plan.degraded">
+          <span class="dwarn">⚠ {{ plan.degraded }}</span>
+        </template>
+        <template v-else>
+          <div class="pl-meta">
+            <span class="strat">{{ plan.strategy }}</span>
+            <span v-if="plan.warrant_preview" class="epi-chip" :style="epiStyle(plan.warrant_preview)"
+                  title="the plan's warrant = its weakest step">
+              <i class="dot" :style="{ background: EPISTEMIC_COLORS[plan.warrant_preview] }" />warrant {{ plan.warrant_preview }}
+            </span>
+            <span class="rn" :class="{ ok: plan.runnable }">{{ plan.runnable ? '✓ runnable' : '✕ not runnable' }}</span>
+          </div>
+          <ol class="pl-steps">
+            <li v-for="(s, i) in plan.steps" :key="s.id" class="pl-step">
+              <span class="wf-idx">{{ i + 1 }}</span>
+              <span class="wf-id">{{ s.kind }}</span>
+              <span class="wf-kind">{{ s.backend }} · satisfies “{{ s.satisfies }}”</span>
+              <span class="epi-chip sm" :style="epiStyle(s.epistemic)">{{ s.epistemic }}</span>
+              <span v-if="!s.entitled" class="lockmini" title="not entitled">🔒</span>
+            </li>
+          </ol>
+          <div v-if="plan.unmet_capabilities?.length || plan.unmet_entitlements?.length" class="unmet">
+            <span v-if="plan.unmet_capabilities?.length">no kind provides: {{ plan.unmet_capabilities.join(', ') }}</span>
+            <span v-if="plan.unmet_entitlements?.length">not entitled: {{ plan.unmet_entitlements.join(', ') }}</span>
+          </div>
+          <button class="primary run-plan" :disabled="!plan.runnable || running" @click="runPlan">
+            <span v-if="running" class="spin" />▸ Run this plan
+          </button>
+        </template>
+      </div>
+    </section>
+
     <!-- ─────────────── the catalog: any compute, one door (the hero) ─────────────── -->
     <section class="reg">
       <div class="reg-head">
@@ -310,6 +396,34 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
 
 <style scoped>
 .cp { font: 14px/1.5 var(--ui); color: var(--ink); display: flex; flex-direction: column; gap: var(--sp-5); }
+
+/* ── planner ── */
+.planner { border: 1px solid var(--hairline); border-radius: var(--r-3); background: var(--surface); padding: var(--sp-4); }
+.pl-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: var(--sp-3); }
+.pl-head h2 { font-size: 16px; margin: 0; }
+.pl-head .sub { color: var(--muted); font-size: 12.5px; margin: 4px 0 0; max-width: 620px; }
+.pl-head .sub b { color: var(--ink-2); }
+.pl-head .wand { font-size: 26px; color: var(--accent); opacity: .8; line-height: 1; }
+.pl-in { display: flex; gap: 8px; }
+.pl-in input { flex: 1; border: 1px solid var(--hairline); border-radius: var(--r-2); background: var(--surface-2);
+  color: var(--ink); padding: 8px 12px; font-size: 13px; outline: none; }
+.pl-in input:focus { border-color: var(--accent); }
+.pl-out { margin-top: var(--sp-3); border: 1px solid var(--hairline); border-radius: var(--r-2); background: var(--ground); padding: var(--sp-3); }
+.pl-out.nope { border-color: color-mix(in srgb, var(--warn) 35%, var(--hairline)); }
+.pl-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.pl-meta .strat { font-family: var(--mono); font-size: 10.5px; color: var(--muted); background: var(--sunken); border-radius: var(--r-1); padding: 1px 7px; }
+.pl-meta .rn { font-size: 11px; font-weight: 700; color: var(--fail); }
+.pl-meta .rn.ok { color: var(--ok); }
+.pl-steps { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pl-step { display: flex; align-items: center; gap: 10px; font-size: 11.5px; padding: 6px 10px; border: 1px solid var(--hairline);
+  border-radius: var(--r-2); background: var(--surface); }
+.pl-step .wf-idx { font-family: var(--mono); font-size: 10px; color: var(--faint); width: 14px; }
+.pl-step .wf-id { font-weight: 700; color: var(--ink); }
+.pl-step .wf-kind { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
+.pl-step .lockmini { margin-left: auto; }
+.unmet { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--warn); margin-bottom: 10px; }
+.run-plan { margin-top: 2px; }
+.pl-out .dwarn { color: var(--warn); font-weight: 700; background: var(--warn-wash); border-radius: var(--r-1); padding: 2px 8px; font-size: 12px; }
 
 /* shared epistemic-warrant chip (coloured off the ramp) */
 .epi-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;
