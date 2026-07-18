@@ -10,7 +10,7 @@ const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_
 export type StudioSection =
   | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench
   | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation" // Knowledge engineering
-  | "operations"                                                                // Operations cockpit (WS#45–48/#31)
+  | "operations" | "compute"                                                    // Operations cockpit (WS#45–48/#31) + Universal Compute Plane
   | "governance"                                                                // Governance: ontology · actions · GAIA
   | "commons";                                                                  // Commons (WS#36–39)
 
@@ -809,6 +809,99 @@ export async function promoteWorldsignal(input: { project: string; signal: strin
   }
   if (!res.ok) throw writeError("promote failed", res.status);
   return await res.json();
+}
+
+// ── Universal Compute Plane — the compute-gateway: one governed door for ALL compute ──
+// A single catalog of compute KINDS (notebook, graph-query, spark, inference, …), each declaring its
+// backends, capabilities, a DEFAULT epistemic warrant, whether it executes user code, a live/declared
+// status and whether the caller is entitled. Every run returns a proof-carrying receipt (optionally
+// signed) + an epistemic status. The Studio BFF proxies to the gateway; unset BASE → honest STUB.
+export interface ComputeKind {
+  kind: string;
+  backends: string[];
+  default: string;              // default backend
+  capabilities: string[];
+  epistemic: string;            // default epistemic warrant for this kind's results (ramp mode)
+  executes_user_code: boolean;
+  status: "live" | "declared";  // live = runnable now; declared = catalogued, not yet provisioned
+  entitled: boolean;
+}
+export interface ComputeOutput { type: string; text?: string; data?: unknown; mime?: string | string[] }
+export interface ComputeReceipt {
+  id: string; kind: string; backend: string; epistemic_status: string;
+  inputs_sha?: string; outputs_sha?: string; prev?: string | null; ts?: number;
+  signature?: string | null; public_key?: string | null;   // Ed25519 over the in-toto statement
+  [k: string]: unknown;
+}
+// Zero-trust conformance (compute-gateway ⇄ OUR mcp-a2a-zero-trust kernel).
+export interface ComputeGrantCheck { operation?: string; grant_id?: string; result?: { valid?: boolean; reason?: string } }
+export interface ComputeAttestation { results?: { tpm_valid?: boolean; cosign_valid?: boolean; fido2_valid?: boolean } }
+export interface ComputeResultLite {
+  status: "ok" | "error" | "degraded" | "entitlement_required" | "grant_required";
+  kind: string; backend: string; epistemic_status: string;
+  outputs: ComputeOutput[];
+  receipt?: ComputeReceipt | null;
+  // the gateway returns the provenance subgraph itself (arrays), not counts.
+  graph_delta?: { nodes?: unknown[]; edges?: unknown[]; written?: boolean } | null;
+  degraded?: string | null;
+  error?: string | null;
+  entitlement_required?: boolean;
+  message?: string | null;              // gateway's pay-gate / grant message (top-level)
+  grant_check?: ComputeGrantCheck | null;
+  attestation?: ComputeAttestation | null;
+  memoized?: boolean;                   // served from the content-addressed compute memo
+}
+
+// STUB catalog — MIRRORS the real compute-gateway registry (backends + warrants) so the offline preview
+// never misrepresents the live plane. notebook/graph/spark are live; inference is declared (adapter wired,
+// endpoint unverified) and left un-entitled so the pay-gate card is demonstrable standalone.
+const STUB_COMPUTE_REGISTRY: { kinds: ComputeKind[] } = {
+  kinds: [
+    { kind: "notebook", backends: ["forge"], default: "forge",
+      capabilities: ["python", "r", "julia", "stateful-kernel"], epistemic: "derived",
+      executes_user_code: true, status: "live", entitled: true },
+    { kind: "graph-query", backends: ["hellgraph"], default: "hellgraph",
+      capabilities: ["label-query", "subgraph"], epistemic: "observed",
+      executes_user_code: false, status: "live", entitled: true },
+    { kind: "graph-stats", backends: ["hellgraph"], default: "hellgraph",
+      capabilities: ["counts", "analytics"], epistemic: "observed",
+      executes_user_code: false, status: "live", entitled: true },
+    { kind: "spark", backends: ["spark-runner"], default: "spark-runner",
+      capabilities: ["sql", "dataframe"], epistemic: "derived",
+      executes_user_code: true, status: "live", entitled: true },
+    { kind: "inference", backends: ["model-server"], default: "model-server",
+      capabilities: ["chat", "embed"], epistemic: "derived",
+      executes_user_code: false, status: "declared", entitled: false },
+  ],
+};
+
+export async function loadComputeRegistry(project: string): Promise<{ kinds: ComputeKind[] }> {
+  const b = nbBase();
+  if (!b) return STUB_COMPUTE_REGISTRY;
+  const r = await fetch(`${b}/api/studio/compute/registry?project=${encodeURIComponent(project)}`, { headers: { accept: "application/json" } }).catch(() => null);
+  if (!r || !r.ok) return STUB_COMPUTE_REGISTRY;
+  const d = await r.json();
+  return Array.isArray(d?.kinds) ? d : STUB_COMPUTE_REGISTRY;
+}
+
+export async function runCompute(input: { kind: string; spec: Record<string, unknown>; project: string; backend?: string }): Promise<ComputeResultLite> {
+  const b = nbBase();
+  // honest stub: no BASE → we do NOT fake a real result; the surface shows the compute plane isn't wired.
+  if (!b) return {
+    status: "degraded", kind: input.kind, backend: input.backend ?? "—",
+    epistemic_status: "hypothesis", outputs: [], receipt: null,
+    graph_delta: { nodes: [], edges: [] },
+    degraded: "compute plane not wired (dev preview)",
+  };
+  const r = await fetch(`${b}/api/studio/compute/run`, {
+    method: "POST", headers: { "Content-Type": "application/json", accept: "application/json" },
+    body: JSON.stringify(input),
+  });
+  // the gateway returns 200 with status:"entitlement_required"|"grant_required" for a soft gate; a 402 is
+  // also honoured for parity with a hard pay-gate. Either way the body carries the typed result.
+  if (r.status === 402) return (await r.json()) as ComputeResultLite;
+  if (!r.ok) throw new Error(`compute run failed (HTTP ${r.status})`);
+  return (await r.json()) as ComputeResultLite;
 }
 
 export async function loadStudio(projectId?: string): Promise<StudioBundle> {

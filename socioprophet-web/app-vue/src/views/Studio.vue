@@ -6,6 +6,7 @@ import StudioQuery from "../components/StudioQuery.vue";
 import StudioExperiments from "../components/StudioExperiments.vue";
 import StudioCommons from "../components/StudioCommons.vue";
 import StudioOps from "../components/StudioOps.vue";
+import StudioCompute from "../components/StudioCompute.vue";
 import StudioGovernance from "../components/StudioGovernance.vue";
 import StudioNotebooks from "../components/StudioNotebooks.vue";
 import LineageStrip from "../components/LineageStrip.vue";
@@ -61,6 +62,7 @@ const sections: { id: StudioSection; label: string; icon: string; group: string;
   { id: "query",       label: "Query",         icon: "⌗", group: "Knowledge engineering", blurb: "SPARQL / Cypher / Gremlin over the live kernel — results you can replay (proof-carrying) and whose facts carry epistemic status." },
   { id: "retrieval",   label: "Retrieval",     icon: "◎", group: "Knowledge engineering", blurb: "Fibered retrieval (PageIndex ⊕ HellGraph) · Graph-RAG · topic & semantic indexes." },
   { id: "generation",  label: "Generation",    icon: "✦", group: "Knowledge engineering", blurb: "Grounded generation & generation-tuning — New-Hope synthesis over the graph." },
+  { id: "compute",     label: "Compute",       icon: "⛩", group: "Operations", blurb: "The Universal Compute Plane — every kind of compute (notebook · graph · Spark · inference) through ONE governed door. Each run is entitlement-gated, zero-trust grant-checked, sealed into a signed, replayable receipt, and typed by epistemic warrant. Databricks welded one paradigm to one surface; this is the generalization — sovereign + multi-backend + proof-carrying." },
   { id: "operations",  label: "Operations",    icon: "⚙", group: "Operations", blurb: "The operations cockpit — run pipelines, promote models, browse the data catalog, submit pay-gated compute, and inspect GraphRAG communities. Every action proof-carrying; compute entitlement-gated (sovereign + multi-backend)." },
   { id: "governance",  label: "Governance",    icon: "⬡", group: "Operations", blurb: "The governance cockpit — browse the real Ontogenesis ontology (817 classes), invoke SHACL-validated ontology actions (Foundry's crown jewel, beaten), and work the GAIA world-signal promotion membrane where a promotion state IS an epistemic status. One discipline across the knowledge, human & Earth twins." },
   { id: "commons",     label: "Commons",       icon: "◆", group: "Commons", blurb: "The proof-carrying knowledge commons — FAIR+ metadata, sovereign DOIs, immutable preservation, ORCID/OpenAIRE + agent hooks, and epistemic-weighted community curation." },
@@ -100,6 +102,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   retrieval:   [{ label: "Query", hint: "run fibered retrieval" }, { label: "Rebuild index", hint: "re-embed" }, { label: "Use in notebook", hint: "attach retriever" }],
   generation:  [{ label: "Run", hint: "New-Hope grounded synthesis" }, { label: "→ Annotation set", hint: "into the workbench" }, { label: "→ Tune", hint: "generation-tuning" }],
   commons:     [{ label: "Cite", hint: "mint a sovereign DOI" }, { label: "Preserve", hint: "seal an immutable version" }, { label: "Export FAIR", hint: "schema.org / DataCite / PROV-O" }],
+  compute:     [{ label: "Run compute", hint: "any kind, one governed door" }, { label: "Verify receipts", hint: "signed, replayable chain" }, { label: "Capability registry", hint: "the agent action space" }],
   operations:  [{ label: "Run pipeline", hint: "governed run ledger" }, { label: "Promote model", hint: "staging → production" }, { label: "Submit compute", hint: "entitlement-gated execution" }],
   governance:  [{ label: "Invoke action", hint: "SHACL-validated writeback" }, { label: "Submit signal", hint: "GAIA world-signal" }, { label: "Promote", hint: "the epistemic membrane" }],
 };
@@ -210,6 +213,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 
         <!-- Notebooks = the governed notebook IDE (lattice-forge · receipt-per-cell) (#31) -->
         <StudioNotebooks v-if="section === 'notebooks'" :project="project" />
+        <!-- Compute = the Universal Compute Plane: any compute, one governed door → signed receipt + warrant (#848/#853) -->
+        <StudioCompute v-else-if="section === 'compute'" :project="project" />
         <!-- Graph section = the provenance-first explorer (KE-2) -->
         <StudioGraph v-else-if="section === 'graph'" :project="project" />
         <!-- Query section = the proof-carrying query IDE (WS#30) -->
@@ -232,15 +237,8 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
 
         <div v-else class="grid">
           <article v-for="it in items" :key="it.id" class="card" :class="{ sel: selected?.item.id === it.id }" @click="pick(it)">
-            <!-- notebooks -->
-            <template v-if="section === 'notebooks'">
-              <div class="row"><span class="name">{{ it.name }}</span><span class="pill" :class="it.status">{{ it.status }}</span></div>
-              <div class="sub">{{ it.runtime }} · {{ it.cells }} cells</div>
-              <code v-if="it.lastCell" class="mono">{{ it.lastCell }}</code>
-              <div class="chips"><span v-for="c in it.collaborators" :key="c" class="chip">{{ c }}</span></div>
-            </template>
-            <!-- data -->
-            <template v-else-if="section === 'data'">
+            <!-- data (notebooks/compute render as full-panel components above, never as grid cards) -->
+            <template v-if="section === 'data'">
               <div class="row"><span class="name">{{ it.name }}</span><span v-if="it.governed" class="pill ok">governed</span><span v-else class="pill warn">ungoverned</span></div>
               <div class="sub">{{ it.kind }}<span v-if="it.rows"> · {{ it.rows.toLocaleString() }} rows</span><span v-if="it.columns"> · {{ it.columns }} cols</span></div>
               <LineageStrip v-if="it.lineage" :steps="it.lineage" />
