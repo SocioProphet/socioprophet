@@ -15,6 +15,8 @@ import WorkstationDeploy from './pages/WorkstationDeploy.vue';
 import WorkstationServices from './pages/WorkstationServices.vue';
 import WorkstationTerminal from './pages/WorkstationTerminal.vue';
 import ModelLabs from './pages/ModelLabs.vue';
+import Studio from './pages/Studio.vue';
+import Discovery from './pages/Discovery.vue';
 import DataSearch from './pages/DataSearch.vue';
 import KnowledgeGraph from './pages/KnowledgeGraph.vue';
 import ForgeImport from './pages/ForgeImport.vue';
@@ -100,7 +102,7 @@ const explicitRoutes = [
   { path: '/capability/entity-analytics', component: PeopleDirectory },
   { path: '/capability/sentiment-analytics', component: SocialSignals },
   { path: '/capability/ontology-epistemology', component: KnowledgeGraph },
-  { path: '/capability/economic-prophet', component: EconomySectorBoard },
+  { path: '/capability/economic-prophet', component: CausalValuation },
   { path: '/research', component: ResearchList },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },
@@ -119,6 +121,8 @@ const explicitRoutes = [
   { path: '/workstation/services', component: WorkstationServices },
   { path: '/workstation/terminal', component: WorkstationTerminal },
   { path: '/ai/labs', component: ModelLabs },
+  { path: '/studio', component: Studio },
+  { path: '/discovery', component: Discovery },
   { path: '/data/search', component: DataSearch },
   { path: '/knowledge/graph', component: KnowledgeGraph },
   { path: '/forge/import', component: ForgeImport },

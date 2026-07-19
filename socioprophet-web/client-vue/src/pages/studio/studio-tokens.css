@@ -1,0 +1,87 @@
+/* Prophet Studio design tokens (Layer 0), SCOPED to the Studio subtree so the migrated
+   notebook/compute surfaces keep their intended look inside the dark cockpit shell without
+   clobbering the cockpit's own global tokens. Dark values (cockpit is always dark).
+   Epistemic ramp = the one saturated dimension (the moat, made visible). */
+.studio-scope {
+  --ground:#0b0f15; --sunken:#080b10; --surface:#141b24; --surface-2:#18202a;
+  --hairline:#232c38; --hairline-strong:#33404f;
+  --ink:#e8eef5; --ink-2:#b4c0cd; --muted:#8a97a5; --faint:#5d6a78;
+  --bar:#080b10; --bar-ink:#e8eef5; --bar-muted:#8a97a5; --bar-line:#1c242f;
+  --accent:#5b95f9; --accent-2:#3f83f8; --accent-wash:#16233b; --accent-ink:#bcd4ff;
+
+  --epi-hypothesis:#8592a3; --epi-observed:#5b95f9; --epi-derived:#a082f8;
+  --epi-verified:#2dd4bf; --epi-attested:#34d399; --epi-simulated:#e0975a; --epi-unknown:#4a5568;
+  --epi-hypothesis-wash:#1a2029; --epi-observed-wash:#14243c; --epi-derived-wash:#211a3a;
+  --epi-verified-wash:#0e2c2b; --epi-attested-wash:#0e2a22;
+
+  --ok:#3fb950; --warn:#d29922; --fail:#e5534b; --run:#5b95f9; --idle:#6b7684;
+  --ok-wash:#0f2417; --warn-wash:#241d0a; --fail-wash:#2a1315; --run-wash:#14243c;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px;
+  --r-1:3px; --r-2:5px; --r-3:8px; --pill:999px;
+  --e-1:0 1px 2px rgba(0,0,0,.4); --e-2:0 4px 14px rgba(0,0,0,.5); --e-3:0 12px 40px rgba(0,0,0,.6);
+  --canvas-dot:#1a212b;
+  --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ---- shared primitive utilities (scoped) ---------------------------------- */
+.studio-scope .epi-stripe { position:relative; }
+.studio-scope .epi-stripe::before {
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--epi, var(--epi-unknown)); border-radius:var(--r-1) 0 0 var(--r-1);
+}
+.studio-scope .epi-dot { display:inline-block; width:8px; height:8px; border-radius:var(--pill);
+  background:var(--epi, var(--epi-unknown)); flex:0 0 auto; }
+.studio-scope .epi-chip { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
+  letter-spacing:.01em; padding:1px 8px 1px 7px; border-radius:var(--r-1);
+  color:var(--epi, var(--epi-unknown)); background:var(--epi-wash, transparent);
+  border:1px solid color-mix(in srgb, var(--epi, var(--epi-unknown)) 40%, transparent); }
+.studio-scope .stat-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600;
+  padding:1px 8px; border-radius:var(--pill); color:#fff; background:var(--stat, var(--idle)); }
+.studio-scope .stat-chip.soft { color:var(--stat, var(--idle)); background:var(--stat-wash, var(--sunken)); }
+.studio-scope .tnum { font-variant-numeric: tabular-nums; }
+.studio-scope .mono { font-family: var(--mono); }
+
+/* ---- Prophet Studio KE-surface tokens + utilities (scoped) ----------------
+   The migrated Graph Explorer / Query / Analytics / GraphRAG / Resource / Reasoner /
+   Entity-Resolution / Ontology views use this vocabulary (--panel, .card, .btn, .tbl…). */
+.studio-scope {
+  --bg:#0b0e14; --panel:#121722; --panel-2:#161c28; --border:#232b3a; --border-2:#2e3849;
+  --text:#e6edf3; --warn:#f0b849; --bad:#ff6b6b; --good:#43d17a;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.studio-scope .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+.studio-scope .card + .card { margin-top: 1rem; }
+.studio-scope .card h3 { margin: 0 0 .3rem; font-size: .92rem; font-weight: 600; }
+.studio-scope .card .desc { color: var(--muted); font-size: .82rem; margin: 0 0 .8rem; }
+.studio-scope .grid { display: grid; gap: 1rem; }
+.studio-scope .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.studio-scope .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) { .studio-scope .grid.cols-2, .studio-scope .grid.cols-3 { grid-template-columns: 1fr; } }
+.studio-scope label.fld { display:block; color:var(--muted); font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .3rem; }
+.studio-scope textarea, .studio-scope input[type=text], .studio-scope select {
+  width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border-2); border-radius:8px;
+  padding:.55rem .65rem; font-family:var(--mono); font-size:.82rem; resize:vertical; }
+.studio-scope textarea:focus, .studio-scope input:focus, .studio-scope select:focus { outline:none; border-color:var(--accent); }
+.studio-scope button.btn { background:var(--accent); color:#04122e; border:0; border-radius:8px; padding:.5rem .9rem; font-weight:600; cursor:pointer; font-size:.84rem; }
+.studio-scope button.btn:hover { filter:brightness(1.08); }
+.studio-scope button.btn.ghost { background:transparent; color:var(--text); border:1px solid var(--border-2); }
+.studio-scope button.btn:disabled { opacity:.5; cursor:default; }
+.studio-scope .row { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+.studio-scope table.tbl { width:100%; border-collapse:collapse; font-size:.82rem; }
+.studio-scope table.tbl th { text-align:left; color:var(--muted); font-weight:500; border-bottom:1px solid var(--border-2); padding:.4rem .5rem; position:sticky; top:0; background:var(--panel); }
+.studio-scope table.tbl td { border-bottom:1px solid var(--border); padding:.4rem .5rem; font-family:var(--mono); vertical-align:top; }
+.studio-scope .scroll { overflow:auto; max-height:52vh; border:1px solid var(--border); border-radius:8px; }
+.studio-scope .pill { display:inline-block; padding:.1rem .5rem; border-radius:999px; font-size:.7rem; border:1px solid var(--border-2); color:var(--muted); }
+.studio-scope .pill.good { color:var(--good); border-color:#1e4d34; background:#0f2a1c; }
+.studio-scope .pill.bad { color:var(--bad); border-color:#4d1e1e; background:#2a0f0f; }
+.studio-scope .pill.accent { color:var(--accent); border-color:#23406e; background:#0f1c33; }
+.studio-scope .kpi { font-size:1.6rem; font-weight:700; letter-spacing:-.02em; }
+.studio-scope .kpi-l { color:var(--muted); font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; }
+.studio-scope code, .studio-scope .mono { font-family:var(--mono); }
+.studio-scope pre.out { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:.7rem; overflow:auto; font-size:.78rem; max-height:40vh; }
+.studio-scope .err { color:var(--bad); font-size:.82rem; }
+.studio-scope .muted { color:var(--muted); }
+.studio-scope a.link { color:var(--accent); cursor:pointer; text-decoration:none; }
+.studio-scope a.link:hover { text-decoration:underline; }

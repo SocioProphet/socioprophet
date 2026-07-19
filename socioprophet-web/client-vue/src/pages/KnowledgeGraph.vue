@@ -42,7 +42,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { graphSurface, graphHealth, type SurfaceResult, type GraphHealth } from '../services/agentMachineApi';
+// Reads the CANONICAL hellgraph-service (shared with the Prophet Studio Graph Explorer) — one graph
+// across every surface. Types still come from agentMachineApi (the surface contract is mirrored).
+import { graphSurface, graphHealth } from '../services/hellgraphApi';
+import type { SurfaceResult, GraphHealth } from '../services/agentMachineApi';
 import { navScopeForPath } from '../config/cockpitNav';
 
 const route = useRoute();

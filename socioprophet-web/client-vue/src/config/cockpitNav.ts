@@ -117,6 +117,7 @@ export const DOMAIN_MENU: NavGroup[] = [
     items: [
       { label: 'Knowledge Graph', to: '/knowledge/graph' },
       { label: 'Search', to: '/data/search' },
+      { label: 'Discovery', to: '/discovery' },
       { label: 'Living Ontology', to: '/ontology' },
       { label: 'Noetica Chat', to: '/noetica' },
       { label: 'Research Capture', to: '/research' },
@@ -200,6 +201,26 @@ export const OPERATOR_SHORTCUTS: NavLeaf[] = [
 // / Code Search collected under SourceOS. Noetica Chat and HolographMe moved OUT to
 // user-facing places (Knowledge menu and the user dropdown).
 export const AGENT_COCKPIT: NavGroup[] = [
+  {
+    label: 'Studio',
+    to: '/studio',
+    items: [
+      { label: 'Notebooks', to: '/studio?section=notebooks' },
+      { label: 'Compute Plane', to: '/studio?section=compute' },
+      { label: 'Graph Explorer', to: '/studio?section=graph' },
+      { label: 'Query Console', to: '/studio?section=query' },
+      { label: 'Analytics', to: '/studio?section=analytics' },
+      { label: 'GraphRAG', to: '/studio?section=graphrag' },
+      { label: 'Resource Browser', to: '/studio?section=resource' },
+      { label: 'Reasoner', to: '/studio?section=reasoner' },
+      { label: 'Entity Resolution', to: '/studio?section=er' },
+      { label: 'Ontology', to: '/studio?section=ontology' },
+      { label: 'Experiments', to: '/studio?section=experiments' },
+      { label: 'Operations', to: '/studio?section=operations' },
+      { label: 'Governance', to: '/studio?section=governance' },
+      { label: 'Commons', to: '/studio?section=commons' },
+    ],
+  },
   {
     label: 'Infrastructure',
     to: '/agentic-os',

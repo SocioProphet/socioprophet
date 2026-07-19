@@ -98,11 +98,11 @@ function money(n: number, c = 'AUD') {
 }
 const bounds = (p: string) => (p === 'lower_better' ? { min: -20, max: 0 } : { min: 0, max: 40 });
 
-const nodeById = computed(() => new Map((cv.value?.causal_graph.nodes ?? []).map((n) => [n.id, n])));
-const supplyNodes = computed(() => (cv.value?.causal_graph.nodes ?? []).filter((n) => n.labels.includes('SupplyChainNode')));
-const causalEdges = computed(() => (cv.value?.causal_graph.edges ?? []).filter((e) => ['CAUSES', 'CONSTRAINS', 'REDUCES'].includes(e.label)));
-const kpis = computed(() => [...(cv.value?.vdt.per_kpi_contribution ?? [])].sort((a, b) => b.value_contribution - a.value_contribution));
-const drivers = computed(() => Object.entries(cv.value?.vdt.per_driver_uplift ?? {}).sort((a, b) => b[1] - a[1]));
+const nodeById = computed(() => new Map((cv.value?.causal_graph?.nodes ?? []).map((n) => [n.id, n])));
+const supplyNodes = computed(() => (cv.value?.causal_graph?.nodes ?? []).filter((n) => (n.labels ?? []).includes('SupplyChainNode')));
+const causalEdges = computed(() => (cv.value?.causal_graph?.edges ?? []).filter((e) => ['CAUSES', 'CONSTRAINS', 'REDUCES'].includes(e.label)));
+const kpis = computed(() => [...(cv.value?.vdt?.per_kpi_contribution ?? [])].sort((a, b) => b.value_contribution - a.value_contribution));
+const drivers = computed(() => Object.entries(cv.value?.vdt?.per_driver_uplift ?? {}).sort((a, b) => b[1] - a[1]));
 const maxContribution = computed(() => Math.max(1, ...kpis.value.map((k) => k.value_contribution)));
 function drivenBy(id: string) {
   return causalEdges.value.filter((e) => e.from === id).map((e) => ({ kpi: nodeById.value.get(e.to)?.properties?.name ?? e.to, mechanism: e.properties?.mechanism ?? '', relation: e.label }));
@@ -202,9 +202,10 @@ const selectedLoc = computed(() => loc.value?.locations.find((l) => l.id === sel
         <div class="cv-card">
           <h3>1 · Supply chain → levers</h3>
           <div class="cv-sc" v-for="n in supplyNodes" :key="n.id">
-            <div class="cv-sc-name">{{ n.properties.name }}</div>
+            <div class="cv-sc-name">{{ n.properties?.name ?? n.id }}</div>
             <ul><li v-for="(d, i) in drivenBy(n.id)" :key="i"><code>{{ d.relation }}</code> <strong>{{ d.kpi }}</strong> — {{ d.mechanism }}</li></ul>
           </div>
+          <p v-if="!supplyNodes.length" class="cv-hint">Loading supply-chain graph…</p>
         </div>
         <div class="cv-card">
           <h3>2 · KPI contribution</h3>
@@ -244,9 +245,9 @@ const selectedLoc = computed(() => loc.value?.locations.find((l) => l.id === sel
         <div class="cv-grid2">
           <div class="cv-card">
             <svg :viewBox="`0 0 ${W} ${H}`" class="cv-map">
-              <polygon :points="outlinePoints" fill="#eef2f7" stroke="#cbd5e1" stroke-width="1" />
+              <polygon :points="outlinePoints" fill="rgba(255,255,255,0.045)" stroke="rgba(255,255,255,0.16)" stroke-width="1" />
               <circle v-for="l in loc.locations" :key="l.id" :cx="px(l.lng)" :cy="py(l.lat)" :r="dotR(l.modeled_weekly_footfall)"
-                :fill="dotColor(l.format)" :fill-opacity="selected===l.id ? 1 : 0.72" :stroke="selected===l.id ? '#0f172a' : 'white'" :stroke-width="selected===l.id ? 2 : 1"
+                :fill="dotColor(l.format)" :fill-opacity="selected===l.id ? 1 : 0.8" :stroke="selected===l.id ? '#edeef2' : '#0c0d11'" :stroke-width="selected===l.id ? 2 : 1"
                 style="cursor:pointer" @click="selected = l.id" />
             </svg>
             <p class="cv-hint">Dot size ∝ modeled weekly footfall · click a dot for detail · coordinates approximate.</p>
@@ -280,65 +281,66 @@ const selectedLoc = computed(() => loc.value?.locations.find((l) => l.id === sel
 </template>
 
 <style scoped>
-.cv { padding: 1rem 1.25rem; max-width: 1100px; font-family: ui-sans-serif, system-ui; }
-.cv-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .6; margin: 0; }
-.cv-title { font-size: 1.4rem; font-weight: 700; margin: .25rem 0; display: flex; align-items: center; gap: .5rem; }
-.cv-sub { margin: 0; opacity: .78; max-width: 820px; }
-.cv-pill { font-size: .7rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid #cbd5e1; text-transform: uppercase; }
-.cv-pill.live { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
-.cv-pill.unavailable { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-.cv-warn { border: 1px solid #fecaca; background: #fef2f2; color: #991b1b; border-radius: 10px; padding: .75rem; }
-.cv-studio { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: .75rem .85rem; margin-bottom: 1rem; }
+.cv { padding: 1rem 1.25rem; max-width: 1100px; font-family: ui-sans-serif, system-ui; color: var(--text); }
+.cv-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); margin: 0; }
+.cv-title { font-size: 1.4rem; font-weight: 700; margin: .25rem 0; display: flex; align-items: center; gap: .5rem; color: var(--text); }
+.cv-sub { margin: 0; color: var(--text-2); max-width: 820px; }
+.cv-pill { font-size: .7rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid var(--line-2); text-transform: uppercase; color: var(--text-2); }
+.cv-pill.live { background: rgba(16,185,129,.14); color: #6ee7b7; border-color: rgba(16,185,129,.4); }
+.cv-pill.unavailable { background: rgba(239,68,68,.14); color: #fca5a5; border-color: rgba(239,68,68,.4); }
+.cv-warn { border: 1px solid rgba(239,68,68,.4); background: rgba(239,68,68,.12); color: #fca5a5; border-radius: 10px; padding: .75rem; }
+.cv-studio { border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); padding: .75rem .85rem; margin-bottom: 1rem; }
 .cv-studio-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
-.cv-studio-eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; opacity: .6; }
-.cv-studio-toggle { font-size: .8rem; display: inline-flex; gap: .3rem; align-items: center; margin-left: auto; }
-.cv-studio-in { flex: 1; min-width: 180px; padding: .45rem .7rem; border: 1px solid #cbd5e1; border-radius: 8px; }
+.cv-studio-eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--text-3); }
+.cv-studio-toggle { font-size: .8rem; display: inline-flex; gap: .3rem; align-items: center; margin-left: auto; color: var(--text-2); }
+.cv-studio-in { flex: 1; min-width: 180px; padding: .45rem .7rem; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface-2); color: var(--text); }
 .cv-studio-ev { flex: 0 0 210px; }
-.cv-studio-sel { padding: .45rem .6rem; border: 1px solid #cbd5e1; border-radius: 8px; }
-.cv-studio-hint { font-size: .76rem; opacity: .6; margin: 0; }
+.cv-studio-sel { padding: .45rem .6rem; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface-2); color: var(--text); }
+.cv-studio-hint { font-size: .76rem; color: var(--text-3); margin: 0; }
 .cv-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .75rem; margin: 1rem 0; }
-.cv-metric { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: .85rem; display: flex; flex-direction: column; }
-.cv-m-label { font-size: .72rem; opacity: .6; text-transform: uppercase; letter-spacing: .04em; }
-.cv-m-val { font-size: 1.35rem; font-weight: 700; }
-.cv-metric.up .cv-m-val, .up { color: #065f46; }
-.cv-m-sub { font-size: .85rem; opacity: .7; }
-.cv-panel { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: .85rem; margin-bottom: 1rem; }
-.cv-panel-h { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; font-weight: 600; }
-.cv-tag { font-size: .7rem; font-weight: 600; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 999px; padding: .1rem .5rem; }
-.cv-hint { font-size: .8rem; opacity: .6; margin: .35rem 0; font-weight: 400; }
+.cv-metric { border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); padding: .85rem; display: flex; flex-direction: column; }
+.cv-m-label { font-size: .72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; }
+.cv-m-val { font-size: 1.35rem; font-weight: 700; color: var(--text); }
+.cv-metric.up { border-color: rgba(16,185,129,.4); }
+.cv-metric.up .cv-m-val, .up { color: #6ee7b7; }
+.cv-m-sub { font-size: .85rem; color: var(--text-2); }
+.cv-panel { border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); padding: .85rem; margin-bottom: 1rem; }
+.cv-panel-h { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; font-weight: 600; color: var(--text); }
+.cv-tag { font-size: .7rem; font-weight: 600; color: #6ee7b7; background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.4); border-radius: 999px; padding: .1rem .5rem; }
+.cv-hint { font-size: .8rem; color: var(--text-3); margin: .35rem 0; font-weight: 400; }
 .cv-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .5rem 1.25rem; margin-top: .5rem; }
-.cv-ctrl-h { display: flex; justify-content: space-between; font-size: .82rem; }
-.cv-ctrl input { width: 100%; }
-.cv-btn { padding: .4rem .8rem; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; }
-.cv-btn.primary { background: #10b981; border-color: #10b981; color: #fff; }
+.cv-ctrl-h { display: flex; justify-content: space-between; font-size: .82rem; color: var(--text-2); }
+.cv-ctrl input { width: 100%; accent-color: var(--accent); }
+.cv-btn { padding: .4rem .8rem; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface-2); color: var(--text); cursor: pointer; }
+.cv-btn.primary { background: #10b981; border-color: #10b981; color: #05271c; font-weight: 700; }
 .cv-btn:disabled { opacity: .5; cursor: default; }
 .cv-grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
 .cv-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-.cv-card { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: .85rem; }
-.cv-card h3 { margin: 0 0 .5rem; font-size: 1rem; }
-.cv-sc { border: 1px solid #eef2f7; border-radius: 10px; padding: .5rem; margin: .45rem 0; }
-.cv-sc-name { font-weight: 650; }
-.cv-sc ul { margin: .35rem 0 0; padding-left: 1rem; font-size: .82rem; }
-.cv-sc code, .cv-sc-name code { font-size: .72rem; background: #f1f5f9; padding: .05rem .3rem; border-radius: 4px; }
+.cv-card { border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); padding: .85rem; color: var(--text); }
+.cv-card h3 { margin: 0 0 .5rem; font-size: 1rem; color: var(--text); }
+.cv-sc { border: 1px solid var(--line); border-radius: 10px; padding: .5rem; margin: .45rem 0; }
+.cv-sc-name { font-weight: 650; color: var(--text); }
+.cv-sc ul { margin: .35rem 0 0; padding-left: 1rem; font-size: .82rem; color: var(--text-2); }
+.cv-sc code, .cv-sc-name code { font-size: .72rem; background: var(--surface-2); color: var(--text); padding: .05rem .3rem; border-radius: 4px; }
 .cv-kpi { margin: .5rem 0; }
-.cv-kpi-h { display: flex; justify-content: space-between; font-size: .85rem; }
-.cv-bar { height: 8px; background: #eef2f7; border-radius: 6px; margin-top: .25rem; overflow: hidden; }
+.cv-kpi-h { display: flex; justify-content: space-between; font-size: .85rem; color: var(--text-2); }
+.cv-bar { height: 8px; background: var(--surface-2); border-radius: 6px; margin-top: .25rem; overflow: hidden; }
 .cv-bar div { height: 100%; background: #10b981; }
-.cv-drv { display: flex; justify-content: space-between; padding: .5rem; border: 1px solid #eef2f7; border-radius: 10px; margin: .35rem 0; }
-.cv-drv.total { background: #ecfdf5; border-color: #a7f3d0; font-weight: 750; }
+.cv-drv { display: flex; justify-content: space-between; padding: .5rem; border: 1px solid var(--line); border-radius: 10px; margin: .35rem 0; color: var(--text); }
+.cv-drv.total { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.4); font-weight: 750; }
 .cv-traj { display: flex; align-items: flex-end; gap: .5rem; height: 130px; margin-top: 1rem; }
 .cv-traj-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
-.cv-traj-v { font-size: .7rem; font-weight: 600; color: #065f46; }
+.cv-traj-v { font-size: .7rem; font-weight: 600; color: #6ee7b7; }
 .cv-traj-bar { width: 100%; max-width: 46px; background: #10b981; border-radius: 6px 6px 0 0; min-height: 4px; margin-top: .2rem; }
-.cv-traj-y { font-size: .74rem; opacity: .6; margin-top: .25rem; }
+.cv-traj-y { font-size: .74rem; color: var(--text-3); margin-top: .25rem; }
 .cv-search { display: flex; gap: .5rem; margin: .5rem 0; }
-.cv-search input { flex: 1; padding: .45rem .7rem; border: 1px solid #cbd5e1; border-radius: 8px; }
-.cv-legend { font-size: .72rem; display: flex; gap: .6rem; align-items: center; font-weight: 400; }
+.cv-search input { flex: 1; padding: .45rem .7rem; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface-2); color: var(--text); }
+.cv-legend { font-size: .72rem; display: flex; gap: .6rem; align-items: center; font-weight: 400; color: var(--text-2); }
 .cv-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; }
 .cv-map { width: 100%; height: auto; }
 .cv-twin { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
 .cv-states { display: flex; flex-wrap: wrap; gap: .35rem; margin: .6rem 0; }
-.cv-states span { font-size: .78rem; padding: .15rem .5rem; border: 1px solid #e2e8f0; border-radius: 999px; }
-.cv-locsel { border-top: 1px solid #eef2f7; margin-top: .6rem; padding-top: .6rem; }
-.cv-lims { margin: .25rem 0 0; padding-left: 1rem; font-size: .82rem; opacity: .8; }
+.cv-states span { font-size: .78rem; padding: .15rem .5rem; border: 1px solid var(--line-2); border-radius: 999px; color: var(--text-2); }
+.cv-locsel { border-top: 1px solid var(--line); margin-top: .6rem; padding-top: .6rem; }
+.cv-lims { margin: .25rem 0 0; padding-left: 1rem; font-size: .82rem; color: var(--text-2); }
 </style>
