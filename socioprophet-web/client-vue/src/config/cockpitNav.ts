@@ -299,7 +299,15 @@ export const DRAWER_SECTIONS: DrawerSection[] = [
     id: 'working',
     label: 'Working surfaces',
     defaultOpen: true,
-    items: [...OPERATOR_SHORTCUTS, { label: 'Feed', to: '/feed' }],
+    // Studio + Notebooks surfaced here (always-visible, top of drawer) so they're findable
+    // without hunting through the operator-gated Studio group. Notebooks is the flagship
+    // workbench — it shouldn't be three clicks and an Operator-mode toggle away.
+    items: [
+      { label: 'Studio', to: '/studio' },
+      { label: 'Notebooks', to: '/studio?section=notebooks' },
+      ...OPERATOR_SHORTCUTS,
+      { label: 'Feed', to: '/feed' },
+    ],
   },
   {
     id: 'knowledge',
@@ -312,7 +320,13 @@ export const DRAWER_SECTIONS: DrawerSection[] = [
       { label: 'Noetica Chat', to: '/noetica' },
     ],
   },
-  ...AGENT_COCKPIT.map((g) => ({ id: _slug(g.label), label: g.label, defaultOpen: false, operator: true, items: g.items })),
+  // The Studio group (Notebooks, Compute, Graph Explorer, …) is a core user surface, so it's
+  // shown by default and NOT operator-gated. The rest (Infrastructure, Models & Pipelines,
+  // Workstation, SourceOS, Marketplace) stay Operator-mode sections.
+  ...AGENT_COCKPIT.map((g) => {
+    const isStudio = g.label === 'Studio';
+    return { id: _slug(g.label), label: g.label, defaultOpen: isStudio, operator: !isStudio, items: g.items };
+  }),
 ];
 
 // Flat, de-duplicated surface index for the ⌘K command palette — every reachable
