@@ -28,7 +28,7 @@ function fmt(e: unknown) { return e instanceof ApiError ? `${e.status}: ${e.mess
         <div><div class="kpi">{{ pr.edges }}</div><div class="kpi-l">edges</div></div>
       </div>
       <div class="scroll"><table class="tbl"><thead><tr><th>#</th><th>node</th><th>score</th></tr></thead>
-        <tbody><tr v-for="(t,i) in pr.top" :key="t.id"><td>{{ i+1 }}</td><td style="word-break:break-all">{{ t.id }}</td><td>{{ t.score }}</td></tr></tbody></table></div>
+        <tbody><tr v-for="(t,i) in pr.top" :key="t.id"><td>{{ Number(i)+1 }}</td><td style="word-break:break-all">{{ t.id }}</td><td>{{ t.score }}</td></tr></tbody></table></div>
     </div>
     <div class="card" v-if="cc">
       <div class="row" style="justify-content:space-between"><h3>Connected components</h3><span class="pill accent">{{ cc.backend }}</span></div>
