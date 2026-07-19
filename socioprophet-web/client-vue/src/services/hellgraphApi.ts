@@ -5,8 +5,9 @@
 // Base is the same-origin `/svc/hellgraph` proxy (see vite.config.ts) → :8090 in dev.
 // Endpoints mirror the agent-machine surface contract, so SurfaceResult/GraphHealth are reused.
 import type { SurfaceResult, GraphHealth } from './agentMachineApi';
+import { resolveBase } from '../config/cockpitRuntime';
 
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_HELLGRAPH_BASE ?? '/svc/hellgraph';
+const BASE = resolveBase('hellgraph', 'VITE_HELLGRAPH_BASE', '/svc/hellgraph');
 
 export const graphSurface = async (view = 'all', limit = 34, root = ''): Promise<SurfaceResult> => {
   const q = new URLSearchParams({ view, limit: String(limit) });

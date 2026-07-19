@@ -1,7 +1,8 @@
 // agentMachineApi — thin client to the local Noetica Agent Machine (sovereign, on-device).
 // Reuses the agent-machine /api/* endpoints unchanged; base is VITE_AGENT_MACHINE (default :8080 in dev).
 // These are local sovereign endpoints (no auth) — distinct from the authed /api/builds platform backend.
-const AM = (import.meta as { env?: Record<string, string> }).env?.VITE_AGENT_MACHINE ?? 'http://127.0.0.1:8080';
+import { resolveBase } from '../config/cockpitRuntime';
+const AM = resolveBase('agentMachine', 'VITE_AGENT_MACHINE', 'http://127.0.0.1:8080');
 
 export const AM_BASE = AM; // exported for SSE streaming endpoints (terminal/run, forge/import-local)
 

@@ -1,7 +1,8 @@
 // Real NLP / Information-Extraction backend — ie-engine (prophet-platform/apps/ie-engine).
 // Entities = live spaCy NER; relations = dependency parse; claims = assert/hedge; extraction can be
 // pushed into the canonical HellGraph. Same-origin `/svc/ie` proxy → :8086 in dev.
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_IE_BASE ?? '/svc/ie';
+import { resolveBase } from '../config/cockpitRuntime';
+const BASE = resolveBase('ie', 'VITE_IE_BASE', '/svc/ie');
 
 export interface Entity { text: string; type: string; spacy_label?: string; mentions?: number; count?: number }
 export interface Relation { from: string; relation: string; to: string }

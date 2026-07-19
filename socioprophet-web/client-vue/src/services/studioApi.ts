@@ -5,7 +5,8 @@
 // Everything is PROJECT-SCOPED: a projectId (Noetica proj- collection) threads through so notebooks/data/models/
 // experiments live in the same knowledge scope an agent team already retrieves.
 
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_API;
+import { resolveBase } from '../config/cockpitRuntime';
+const BASE = resolveBase('studio', 'VITE_STUDIO_API');
 
 export type StudioSection =
   | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench

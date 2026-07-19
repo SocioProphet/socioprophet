@@ -1,7 +1,8 @@
 // Real Algorithmic Trading backend — algo-engine (prophet-platform/apps/algo-engine).
 // Backtests run over real historical daily bars (Yahoo); paper execution is a real ledger
 // marked to the latest close. Same-origin `/svc/algo` proxy → :8085 in dev.
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_ALGO_BASE ?? '/svc/algo';
+import { resolveBase } from '../config/cockpitRuntime';
+const BASE = resolveBase('algo', 'VITE_ALGO_BASE', '/svc/algo');
 
 export interface StrategyDef { id: string; label: string; blurb: string; params: Record<string, any> }
 export interface Metrics { total_return: number; cagr: number; sharpe: number; max_drawdown: number; win_rate: number; vol: number }

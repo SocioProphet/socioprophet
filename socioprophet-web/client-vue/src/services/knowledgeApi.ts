@@ -2,8 +2,9 @@
 // root (sovereign-vault) and stores structure for GDS (knowledge-persist.ts). VITE_KNOWLEDGE_API unset → STUB mode
 // (no network) so the editor runs standalone/local-first until the backend route is wired.
 import type { KGraph } from "./knowledgeGraph";
+import { resolveBase } from '../config/cockpitRuntime';
 
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_KNOWLEDGE_API;
+const BASE = resolveBase('knowledge', 'VITE_KNOWLEDGE_API');
 
 export interface PersistResult { nodes: number; edges: number; sealed: boolean }
 

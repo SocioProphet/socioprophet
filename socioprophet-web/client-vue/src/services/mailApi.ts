@@ -33,7 +33,8 @@ export interface ScreenerItem {
   firstSeen: string;
 }
 
-const BASE = (import.meta as any).env?.VITE_MAIL_API || "";
+import { resolveBase } from '../config/cockpitRuntime';
+const BASE = resolveBase('mail', 'VITE_MAIL_API') ?? "";
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

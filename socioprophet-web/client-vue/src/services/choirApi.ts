@@ -2,8 +2,9 @@
 // (cites the focus) so the AI panel runs standalone until the choir endpoint is wired. The real call sends the
 // assembled grounded prompt and returns the model's answer (then checkGrounding validates the citations).
 import type { GroundedContext, ChoirAction } from "./choirGrounding";
+import { resolveBase } from '../config/cockpitRuntime';
 
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_CHOIR_API;
+const BASE = resolveBase('choir', 'VITE_CHOIR_API');
 
 export async function complete(prompt: string, grounded: GroundedContext, action: ChoirAction): Promise<string> {
   if (!BASE) {

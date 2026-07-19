@@ -1,7 +1,8 @@
 // Sherlock — sovereign Discovery search (sherlock-engine, Tantivy/Rust, no JVM). Same-origin
 // `/svc/sherlock` proxy → :8093 in dev. Ontology-driven full-text with BM25 + highlighted snippets;
 // results can be verified against HellGraph evidence via Holmes (see ieApi.verifyClaims).
-const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_SHERLOCK_BASE ?? '/svc/sherlock';
+import { resolveBase } from '../config/cockpitRuntime';
+const BASE = resolveBase('sherlock', 'VITE_SHERLOCK_BASE', '/svc/sherlock');
 
 export interface Hit { id: string; title: string; doctype: string; category: string; region: string; score: number; bm25: number; snippet: string }
 export interface SearchResult { query: string; engine: string; total: number; hits: Hit[]; error?: string }
