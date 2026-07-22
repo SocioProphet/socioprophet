@@ -18,6 +18,26 @@
       <span v-if="root" class="rooted">rooted at <b>{{ rootLabel }}</b></span>
     </div>
 
+    <!-- Org federation — membership state of the shared graph (super-peer, opt-in). Admins hand
+         the BASE KEY to users; users' machine keys are admitted operator-side ('admit' scope). -->
+    <div v-if="fed" class="fedcard" :class="{ off: !fed.enabled }">
+      <template v-if="fed.enabled">
+        <span class="feddot on" aria-hidden="true" />
+        <span class="fedtext"><b>Org federation live</b>
+          <template v-if="fed.health"> — {{ fed.health.writers }} writer{{ fed.health.writers === 1 ? '' : 's' }} · {{ fed.health.nodes }} federated nodes</template>
+          <template v-if="fed.authEnforced === false"> · <b class="warn">auth OFF (dev)</b></template>
+        </span>
+        <span v-if="fed.baseKey" class="fedkey">
+          join key <code :title="fed.baseKey">{{ fed.baseKey.slice(0, 12) }}…</code>
+          <button class="copy" @click="copyBaseKey">{{ copied ? 'copied' : 'copy' }}</button>
+        </span>
+      </template>
+      <template v-else>
+        <span class="feddot" aria-hidden="true" />
+        <span class="fedtext">Org federation off — activation runbook in deploy/values/hellgraph-service.yaml</span>
+      </template>
+    </div>
+
     <p v-if="error" class="error">{{ error }} — run the Agent Machine (dev:app) with the HellGraph sidecar.</p>
     <p v-else-if="!data" class="muted">Loading subgraph…</p>
     <p v-else-if="data.nodes.length === 0" class="muted">No nodes in this view yet — ingest interactions to populate the graph.</p>
@@ -44,7 +64,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 // Reads the CANONICAL hellgraph-service (shared with the Prophet Studio Graph Explorer) — one graph
 // across every surface. Types still come from agentMachineApi (the surface contract is mirrored).
-import { graphSurface, graphHealth } from '../services/hellgraphApi';
+import { graphSurface, graphHealth, federationState, type FederationState } from '../services/hellgraphApi';
 import type { SurfaceResult, GraphHealth } from '../services/agentMachineApi';
 import { navScopeForPath } from '../config/cockpitNav';
 
@@ -57,6 +77,12 @@ const view = ref<(typeof views)[number]>('all');
 const root = ref('');
 const data = ref<SurfaceResult | null>(null);
 const health = ref<GraphHealth | null>(null);
+const fed = ref<FederationState | null>(null);
+const copied = ref(false);
+function copyBaseKey() {
+  if (!fed.value?.baseKey) return;
+  void navigator.clipboard?.writeText(fed.value.baseKey).then(() => { copied.value = true; setTimeout(() => { copied.value = false; }, 1500); });
+}
 const error = ref('');
 
 const W = 720, H = 460;
@@ -73,6 +99,7 @@ onMounted(async () => {
   const r = typeof route.query.root === 'string' ? route.query.root : '';
   if (r) root.value = r;
   void load();
+  federationState().then((f) => { fed.value = f; }).catch(() => { fed.value = null; });  // card hides when unreachable
   try { health.value = await graphHealth(); } catch { /* health is best-effort */ }
 });
 
@@ -135,4 +162,15 @@ h1 { margin: 0; font-size: 1.25rem; } .head p { margin: 0.25rem 0 0; color: rgba
 .node text { fill: rgba(255, 255, 255, 0.72); font-size: 8.5px; pointer-events: none; } .node.featured text { fill: #fff; font-weight: 600; }
 .legend { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.5rem 0.9rem; border-top: 1px solid rgba(255, 255, 255, 0.08); }
 .lg { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; color: rgba(255, 255, 255, 0.6); text-transform: capitalize; } .lg i { width: 9px; height: 9px; border-radius: 50%; }
+
+/* org federation card — quiet strip; state carried by the dot + one line of text */
+.fedcard { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--border-subtle-01, #e0e0e0); border-radius: 8px; font-size: 12.5px; }
+.fedcard.off { color: var(--text-helper, #8d9196); }
+.feddot { width: 8px; height: 8px; border-radius: 999px; background: var(--border-strong-01, #c6c6c6); flex: none; }
+.feddot.on { background: #24a148; }
+.fedtext { min-width: 0; }
+.fedtext .warn { color: #b28600; }
+.fedkey { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--text-secondary, #525252); }
+.fedkey code { font-size: 11px; }
+.copy { border: 1px solid var(--border-subtle-01, #e0e0e0); background: none; border-radius: 6px; padding: 1px 8px; font-size: 11px; cursor: pointer; color: inherit; }
 </style>

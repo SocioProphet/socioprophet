@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { loadStudio, loadReceipts, mintCitation, SECTION_COUNT, EPISTEMIC_COLORS, type StudioBundle, type StudioSection, type Receipts, type Citation } from "../services/studioApi";
 import StudioGraph from "../components/StudioGraph.vue";
+import StudioDocuments from "../components/StudioDocuments.vue";
 import StudioQuery from "../components/StudioQuery.vue";
 import StudioExperiments from "../components/StudioExperiments.vue";
 import StudioCommons from "../components/StudioCommons.vue";
@@ -59,6 +60,7 @@ const sections: { id: StudioSection; label: string; icon: string; group: string;
   { id: "extraction",  label: "Extraction",    icon: "⛏", group: "Knowledge engineering", blurb: "Pull knowledge into the project graph — Holmes entities/relations, Sherlock federated search, governed ingest." },
   { id: "ontology",    label: "Ontology",      icon: "⬡", group: "Knowledge engineering", blurb: "The schema & alignment layer — Ontogenesis classes, relations, KKO alignment." },
   { id: "graph",       label: "Graph",         icon: "⧉", group: "Knowledge engineering", blurb: "The project knowledge graph — HellGraph, gremlin/sparql, grounded to your docs." },
+  { id: "documents",   label: "Documents",     icon: "▤", group: "Knowledge engineering", blurb: "What was ingested — every document and the linked knowledge it yielded, doc_sha provenance per fact." },
   { id: "query",       label: "Query",         icon: "⌗", group: "Knowledge engineering", blurb: "SPARQL / Cypher / Gremlin over the live kernel — results you can replay (proof-carrying) and whose facts carry epistemic status." },
   { id: "retrieval",   label: "Retrieval",     icon: "◎", group: "Knowledge engineering", blurb: "Fibered retrieval (PageIndex ⊕ HellGraph) · Graph-RAG · topic & semantic indexes." },
   { id: "generation",  label: "Generation",    icon: "✦", group: "Knowledge engineering", blurb: "Grounded generation & generation-tuning — New-Hope synthesis over the graph." },
@@ -96,6 +98,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
   tuning:      [{ label: "Register model", hint: "→ model zoo" }, { label: "Logs", hint: "job status" }, { label: "Cancel", hint: "cancel job" }],
   experiments: [{ label: "Re-run", hint: "reproduce end-to-end" }, { label: "Provenance", hint: "in-toto chain" }, { label: "Publish", hint: "publication artifact" }],
   extraction:  [{ label: "Run extraction", hint: "Holmes/Sherlock → project graph" }, { label: "View in graph", hint: "open the graph" }, { label: "Share to team", hint: "in the project collection" }],
+  documents:   [{ label: "View in graph", hint: "the doc's subgraph in the explorer" }, { label: "Provenance", hint: "every fact carries its doc_sha" }],
   ontology:    [{ label: "Edit ontology", hint: "Ontogenesis" }, { label: "Align", hint: "map to KKO / project" }, { label: "Apply to graph", hint: "re-type entities" }],
   graph:       [{ label: "Open graph", hint: "HellGraph gremlin/sparql" }, { label: "Query", hint: "graph-RAG" }, { label: "Export", hint: "sub-graph" }],
   query:       [{ label: "Run", hint: "SPARQL/Cypher/Gremlin over the kernel" }, { label: "Replay", hint: "re-evaluate by query hash" }, { label: "Export", hint: "results + proof" }],
@@ -217,6 +220,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
         <StudioCompute v-else-if="section === 'compute'" :project="project" />
         <!-- Graph section = the provenance-first explorer (KE-2) -->
         <StudioGraph v-else-if="section === 'graph'" :project="project" />
+        <StudioDocuments v-else-if="section === 'documents'" :project="project" />
         <!-- Query section = the proof-carrying query IDE (WS#30) -->
         <StudioQuery v-else-if="section === 'query'" :project="project" />
         <!-- Experiments = runs as proof-carrying graph facts (WS#32) -->

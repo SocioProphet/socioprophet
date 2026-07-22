@@ -9,7 +9,7 @@ const BASE = (import.meta as { env?: Record<string, string> }).env?.VITE_STUDIO_
 
 export type StudioSection =
   | "notebooks" | "data" | "models" | "tuning" | "experiments"                 // Workbench
-  | "extraction" | "ontology" | "graph" | "query" | "retrieval" | "generation" // Knowledge engineering
+  | "extraction" | "ontology" | "graph" | "documents" | "query" | "retrieval" | "generation" // Knowledge engineering
   | "operations" | "compute"                                                    // Operations cockpit (WS#45–48/#31) + Universal Compute Plane
   | "governance"                                                                // Governance: ontology · actions · GAIA
   | "commons";                                                                  // Commons (WS#36–39)
@@ -177,6 +177,34 @@ const STUB_GRAPH: GraphView = {
   ],
   count: 5, edge_count: 6, epistemic_distribution: { verified: 1, observed: 2, derived: 1, hypothesis: 1 }, stub: true,
 };
+
+// ── documents view: what was ingested and how much linked knowledge each doc yielded ──
+export interface StudioDocument {
+  doc_sha: string; filename?: string; file_sha?: string; source?: string; extractor?: string;
+  entities: number; edges: number; sample: string[];
+}
+export interface DocumentsView {
+  project: string; documents: StudioDocument[]; count: number;
+  undocumented_nodes: number; degraded?: string | null; stub?: boolean;
+}
+
+const STUB_DOCUMENTS: DocumentsView = {
+  project: "demo",
+  documents: [
+    { doc_sha: "d3adb33fcafe0001", filename: "gyg-fy26-pack.pdf", extractor: "lattice-studio/ie-pipeline-v1",
+      entities: 12, edges: 7, sample: ["Guzman & Gomez", "Sydney", "Steven Marks"] },
+    { doc_sha: "0ddba11deadf0002", filename: "cmg-q1-earnings.htm", extractor: "lattice-studio/ie-pipeline-v1",
+      entities: 9, edges: 4, sample: ["Chipotle", "Total revenue"] },
+  ],
+  count: 2, undocumented_nodes: 3, stub: true,
+};
+
+export async function loadDocuments(project: string): Promise<DocumentsView> {
+  if (!BASE) return STUB_DOCUMENTS;
+  const res = await fetch(`${BASE.replace(/\/$/, "")}/api/studio/documents?project=${encodeURIComponent(project)}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`documents load failed: ${res.status}`);
+  return (await res.json()) as DocumentsView;
+}
 
 export async function loadGraph(project: string): Promise<GraphView> {
   if (!BASE) return STUB_GRAPH;
