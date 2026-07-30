@@ -179,15 +179,21 @@ const nlBootPlan = (deviceId: string, buildId: string, stages: any[]) => ({
 // scaled instances or serverless cold starts, because `_bootProofSeq` resets to 0 in
 // each process and Date.now() readily matches across them. Combined with the same-device
 // key, an id like `boot-proof:dev-1-172890123-0` could easily be minted by two workers
-// simultaneously. Add a process-unique random suffix (crypto.randomUUID short-form) so
-// ids are globally unique, not just per-process. The sequence stays for readability and
-// as a tiebreaker within a single process's tick. `bootedAt` still carries wall time.
+// simultaneously. Add a process-unique random suffix so ids are globally unique, not
+// just per-process. The sequence stays for readability and as a tiebreaker within a
+// single process's tick. `bootedAt` still carries wall time.
+//
+// Copilot round-3: the earlier 8-hex-char slice gave only 32 bits of process entropy —
+// birthday collision at ~65k concurrent process nonces (very reachable in a serverless
+// deployment over a deployment's lifetime), and Firestore treats colliding ids as
+// silent overwrites of the earlier boot-proof. Use 24 hex chars (96 bits of entropy)
+// so the birthday bound moves to ~2^48 processes — well past any realistic fleet.
 const crypto = require("crypto");
-const _bootProofNonce = crypto.randomUUID().slice(0, 8); // once per process — 32 bits of process entropy
+const _bootProofNonce = crypto.randomBytes(12).toString("hex"); // once per process — 96 bits of process entropy
 let _bootProofSeq = 0;
 const bootProofRecord = (deviceId: string, planRef: string, outcome: string) => ({
   // Deterministic-shape id: `boot-proof:{device}-{ms}-{seq}-{procNonce}`. Every id is
-  // unique across every replica by the procNonce even if seq and ms collide.
+  // unique across every replica by the 96-bit procNonce even if seq and ms collide.
   id: `urn:srcos:boot-proof:${lc(deviceId)}-${Date.now()}-${_bootProofSeq++}-${_bootProofNonce}`,
   type: "BootProofRecord",
   specVersion: SPEC_VERSION,
