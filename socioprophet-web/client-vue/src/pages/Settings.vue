@@ -32,13 +32,27 @@ const savedNote = ref('');
 // Everything below binds REAL planes: the evidence fabric's receipts feed and the
 // agent-machine governance ledger. Unreachable planes render as unreachable — no
 // invented numbers.
+// Page size for the receipts feed. Named because it caps how much of the ledger the
+// operator sees; a future paging control derives from this. The receipt-hash preview
+// length is bounded here for the same reason — a 60-char hash in the row would push
+// the layout wider than the settings shell.
+const RECEIPT_PAGE_SIZE = 8;
+const RECEIPT_PREVIEW_LEN = 18;
 const receipts = ref<Receipts | null>(null);
 const receiptsErr = ref('');
 const decisions = ref<GovDecisionRecord[] | null>(null);
 const decisionsErr = ref('');
 onMounted(async () => {
-  try { receipts.value = await loadReceipts(8); } catch (e) { receiptsErr.value = e instanceof Error ? e.message : String(e); }
-  try { decisions.value = (await govDecisions()).decisions; } catch (e) { decisionsErr.value = e instanceof Error ? e.message : String(e); }
+  // The two feeds are independent — a slow governance ledger must not delay receipts,
+  // and vice versa. Promise.allSettled so one failing does not abort the other.
+  const [rReceipts, rDecisions] = await Promise.allSettled([
+    loadReceipts(RECEIPT_PAGE_SIZE),
+    govDecisions(),
+  ]);
+  if (rReceipts.status === 'fulfilled') receipts.value = rReceipts.value;
+  else receiptsErr.value = rReceipts.reason instanceof Error ? rReceipts.reason.message : String(rReceipts.reason);
+  if (rDecisions.status === 'fulfilled') decisions.value = rDecisions.value.decisions;
+  else decisionsErr.value = rDecisions.reason instanceof Error ? rDecisions.reason.message : String(rDecisions.reason);
 });
 
 function saveConnections() {
@@ -140,12 +154,12 @@ function saveConnections() {
         <span v-if="receipts">
           <span class="st-pill" :class="{ ok: receipts.services_reachable > 0 }">{{ receipts.services_reachable }}/{{ Object.keys(receipts.services).length }} reachable</span>
         </span>
-        <span v-else-if="receiptsErr" class="st-mesh"><span class="st-dot"></span>evidence fabric unreachable</span>
+        <span v-else-if="receiptsErr" class="st-mesh" :title="receiptsErr"><span class="st-dot"></span>evidence fabric: {{ receiptsErr }}</span>
         <span v-else class="st-hint-inline">loading…</span>
       </div>
 
       <div v-if="receipts && receipts.receipts.length" class="st-receipts">
-        <div v-for="r in receipts.receipts" :key="r.service + r.correlation_id" class="st-receipt">
+        <div v-for="r in receipts.receipts" :key="`${r.service}:${r.correlation_id}`" class="st-receipt">
           <span class="st-receipt-svc">{{ r.service }}</span>
           <span class="st-receipt-kind">{{ r.kind ?? '—' }}</span>
           <span class="st-receipt-verdict" :class="{ ok: r.verdict === 'ok' || r.verdict === 'sound' || r.verdict === 'merged' }">{{ r.verdict ?? '—' }}</span>
@@ -156,11 +170,11 @@ function saveConnections() {
       <div class="st-row" style="margin-top:.5rem;">
         <span class="st-label">Governed decisions (agent machine)</span>
         <span v-if="decisions" class="st-pill">{{ decisions.length }} on ledger</span>
-        <span v-else-if="decisionsErr" class="st-mesh"><span class="st-dot"></span>agent machine unreachable</span>
+        <span v-else-if="decisionsErr" class="st-mesh" :title="decisionsErr"><span class="st-dot"></span>agent machine: {{ decisionsErr }}</span>
         <span v-else class="st-hint-inline">loading…</span>
       </div>
       <div v-if="decisions && decisions.length" class="st-hint" style="margin-top:.25rem;">
-        Latest: <code>{{ decisions[decisions.length - 1]!.decision }}</code> on run <code>{{ decisions[decisions.length - 1]!.run_id }}</code> by {{ decisions[decisions.length - 1]!.actor }} — receipt {{ decisions[decisions.length - 1]!.receipt.slice(0, 18) }}…
+        Latest: <code>{{ decisions[decisions.length - 1]!.decision }}</code> on run <code>{{ decisions[decisions.length - 1]!.run_id }}</code> by {{ decisions[decisions.length - 1]!.actor }} — receipt {{ decisions[decisions.length - 1]!.receipt.slice(0, RECEIPT_PREVIEW_LEN) }}…
       </div>
 
       <p class="st-hint">Per-provider token spend lands here once the mesh conductor exports per-key metering; the receipts feed above is the source it will roll up from.</p>
