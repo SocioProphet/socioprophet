@@ -22,10 +22,10 @@ on:
 
 # Least privilege — read-only. Without this block the job inherits the repo default,
 # which on some installs is write-all: a supply-chain compromise of any Python transitive
-# dep in the validate step would then get a token that can push to master. The step only
-# runs `bash ci/validate_grlplus_*.sh` on a checked-out tree, which needs contents:read
-# and nothing else. Sibling workflows (client-vue-product-build, builder-contract-tests,
-# app-vue-deploy) declare the same block for the same reason.
+# dep in the validate step would then get a token that can push to the default branch.
+# The step only runs `bash ci/validate_grlplus_*.sh` on a checked-out tree, which needs
+# contents:read and nothing else. Sibling workflows (client-vue-product-build,
+# builder-contract-tests, app-vue-deploy) declare the same block for the same reason.
 permissions:
   contents: read
 

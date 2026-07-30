@@ -24,7 +24,7 @@ on:
 
 # Least privilege — read-only. Same reasoning as validate-grlplus-exports.yml: without
 # this the job inherits the repo default (write-all on some installs), so a transitive
-# Python dep compromise gets a token that can push master.
+# Python dep compromise gets a token that can push to the default branch.
 permissions:
   contents: read
 
