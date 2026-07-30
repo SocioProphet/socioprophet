@@ -22,6 +22,12 @@ on:
       - 'ci/validate_grlplus_*.sh'
       - '.github/workflows/validate-grlplus-export-snapshots.yml'
 
+# Least privilege — read-only. Same reasoning as validate-grlplus-exports.yml: without
+# this the job inherits the repo default (write-all on some installs), so a transitive
+# Python dep compromise gets a token that can push master.
+permissions:
+  contents: read
+
 jobs:
   validate-grlplus-export-snapshots:
     runs-on: ubuntu-latest
