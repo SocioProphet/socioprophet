@@ -3,8 +3,12 @@ default_branch: master
 docs:
   deploy_branches:
     - master
-  transitional_allowed_branches:
-    - main
+  # `transitional_allowed_branches: [main]` used to excuse the `main`-targeting
+  # docs-pages.yml while docs-pages-master.yml was introduced beside it. That
+  # transition is complete: docs-pages.yml has been removed, this repo has no
+  # `main` branch, and leaving the exemption in place is what let a dead
+  # workflow sit state=active with 0 runs for 3.5 months. Do not reintroduce
+  # it -- retarget the workflow instead.
   nav_exceptions:
     - docs/guide/legal-entity-reference-fabric.md
 

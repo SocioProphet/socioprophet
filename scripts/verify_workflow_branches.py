@@ -52,9 +52,26 @@ def main() -> int:
         push = on_block.get('push', {}) if isinstance(on_block, dict) else {}
         if not isinstance(push, dict):
             push = {}
+        pull = on_block.get('pull_request', {}) if isinstance(on_block, dict) else {}
+        if not isinstance(pull, dict):
+            pull = {}
         branches = set(normalize_branches(push.get('branches')))
         text = wf.read_text(encoding='utf-8')
         is_docs_deploy = 'Deploy Docs' in text or 'upload-pages-artifact' in text or 'deploy-pages' in text
+
+        # Dead-trigger rule. A branch filter that omits the default branch can
+        # never fire on the default branch. Two workflows shipped that way
+        # (agentplane-ci.yml, docs-pages.yml) and sat state=active with 0 runs
+        # for months, because nothing checked the general case -- only the
+        # docs-deploy and check/gitleaks special cases below. An empty/absent
+        # filter is fine: that means "all branches".
+        for event, cfg in (('push', push), ('pull_request', pull)):
+            declared = set(normalize_branches(cfg.get('branches')))
+            if declared and default_branch not in declared:
+                problems.append(
+                    f'{wf}: on.{event}.branches {sorted(declared)} omits default branch '
+                    f'{default_branch!r}, so this trigger can never fire'
+                )
 
         if wf.name in {'check.yml', 'gitleaks.yml'}:
             if default_branch not in branches:

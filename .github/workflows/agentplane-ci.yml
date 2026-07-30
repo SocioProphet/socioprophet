@@ -1,10 +1,31 @@
-name: ci
+name: agentplane-ci
+
+# This file is the repo-root copy of agentplane/.github/workflows/ci.yml, which was
+# vendored in from a standalone repo whose default branch was `main`. This repo's
+# default branch is `master` and no `main` branch exists, so the original trigger
+# could never fire (0 runs between 2026-02-11 and 2026-07-29). The step commands
+# were also relative to the agentplane/ subtree, so they are run from there via
+# `defaults.run.working-directory`. Path filters follow the sibling
+# agentplane-deployment-invariants.yml.
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
+    paths:
+      - "agentplane/**"
+      - ".github/workflows/agentplane-ci.yml"
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
+    paths:
+      - "agentplane/**"
+      - ".github/workflows/agentplane-ci.yml"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: agentplane
 
 jobs:
   lint:
