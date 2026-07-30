@@ -50,3 +50,4 @@ marketing/public/documentation/*.html
 marketing/public/documentation/*.css
 marketing/public/documentation/*.json
 marketing/public/documentation/icon.png
+/docs/.vitepress/publish/
