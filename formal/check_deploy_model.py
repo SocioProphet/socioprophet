@@ -3,6 +3,26 @@ from __future__ import annotations
 
 BUNDLES = ("A", "B")
 
+
+class DeployModelViolation(AssertionError):
+    """A deploy-model invariant failed during state-space exploration."""
+
+
+def require(condition: object, message: str) -> None:
+    """Invariant check that survives `python -O`.
+
+    `inv()` IS the proof obligation of this model checker: it is the only thing
+    standing between the explored state space and the claim printed at the end.
+    Written with bare `assert`, every one of those obligations was deleted by
+    `python -O` while `explore()` still walked the full state space and printed
+    `{"status": "PASS", "states_explored": N}` — a formal check reporting PASS
+    for invariants it never evaluated. The failure mode is silent and total: no
+    error, no diagnostic, a green run, and a deploy model nobody verified.
+    A check a runtime flag can switch off is not a check.
+    """
+    if not condition:
+        raise DeployModelViolation(message)
+
 base_exists = {"A": True, "B": True}
 base_lane = {"A": "staging", "B": "prod"}
 base_closed = {"A": True, "B": True}
@@ -23,12 +43,12 @@ def inv(state):
     for p in ("current-staging", "current-prod", "previous-good"):
         b = ptr[p]
         if b is not None:
-            assert exists[b], f"{p} points to non-existent bundle"
-            assert closed[b], f"{p} points to non-closed bundle"
-            assert coherent[b], f"{p} points to incoherent bundle"
-            assert replayable[b], f"{p} points to non-replayable bundle"
+            require(exists[b], f"{p} points to non-existent bundle")
+            require(closed[b], f"{p} points to non-closed bundle")
+            require(coherent[b], f"{p} points to incoherent bundle")
+            require(replayable[b], f"{p} points to non-replayable bundle")
     if ptr["current-prod"] is not None:
-        assert lane[ptr["current-prod"]] == "prod", "current-prod must point to prod-lane bundle"
+        require(lane[ptr["current-prod"]] == "prod", "current-prod must point to prod-lane bundle")
 
 
 def next_states(state):

@@ -13,6 +13,24 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 BUILDER_PATH = ROOT / "scripts" / "build_event_orchestration_fixture.py"
 
 
+class SmokeFailure(RuntimeError):
+    """A round-trip assertion on the built fixture failed."""
+
+
+def require(condition: object, message: str) -> None:
+    """Check that survives `python -O`.
+
+    These are the only statements that inspect what was actually written to
+    disk. Under `python -O` every `assert` here was stripped, the function ran
+    to completion and printed "event orchestration fixture builder smoke
+    passed" for a fixture whose readOnly flag, record count and admission
+    summary had gone entirely unread. The smoke test reported success for work
+    it never checked.
+    """
+    if not condition:
+        raise SmokeFailure(message)
+
+
 def load_builder() -> Any:
     spec = importlib.util.spec_from_file_location("build_event_orchestration_fixture", BUILDER_PATH)
     if spec is None or spec.loader is None:
@@ -136,11 +154,20 @@ def main() -> int:
             raise SystemExit("fixture validation failed: " + "; ".join(errors))
         builder.write_json(out, fixture)
         reloaded = json.loads(out.read_text(encoding="utf-8"))
-        assert reloaded["readOnly"] is True
-        assert reloaded["mode"] == "fixture"
-        assert len(reloaded["eventCapabilityRecords"]) == 3
-        assert reloaded["agentplaneAdmission"]["summary"]["invalid"] == 0
-        assert reloaded["sourceosQueue"]["non_mutating"] is True
+        require(reloaded["readOnly"] is True, "round-tripped fixture must stay readOnly")
+        require(reloaded["mode"] == "fixture", "round-tripped fixture must stay in fixture mode")
+        require(
+            len(reloaded["eventCapabilityRecords"]) == 3,
+            f"expected 3 eventCapabilityRecords, got {len(reloaded['eventCapabilityRecords'])}",
+        )
+        require(
+            reloaded["agentplaneAdmission"]["summary"]["invalid"] == 0,
+            "agentplane admission must report zero invalid records",
+        )
+        require(
+            reloaded["sourceosQueue"]["non_mutating"] is True,
+            "sourceos queue must stay non-mutating",
+        )
     print("event orchestration fixture builder smoke passed")
     return 0
 
