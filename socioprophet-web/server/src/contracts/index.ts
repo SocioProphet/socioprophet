@@ -173,12 +173,22 @@ const nlBootPlan = (deviceId: string, buildId: string, stages: any[]) => ({
 // The id used to be `boot-proof:{deviceId}-{Date.now()}`, so two boot-proofs from the
 // same device in the same millisecond (retry loop, rapid stage transitions, batched
 // fleet callback) minted identical URNs and the second silently overwrote the first in
-// Firestore. Adding a per-call sequence — same pattern the sibling `eventEnvelope`
-// already uses below — makes every id unique per-tick without depending on cross-tick
-// clock resolution. `bootedAt` still carries wall time for auditors.
+// Firestore.
+//
+// Copilot round-2: a per-process sequence alone still collides across horizontally
+// scaled instances or serverless cold starts, because `_bootProofSeq` resets to 0 in
+// each process and Date.now() readily matches across them. Combined with the same-device
+// key, an id like `boot-proof:dev-1-172890123-0` could easily be minted by two workers
+// simultaneously. Add a process-unique random suffix (crypto.randomUUID short-form) so
+// ids are globally unique, not just per-process. The sequence stays for readability and
+// as a tiebreaker within a single process's tick. `bootedAt` still carries wall time.
+const crypto = require("crypto");
+const _bootProofNonce = crypto.randomUUID().slice(0, 8); // once per process — 32 bits of process entropy
 let _bootProofSeq = 0;
 const bootProofRecord = (deviceId: string, planRef: string, outcome: string) => ({
-  id: `urn:srcos:boot-proof:${lc(deviceId)}-${Date.now()}-${_bootProofSeq++}`,
+  // Deterministic-shape id: `boot-proof:{device}-{ms}-{seq}-{procNonce}`. Every id is
+  // unique across every replica by the procNonce even if seq and ms collide.
+  id: `urn:srcos:boot-proof:${lc(deviceId)}-${Date.now()}-${_bootProofSeq++}-${_bootProofNonce}`,
   type: "BootProofRecord",
   specVersion: SPEC_VERSION,
   bootPlanRef: planRef,
