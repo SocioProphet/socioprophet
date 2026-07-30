@@ -3,12 +3,22 @@
 // mesh.socioprophet.ai is the Model Choir / Conductor: an OpenAI-compatible gateway
 // (GET /v1/models, POST /v1/chat/completions) that routes model=prophet-mesh to a
 // vLLM seat. /v1/models is open; chat requires the mesh bearer token (MESH_AUTH_TOKEN,
-// k8s secret prophet-mesh-auth). The operator pastes the token in Settings → Connections;
-// it's stored per-browser and never committed.
+// k8s secret prophet-mesh-auth). The operator pastes the token in Settings → Connections.
+//
+// STORAGE — token in sessionStorage, endpoint in localStorage.
+// The endpoint URL is not sensitive; localStorage is fine.
+// The bearer token was previously in localStorage, which meant any DOM-XSS anywhere in
+// the app (or a malicious extension) could exfiltrate the token indefinitely — the raw
+// grant stayed available across sessions until manually cleared. Moved to sessionStorage
+// so an exfil's blast radius ends when the tab closes; a browser-restart re-entry is a
+// small cost for closing that surface. A one-shot migration copies the legacy token from
+// localStorage into sessionStorage on first read, then clears the localStorage entry so
+// the raw secret does not linger.
 
 const ENV_MESH = (import.meta as any).env?.VITE_MESH_BASE as string | undefined;
 const LS_BASE = 'sp.conn.mesh';
-const LS_TOKEN = 'sp.conn.mesh-token';
+const SS_TOKEN = 'sp.conn.mesh-token';
+const LS_TOKEN_LEGACY = 'sp.conn.mesh-token';
 
 export const DEFAULT_MESH_BASE = 'https://mesh.socioprophet.ai';
 // Default to the muscular seat (Qwen3-32B on A100). The conductor routes 'xl' → that seat;
@@ -24,13 +34,31 @@ const MESH_FETCH = '/mesh';
 function ls(key: string): string | null {
   try { return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null; } catch { return null; }
 }
+function ss(key: string): string | null {
+  try { return typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(key) : null; } catch { return null; }
+}
+
+// One-time migration from the old localStorage location. Copies the value into
+// sessionStorage and CLEARS the localStorage entry so the raw secret does not linger.
+// Idempotent: after the legacy key is cleared, this is a no-op.
+function migrateLegacyToken(): string | null {
+  const legacy = ls(LS_TOKEN_LEGACY);
+  if (!legacy) return null;
+  try { sessionStorage.setItem(SS_TOKEN, legacy); } catch { /* private mode / disabled */ }
+  try { localStorage.removeItem(LS_TOKEN_LEGACY); } catch { /* ignore */ }
+  return legacy;
+}
 
 export function meshBase(): string {
   return (ls(LS_BASE) || ENV_MESH || DEFAULT_MESH_BASE).replace(/\/$/, '');
 }
 export function setMeshBase(url: string) { try { localStorage.setItem(LS_BASE, url.replace(/\/$/, '')); } catch { /* ignore */ } }
-export function meshToken(): string { return ls(LS_TOKEN) || ''; }
-export function setMeshToken(t: string) { try { localStorage.setItem(LS_TOKEN, t.trim()); } catch { /* ignore */ } }
+export function meshToken(): string {
+  const current = ss(SS_TOKEN);
+  if (current) return current;
+  return migrateLegacyToken() ?? '';
+}
+export function setMeshToken(t: string) { try { sessionStorage.setItem(SS_TOKEN, t.trim()); } catch { /* ignore */ } }
 
 export interface MeshStatus { ok: boolean; status: number | null; detail: string; models: string[] }
 
