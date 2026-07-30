@@ -38,8 +38,12 @@ const env = (import.meta as { env?: Record<string, string> }).env ?? {};
 export function resolveBase(key: string, envVar: string, fallback: string): string;
 export function resolveBase(key: string, envVar: string): string | undefined;
 export function resolveBase(key: string, envVar: string, fallback?: string): string | undefined {
-  const host = injected().bases?.[key];
-  if (host) return host;
+  // PRESENCE, not truthiness — a sovereign host that injects `bases[key] = ''`
+  // is explicitly disabling that service. Treating '' as absent would fall
+  // through to the VITE build env and then the hosted default, silently
+  // egressing off-device — exactly what the host was trying to prevent.
+  const bases = injected().bases;
+  if (bases && Object.prototype.hasOwnProperty.call(bases, key)) return bases[key];
   const fromEnv = env[envVar];
   if (fromEnv) return fromEnv;
   return fallback;

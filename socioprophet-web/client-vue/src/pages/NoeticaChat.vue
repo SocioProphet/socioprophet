@@ -196,7 +196,7 @@
               <button type="button" class="nx-scope-new" @click="addMcpServer">+ Add MCP server</button>
               <template v-if="mcp.tools.length">
                 <div class="nx-scope-sec">Tools — tick to let the agent use them</div>
-                <button v-for="t in mcp.tools" :key="t.serverId + t.name" type="button"
+                <button v-for="t in mcp.tools" :key="toolKey(t)" type="button"
                   :class="{ on: mcp.enabled.has(toolKey(t)) }" @click="mcp.toggleTool(toolKey(t))" :title="t.description">
                   {{ mcp.enabled.has(toolKey(t)) ? '☑' : '☐' }} <b>{{ t.name }}</b> <span class="nx-dim">· {{ t.serverName }}</span>
                 </button>

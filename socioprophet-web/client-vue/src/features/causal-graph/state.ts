@@ -25,13 +25,28 @@ import type {
   WarrantSummary,
 } from './types';
 
+// Own-property guard — a bare `snapshot.warrants[ref]` resolves prototype
+// members (toString, valueOf, __proto__) as if they were warrants, and the
+// downstream render layer then crashes on `w.excerpt.…` / `w.sourceDocRef.
+// startsWith(...)` because those Function values have no such fields. Same
+// class of bug that PR #474 hardened in `assertWellFormed`; hardened here
+// too so the render helpers are also safe on a malformed snapshot.
+function resolveWarrant(
+  snapshot: CausalGraphSnapshot,
+  ref: string,
+): WarrantSummary | undefined {
+  if (!Object.prototype.hasOwnProperty.call(snapshot.warrants, ref)) return undefined;
+  const w = snapshot.warrants[ref];
+  return w || undefined;
+}
+
 export function warrantsForEdge(
   snapshot: CausalGraphSnapshot,
   edge: CausalEdge,
 ): WarrantSummary[] {
   return edge.warrantRefs
-    .map((ref) => snapshot.warrants[ref])
-    .filter((w): w is WarrantSummary => Boolean(w));
+    .map((ref) => resolveWarrant(snapshot, ref))
+    .filter((w): w is WarrantSummary => w !== undefined);
 }
 
 export function warrantsForHypothesis(
@@ -39,8 +54,8 @@ export function warrantsForHypothesis(
   hypothesis: CausalHypothesis,
 ): WarrantSummary[] {
   return hypothesis.warrantRefs
-    .map((ref) => snapshot.warrants[ref])
-    .filter((w): w is WarrantSummary => Boolean(w));
+    .map((ref) => resolveWarrant(snapshot, ref))
+    .filter((w): w is WarrantSummary => w !== undefined);
 }
 
 export interface SeverityBadge {

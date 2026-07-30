@@ -40,11 +40,21 @@ const STAGES = ["none", "staging", "production", "archived"];
 const busy = ref(""); const flash = ref("");
 function say(msg: string) { flash.value = msg; setTimeout(() => (flash.value = ""), 2600); }
 
+// v-model for each row's <select>. A bare @change handler on the placeholder
+// pattern (option value="" disabled selected) leaves the DOM element pinned to
+// the last chosen target: selecting the SAME stage again is a
+// browser-suppressed change event, so the promote silently no-ops. A bound
+// ref cleared after each await snaps the select back to "promote…".
+const promoteSel = ref<Record<string, string>>({});
+function selKey(name: string, version: string): string { return `${name}:${version}`; }
+
 async function doPromote(name: string, version: string, stage: string) {
-  busy.value = `${name}:${version}`;
+  if (!stage) return;
+  const key = selKey(name, version);
+  busy.value = key;
   try { const r = await promoteModel({ project: props.project, name, version, stage }, token.value); say(`${name} v${version} → ${r.stage}`); await load(); }
   catch (e) { say(e instanceof Error ? e.message : "promote failed"); }
-  finally { busy.value = ""; }
+  finally { busy.value = ""; promoteSel.value[key] = ""; }
 }
 async function doRun(pipeline: string) {
   busy.value = pipeline;
@@ -124,8 +134,9 @@ function kv(o: Record<string, number>): string { return Object.entries(o).map(([
             <span class="mono met">{{ kv(v.metrics) }}</span>
             <span v-if="v.run" class="lineage mono" :title="'produced_by → run'">↳ {{ v.run.split(':').pop() }}</span>
             <select class="promote" :disabled="busy === `${m.name}:${v.version}`"
+                    :value="promoteSel[selKey(m.name, v.version)] || ''"
                     @change="e => doPromote(m.name, v.version, (e.target as HTMLSelectElement).value)">
-              <option value="" disabled selected>promote…</option>
+              <option value="" disabled>promote…</option>
               <option v-for="s in STAGES" :key="s" :value="s" :disabled="s === v.stage">{{ s }}</option>
             </select>
           </div>

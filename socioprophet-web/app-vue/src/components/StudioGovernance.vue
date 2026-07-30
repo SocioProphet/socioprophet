@@ -6,7 +6,8 @@
 import { ref, onMounted, watch } from "vue";
 import {
   loadOntology, loadOntologyClass, loadActions, invokeAction, loadWorldsignals, submitWorldsignal,
-  promoteWorldsignal, loadGaiaOntology, loadHdt, loadHdtOntology, submitHdtObservation, promoteHdt, EPISTEMIC_COLORS,
+  promoteWorldsignal, loadGaiaOntology, loadHdt, loadHdtOntology, submitHdtObservation, promoteHdt,
+  isPromoteBlocked, EPISTEMIC_COLORS,
   type OntologyView, type OntologyClassDetail, type ActionDef, type WorldSignal, type GaiaOntology,
   type HdtObservation, type HdtOntology,
 } from "../services/studioApi";
@@ -62,7 +63,10 @@ async function doSubmit() {
 async function doPromote(sig: WorldSignal, to_state: string, actor_kind: string) {
   try {
     const r = await promoteWorldsignal({ project: props.project, signal: sig.signal_id, to_state, actor_kind }, token.value);
-    if ("blocked" in r) say(`🔒 ${r.message}`);
+    // `isPromoteBlocked` narrows on `blocked === true` — `"blocked" in r` is
+    // TRUE for `{ blocked: false }` too, so a legitimate success that ever
+    // emitted `blocked: false` would misread as a rejection.
+    if (isPromoteBlocked(r)) say(`🔒 ${r.message}`);
     else { say(`${sig.feature_id} → ${r.to_state} (${r.epistemic_mode})`); await load(); }
   } catch (e) { say(e instanceof Error ? e.message : "promote failed"); }
 }
@@ -77,7 +81,8 @@ async function doHdtSubmit() {
 async function doHdtPromote(o: HdtObservation, to_state: string, actor_kind: string) {
   try {
     const r = await promoteHdt({ project: props.project, observation: o.observation_id, to_state, actor_kind }, token.value);
-    if ("blocked" in r) say(`🔒 ${r.message}`);
+    // See promoteWorldsignal above for the reasoning.
+    if (isPromoteBlocked(r)) say(`🔒 ${r.message}`);
     else { say(`${o.code} → ${r.to_state} (${r.epistemic_mode})`); await load(); }
   } catch (e) { say(e instanceof Error ? e.message : "promote failed"); }
 }

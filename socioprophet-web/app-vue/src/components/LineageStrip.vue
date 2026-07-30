@@ -10,7 +10,12 @@ const stages = computed(() => {
   const out: { label: string; hash?: string }[] = [];
   for (const s of props.steps ?? []) {
     if (typeof s === "object") { out.push({ label: s.label, hash: s.hash }); continue; }
-    for (const part of String(s).split(/\s*(?:→|->|·|→)\s*/).filter(Boolean)) {
+    // Separators a doc-author would type between pipeline stages:
+    // U+2192 →, U+21D2 ⇒, U+27F6 ⟶, ASCII ->, and the mid-dot U+00B7 ·.
+    // Historic form of this regex duplicated → in the fourth slot; that dead
+    // alternative masked the arrow the author intended, so pipelines written
+    // with ⇒ / ⟶ / -> silently rendered as one un-split node.
+    for (const part of String(s).split(/\s*(?:⇒|⟶|→|->|·)\s*/).filter(Boolean)) {
       out.push({ label: part.trim() });
     }
   }
