@@ -26,7 +26,14 @@ async function run() {
   }
 }
 
-function hostOf(url: string): string {
+// Copilot round-3: hostOf runs unconditionally on `r.url` in the template (the
+// `<a v-if="isSafeHttp(...)">` guard only hides the anchor, not the neighbouring
+// hostname line). If an upstream engine ever returns `r.url` as `null` / a number /
+// missing, the pre-fix `url.match(...)` on a non-string would throw and blow up the
+// whole results render. Accept `unknown`, fall through to empty for anything that
+// isn't a string — same fail-closed posture as `isSafeHttp` already does.
+function hostOf(url: unknown): string {
+  if (typeof url !== "string") return "";
   const m = url.match(/^[a-z]+:\/\/([^/]+)/i);
   return m ? m[1] : url.split("/")[0];
 }
