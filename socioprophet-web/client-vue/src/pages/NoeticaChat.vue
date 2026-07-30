@@ -12,6 +12,13 @@
         <span class="nx-localpill" title="Local-first — your data never leaves this device">Local-first</span>
       </div>
       <div class="nx-head-r">
+        <span
+          v-if="persistState !== 'ok'"
+          class="nx-persist-warn"
+          :title="persistState === 'quota'
+            ? 'Local storage full — new turns are only in memory. Clear to restore persistence.'
+            : 'Local storage unavailable (private mode?) — turns will not persist across reload.'"
+        >⚠ history not saved</span>
         <span class="nx-sess">session {{ chat.sessionId.slice(0, 8) }}</span>
         <button v-if="chat.turns.value.length" class="nx-clear" @click="chat.reset()">Clear</button>
       </div>
@@ -154,6 +161,10 @@
           <input ref="attachRef" type="file" multiple class="nx-hidden" @change="onAttach" />
           <span v-if="ingesting" class="nx-ingest">ingesting…</span>
           <span v-else-if="ingestedCount" class="nx-ingest" :title="ingestedCount + ' files ingested this session'">✓ {{ ingestedCount }}</span>
+          <span v-if="attachErrors.length" class="nx-attach-err" role="alert" :title="attachErrors.join('\n')">
+            ⚠ {{ attachErrors.length }} attachment issue{{ attachErrors.length === 1 ? '' : 's' }}
+            <button type="button" class="nx-attach-err-x" @click="attachErrors = []" title="Dismiss">✕</button>
+          </span>
 
           <!-- fan-out: compare multiple models -->
           <div v-if="models.length" class="nx-scope">
@@ -212,7 +223,12 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
-import { useNoeticaChat, type ChatTurn } from '../composables/useNoeticaChat';
+import {
+  useNoeticaChat,
+  type ChatTurn,
+  validateAttachments,
+  persistState,
+} from '../composables/useNoeticaChat';
 import { useProjects, projectCollectionId } from '../stores/projects';
 import { useMcp, toolKey } from '../stores/mcp';
 import { AM_BASE, labsCatalog, type ModelEntry } from '../services/agentMachineApi';
@@ -259,12 +275,23 @@ function uploadCollection(): string {
   if (chat.retrievalScope.value === 'project' && projects.active) return projectCollectionId(projects.active.id);
   return `chat-${chat.sessionId.replace(/-/g, '').slice(0, 8)}`;   // mirrors Noetica chatCollectionId
 }
+const attachErrors = ref<string[]>([]);
 async function onAttach(e: Event) {
-  const files = Array.from((e.target as HTMLInputElement).files ?? []);
+  const input = e.target as HTMLInputElement;
+  const files = Array.from(input.files ?? []);
   if (!files.length) return;
+  attachErrors.value = [];
+  // Gate on MIME + per-file cap + aggregate cap BEFORE we start reading anything
+  // into memory as base64 — an unfiltered Promise.all would blow up the tab.
+  const validated = validateAttachments(files);
+  if (validated.errors.length) attachErrors.value = [...validated.errors];
+  if (validated.batchRejected || !validated.accepted.length) {
+    if (input) input.value = '';
+    return;
+  }
   ingesting.value = true;
   const collection = uploadCollection();
-  const results = await Promise.all(files.map((f) => new Promise<boolean>((resolve) => {
+  const results = await Promise.all(validated.accepted.map((f) => new Promise<boolean>((resolve) => {
     const reader = new FileReader();
     reader.onload = async () => {
       const dataBase64 = (reader.result as string).split(',')[1] ?? '';
@@ -273,15 +300,24 @@ async function onAttach(e: Event) {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filename: f.name, mimeType: f.type, dataBase64, collection }),
         });
+        if (!r.ok) attachErrors.value.push(`${f.name}: upload failed (${r.status})`);
         resolve(r.ok);
-      } catch { resolve(false); }
+      } catch (err) {
+        // Surface the failure — the previous silent catch let the batch look
+        // successful even when every request had errored.
+        attachErrors.value.push(`${f.name}: ${err instanceof Error ? err.message : 'upload failed'}`);
+        resolve(false);
+      }
     };
-    reader.onerror = () => resolve(false);
+    reader.onerror = () => {
+      attachErrors.value.push(`${f.name}: read failed`);
+      resolve(false);
+    };
     reader.readAsDataURL(f);
   })));
   ingestedCount.value += results.filter(Boolean).length;
   ingesting.value = false;
-  if (attachRef.value) attachRef.value.value = '';
+  if (input) input.value = '';
 }
 const expanded = ref<Set<number>>(new Set());
 function toggleTrace(i: number) { if (expanded.value.has(i)) expanded.value.delete(i); else expanded.value.add(i); }
@@ -569,6 +605,11 @@ onMounted(() => inputEl.value?.focus());
 .nx-spacer { flex: 1 1 auto; }
 .nx-hidden { display: none; }
 .nx-ingest { font-size: 10px; color: var(--nblue); }
+.nx-attach-err { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, .35); background: rgba(239, 68, 68, .08); padding: 2px 6px; border-radius: 6px; }
+.nx-attach-err-x { border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 11px; line-height: 1; padding: 0 2px; }
+.nx-persist-warn { font-size: 10px; color: #f59e0b; border: 1px solid rgba(245, 158, 11, .35);
+  background: rgba(245, 158, 11, .08); padding: 2px 6px; border-radius: 6px; cursor: help; }
 .nx-scope { position: relative; }
 .nx-scope-btn { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--nline-weak); background: transparent;
   color: var(--ntext3); font: inherit; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 7px; cursor: pointer; }

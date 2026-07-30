@@ -12,13 +12,115 @@ import { useMcp } from '../stores/mcp';
 import { meshChatStream } from '../config/mesh';
 
 const STORE_KEY = 'noetica-chat-v1';
+
+// Persistence health — module-level so the same signal is shared across every
+// consumer (chat header, settings badge, tests). Once the quota is hit we STOP
+// trying to persist so writes don't churn silently; the UI can surface "chat
+// history is no longer being saved" and offer a Reset. Reset clears the store
+// and puts us back to 'ok'.
+export type PersistState = 'ok' | 'quota' | 'blocked';
+export const persistState = ref<PersistState>('ok');
+let persistWarned = false;
+function classifyPersistError(e: unknown): 'quota' | 'blocked' {
+  if (e instanceof DOMException) {
+    // Chrome: 'QuotaExceededError'; Firefox: 'NS_ERROR_DOM_QUOTA_REACHED' (code 22 / 1014)
+    if (/quota/i.test(e.name) || e.code === 22 || e.code === 1014) return 'quota';
+  }
+  const name = (e as { name?: string } | null)?.name ?? '';
+  if (/quota/i.test(name)) return 'quota';
+  return 'blocked';
+}
+
+// Trace / thinking / retrieval are large per-turn observability payloads that only
+// matter while the operator is looking at the live turn — dropping them from the
+// persisted copy keeps the store small so quota is hit later, and a reload still
+// restores content + model + badge + judgment (the pieces a chat log needs).
+function slimForPersist(turnsList: ChatTurn[]): Array<Omit<ChatTurn, 'streaming' | 'trace' | 'thinking' | 'retrieval'>> {
+  return turnsList
+    .filter((x) => !x.streaming)
+    .map(({ streaming: _s, trace: _t, thinking: _k, retrieval: _r, ...rest }) => rest);
+}
+
 function loadPersisted(): ChatTurn[] {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ChatTurn[];
     return Array.isArray(parsed) ? parsed.map((t) => ({ ...t, streaming: false })) : [];
-  } catch { return []; }
+  } catch (e) {
+    persistState.value = classifyPersistError(e);
+    return [];
+  }
+}
+
+// Pop every trailing assistant turn back to the last user turn. Regenerate uses
+// this so a fan-out (N assistant columns for one user turn) doesn't leave N-1
+// orphaned columns dangling as prior context on the retry.
+export function popTrailingAssistants(turns: ChatTurn[]): ChatTurn[] {
+  const next = turns.slice();
+  while (next.length && next[next.length - 1].role === 'assistant') next.pop();
+  return next;
+}
+
+// Shared history for fan-out: all prior turns as one linear conversation, but
+// only the FIRST assistant column per user turn (so a prior fan-out doesn't
+// re-inject N assistant answers to a single question). In-flight streaming
+// turns are excluded — we haven't heard the full answer yet.
+export function buildSharedHistory(turns: ChatTurn[]): Array<{ role: Role; content: string }> {
+  const out: Array<{ role: Role; content: string }> = [];
+  let awaitingAssistant = false;
+  for (const t of turns) {
+    if (t.streaming) continue;
+    if (t.role === 'user') {
+      out.push({ role: 'user', content: t.content });
+      awaitingAssistant = true;
+    } else if (awaitingAssistant) {
+      out.push({ role: 'assistant', content: t.content });
+      awaitingAssistant = false;
+    }
+    // additional assistant columns for the same user turn are dropped
+  }
+  return out;
+}
+
+// Attachment limits — the operator uploads via <input type="file">, and we
+// base64-encode the file in-browser before POSTing to the ingest queue. Cap
+// per-file and aggregate size, and restrict MIME to what the ingest pipeline
+// actually understands (docs, PDFs, plain text, images for OCR).
+export const MAX_ATTACH_BYTES = 20 * 1024 * 1024;
+export const MAX_ATTACH_TOTAL_BYTES = 40 * 1024 * 1024;
+const ALLOWED_MIME_PATTERNS: RegExp[] = [/^image\//, /^application\/pdf$/, /^text\//];
+export function isAllowedAttachmentMime(mime: string): boolean {
+  return ALLOWED_MIME_PATTERNS.some((r) => r.test(mime));
+}
+export interface AttachCandidate { name: string; size: number; type: string }
+export interface AttachmentValidation<T extends AttachCandidate> {
+  accepted: T[];
+  errors: string[];
+  batchRejected: boolean;   // aggregate cap exceeded — the whole batch is dropped
+}
+export function validateAttachments<T extends AttachCandidate>(files: T[]): AttachmentValidation<T> {
+  const errors: string[] = [];
+  const accepted: T[] = [];
+  let total = 0;
+  const mb = (n: number) => (n / 1024 / 1024).toFixed(1);
+  for (const f of files) {
+    if (!isAllowedAttachmentMime(f.type || '')) {
+      errors.push(`${f.name}: unsupported type (${f.type || 'unknown'}) — allowed: image/*, application/pdf, text/*`);
+      continue;
+    }
+    if (f.size > MAX_ATTACH_BYTES) {
+      errors.push(`${f.name}: ${mb(f.size)} MB exceeds ${mb(MAX_ATTACH_BYTES)} MB per-file cap`);
+      continue;
+    }
+    total += f.size;
+    accepted.push(f);
+  }
+  if (total > MAX_ATTACH_TOTAL_BYTES) {
+    errors.push(`batch total ${mb(total)} MB exceeds ${mb(MAX_ATTACH_TOTAL_BYTES)} MB — split the upload`);
+    return { accepted: [], errors, batchRejected: true };
+  }
+  return { accepted, errors, batchRejected: false };
 }
 
 export type Role = 'user' | 'assistant';
@@ -77,12 +179,31 @@ export function createNoeticaChat() {
   let controller: AbortController | null = null;
   function stop() { controller?.abort(); stopFanout(); }
 
-  // Persist finalized history so a reload keeps the conversation.
+  // Persist finalized history so a reload keeps the conversation. If the store
+  // ever refuses a write (quota exceeded / private mode), flip persistState and
+  // STOP retrying — the previous silent try/catch let every subsequent mutation
+  // be dropped without the UI ever knowing memory and disk had diverged. The
+  // exported ref lets the header show "chat history not being persisted".
   watch(turns, (t) => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(t.filter((x) => !x.streaming))); } catch { /* quota/private-mode */ }
+    if (persistState.value !== 'ok') return;
+    let json = '';
+    try {
+      json = JSON.stringify(slimForPersist(t));
+      localStorage.setItem(STORE_KEY, json);
+    } catch (e) {
+      persistState.value = classifyPersistError(e);
+      if (!persistWarned) {
+        persistWarned = true;
+        // eslint-disable-next-line no-console
+        console.warn(`[noetica-chat] persistence disabled (${persistState.value}) at ~${json.length} bytes`);
+      }
+    }
   }, { deep: true });
 
-  function reset() { turns.value = []; try { localStorage.removeItem(STORE_KEY); } catch { /* */ } }
+  function reset() {
+    turns.value = [];
+    try { localStorage.removeItem(STORE_KEY); persistState.value = 'ok'; persistWarned = false; } catch { /* */ }
+  }
 
   async function send(text: string) {
     const msg = text.trim();
@@ -215,10 +336,13 @@ export function createNoeticaChat() {
     }
   }
 
-  // Regenerate: drop the last assistant turn and re-run against the history.
+  // Regenerate: drop EVERY trailing assistant turn back to the last user turn,
+  // then re-run against the history. A fan-out call produces N assistant turns
+  // for one user turn — a single pop would leave N-1 orphaned columns dangling
+  // as prior context on the retry.
   function regenerate() {
     if (busy.value) return;
-    if (turns.value.at(-1)?.role === 'assistant') turns.value.pop();
+    turns.value = popTrailingAssistants(turns.value);
     void stream();
   }
 
@@ -290,7 +414,11 @@ export function createNoeticaChat() {
     const msg = text.trim();
     if (!msg || busy.value || modelIds.length === 0) return;
     turns.value.push({ role: 'user', content: msg });
-    const history = turns.value.filter((t) => t.role === 'user').map((t) => ({ role: t.role, content: t.content }));
+    // Every model in the compare sees the SAME shared context: all prior turns,
+    // but only the first assistant column per user turn (so a prior fan-out
+    // doesn't re-inject N answers to one question). Filtering to user-only
+    // dropped every prior assistant response and made compare a memoryless run.
+    const history = buildSharedHistory(turns.value);
     const slots = modelIds.map((mid) => {
       const a: ChatTurn = { role: 'assistant', content: '', streaming: true, fanoutModel: mid };
       turns.value.push(a);
