@@ -38,3 +38,33 @@ describe('CausalGraphView', () => {
     expect(new Set(tones).size).toBeGreaterThan(1);
   });
 });
+
+describe('accessibility (Copilot follow-up)', () => {
+  it('every disclosure button declares aria-expanded and aria-controls', () => {
+    const w = mount(CausalGraphView);
+    const buttons = w.findAll('.row');
+    expect(buttons.length).toBeGreaterThan(0);
+    for (const b of buttons) {
+      expect(b.attributes('type')).toBe('button');
+      expect(b.attributes('aria-expanded')).toBeDefined();
+      expect(b.attributes('aria-controls')).toBeDefined();
+    }
+  });
+
+  it('aria-expanded flips when a row is clicked', async () => {
+    const w = mount(CausalGraphView);
+    const first = w.find('.hypothesis .row');
+    expect(first.attributes('aria-expanded')).toBe('false');
+    await first.trigger('click');
+    expect(first.attributes('aria-expanded')).toBe('true');
+  });
+
+  it('drill-down id matches the button aria-controls', async () => {
+    const w = mount(CausalGraphView);
+    const btn = w.find('.edge .row');
+    const id = btn.attributes('aria-controls');
+    await btn.trigger('click');
+    const drilled = w.find('.edge .drill-down');
+    expect(drilled.attributes('id')).toBe(id);
+  });
+});

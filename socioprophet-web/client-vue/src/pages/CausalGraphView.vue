@@ -65,15 +65,25 @@ function toggleHyp(h: CausalHypothesis) {
           :key="h.id"
           class="hypothesis"
         >
-          <button class="row" @click="toggleHyp(h)">
+          <button
+            type="button"
+            class="row"
+            :aria-expanded="expandedHypId === h.id"
+            :aria-controls="`hyp-drill-${h.id}`"
+            @click="toggleHyp(h)"
+          >
             <span class="label">{{ h.label }}</span>
             <span class="badge" :data-tone="severityBadge(h).tone">
               {{ severityBadge(h).label }}
             </span>
           </button>
           <p class="statement">{{ h.hypothesis }}</p>
-          <div v-if="expandedHypId === h.id" class="drill-down">
-            <p v-if="warrantsForHypothesis(snapshot, h).length === 0" class="no-warrants">
+          <div
+            v-if="expandedHypId === h.id"
+            class="drill-down"
+            :id="`hyp-drill-${h.id}`"
+          >
+            <p v-if="h.warrantRefs.length === 0" class="no-warrants">
               No warrants attached yet — status is
               <em>{{ h.claimStatus }}</em>.
             </p>
@@ -99,7 +109,13 @@ function toggleHyp(h: CausalHypothesis) {
           :key="edge.id"
           class="edge"
         >
-          <button class="row" @click="toggleEdge(edge)">
+          <button
+            type="button"
+            class="row"
+            :aria-expanded="expandedEdgeId === edge.id"
+            :aria-controls="`edge-drill-${edge.id}`"
+            @click="toggleEdge(edge)"
+          >
             <span class="direction">
               {{ hypothesisById[edge.fromRef]?.label ?? edge.fromRef }}
               →
@@ -110,7 +126,11 @@ function toggleHyp(h: CausalHypothesis) {
             </span>
           </button>
           <p class="summary">{{ contributionSummary(edge) }}</p>
-          <div v-if="expandedEdgeId === edge.id" class="drill-down">
+          <div
+            v-if="expandedEdgeId === edge.id"
+            class="drill-down"
+            :id="`edge-drill-${edge.id}`"
+          >
             <h3>Warrants</h3>
             <ul class="warrants">
               <li

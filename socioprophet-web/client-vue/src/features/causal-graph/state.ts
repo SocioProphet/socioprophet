@@ -98,6 +98,19 @@ export function assertWellFormed(snapshot: CausalGraphSnapshot): void {
       }
     }
   }
+  // Hypothesis warrant refs must resolve too — otherwise a broken lookup on a
+  // hypothesis would slip past validation and later render as "no warrants
+  // attached yet" in the UI, misleading a viewer into thinking a claim is
+  // deliberately unbacked when it is actually a fabric bug.
+  for (const h of snapshot.hypotheses) {
+    for (const ref of h.warrantRefs) {
+      if (!snapshot.warrants[ref]) {
+        throw new Error(
+          `CausalGraphSnapshot ${snapshot.graphRef}: hypothesis ${h.id} references warrant ${ref} not present in snapshot.warrants`,
+        );
+      }
+    }
+  }
   const hypIds = new Set(snapshot.hypotheses.map((h) => h.id));
   for (const edge of snapshot.edges) {
     if (!hypIds.has(edge.fromRef) || !hypIds.has(edge.toRef)) {
