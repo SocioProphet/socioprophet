@@ -382,7 +382,7 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
       <!-- session receipt chain — the tamper-evident record of every run -->
       <div v-if="chain.length" class="chain">
         <div class="chain-head">⛨ Session receipt chain <span class="cn">{{ chain.length }}</span></div>
-        <div class="crow" v-for="(c, i) in chain" :key="i">
+        <div class="crow" v-for="(c, i) in chain" :key="c.receipt?.id ?? `row-${i}`">
           <span class="cdot" :style="{ background: EPISTEMIC_COLORS[c.epistemic_status] || 'var(--idle)' }" />
           <span class="mono cid">{{ c.receipt ? short(c.receipt.id) : '—' }}</span>
           <span class="ckind">{{ c.kind }} · {{ c.backend }}</span>

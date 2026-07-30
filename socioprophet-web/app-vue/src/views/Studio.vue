@@ -180,7 +180,7 @@ const actionsFor: Record<StudioSection, { label: string; hint: string }[]> = {
       <div class="rc-head"><b>Verified-compute receipts</b><span class="rc-sub">replayable proof-of-work · {{ receiptsData?.services_reachable ?? 0 }} services answering</span><button class="rc-x" @click="receiptsOpen = false" aria-label="Close receipts panel">✕</button></div>
       <div v-if="receiptsErr" class="rc-err">{{ receiptsErr }}</div>
       <div v-else-if="receiptsData" class="rc-list">
-        <div v-for="r in receiptsData.receipts" :key="r.service + r.correlation_id" class="rc-row" :title="r.bundle_ref || ''">
+        <div v-for="r in receiptsData.receipts" :key="`${r.service}:${r.correlation_id}`" class="rc-row" :title="r.bundle_ref || ''">
           <span class="rc-svc">{{ r.service }}</span>
           <span class="rc-cid mono">{{ r.correlation_id }}</span>
           <span v-if="r.verdict" class="rc-verdict">{{ r.verdict }}</span>

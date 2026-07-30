@@ -64,10 +64,10 @@ function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "var(--f
 
       <div v-if="result.columns.length" class="qscroll">
         <table class="qgrid">
-          <thead><tr><th v-for="c in result.columns" :key="c">{{ c }}</th></tr></thead>
+          <thead><tr><th v-for="(c, colIdx) in result.columns" :key="`${c}:${colIdx}`">{{ c }}</th></tr></thead>
           <tbody>
-            <tr v-for="(r, i) in result.rows" :key="i">
-              <td v-for="c in result.columns" :key="c">
+            <tr v-for="(r, i) in result.rows" :key="`${i}:${JSON.stringify(r).slice(0, 120)}`">
+              <td v-for="(c, colIdx) in result.columns" :key="`${c}:${colIdx}`">
                 <span class="val">{{ r[c] }}</span>
                 <span v-if="epiOf(r[c])" class="epi" :style="{ background: color(epiOf(r[c])!) }" :title="`epistemic: ${epiOf(r[c])}`" />
               </td>

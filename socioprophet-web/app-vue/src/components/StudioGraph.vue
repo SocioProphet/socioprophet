@@ -306,7 +306,7 @@ async function loadDerived() {
           </div>
           <div v-if="derived.derivation_count" class="dlist">
             <div class="dlbl">Derived / co-observed with</div>
-            <div v-for="(d, i) in derived.derivations" :key="i" class="drow">
+            <div v-for="d in derived.derivations" :key="`${d.direction}:${d.relation}:${d.with.id}`" class="drow">
               <span class="rel">{{ d.direction === 'out' ? '→' : '←' }} {{ d.relation }}</span>
               <span class="dwith">{{ d.with.name }}</span>
               <span class="dpill" :style="{ borderColor: color(d.with.epistemic_mode), color: color(d.with.epistemic_mode) }">{{ d.with.epistemic_mode }}</span>
