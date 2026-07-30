@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # Copilot round-2: pin the runner image to align with the SHA-pinned actions above — `ubuntu-latest` moves as GitHub retires images and can introduce non-deterministic changes to a workflow that holds FIREBASE_TOKEN.
     steps:
       # SHA-pinned per convention — this workflow holds FIREBASE_TOKEN with full Hosting
       # deploy authority; a moving-tag compromise (as in the tj-actions/changed-files
@@ -60,7 +60,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # Copilot round-2: pin the runner image to align with the SHA-pinned actions above — `ubuntu-latest` moves as GitHub retires images and can introduce non-deterministic changes to a workflow that holds FIREBASE_TOKEN.
     # A push to master deploys dev; a manual run deploys the chosen alias. The `prod` alias runs under the
     # `production` Environment so it inherits that Environment's protection rules (required reviewers).
     environment: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod') && 'production' || 'development' }}
