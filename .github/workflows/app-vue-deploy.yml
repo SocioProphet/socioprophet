@@ -35,8 +35,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # SHA-pinned per convention — this workflow holds FIREBASE_TOKEN with full Hosting
+      # deploy authority; a moving-tag compromise (as in the tj-actions/changed-files
+      # incident, Mar 2025) executes attacker-controlled code in a job whose secret can
+      # deploy arbitrary content to prod. Version comments name the tag so
+      # renovate/dependabot can bump against them.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: '20', cache: 'npm', cache-dependency-path: socioprophet-web/app-vue/package-lock.json }
       - name: Build app-vue
         working-directory: socioprophet-web/app-vue
@@ -50,7 +55,7 @@ jobs:
           npm ci
           npm run build
       - name: Upload build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with: { name: app-vue-dist, path: socioprophet-web/app-vue/dist, retention-days: 3 }
 
   deploy:
@@ -60,14 +65,17 @@ jobs:
     # `production` Environment so it inherits that Environment's protection rules (required reviewers).
     environment: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod') && 'production' || 'development' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with: { name: app-vue-dist, path: socioprophet-web/app-vue/dist }
       - name: Resolve alias
         id: env
         run: echo "alias=${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'dev' }}" >> "$GITHUB_OUTPUT"
       - name: Deploy to Firebase Hosting (app target)
-        uses: w9jds/firebase-action@v15.24.0
+        # SHA-pinned. THIS action receives FIREBASE_TOKEN — if the w9jds account or repo
+        # is compromised and the maintainer force-moves the tag, the next master push
+        # exfils the token and lets the attacker deploy arbitrary Hosting content.
+        uses: w9jds/firebase-action@af97ff3f81136bba7d9048915ba5f05ba42a551d # v15.24.0
         with:
           args: deploy --only hosting:app --project ${{ steps.env.outputs.alias }}
         env:
