@@ -38,15 +38,25 @@ function ss(key: string): string | null {
   try { return typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(key) : null; } catch { return null; }
 }
 
-// One-time migration from the old localStorage location. Copies the value into
-// sessionStorage and CLEARS the localStorage entry so the raw secret does not linger.
+// One-time migration from the old localStorage location. If the legacy key EXISTS
+// (present at all — including empty or whitespace-only), it is cleared. Only a real
+// non-whitespace token is carried over to sessionStorage; an empty/whitespace legacy
+// value is discarded, not migrated verbatim (a blank token would have been useless
+// anyway, and the callsite already treats '' as no-token). Copilot round-2 flagged
+// the earlier version, which used truthiness and so silently LEFT an empty legacy
+// entry in localStorage — contradicting the migration's own contract.
 // Idempotent: after the legacy key is cleared, this is a no-op.
 function migrateLegacyToken(): string | null {
+  // Distinguish MISSING from PRESENT-BUT-EMPTY: only the presence check tells us
+  // whether we owe a clear.
   const legacy = ls(LS_TOKEN_LEGACY);
-  if (!legacy) return null;
-  try { sessionStorage.setItem(SS_TOKEN, legacy); } catch { /* private mode / disabled */ }
+  if (legacy === null) return null;
+  // Present — always clear, whatever the shape.
   try { localStorage.removeItem(LS_TOKEN_LEGACY); } catch { /* ignore */ }
-  return legacy;
+  const trimmed = legacy.trim();
+  if (!trimmed) return null;
+  try { sessionStorage.setItem(SS_TOKEN, trimmed); } catch { /* private mode / disabled */ }
+  return trimmed;
 }
 
 export function meshBase(): string {

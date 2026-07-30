@@ -66,6 +66,34 @@ describe('legacy-localStorage migration', () => {
     const m = await import('./mesh');
     expect(m.meshToken()).toBe('IN-USE');
   });
+
+  // Copilot round-2: an empty (or whitespace-only) legacy value must still be CLEARED —
+  // the previous truthiness check left it in localStorage, contradicting the migration
+  // contract. Also: whitespace-only tokens must not migrate verbatim (blank tokens are
+  // useless; the callsite treats '' as no-token anyway).
+  it('clears an empty legacy value from localStorage on first read', async () => {
+    localStorage.setItem('sp.conn.mesh-token', '');
+    const m = await import('./mesh');
+    expect(m.meshToken()).toBe('');
+    expect(localStorage.getItem('sp.conn.mesh-token')).toBe(null);
+    expect(sessionStorage.getItem('sp.conn.mesh-token')).toBe(null);
+  });
+
+  it('clears a whitespace-only legacy value AND does not migrate it verbatim', async () => {
+    localStorage.setItem('sp.conn.mesh-token', '   \t\n   ');
+    const m = await import('./mesh');
+    expect(m.meshToken()).toBe('');
+    expect(localStorage.getItem('sp.conn.mesh-token')).toBe(null);
+    expect(sessionStorage.getItem('sp.conn.mesh-token')).toBe(null);
+  });
+
+  it('trims whitespace around a legacy token during migration', async () => {
+    localStorage.setItem('sp.conn.mesh-token', '  AUTH-legacy  ');
+    const m = await import('./mesh');
+    expect(m.meshToken()).toBe('AUTH-legacy');
+    expect(sessionStorage.getItem('sp.conn.mesh-token')).toBe('AUTH-legacy');
+    expect(localStorage.getItem('sp.conn.mesh-token')).toBe(null);
+  });
 });
 
 describe('endpoint storage — localStorage is fine (not sensitive)', () => {
