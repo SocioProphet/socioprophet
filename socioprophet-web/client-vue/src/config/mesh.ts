@@ -39,24 +39,28 @@ function ss(key: string): string | null {
 }
 
 // One-time migration from the old localStorage location. If the legacy key EXISTS
-// (present at all — including empty or whitespace-only), it is cleared. Only a real
-// non-whitespace token is carried over to sessionStorage; an empty/whitespace legacy
-// value is discarded, not migrated verbatim (a blank token would have been useless
-// anyway, and the callsite already treats '' as no-token). Copilot round-2 flagged
-// the earlier version, which used truthiness and so silently LEFT an empty legacy
-// entry in localStorage — contradicting the migration's own contract.
+// (present at all — including empty or whitespace-only), it is cleared. A real
+// non-whitespace legacy token is copied to sessionStorage ONLY when sessionStorage
+// has no live token; an empty/whitespace legacy value is discarded, not migrated
+// verbatim.
+// Copilot round-3: the legacy key must be cleared even when a live sessionStorage
+// token already exists — otherwise the raw secret keeps lingering in localStorage
+// for anyone who already re-set the token this session, which is the whole surface
+// this move was meant to close. And an explicit '' in sessionStorage (a deliberate
+// clear) must NOT trigger re-migration: distinguish `null` (missing) from `''`.
 // Idempotent: after the legacy key is cleared, this is a no-op.
-function migrateLegacyToken(): string | null {
-  // Distinguish MISSING from PRESENT-BUT-EMPTY: only the presence check tells us
-  // whether we owe a clear.
+function runLegacyMigration(): void {
   const legacy = ls(LS_TOKEN_LEGACY);
-  if (legacy === null) return null;
+  if (legacy === null) return;
   // Present — always clear, whatever the shape.
   try { localStorage.removeItem(LS_TOKEN_LEGACY); } catch { /* ignore */ }
   const trimmed = legacy.trim();
-  if (!trimmed) return null;
+  if (!trimmed) return;
+  // Only overwrite session when it has NO value at all (null). An explicitly-empty
+  // session value is a user-intentional clear and must be respected.
+  const current = ss(SS_TOKEN);
+  if (current !== null) return;
   try { sessionStorage.setItem(SS_TOKEN, trimmed); } catch { /* private mode / disabled */ }
-  return trimmed;
 }
 
 export function meshBase(): string {
@@ -64,9 +68,10 @@ export function meshBase(): string {
 }
 export function setMeshBase(url: string) { try { localStorage.setItem(LS_BASE, url.replace(/\/$/, '')); } catch { /* ignore */ } }
 export function meshToken(): string {
-  const current = ss(SS_TOKEN);
-  if (current) return current;
-  return migrateLegacyToken() ?? '';
+  // Always run migration first: it clears the legacy key even if session already
+  // has a value, and no-ops once the legacy key is gone.
+  runLegacyMigration();
+  return ss(SS_TOKEN) ?? '';
 }
 export function setMeshToken(t: string) { try { sessionStorage.setItem(SS_TOKEN, t.trim()); } catch { /* ignore */ } }
 
