@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { runQuery, EPISTEMIC_COLORS, type QueryLang, type QueryResult } from "../services/studioApi";
 
 const props = defineProps<{ project: string }>();
@@ -32,6 +32,42 @@ async function run() {
 
 function epiOf(v: unknown): string | null { return result.value?.epistemic[String(v)] ?? null; }
 function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "var(--faint)"; }
+
+// Copilot round-2: computing `JSON.stringify(r).slice(...)` in the template ran on
+// every reactivity tick for every row (expensive on large result sets), and using
+// the loop index in the key meant DOM was recreated on any row-order change. Move
+// key derivation to a computed keyed off `result.value.rows` — recomputed only when
+// the result set itself changes, not per render. Keys are content-derived (a cheap
+// FNV-1a 32-bit rolling hash over the JSON serialisation, capped so a giant row
+// doesn't dominate) and disambiguated only when the same content appears twice, so
+// reordering the same rows preserves each row's DOM identity.
+function fnv1a32(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+function rowSignature(r: Record<string, unknown>): string {
+  // Bounded: an unbounded JSON.stringify would defeat the point of moving off the
+  // template. 512 bytes of the canonical form is more than enough to distinguish
+  // rows in practice, and duplicate content collapses onto the disambiguator below.
+  const s = JSON.stringify(r);
+  return fnv1a32(s.length > 512 ? s.slice(0, 512) : s).toString(36);
+}
+const rowKeys = computed<string[]>(() => {
+  const rows = result.value?.rows ?? [];
+  const seen = new Map<string, number>();
+  return rows.map((r) => {
+    const sig = rowSignature(r as Record<string, unknown>);
+    const n = seen.get(sig) ?? 0;
+    seen.set(sig, n + 1);
+    // Same-content rows get a stable dup-index suffix so Vue doesn't collapse them,
+    // but a reorder of distinct rows produces identical keys → DOM stays with the row.
+    return n === 0 ? sig : `${sig}#${n}`;
+  });
+});
 </script>
 
 <template>
@@ -66,7 +102,7 @@ function color(mode: string): string { return EPISTEMIC_COLORS[mode] || "var(--f
         <table class="qgrid">
           <thead><tr><th v-for="(c, colIdx) in result.columns" :key="`${c}:${colIdx}`">{{ c }}</th></tr></thead>
           <tbody>
-            <tr v-for="(r, i) in result.rows" :key="`${i}:${JSON.stringify(r).slice(0, 120)}`">
+            <tr v-for="(r, i) in result.rows" :key="rowKeys[i]">
               <td v-for="(c, colIdx) in result.columns" :key="`${c}:${colIdx}`">
                 <span class="val">{{ r[c] }}</span>
                 <span v-if="epiOf(r[c])" class="epi" :style="{ background: color(epiOf(r[c])!) }" :title="`epistemic: ${epiOf(r[c])}`" />

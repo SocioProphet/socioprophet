@@ -32,7 +32,7 @@ async function runPlan() {
   try {
     const res = await runCompute({ kind: "workflow", spec: p.spec as Record<string, unknown>, project: props.project });
     result.value = res;
-    if (res.status === "ok" || res.status === "degraded") chain.value.unshift(res);
+    appendToChain(res);
   } catch (e) {
     runErr.value = e instanceof Error ? e.message : "run failed";
   } finally {
@@ -111,7 +111,18 @@ const running = ref(false);
 const runErr = ref("");
 const result = ref<ComputeResultLite | null>(null);
 // the receipt chain: every sealed run in this session, newest first (the tamper-evident record).
-const chain = ref<ComputeResultLite[]>([]);
+// Each entry carries a per-session localId so `v-for :key` is stable even when a run
+// completed without a receipt id (degraded status, or a gateway that omitted it). Without
+// it the fallback `row-${i}` shifted every existing key on each unshift and Vue rebuilt
+// the whole list, losing signed/attest transition state per row (Copilot round-2).
+interface ChainEntry extends ComputeResultLite { localId: string }
+let _chainSeq = 0;
+const chain = ref<ChainEntry[]>([]);
+function appendToChain(res: ComputeResultLite) {
+  if (res.status === "ok" || res.status === "degraded") {
+    chain.value.unshift({ ...res, localId: `local-${++_chainSeq}` });
+  }
+}
 
 const canRun = computed(() => !!selected.value && !running.value && fields.value.some((f) => (spec[f.key] ?? "").trim().length > 0 || f.type === "select"));
 
@@ -150,7 +161,7 @@ async function run() {
   try {
     const res = await runCompute({ kind: k.kind, spec: payloadSpec, project: props.project, backend: backend.value || undefined });
     result.value = res;
-    if (res.status === "ok" || res.status === "degraded") chain.value.unshift(res);
+    appendToChain(res);
   } catch (e) {
     runErr.value = e instanceof Error ? e.message : "run failed";
   } finally {
@@ -382,7 +393,7 @@ function onKey(e: KeyboardEvent) { if (e.key === "Enter" && (e.shiftKey || e.ctr
       <!-- session receipt chain — the tamper-evident record of every run -->
       <div v-if="chain.length" class="chain">
         <div class="chain-head">⛨ Session receipt chain <span class="cn">{{ chain.length }}</span></div>
-        <div class="crow" v-for="(c, i) in chain" :key="c.receipt?.id ?? `row-${i}`">
+        <div class="crow" v-for="c in chain" :key="c.receipt?.id ?? c.localId">
           <span class="cdot" :style="{ background: EPISTEMIC_COLORS[c.epistemic_status] || 'var(--idle)' }" />
           <span class="mono cid">{{ c.receipt ? short(c.receipt.id) : '—' }}</span>
           <span class="ckind">{{ c.kind }} · {{ c.backend }}</span>
