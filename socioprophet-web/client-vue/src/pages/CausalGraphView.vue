@@ -83,19 +83,23 @@ function toggleHyp(h: CausalHypothesis) {
             class="drill-down"
             :id="`hyp-drill-${h.id}`"
           >
-            <p v-if="h.warrantRefs.length === 0" class="no-warrants">
-              No warrants attached yet — status is
-              <em>{{ h.claimStatus }}</em>.
-            </p>
-            <ul v-else class="warrants">
-              <li
-                v-for="w in warrantsForHypothesis(snapshot, h)"
-                :key="w.id"
-              >
-                <p class="excerpt">"{{ w.excerpt }}"</p>
-                <p class="source"><code>{{ w.sourceDocRef }}</code></p>
-              </li>
-            </ul>
+            <!-- Contents render only when open (v-if inside), so DOM stays
+                 small while the container stays present for aria-controls. -->
+            <template v-if="expandedHypId === h.id">
+              <p v-if="h.warrantRefs.length === 0" class="no-warrants">
+                No warrants attached yet — status is
+                <em>{{ h.claimStatus }}</em>.
+              </p>
+              <ul v-else class="warrants">
+                <li
+                  v-for="w in warrantsForHypothesis(snapshot, h)"
+                  :key="w.id"
+                >
+                  <p class="excerpt">"{{ w.excerpt }}"</p>
+                  <p class="source"><code>{{ w.sourceDocRef }}</code></p>
+                </li>
+              </ul>
+            </template>
           </div>
         </li>
       </ul>
@@ -131,16 +135,18 @@ function toggleHyp(h: CausalHypothesis) {
             class="drill-down"
             :id="`edge-drill-${edge.id}`"
           >
-            <h3>Warrants</h3>
-            <ul class="warrants">
-              <li
-                v-for="w in warrantsForEdge(snapshot, edge)"
-                :key="w.id"
-              >
-                <p class="excerpt">"{{ w.excerpt }}"</p>
-                <p class="source"><code>{{ w.sourceDocRef }}</code></p>
-              </li>
-            </ul>
+            <template v-if="expandedEdgeId === edge.id">
+              <h3>Warrants</h3>
+              <ul class="warrants">
+                <li
+                  v-for="w in warrantsForEdge(snapshot, edge)"
+                  :key="w.id"
+                >
+                  <p class="excerpt">"{{ w.excerpt }}"</p>
+                  <p class="source"><code>{{ w.sourceDocRef }}</code></p>
+                </li>
+              </ul>
+            </template>
           </div>
         </li>
       </ul>

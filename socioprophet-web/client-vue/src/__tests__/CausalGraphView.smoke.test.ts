@@ -85,3 +85,17 @@ describe('aria-controls idref always resolves (Copilot round-2)', () => {
     for (const d of drilled) expect(d.attributes('id')).toBeDefined();
   });
 });
+
+
+describe('lazy-render inside v-show container (Copilot round-3)', () => {
+  it('drill-down container is always present but warrant list only renders when open', async () => {
+    const w = mount(CausalGraphView);
+    // Container present, but no <ul.warrants> rendered inside any edge yet.
+    expect(w.findAll('.edge .drill-down').length).toBeGreaterThan(0);
+    expect(w.findAll('.edge .drill-down ul.warrants').length).toBe(0);
+
+    await w.find('.edge .row').trigger('click');
+    // Now exactly one edge has warrants rendered.
+    expect(w.findAll('.edge .drill-down ul.warrants').length).toBe(1);
+  });
+});
