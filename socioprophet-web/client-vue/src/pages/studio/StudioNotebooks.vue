@@ -4,6 +4,7 @@ import {
   loadNotebookAdapters, createNotebookSession, executeCell, loadNotebookReceipts, proposeCell,
   type NbAdapter, type NbSession, type NbOutput, type NbReceipt,
 } from "../../services/studioApi";
+import { sanitizeCellHtml, sanitizeCellSvg } from "../../utils/sanitizeHtml";
 
 // a tiny inline bar chart (epistemic-coloured) to demonstrate rich output rendering in the preview
 const MINI_SVG = `<svg viewBox="0 0 260 120" width="260" height="120" xmlns="http://www.w3.org/2000/svg">
@@ -184,8 +185,8 @@ async function toggleChain() {
             <template v-for="(o, i) in cell.outputs" :key="i">
               <!-- rich: plots (png/svg) and tables/HTML (DataFrame._repr_html_) — real DS output -->
               <img v-if="o.png" class="rich" :src="'data:image/png;base64,' + o.png" alt="cell output" />
-              <div v-else-if="o.svg" class="rich" v-html="o.svg" />
-              <div v-else-if="o.html" class="rich htmlout" v-html="o.html" />
+              <div v-else-if="o.svg" class="rich" v-html="sanitizeCellSvg(o.svg)" />
+              <div v-else-if="o.html" class="rich htmlout" v-html="sanitizeCellHtml(o.html)" />
               <pre v-else-if="o.type === 'error'" class="oerr">{{ o.ename }}: {{ o.evalue }}</pre>
               <div v-else-if="o.type === 'degraded'" class="odeg">⚠ {{ o.text }}</div>
               <pre v-else class="stream">{{ o.text }}</pre>

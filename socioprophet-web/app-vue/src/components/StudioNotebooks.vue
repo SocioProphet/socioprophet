@@ -184,8 +184,18 @@ async function toggleChain() {
             <template v-for="(o, i) in cell.outputs" :key="i">
               <!-- rich: plots (png/svg) and tables/HTML (DataFrame._repr_html_) — real DS output -->
               <img v-if="o.png" class="rich" :src="'data:image/png;base64,' + o.png" alt="cell output" />
-              <div v-else-if="o.svg" class="rich" v-html="o.svg" />
-              <div v-else-if="o.html" class="rich htmlout" v-html="o.html" />
+              <!-- v-html on notebook cell output is untrusted (pandas _repr_html_,
+                   IPython.display.HTML, a compromised BFF over /api/studio/notebook/
+                   execute) — see fix in client-vue/src/utils/sanitizeHtml.ts. app-vue
+                   does not carry DOMPurify (the deploy pipeline uses `npm ci` and I do
+                   not want to hand-edit the lock file), so the two paths fail closed
+                   here: rich rendering is disabled and the operator is told where the
+                   full-fidelity notebook lives. Migration to client-vue is in progress. -->
+              <div v-else-if="o.svg || o.html" class="rich odeg" role="status">
+                ⛨ rich output (SVG/HTML) not rendered on the legacy cockpit — open in the
+                unified cockpit at <a href="/cockpit" rel="noopener">{{ '/cockpit' }}</a>
+                to view.
+              </div>
               <pre v-else-if="o.type === 'error'" class="oerr">{{ o.ename }}: {{ o.evalue }}</pre>
               <div v-else-if="o.type === 'degraded'" class="odeg">⚠ {{ o.text }}</div>
               <pre v-else class="stream">{{ o.text }}</pre>
