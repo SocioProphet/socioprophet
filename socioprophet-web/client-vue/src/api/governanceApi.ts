@@ -22,7 +22,14 @@ export interface GovParams {
 
 export async function runGovernanceTest(p: GovParams): Promise<{ data: GovernanceTest | null; error?: string }> {
   const q = new URLSearchParams();
-  Object.entries(p).forEach(([k, v]) => { if (v) q.set(k, String(v)); });
+  // Only skip when a field is genuinely absent (undefined / null). Clearing "Evidence"
+  // to '' is a MEANINGFUL operator action — re-running the governance test with NO
+  // evidence — and if we drop the empty string here, `dashboard-bff` falls back to its
+  // default and the UI displays a receipt that does not match what the operator actually
+  // asked. Empty string is presence, not absence.
+  Object.entries(p).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) q.set(k, String(v));
+  });
   try {
     const res = await fetch(`${API_BASE}/v1/governance/test?${q.toString()}`, { headers: { accept: 'application/json' } });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);

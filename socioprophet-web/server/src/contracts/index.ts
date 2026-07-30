@@ -169,8 +169,16 @@ const nlBootPlan = (deviceId: string, buildId: string, stages: any[]) => ({
 });
 
 // Evidence that a device booted a plan → conformant BootProofRecord.
+//
+// The id used to be `boot-proof:{deviceId}-{Date.now()}`, so two boot-proofs from the
+// same device in the same millisecond (retry loop, rapid stage transitions, batched
+// fleet callback) minted identical URNs and the second silently overwrote the first in
+// Firestore. Adding a per-call sequence — same pattern the sibling `eventEnvelope`
+// already uses below — makes every id unique per-tick without depending on cross-tick
+// clock resolution. `bootedAt` still carries wall time for auditors.
+let _bootProofSeq = 0;
 const bootProofRecord = (deviceId: string, planRef: string, outcome: string) => ({
-  id: `urn:srcos:boot-proof:${lc(deviceId)}-${Date.now()}`,
+  id: `urn:srcos:boot-proof:${lc(deviceId)}-${Date.now()}-${_bootProofSeq++}`,
   type: "BootProofRecord",
   specVersion: SPEC_VERSION,
   bootPlanRef: planRef,
