@@ -40,11 +40,17 @@ const STAGES = ["none", "staging", "production", "archived"];
 const busy = ref(""); const flash = ref("");
 function say(msg: string) { flash.value = msg; setTimeout(() => (flash.value = ""), 2600); }
 
-// v-model for each row's <select>. A bare @change handler on the placeholder
-// pattern (option value="" disabled selected) leaves the DOM element pinned to
-// the last chosen target: selecting the SAME stage again is a
-// browser-suppressed change event, so the promote silently no-ops. A bound
-// ref cleared after each await snaps the select back to "promote…".
+// Per-row v-model backing for the promote <select>. A bare @change handler on the
+// placeholder pattern (option value="" disabled selected) leaves the DOM element
+// pinned to the last chosen target: selecting the SAME stage again is a
+// browser-suppressed change event, so the promote silently no-ops. Vue's v-model
+// writes the selection into `promoteSel[key]`; the `finally` block clears it back
+// to '', which forces Vue to snap the DOM select back to the "promote…" placeholder.
+// Copilot round-3: previously we only bound `:value` and never wrote to `promoteSel`
+// on change, so the state was misleading — the model was always '' and did not
+// actually track selection. Real `v-model` binding matches the intent and lets
+// `doPromote` read the current selection from the reactive model instead of the
+// change event's DOM target.
 const promoteSel = ref<Record<string, string>>({});
 function selKey(name: string, version: string): string { return `${name}:${version}`; }
 
@@ -134,8 +140,8 @@ function kv(o: Record<string, number>): string { return Object.entries(o).map(([
             <span class="mono met">{{ kv(v.metrics) }}</span>
             <span v-if="v.run" class="lineage mono" :title="'produced_by → run'">↳ {{ v.run.split(':').pop() }}</span>
             <select class="promote" :disabled="busy === `${m.name}:${v.version}`"
-                    :value="promoteSel[selKey(m.name, v.version)] || ''"
-                    @change="e => doPromote(m.name, v.version, (e.target as HTMLSelectElement).value)">
+                    v-model="promoteSel[selKey(m.name, v.version)]"
+                    @change="doPromote(m.name, v.version, promoteSel[selKey(m.name, v.version)] || '')">
               <option value="" disabled>promote…</option>
               <option v-for="s in STAGES" :key="s" :value="s" :disabled="s === v.stage">{{ s }}</option>
             </select>

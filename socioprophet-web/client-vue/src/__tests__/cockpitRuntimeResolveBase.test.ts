@@ -28,13 +28,21 @@ describe('resolveBase — presence beats truthiness for injected bases', () => {
     expect(resolveBase('algo', 'VITE_ALGO_BASE', '/svc/algo')).toBe('http://127.0.0.1:9090');
   });
 
+  // Copilot round-3: the fallthrough tests must NOT reference a real
+  // `VITE_*` name that might be set in some test environments — if it is,
+  // `resolveBase` reads it via `import.meta.env` and the assertion flips
+  // from `/svc/algo` to whatever the env carries. Use a sentinel env-var
+  // name that is guaranteed to be undefined so the fallthrough behaviour
+  // is what we're actually testing.
+  const SENTINEL_ENV = 'VITE_RESOLVEBASE_TEST_SENTINEL_UNSET' as const;
+
   it('key not injected falls through to the code fallback', () => {
     setInjected({ mode: 'connected', bases: {} });
-    expect(resolveBase('algo', 'VITE_ALGO_BASE', '/svc/algo')).toBe('/svc/algo');
+    expect(resolveBase('algo', SENTINEL_ENV, '/svc/algo')).toBe('/svc/algo');
   });
 
   it('no config at all falls through to the code fallback', () => {
     setInjected(undefined);
-    expect(resolveBase('algo', 'VITE_ALGO_BASE', '/svc/algo')).toBe('/svc/algo');
+    expect(resolveBase('algo', SENTINEL_ENV, '/svc/algo')).toBe('/svc/algo');
   });
 });
