@@ -229,6 +229,7 @@ export const AGENT_COCKPIT: NavGroup[] = [
       { label: 'Control Plane', to: '/control-plane/org' },
       { label: 'Provenance (why a decision)', to: '/control-plane/provenance' },
       { label: 'Universe Viewer', to: '/universe' },
+      { label: 'Space Twin (4D)', to: '/space' },
       { label: 'Situations (n-ary)', to: '/situations' },
     ],
   },

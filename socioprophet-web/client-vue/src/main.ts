@@ -53,6 +53,7 @@ import PortfolioBoard from './pages/PortfolioBoard.vue';
 import OperatorSurface from './pages/OperatorSurface.vue';
 import OntologySurface from './pages/OntologySurface.vue';
 import UniverseViewer from './pages/UniverseViewer.vue';
+import SpaceTwin from './pages/SpaceTwin.vue';
 import SupplyChainOrchestrator from './pages/SupplyChainOrchestrator.vue';
 import HolographMe from './pages/HolographMe.vue';
 import SituationsSurface from './pages/SituationsSurface.vue';
@@ -87,6 +88,7 @@ const explicitRoutes = [
   { path: '/operator/:id', component: OperatorSurface },
   { path: '/ontology', component: OntologySurface },
   { path: '/universe', component: UniverseViewer },
+  { path: '/space', component: SpaceTwin },
   { path: '/situations', component: SituationsSurface },
   { path: '/marketplace/orchestrate', component: SupplyChainOrchestrator },
   { path: '/capability/algorithmic-trading', component: AlgoTradingBoard },
