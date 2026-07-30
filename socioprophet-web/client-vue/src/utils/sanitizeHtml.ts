@@ -11,6 +11,14 @@
 import DOMPurify from 'dompurify';
 
 const HTML_OPTS: DOMPurify.Config = {
+  // Copilot round-2: pin the sanitiser to the HTML profile. Without this DOMPurify
+  // permits SVG and MathML inside an HTML payload, which reopens the SVG-smuggle
+  // surface `sanitizeCellSvg` was split out to police — an attacker could ship an
+  // `<svg><foreignObject>` carrying `<script>` inside what claims to be
+  // pandas' `_repr_html_` and bypass the stricter SVG allowlist. SVG cells go
+  // through `sanitizeCellSvg`; anything shaped like SVG in an HTML cell is
+  // deliberately dropped here.
+  USE_PROFILES: { html: true },
   // The chat path opts in `target` and `rel` for its markdown links; notebook HTML
   // can carry the same on plain <a>, so keep the same additions.
   ADD_ATTR: ['target', 'rel'],
@@ -32,4 +40,41 @@ export function sanitizeCellHtml(input: unknown): string {
 export function sanitizeCellSvg(input: unknown): string {
   if (typeof input !== 'string') return '';
   return DOMPurify.sanitize(input, SVG_OPTS);
+}
+
+// Copilot round-2: sanitising in the template means DOMPurify runs on every render
+// (a large DataFrame HTML repr can be tens of KB — Vue reactivity re-runs it any
+// time an unrelated cell mutates). Memoise by INPUT-STRING IDENTITY so a stable
+// cell output is sanitised exactly once per lifetime, and the cache is bounded
+// (~200 entries) with LRU-lite eviction so a chatty runtime cannot balloon it.
+const CACHE_MAX = 200;
+const htmlCache = new Map<string, string>();
+const svgCache = new Map<string, string>();
+
+function cached(cache: Map<string, string>, input: string, run: (s: string) => string): string {
+  const hit = cache.get(input);
+  if (hit !== undefined) {
+    // Touch: re-insert to move to the end of the Map's insertion order (JS Map is
+    // insertion-ordered, so the OLDEST key is `keys().next().value`).
+    cache.delete(input);
+    cache.set(input, hit);
+    return hit;
+  }
+  const out = run(input);
+  cache.set(input, out);
+  if (cache.size > CACHE_MAX) {
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) cache.delete(oldest);
+  }
+  return out;
+}
+
+export function sanitizeCellHtmlMemo(input: unknown): string {
+  if (typeof input !== 'string') return '';
+  return cached(htmlCache, input, (s) => DOMPurify.sanitize(s, HTML_OPTS));
+}
+
+export function sanitizeCellSvgMemo(input: unknown): string {
+  if (typeof input !== 'string') return '';
+  return cached(svgCache, input, (s) => DOMPurify.sanitize(s, SVG_OPTS));
 }
