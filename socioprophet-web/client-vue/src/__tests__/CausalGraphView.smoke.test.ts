@@ -20,13 +20,17 @@ describe('CausalGraphView', () => {
 
   it('surfaces the source-document warrant when an edge is clicked', async () => {
     const w = mount(CausalGraphView);
-    // No drill-down visible before click.
-    expect(w.find('.edge .drill-down').exists()).toBe(false);
+    // Drill-down exists but is hidden pre-click (v-show, not v-if — so
+    // aria-controls idref stays valid; the button's aria-expanded='false'
+    // is what conveys the state to assistive tech).
+    const before = w.find('.edge .drill-down');
+    expect(before.exists()).toBe(true);
+    expect((before.element as HTMLElement).style.display).toBe('none');
 
     await w.find('.edge .row').trigger('click');
 
     const drilled = w.find('.edge .drill-down');
-    expect(drilled.exists()).toBe(true);
+    expect((drilled.element as HTMLElement).style.display).not.toBe('none');
     // The auto-parts fixture references a document — the surface must show it.
     expect(drilled.text()).toContain('urn:srcos:doc:');
   });
@@ -66,5 +70,18 @@ describe('accessibility (Copilot follow-up)', () => {
     await btn.trigger('click');
     const drilled = w.find('.edge .drill-down');
     expect(drilled.attributes('id')).toBe(id);
+  });
+});
+
+describe('aria-controls idref always resolves (Copilot round-2)', () => {
+  it('drill-down container stays in the DOM when collapsed, so idref is valid', () => {
+    const w = mount(CausalGraphView);
+    // Before any click, the container should exist and be hidden via v-show
+    // (display:none) rather than removed with v-if. That makes aria-controls
+    // idref valid at all times.
+    const drilled = w.findAll('.hypothesis .drill-down');
+    expect(drilled.length).toBeGreaterThan(0);
+    // Each container has a matching id even when not expanded.
+    for (const d of drilled) expect(d.attributes('id')).toBeDefined();
   });
 });

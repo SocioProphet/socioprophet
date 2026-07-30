@@ -79,7 +79,7 @@ function toggleHyp(h: CausalHypothesis) {
           </button>
           <p class="statement">{{ h.hypothesis }}</p>
           <div
-            v-if="expandedHypId === h.id"
+            v-show="expandedHypId === h.id"
             class="drill-down"
             :id="`hyp-drill-${h.id}`"
           >
@@ -127,7 +127,7 @@ function toggleHyp(h: CausalHypothesis) {
           </button>
           <p class="summary">{{ contributionSummary(edge) }}</p>
           <div
-            v-if="expandedEdgeId === edge.id"
+            v-show="expandedEdgeId === edge.id"
             class="drill-down"
             :id="`edge-drill-${edge.id}`"
           >

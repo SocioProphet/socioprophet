@@ -91,7 +91,11 @@ export function assertWellFormed(snapshot: CausalGraphSnapshot): void {
       );
     }
     for (const ref of edge.warrantRefs) {
-      if (!snapshot.warrants[ref]) {
+      // Own-property check: `snapshot.warrants[ref]` would treat prototype
+      // properties (toString, __proto__) as present, letting an attacker
+      // craft a warrantRef of 'toString' that passes validation but resolves
+      // to a Function at render time.
+      if (!Object.prototype.hasOwnProperty.call(snapshot.warrants, ref)) {
         throw new Error(
           `CausalGraphSnapshot ${snapshot.graphRef}: edge ${edge.id} references warrant ${ref} not present in snapshot.warrants`,
         );
@@ -104,7 +108,7 @@ export function assertWellFormed(snapshot: CausalGraphSnapshot): void {
   // deliberately unbacked when it is actually a fabric bug.
   for (const h of snapshot.hypotheses) {
     for (const ref of h.warrantRefs) {
-      if (!snapshot.warrants[ref]) {
+      if (!Object.prototype.hasOwnProperty.call(snapshot.warrants, ref)) {
         throw new Error(
           `CausalGraphSnapshot ${snapshot.graphRef}: hypothesis ${h.id} references warrant ${ref} not present in snapshot.warrants`,
         );
