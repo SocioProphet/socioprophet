@@ -227,6 +227,8 @@ export const AGENT_COCKPIT: NavGroup[] = [
     items: [
       { label: 'Agentic OS', to: '/agentic-os' },
       { label: 'Control Plane', to: '/control-plane/org' },
+      { label: 'Executions Ledger', to: '/control-plane/executions' },
+      { label: 'Containment (blast-radius)', to: '/control-plane/containment' },
       { label: 'Provenance (why a decision)', to: '/control-plane/provenance' },
       { label: 'Universe Viewer', to: '/universe' },
       { label: 'Space Twin (4D)', to: '/space' },

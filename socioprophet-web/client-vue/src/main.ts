@@ -39,6 +39,8 @@ import NoeticaChat from './pages/NoeticaChat.vue';
 import WeatherMonitor from './pages/WeatherMonitor.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import NoeticaControlPlane from './pages/NoeticaControlPlane.vue';
+import ExecutionsLedger from './pages/ExecutionsLedger.vue';
+import ContainmentGraph from './pages/ContainmentGraph.vue';
 import DomainSurfacePage from './pages/DomainSurfacePage.vue';
 import FeedPage from './pages/FeedPage.vue';
 import Journal from './pages/Journal.vue';
@@ -114,6 +116,8 @@ const explicitRoutes = [
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },
   { path: '/control-plane/org', component: NoeticaControlPlane },
+  { path: '/control-plane/executions', component: ExecutionsLedger },
+  { path: '/control-plane/containment', component: ContainmentGraph },
   { path: '/nlboot', component: NLBootEvidence },
   { path: '/reader', component: Reader },
   { path: '/journal', component: Journal },
