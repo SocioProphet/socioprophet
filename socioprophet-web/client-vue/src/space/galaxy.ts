@@ -36,7 +36,12 @@ export interface GalaxyOptions {
 /** A logarithmic-spiral galaxy: a warm bulge, cooler disk stars scattered around
  *  `arms` trailing spiral arms, with vertical thickness falling off toward the rim. */
 export function generateGalaxy(opts: GalaxyOptions = {}): StarPoint[] {
-  const { seed = 42, arms = 4, count = 6000, radius = 90, twist = 2.6 } = opts;
+  const { seed = 42, count = 6000, twist = 2.6 } = opts;
+  // `arms` and `radius` are DIVISORS below (`arm / arms`, `r * twist / radius`). A caller passing 0 —
+  // or a negative — would emit a whole field of NaN positions, which deck.gl renders as nothing (or
+  // scattered garbage) with no error. Clamp to safe positives; an unspecified value keeps the defaults.
+  const arms = Math.max(1, Math.trunc(opts.arms ?? 4));
+  const radius = opts.radius != null && opts.radius > 0 ? opts.radius : 90;
   const rnd = mulberry32(seed);
   const out: StarPoint[] = [];
   for (let k = 0; k < count; k++) {

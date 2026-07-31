@@ -163,9 +163,14 @@ function initialViewState(): OrbitViewState {
     : { target: [0, 0, 0], rotationX: 62, rotationOrbit: 0, zoom: -3.4, minZoom: -6, maxZoom: 4 };
 }
 
-// deck's setProps takes view state keyed by view id, so the single OrbitView is named.
-function viewStates(extra: Partial<OrbitViewState> = {}) {
-  return { orbit: { ...initialViewState(), ...extra } };
+// The camera is CONTROLLED — we own the view state. `initialViewState()` is only the per-mode DEFAULT;
+// after mount `viewState` tracks the user's zoom/drag (via onViewStateChange), and the galaxy spin
+// advances ONLY rotationOrbit. The bug this replaces reapplied `initialViewState()` every frame, which
+// threw away the user's zoom/drag/target the instant the spin ran. deck's setProps takes view state
+// keyed by view id, so the single OrbitView is named.
+let viewState: OrbitViewState = initialViewState();
+function pushView() {
+  deck.value?.setProps({ viewState: { orbit: viewState } });
 }
 
 function render() {
@@ -177,7 +182,9 @@ function setMode(m: 'solar' | 'galaxy') {
   if (m === mode.value) return;
   mode.value = m;
   playing.value = false;
-  deck.value?.setProps({ initialViewState: viewStates(), layers: m === 'solar' ? solarLayers() : galaxyLayers() });
+  galaxyAngle = 0;                    // so re-entering galaxy mode does not resume mid-spin
+  viewState = initialViewState();     // a mode switch DELIBERATELY reframes to the new mode's default
+  deck.value?.setProps({ viewState: { orbit: viewState }, layers: m === 'solar' ? solarLayers() : galaxyLayers() });
 }
 
 // ── animation loop (time or galaxy spin) ─────────────────────────────────
@@ -190,7 +197,8 @@ function tick(ts: number) {
       if (dayOffset.value >= SPAN_DAYS) playing.value = false;
     } else {
       galaxyAngle += dt * 4;
-      deck.value?.setProps({ initialViewState: viewStates({ rotationOrbit: galaxyAngle }) });
+      viewState = { ...viewState, rotationOrbit: galaxyAngle };   // preserve the user's zoom/drag/target
+      pushView();
     }
   }
   raf = requestAnimationFrame(tick);
@@ -200,11 +208,15 @@ watch([dayOffset, mode], render);
 
 onMounted(() => {
   if (!canvasEl.value) return;
+  viewState = initialViewState();
   deck.value = new Deck<OrbitView[]>({
     canvas: canvasEl.value,
     views: [new OrbitView({ id: 'orbit', orbitAxis: 'Z', fovy: 50 })],
-    initialViewState: viewStates(),
+    viewState: { orbit: viewState },
     controller: true,
+    // Controlled view: fold the user's own zoom/drag back into `viewState` so the spin (which only
+    // touches rotationOrbit) never clobbers it, and a re-render never snaps the camera home.
+    onViewStateChange: ({ viewState: vs }) => { viewState = vs as OrbitViewState; pushView(); },
     // v9 clears to transparent by default, so the .st-stage gradient is the backdrop.
     layers: solarLayers(),
   });
