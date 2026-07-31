@@ -35,4 +35,14 @@ describe('ExecutionsLedger', () => {
     expect(w.find('.warrant .caps').exists()).toBe(true);
     expect(w.find('.warrant .decision').exists()).toBe(true);
   });
+
+  it('is keyboard-operable: Enter toggles the row', async () => {
+    const w = mount(ExecutionsLedger, mountOpts);
+    const row = w.find('.exec-row');
+    expect(row.attributes('tabindex')).toBe('0');
+    const firstWarrant = () => w.findAll('.warrant-row')[0].element as HTMLElement;
+    expect(firstWarrant().style.display).toBe('none');
+    await row.trigger('keydown.enter');
+    expect(firstWarrant().style.display).not.toBe('none');
+  });
 });

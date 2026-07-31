@@ -37,7 +37,11 @@
         </thead>
         <tbody>
           <template v-for="row in filtered" :key="row.executionReceiptId">
-            <tr class="exec-row" @click="toggle(row.executionReceiptId)">
+            <tr class="exec-row" tabindex="0" role="button"
+              :aria-expanded="open.has(row.executionReceiptId)"
+              @click="toggle(row.executionReceiptId)"
+              @keydown.enter="toggle(row.executionReceiptId)"
+              @keydown.space.prevent="toggle(row.executionReceiptId)">
               <td class="mono when">{{ fmt(row.executedAt) }}</td>
               <td><div class="agent"><span class="an">{{ row.agent.name }}</span><span class="av mono">{{ row.agent.version }}</span></div></td>
               <td><span class="in-tag mono">{{ inputLabel(row.input.type) }}</span></td>
@@ -74,7 +78,7 @@
                     <div class="proof mono">
                       {{ row.receiptHash }}<br />
                       replayable={{ row.proofReplayable }} · epistemicLevel={{ row.epistemicLevel ?? 'n/a' }}
-                      <span v-if="!row.proofReplayable" class="warn">⊘ verified verdict requires a replayable artifact</span>
+                      <span v-if="row.verdict === 'verified' && !row.proofReplayable" class="warn">⊘ verified verdict requires a replayable artifact</span>
                     </div>
                   </div>
                   <div v-if="row.blast" class="wsec">

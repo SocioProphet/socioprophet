@@ -43,7 +43,8 @@
 
         <div class="toggle-row">
           <span>Require approval before sever</span>
-          <button type="button" class="switch" role="switch" :aria-checked="requireApproval" @click="requireApproval = !requireApproval"
+          <button type="button" class="switch" role="switch" aria-label="Require approval before sever"
+            :aria-checked="requireApproval" @click="requireApproval = !requireApproval"
             :class="{ on: requireApproval }"></button>
         </div>
         <div class="approve-note" v-if="requireApproval">Signed, time-boxed, revocable · link via
@@ -75,7 +76,8 @@ import {
 } from '../features/containment/types';
 
 const route = useRoute();
-const source = ref<string>(normalizeSource((route.query.node as string) || DEMO_SOURCE));
+// Reactive to ?node= so navigating to the same route with a different node updates the surface.
+const source = computed<string>(() => normalizeSource((route.query.node as string) || DEMO_SOURCE));
 const scope = ref<SeverScope>('full');
 const requireApproval = ref(true);
 const keepLabels = SELECTIVE_KEEP;

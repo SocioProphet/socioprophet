@@ -69,7 +69,9 @@ export function severResidual(
     } else if (scope === 'full') {
       expand = []; // fully isolated: nothing expands
     } else {
-      expand = edges.filter((e) => keepLabels.includes(e.label)); // keep only excluded labels
+      // Selective: keep only kept-label edges traversable, and never expand THROUGH an
+      // allow-listed endpoint (it is terminal — recorded below but never a pivot).
+      expand = edges.filter((e) => keepLabels.includes(e.label) && !allowSet.has(e.to));
     }
     // Allow-listed neighbours of a cut node are terminal-reachable but not expanded.
     if (cut.has(d)) {
