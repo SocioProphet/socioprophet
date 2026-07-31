@@ -8,9 +8,13 @@
 // DOMPurify is already the shipped pattern for the chat markdown path — see
 // `renderMarkdown` in `./markdown.ts`. Using it here keeps notebook rendering on
 // the same audited allowlist rather than inventing a second, weaker one.
-import DOMPurify from 'dompurify';
+import DOMPurify, { type Config } from 'dompurify';
 
-const HTML_OPTS: DOMPurify.Config = {
+// dompurify v3 exports `Config` as a named type (the old `DOMPurify.Config`
+// namespace is gone). Typing the options as `Config` also lets `sanitize`
+// resolve to its `(dirty, cfg?: Config): string` overload instead of the
+// `RETURN_TRUSTED_TYPE: true` one that returns TrustedHTML.
+const HTML_OPTS: Config = {
   // Copilot round-2: pin the sanitiser to the HTML profile. Without this DOMPurify
   // permits SVG and MathML inside an HTML payload, which reopens the SVG-smuggle
   // surface `sanitizeCellSvg` was split out to police — an attacker could ship an
@@ -24,7 +28,7 @@ const HTML_OPTS: DOMPurify.Config = {
   ADD_ATTR: ['target', 'rel'],
 };
 
-const SVG_OPTS: DOMPurify.Config = {
+const SVG_OPTS: Config = {
   // Cell PNGs go through `:src="'data:image/png;base64,'+..."`, but SVG plots
   // (matplotlib, plotly static) come in as raw markup. Restrict DOMPurify to the
   // SVG grammar rather than the HTML grammar so a stray `<script>` in an SVG is
