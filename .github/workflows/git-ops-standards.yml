@@ -1,0 +1,8 @@
+name: git-ops-standards
+
+on:
+  pull_request:
+
+jobs:
+  gate:
+    uses: SocioProphet/git-ops-standards/.github/workflows/pr-merge-gate.yml@main
