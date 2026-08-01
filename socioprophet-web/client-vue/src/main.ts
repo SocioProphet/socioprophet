@@ -67,6 +67,7 @@ import AnalyticsStudio from './pages/AnalyticsStudio.vue';
 import SupplyChainMap from './pages/SupplyChainMap.vue';
 import DigitalTwin from './pages/DigitalTwin.vue';
 import TwinOperatingPicture from './pages/TwinOperatingPicture.vue';
+import ModelTournament from './pages/ModelTournament.vue';
 import LandResources from './pages/LandResources.vue';
 import AgenticOS from './pages/AgenticOS.vue';
 import Marketplace from './pages/Marketplace.vue';
@@ -104,6 +105,7 @@ const explicitRoutes = [
   { path: '/analytics/supply-chain', component: SupplyChainMap },
   { path: '/analytics/digital-twin', component: DigitalTwin },
   { path: '/analytics/twin-workshop', component: TwinOperatingPicture },
+  { path: '/analytics/model-tournament', component: ModelTournament },
   // Layer 0 — Land & Natural Resources (the base of the economic model). Also
   // gives the Weather domain's "Natural Resources" sub-domain a real surface.
   { path: '/weather/natural-resources', component: LandResources },
