@@ -195,30 +195,35 @@ const stageTargets = computed(() =>
   snapshot.value.stages.map((stage) => reachedStage(snapshot.value.models, stage.index)),
 );
 
-const animatedCounts = ref<number[]>([]);
+// Initialize from the current targets so the funnel shows real counts on first
+// paint (not `undefined`) before any Run-tournament animation.
+const animatedCounts = ref<number[]>([...stageTargets.value]);
 const running = ref(false);
 
 function resetCounts() {
   animatedCounts.value = stageTargets.value.map(() => 0);
 }
 
-// "Run tournament" animates each stage count up to its target funnel value.
+// "Run tournament" animates each stage count up to its target funnel value over a
+// FIXED number of ticks, so the animation duration stays bounded (~1s) regardless
+// of how many models the tournament holds.
+const FUNNEL_TICKS = 24;
 function runTournament() {
   if (running.value) return;
   running.value = true;
   resetCounts();
   const targets = stageTargets.value;
   let step = 0;
-  const maxSteps = Math.max(1, ...targets) + 1;
   const timer = setInterval(() => {
     step += 1;
-    animatedCounts.value = targets.map((t) => Math.min(t, step));
-    if (step >= maxSteps) {
+    const fraction = step / FUNNEL_TICKS;
+    animatedCounts.value = targets.map((t) => Math.min(t, Math.round(t * fraction)));
+    if (step >= FUNNEL_TICKS) {
       clearInterval(timer);
       animatedCounts.value = [...targets];
       running.value = false;
     }
-  }, 160);
+  }, 40);
 }
 
 function verdictLabel(v: Verdict): string {

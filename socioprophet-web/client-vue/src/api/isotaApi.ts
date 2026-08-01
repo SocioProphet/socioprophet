@@ -130,13 +130,22 @@ export async function fetchTournamentSnapshotWithFallback(): Promise<TournamentL
     // cited) shape; when it does not conform to a TournamentSnapshot we honestly fall
     // back to the fixture rather than fabricate a live tournament.
     const raw = await getJson<Partial<TournamentSnapshot>>('/v1/intelligence-superiority');
-    if (raw && Array.isArray(raw.models) && Array.isArray(raw.corpora) && Array.isArray(raw.stages)) {
+    // Require the honesty flag too: the UI badges rows by `illustrativeSeed`, so a
+    // response that omits it could render illustrative data as if it were measured.
+    // If it's missing, fall back to the clearly-badged fixture rather than risk that.
+    if (
+      raw &&
+      Array.isArray(raw.models) &&
+      Array.isArray(raw.corpora) &&
+      Array.isArray(raw.stages) &&
+      typeof raw.illustrativeSeed === 'boolean'
+    ) {
       return { snapshot: raw as TournamentSnapshot, mode: 'live' };
     }
     return {
       snapshot: demoTournamentSnapshot(),
       mode: 'fixture',
-      error: 'live seam did not expose a model-tournament shape; showing fixture',
+      error: 'live seam did not expose a badged model-tournament shape; showing fixture',
     };
   } catch (error) {
     return {
