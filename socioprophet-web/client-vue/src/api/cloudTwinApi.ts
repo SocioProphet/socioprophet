@@ -133,9 +133,9 @@ export async function fetchTwinEvents(twinId: string): Promise<TwinEventEnvelope
 
 // ── Client-side fail-closed validation, mirroring the service's SeedValidationError ──
 export function validateSeed(seed: Partial<GenesisSeed>): string | null {
-  if (!seed.kind) return 'field "kind" is required';
-  if (!seed.hologram_ref) return 'field "hologram_ref" is required (no base semantic rep)';
-  if (!seed.authorization) return 'field "authorization" (principal) required to authorize the twin';
+  if (!seed.kind) return 'Choose a twin kind.';
+  if (!seed.hologram_ref) return 'A hologram reference is required.';
+  if (!seed.authorization) return 'An authorization principal is required.';
   return null;
 }
 

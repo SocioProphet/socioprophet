@@ -95,7 +95,7 @@
         <li v-if="events.length === 0" class="tw-empty">No events yet — build a twin to emit the lifecycle stream.</li>
         <li v-for="(e, i) in events" :key="`${e.twin_id}-${e.seq}-${i}`" class="tw-event">
           <span class="tw-seq">#{{ e.seq }}</span>
-          <span :class="['tw-type', `tw-type--${e.type.split('.')[1]}`]">{{ e.type }}</span>
+          <span :class="['tw-type', typeClass(e.type)]">{{ e.type }}</span>
           <span class="tw-ev-meta">{{ e.twin_id }} · {{ e.payload }}</span>
         </li>
       </ul>
@@ -160,6 +160,13 @@ onMounted(async () => {
 
 function pushEvent(e: TwinEventEnvelope): void {
   events.value = [e, ...events.value].slice(0, 40);
+}
+
+// Safe lifecycle-suffix class — an unexpected event type (no dot) styles as the
+// neutral base rather than `tw-type--undefined`.
+function typeClass(type: string): string {
+  const suffix = type.includes('.') ? type.split('.')[1] : 'event';
+  return `tw-type--${suffix || 'event'}`;
 }
 
 function payloadFor(st: TwinState, seed: GenesisSeed, id: string): string {

@@ -4,12 +4,13 @@
  *
  * Covers:
  *  1. the page mounts and renders the fixture twin registry + metric tiles;
- *  2. fail-closed GenesisSeed validation rejects missing required fields (mirrors the
- *     service's 422 SeedValidationError);
- *  3. twinCounts tallies the fleet by lifecycle state.
+ *  2. on mount, the async load actually runs and falls back to the fixture registry
+ *     when the backend is unavailable (proves fetchTwinRegistryWithFallback ran);
+ *  3. fail-closed GenesisSeed validation rejects missing required fields;
+ *  4. twinCounts tallies the fleet by lifecycle state.
  */
-import { mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import TwinOperatingPicture from '../pages/TwinOperatingPicture.vue';
 import { demoTwins, twinCounts, validateSeed } from '../api/cloudTwinApi';
@@ -21,6 +22,11 @@ describe('TwinOperatingPicture', () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no backend in test'))));
   });
 
+  afterEach(() => {
+    // Restore globals so the fetch stub does not leak into other test files in the worker.
+    vi.unstubAllGlobals();
+  });
+
   it('mounts and renders the fixture twin registry', () => {
     const wrapper = mount(TwinOperatingPicture);
     expect(wrapper.text()).toContain('Twin Workshop');
@@ -29,11 +35,20 @@ describe('TwinOperatingPicture', () => {
     expect(wrapper.find('table.tw-table').exists()).toBe(true);
   });
 
+  it('runs the async load on mount and falls back to the fixture registry', async () => {
+    const fetchMock = vi.fn(() => Promise.reject(new Error('no backend')));
+    vi.stubGlobal('fetch', fetchMock);
+    const wrapper = mount(TwinOperatingPicture);
+    await flushPromises(); // let onMounted -> fetchTwinRegistryWithFallback resolve
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/twins'), expect.anything());
+    expect(wrapper.text()).toContain('fixture'); // fell back to the fixture registry
+  });
+
   it('fail-closed seed validation rejects missing required fields', () => {
-    expect(validateSeed({ kind: 'market' })).toMatch(/hologram_ref/);
-    expect(validateSeed({ kind: 'market', hologram_ref: 'holo:x' })).toMatch(/authorization/);
+    expect(validateSeed({ kind: 'market' })).toMatch(/hologram/i);
+    expect(validateSeed({ kind: 'market', hologram_ref: 'holo:x' })).toMatch(/authorization|principal/i);
     expect(validateSeed({ kind: 'market', hologram_ref: 'holo:x', authorization: 'user/x' })).toBeNull();
-    expect(validateSeed({ hologram_ref: 'holo:x', authorization: 'user/x' })).toMatch(/kind/);
+    expect(validateSeed({ hologram_ref: 'holo:x', authorization: 'user/x' })).toMatch(/kind/i);
   });
 
   it('twinCounts tallies the fleet by state', () => {
