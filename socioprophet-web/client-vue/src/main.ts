@@ -50,6 +50,7 @@ import PersonGraph from './pages/PersonGraph.vue';
 import ProfessionalIntelligence from './pages/ProfessionalIntelligence.vue';
 import CompetitiveIntelligence from './pages/CompetitiveIntelligence.vue';
 import CompetitiveIntelligenceApp from './pages/CompetitiveIntelligenceApp.vue';
+import CompetitiveIntelligenceFeatures from './pages/CompetitiveIntelligenceFeatures.vue';
 import Reader from './pages/Reader.vue';
 import OperatorDashboard from './pages/OperatorDashboard.vue';
 import AlgoTradingBoard from './pages/AlgoTradingBoard.vue';
@@ -122,6 +123,8 @@ const explicitRoutes = [
   { path: '/capability/economic-prophet', component: CausalValuation },
   { path: '/research', component: ResearchList },
   { path: '/professional-intelligence/competitive', component: CompetitiveIntelligence },
+  // static before the :id param so /features is not swallowed as a specimen slug
+  { path: '/professional-intelligence/competitive/features', component: CompetitiveIntelligenceFeatures },
   { path: '/professional-intelligence/competitive/:id', component: CompetitiveIntelligenceApp },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },

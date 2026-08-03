@@ -58,6 +58,11 @@ function appLink(name: string): string {
 
     <p class="ci-thesis"><span class="ci-thesis-mark">Thesis</span>{{ state.thesis }}</p>
 
+    <RouterLink class="ci-galaxy" to="/professional-intelligence/competitive/features">
+      <span class="ci-galaxy-k">Feature Library — the galaxy</span>
+      <span class="ci-galaxy-t">Every feature across all specimens, normalized and aligned to real tritfabric modules + foundation models, through six typed lenses →</span>
+    </RouterLink>
+
     <!-- THE MACHINE -->
     <section class="ci-block" aria-label="The machine">
       <div class="ci-h">
@@ -303,6 +308,22 @@ function appLink(name: string): string {
   border-left: 2px solid var(--accent);
   padding-left: 0.85rem;
 }
+
+.ci-galaxy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border: 1px solid var(--line-2);
+  border-left: 2px solid var(--teal);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 0.7rem 0.9rem;
+  text-decoration: none;
+  max-width: 96ch;
+}
+.ci-galaxy:hover { border-color: var(--teal); background: var(--surface-2); }
+.ci-galaxy-k { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700; color: var(--teal); }
+.ci-galaxy-t { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.45; }
 
 .ci-thesis-mark {
   display: block;
