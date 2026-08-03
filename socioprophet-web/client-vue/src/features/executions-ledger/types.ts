@@ -24,6 +24,10 @@ export interface ExecutionRow {
   proofReplayable: boolean;
   receiptHash: string; // ^sha256:
   blast?: { targetNode: string; reachableCount: number; hops: number };
+  // Multi-agent run linkage (dispatch-ledger DispatchEntry.prev): `runId` groups the
+  // handoff, `handoffFrom` = executionReceiptId of the parent that dispatched this step,
+  // `step` orders siblings. Absent on standalone executions.
+  run?: { runId: string; step: number; handoffFrom?: string };
 }
 
 // ---------------------------------------------------------------------------
@@ -91,6 +95,83 @@ export function rowMatches(row: ExecutionRow, f: ParsedFilter): boolean {
 export function applyFilter(rows: ExecutionRow[], query: string): ExecutionRow[] {
   const f = parseFilter(query);
   return rows.filter((r) => rowMatches(r, f));
+}
+
+// ---------------------------------------------------------------------------
+// Run-tree grouping — a multi-agent run is a chain (or fork) of executions linked
+// by `run.handoffFrom` (the dispatch-ledger `prev`). This reconstructs the tree
+// from a flat ledger: rows without `run` stay ungrouped (standalone executions);
+// grouped rows are assembled per `runId` into a depth-annotated DFS order, so a
+// PM→frontend→{backend,tester} handoff reads as an indented tree, not flat rows.
+// Pure + total: cycles are broken, orphans (handoffFrom outside the group) become
+// additional roots, and any unreached member is appended rather than dropped.
+// ---------------------------------------------------------------------------
+
+export interface RunNode { row: ExecutionRow; depth: number; }
+export interface RunTree {
+  runId: string;
+  startedAt: string;     // earliest executedAt in the run
+  agents: string[];      // distinct agent names in handoff (DFS) order
+  nodes: RunNode[];      // DFS-ordered rows with indentation depth
+  verdict: VerdictState; // worst-case roll-up: denied ≻ pending ≻ verified
+  count: number;
+}
+
+const VERDICT_RANK: Record<VerdictState, number> = { verified: 0, pending: 1, denied: 2 };
+
+export function groupIntoRuns(rows: ExecutionRow[]): { runs: RunTree[]; ungrouped: ExecutionRow[] } {
+  const ungrouped: ExecutionRow[] = [];
+  const groups = new Map<string, ExecutionRow[]>();
+  for (const r of rows) {
+    if (!r.run) { ungrouped.push(r); continue; }
+    const g = groups.get(r.run.runId);
+    if (g) g.push(r); else groups.set(r.run.runId, [r]);
+  }
+
+  const byStep = (a: ExecutionRow, b: ExecutionRow) =>
+    (a.run!.step - b.run!.step) || a.executedAt.localeCompare(b.executedAt);
+
+  const runs: RunTree[] = [];
+  for (const [runId, members] of groups) {
+    const byId = new Map(members.map((m) => [m.executionReceiptId, m]));
+    const childrenOf = new Map<string, ExecutionRow[]>();
+    const roots: ExecutionRow[] = [];
+    for (const m of members) {
+      const from = m.run!.handoffFrom;
+      if (from && byId.has(from)) {
+        const arr = childrenOf.get(from);
+        if (arr) arr.push(m); else childrenOf.set(from, [m]);
+      } else {
+        roots.push(m); // no parent, or parent lives outside this group → a root
+      }
+    }
+    roots.sort(byStep);
+
+    const nodes: RunNode[] = [];
+    const seen = new Set<string>();
+    const walk = (row: ExecutionRow, depth: number) => {
+      if (seen.has(row.executionReceiptId)) return; // cycle guard
+      seen.add(row.executionReceiptId);
+      nodes.push({ row, depth });
+      for (const kid of (childrenOf.get(row.executionReceiptId) ?? []).slice().sort(byStep)) {
+        walk(kid, depth + 1);
+      }
+    };
+    for (const r of roots) walk(r, 0);
+    for (const m of members) if (!seen.has(m.executionReceiptId)) nodes.push({ row: m, depth: 0 });
+
+    const agents: string[] = [];
+    for (const n of nodes) if (!agents.includes(n.row.agent.name)) agents.push(n.row.agent.name);
+    const verdict = nodes.reduce<VerdictState>(
+      (worst, n) => (VERDICT_RANK[n.row.verdict] > VERDICT_RANK[worst] ? n.row.verdict : worst),
+      'verified',
+    );
+    const startedAt = members.reduce((min, m) => (m.executedAt < min ? m.executedAt : min), members[0].executedAt);
+    runs.push({ runId, startedAt, agents, nodes, verdict, count: members.length });
+  }
+
+  runs.sort((a, b) => b.startedAt.localeCompare(a.startedAt)); // newest run first
+  return { runs, ungrouped };
 }
 
 // ---------------------------------------------------------------------------
@@ -166,5 +247,85 @@ export const demoLedger: ExecutionRow[] = [
     proofReplayable: true,
     receiptHash: 'sha256:93aa0e4fbb1122334455667788990011223344556677889900aabbccddeeff00',
     blast: { targetNode: 'endpoint://mbx-42', reachableCount: 1, hops: 1 },
+  },
+
+  // --- Multi-agent handoff run: one incident, five governed executions linked by
+  //     run.handoffFrom. Triage → Correlation → { Endpoint Containment, Mailbox
+  //     Containment }, and Endpoint Containment → Attestation. Renders as a tree
+  //     under "Group by run". Roll-up verdict = pending (two steps await approval).
+  {
+    executionReceiptId: 'exec_triage_router_atlas',
+    executedAt: '2026-08-01T09:14:02Z',
+    agent: { name: 'Triage Router Agent', version: '2.0.0', category: 'triage' },
+    input: { type: 'external_alert', ref: 'alert_atlas_9001' },
+    decision: { verdict: 'allow', authorityBand: 'recommend', latencyMs: 11 },
+    verdict: 'verified',
+    epistemicLevel: 'bounded',
+    capabilitiesHeld: ['cap_read_alerts_demo', 'cap_dispatch_agent_demo'],
+    capabilitiesUsed: ['cap_read_alerts_demo', 'cap_dispatch_agent_demo'],
+    proofReplayable: true,
+    receiptHash: 'sha256:aa01bb02cc03dd04ee05ff0611223344556677889900aabbccddeeff00112233',
+    blast: { targetNode: 'endpoint://vvv-648e9d56f1a', reachableCount: 7, hops: 3 },
+    run: { runId: 'run_incident_atlas_88231', step: 0 },
+  },
+  {
+    executionReceiptId: 'exec_correlation_atlas',
+    executedAt: '2026-08-01T09:14:19Z',
+    agent: { name: 'Correlation Agent', version: '1.4.0', category: 'investigation' },
+    input: { type: 'detection', ref: 'det_atlas_2' },
+    decision: { verdict: 'allow', authorityBand: 'recommend', latencyMs: 33 },
+    verdict: 'verified',
+    epistemicLevel: 'bounded',
+    capabilitiesHeld: ['cap_read_detections_demo', 'cap_read_baseline_demo', 'cap_dispatch_agent_demo'],
+    capabilitiesUsed: ['cap_read_detections_demo', 'cap_read_baseline_demo'],
+    proofReplayable: true,
+    receiptHash: 'sha256:bb11cc22dd33ee44ff556677889900aabbccddeeff0011223344556677889900',
+    blast: { targetNode: 'endpoint://vvv-648e9d56f1a', reachableCount: 9, hops: 4 },
+    run: { runId: 'run_incident_atlas_88231', step: 1, handoffFrom: 'exec_triage_router_atlas' },
+  },
+  {
+    executionReceiptId: 'exec_endpoint_containment_atlas',
+    executedAt: '2026-08-01T09:14:41Z',
+    agent: { name: 'Endpoint Containment Agent', version: '1.3.0', category: 'response' },
+    input: { type: 'detection', ref: 'det_atlas_2' },
+    decision: { verdict: 'require_approval', authorityBand: 'queue', latencyMs: 47 },
+    verdict: 'pending',
+    epistemicLevel: 'synthetic',
+    capabilitiesHeld: ['cap_read_detections_demo', 'cap_isolate_endpoint_demo'],
+    capabilitiesUsed: ['cap_read_detections_demo'],
+    proofReplayable: true,
+    receiptHash: 'sha256:cc22dd33ee44ff5566778899aabbccddeeff00112233445566778899aabbccdd',
+    blast: { targetNode: 'endpoint://vvv-648e9d56f1a', reachableCount: 14, hops: 5 },
+    run: { runId: 'run_incident_atlas_88231', step: 2, handoffFrom: 'exec_correlation_atlas' },
+  },
+  {
+    executionReceiptId: 'exec_mailbox_containment_atlas',
+    executedAt: '2026-08-01T09:14:43Z',
+    agent: { name: 'Mailbox Containment Agent', version: '1.1.0', category: 'email_security' },
+    input: { type: 'event', ref: 'event_atlas_5' },
+    decision: { verdict: 'allow', authorityBand: 'execute_local', latencyMs: 13 },
+    verdict: 'verified',
+    epistemicLevel: 'empirical',
+    capabilitiesHeld: ['cap_write_comment_demo', 'cap_quarantine_mail_demo'],
+    capabilitiesUsed: ['cap_quarantine_mail_demo'],
+    proofReplayable: true,
+    receiptHash: 'sha256:dd33ee44ff556677889900aabbccddeeff00112233445566778899aabbccddee',
+    blast: { targetNode: 'endpoint://mbx-42', reachableCount: 2, hops: 1 },
+    run: { runId: 'run_incident_atlas_88231', step: 2, handoffFrom: 'exec_correlation_atlas' },
+  },
+  {
+    executionReceiptId: 'exec_attestation_atlas',
+    executedAt: '2026-08-01T09:15:07Z',
+    agent: { name: 'Attestation Agent', version: '1.0.0', category: 'attestation' },
+    input: { type: 'event', ref: 'event_atlas_att' },
+    decision: { verdict: 'require_approval', authorityBand: 'queue', latencyMs: 22 },
+    verdict: 'pending',
+    epistemicLevel: 'synthetic',
+    capabilitiesHeld: ['cap_read_receipts_demo', 'cap_seal_attestation_demo'],
+    capabilitiesUsed: ['cap_read_receipts_demo'],
+    proofReplayable: true,
+    receiptHash: 'sha256:ee44ff556677889900aabbccddeeff00112233445566778899aabbccddeeff00',
+    blast: { targetNode: 'endpoint://vvv-648e9d56f1a', reachableCount: 14, hops: 5 },
+    run: { runId: 'run_incident_atlas_88231', step: 3, handoffFrom: 'exec_endpoint_containment_atlas' },
   },
 ];

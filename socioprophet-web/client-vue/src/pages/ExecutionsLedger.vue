@@ -25,6 +25,9 @@
         placeholder="status:verified  input:external_alert|event  receipt:present  level:bounded"
         v-model="query"
       />
+      <label class="grp" title="Reconstruct multi-agent runs from handoff links (dispatch-ledger prev)">
+        <input type="checkbox" v-model="groupByRun" /> Group by run
+      </label>
       <span class="count">{{ filtered.length }} / {{ rows.length }}</span>
     </div>
 
@@ -36,61 +39,87 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="row in filtered" :key="row.executionReceiptId">
-            <tr class="exec-row" tabindex="0" role="button"
-              :aria-expanded="open.has(row.executionReceiptId)"
-              @click="toggle(row.executionReceiptId)"
-              @keydown.enter="toggle(row.executionReceiptId)"
-              @keydown.space.prevent="toggle(row.executionReceiptId)">
-              <td class="mono when">{{ fmt(row.executedAt) }}</td>
-              <td><div class="agent"><span class="an">{{ row.agent.name }}</span><span class="av mono">{{ row.agent.version }}</span></div></td>
-              <td><span class="in-tag mono">{{ inputLabel(row.input.type) }}</span></td>
+          <template v-for="item in displayItems" :key="item.kind === 'run-head' ? 'run:' + item.runId : item.row.executionReceiptId">
+            <tr v-if="item.kind === 'run-head'" class="run-head">
+              <td class="mono when">{{ fmt(item.run.startedAt) }}</td>
+              <td colspan="5">
+                <div class="run-line">
+                  <span class="run-id mono">⛓ {{ item.runId }}</span>
+                  <span class="run-chain">{{ item.run.agents.join(' → ') }}</span>
+                  <span class="chip" :class="verdictClass(item.run.verdict)">{{ item.run.verdict }}</span>
+                  <span class="run-n mono">{{ item.run.count }} step{{ item.run.count === 1 ? '' : 's' }}</span>
+                </div>
+              </td>
+            </tr>
+            <template v-else>
+            <tr class="exec-row" :class="{ 'is-child': item.depth > 0 }" tabindex="0" role="button"
+              :aria-expanded="open.has(item.row.executionReceiptId)"
+              @click="toggle(item.row.executionReceiptId)"
+              @keydown.enter="toggle(item.row.executionReceiptId)"
+              @keydown.space.prevent="toggle(item.row.executionReceiptId)">
+              <td class="mono when">{{ fmt(item.row.executedAt) }}</td>
               <td>
-                <span class="chip" :class="verdictClass(row.verdict)">{{ row.verdict }}</span>
-                <span v-if="row.epistemicLevel" class="lvl mono">{{ row.epistemicLevel }}</span>
+                <div class="agent" :style="item.depth ? { paddingLeft: item.depth * 16 + 'px' } : undefined">
+                  <span class="an"><span v-if="item.depth" class="branch mono">└─ </span>{{ item.row.agent.name }}</span>
+                  <span class="av mono">{{ item.row.agent.version }}</span>
+                </div>
+              </td>
+              <td><span class="in-tag mono">{{ inputLabel(item.row.input.type) }}</span></td>
+              <td>
+                <span class="chip" :class="verdictClass(item.row.verdict)">{{ item.row.verdict }}</span>
+                <span v-if="item.row.epistemicLevel" class="lvl mono">{{ item.row.epistemicLevel }}</span>
               </td>
               <td>
-                <span v-if="row.blast" class="mono blast">{{ row.blast.hops }} hop{{ row.blast.hops === 1 ? '' : 's' }} · {{ row.blast.reachableCount }}</span>
+                <span v-if="item.row.blast" class="mono blast">{{ item.row.blast.hops }} hop{{ item.row.blast.hops === 1 ? '' : 's' }} · {{ item.row.blast.reachableCount }}</span>
                 <span v-else class="mono muted">—</span>
               </td>
-              <td><span class="mono receipt"><span class="seal">✦</span>{{ shortHash(row.receiptHash) }}</span></td>
+              <td><span class="mono receipt"><span class="seal">✦</span>{{ shortHash(item.row.receiptHash) }}</span></td>
             </tr>
-            <tr v-show="open.has(row.executionReceiptId)" class="warrant-row">
+            <tr v-show="open.has(item.row.executionReceiptId)" class="warrant-row">
               <td colspan="6">
                 <div class="warrant">
                   <div class="wsec">
                     <div class="eyebrow">ExecutionDecision</div>
-                    <div class="decision" :class="{ pend: row.decision.verdict === 'require_approval', deny: row.decision.verdict === 'block' }">
-                      <b>{{ decisionLabel(row.decision.verdict) }}</b>
-                      <span class="mono">authority: {{ row.decision.authorityBand }}<template v-if="row.decision.latencyMs != null"> · {{ row.decision.latencyMs }}ms</template></span>
+                    <div class="decision" :class="{ pend: item.row.decision.verdict === 'require_approval', deny: item.row.decision.verdict === 'block' }">
+                      <b>{{ decisionLabel(item.row.decision.verdict) }}</b>
+                      <span class="mono">authority: {{ item.row.decision.authorityBand }}<template v-if="item.row.decision.latencyMs != null"> · {{ item.row.decision.latencyMs }}ms</template></span>
+                    </div>
+                  </div>
+                  <div v-if="item.row.run" class="wsec">
+                    <div class="eyebrow">Run handoff</div>
+                    <div class="mono handoff">
+                      run={{ item.row.run.runId }} · step {{ item.row.run.step }}<br />
+                      <template v-if="item.row.run.handoffFrom">↳ handed off from {{ item.row.run.handoffFrom }}</template>
+                      <template v-else>◆ run root (no prior handoff)</template>
                     </div>
                   </div>
                   <div class="wsec">
                     <div class="eyebrow">Capabilities held → used</div>
                     <div class="caps">
-                      <span v-for="c in row.capabilitiesHeld" :key="c" class="cap mono" :class="{ used: row.capabilitiesUsed.includes(c) }">
-                        <span v-if="row.capabilitiesUsed.includes(c)" class="dot">✓</span>{{ c }}
+                      <span v-for="c in item.row.capabilitiesHeld" :key="c" class="cap mono" :class="{ used: item.row.capabilitiesUsed.includes(c) }">
+                        <span v-if="item.row.capabilitiesUsed.includes(c)" class="dot">✓</span>{{ c }}
                       </span>
                     </div>
                   </div>
                   <div class="wsec">
                     <div class="eyebrow">ProofArtifact</div>
                     <div class="proof mono">
-                      {{ row.receiptHash }}<br />
-                      replayable={{ row.proofReplayable }} · epistemicLevel={{ row.epistemicLevel ?? 'n/a' }}
-                      <span v-if="row.verdict === 'verified' && !row.proofReplayable" class="warn">⊘ verified verdict requires a replayable artifact</span>
+                      {{ item.row.receiptHash }}<br />
+                      replayable={{ item.row.proofReplayable }} · epistemicLevel={{ item.row.epistemicLevel ?? 'n/a' }}
+                      <span v-if="item.row.verdict === 'verified' && !item.row.proofReplayable" class="warn">⊘ verified verdict requires a replayable artifact</span>
                     </div>
                   </div>
-                  <div v-if="row.blast" class="wsec">
+                  <div v-if="item.row.blast" class="wsec">
                     <div class="eyebrow">Blast (GBRG)</div>
                     <div class="mono">
-                      <RouterLink class="blink" :to="`/control-plane/containment?node=${encodeURIComponent(row.blast.targetNode)}`">{{ row.blast.targetNode }}</RouterLink>
-                      — {{ row.blast.reachableCount }} reachable · {{ row.blast.hops }} hops
+                      <RouterLink class="blink" :to="`/control-plane/containment?node=${encodeURIComponent(item.row.blast.targetNode)}`">{{ item.row.blast.targetNode }}</RouterLink>
+                      — {{ item.row.blast.reachableCount }} reachable · {{ item.row.blast.hops }} hops
                     </div>
                   </div>
                 </div>
               </td>
             </tr>
+            </template>
           </template>
           <tr v-if="filtered.length === 0"><td colspan="6" class="empty">No executions match the filter.</td></tr>
         </tbody>
@@ -102,15 +131,34 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { applyFilter, demoLedger, type ExecutionRow, type InputType, type VerdictState, type DecisionVerdict } from '../features/executions-ledger/types';
+import { applyFilter, demoLedger, groupIntoRuns, type ExecutionRow, type RunTree, type InputType, type VerdictState, type DecisionVerdict } from '../features/executions-ledger/types';
 
 const rows = ref<ExecutionRow[]>(demoLedger);
 const query = ref('');
+const groupByRun = ref(false);
 const open = reactive(new Set<string>());
 
 const filtered = computed(() => applyFilter(rows.value, query.value));
 const verifiedCount = computed(() => rows.value.filter((r) => r.verdict === 'verified').length);
 const heldCount = computed(() => rows.value.filter((r) => r.verdict !== 'verified').length);
+
+// Flat rows by default (one .exec-row per filtered execution); when grouped, a
+// run-head precedes each run's depth-indented steps, with standalone rows after.
+type DisplayItem =
+  | { kind: 'run-head'; runId: string; run: RunTree }
+  | { kind: 'row'; row: ExecutionRow; depth: number };
+
+const displayItems = computed<DisplayItem[]>(() => {
+  if (!groupByRun.value) return filtered.value.map((row) => ({ kind: 'row', row, depth: 0 }));
+  const { runs, ungrouped } = groupIntoRuns(filtered.value);
+  const items: DisplayItem[] = [];
+  for (const run of runs) {
+    items.push({ kind: 'run-head', runId: run.runId, run });
+    for (const n of run.nodes) items.push({ kind: 'row', row: n.row, depth: n.depth + 1 });
+  }
+  for (const row of ungrouped) items.push({ kind: 'row', row, depth: 0 });
+  return items;
+});
 
 function toggle(id: string) {
   if (open.has(id)) open.delete(id);
@@ -148,6 +196,8 @@ function decisionLabel(v: DecisionVerdict) { return DECISION_LABELS[v]; }
 .kpi .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--cds-text-secondary, #6f6f6f); }
 .filterbar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .q { flex: 1; font-family: var(--font-mono, monospace); font-size: 12.5px; padding: 9px 12px; border: 1px solid var(--cds-border-strong, #8d8d8d); border-radius: 2px; background: var(--cds-field, #f4f4f4); color: inherit; }
+.grp { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--cds-text-secondary, #6f6f6f); white-space: nowrap; cursor: pointer; user-select: none; }
+.grp input { accent-color: var(--sp-amber-70, #b28600); }
 .count { font-family: var(--font-mono, monospace); font-size: 11.5px; color: var(--cds-text-secondary, #6f6f6f); white-space: nowrap; }
 .tbl-scroll { overflow-x: auto; }
 table.ledger { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 760px; }
@@ -155,6 +205,15 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 12.5px; min-wi
 .exec-row { cursor: pointer; border-bottom: 1px solid var(--cds-border-subtle, #e0e0e0); }
 .exec-row:hover { background: var(--cds-layer-hover, #e8e8e8); }
 .exec-row td { padding: 10px 12px; vertical-align: middle; }
+.exec-row.is-child { background: color-mix(in srgb, var(--cds-layer-01, #f4f4f4) 55%, transparent); }
+.exec-row.is-child:hover { background: var(--cds-layer-hover, #e8e8e8); }
+.branch { color: var(--cds-text-placeholder, #a8a8a8); }
+.run-head td { padding: 9px 12px 8px; border-top: 2px solid var(--sp-amber-70, #b28600); background: var(--cds-layer-01, #f4f4f4); }
+.run-line { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.run-id { font-size: 11px; font-weight: 600; color: var(--sp-amber-70, #b28600); }
+.run-chain { font-size: 11.5px; color: var(--cds-text-secondary, #4f4f4f); }
+.run-n { font-size: 10.5px; color: var(--cds-text-secondary, #6f6f6f); }
+.handoff { font-size: 10.5px; color: var(--cds-text-secondary, #6f6f6f); padding: 8px 10px; border: 1px dashed var(--cds-border-subtle, #e0e0e0); border-radius: 3px; }
 .mono { font-family: var(--font-mono, monospace); }
 .when { color: var(--cds-text-secondary, #6f6f6f); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .agent { display: flex; flex-direction: column; gap: 1px; }
