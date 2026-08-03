@@ -11,10 +11,13 @@
 #   manual run (workflow_dispatch, environment=prod) → deploy to PROD, gated by the
 #     `production` GitHub Environment (required reviewers = "prod on my say-so").
 #
-# Requires: repo secret FIREBASE_TOKEN, and the Hosting sites to exist:
-#   firebase hosting:sites:create socioprophet-cockpit-dev --project socioprophet-web-dev-env
-#   firebase hosting:sites:create socioprophet-cockpit     --project socioprophet-web
-# Nothing deploys without them; the job fails loudly rather than silently no-oping.
+# STOPGAP, DELIBERATELY. The strategic target for the sovereign stack is socbase,
+# not Firebase Hosting — serving a sovereignty-first cockpit off Google's substrate
+# contradicts the thesis the cockpit argues. This exists so the boards are
+# reviewable today; it should be retired when socbase can serve the SPA.
+#
+# Requires repo secret FIREBASE_TOKEN. Sites (per Michael): prod = socioprophet-web,
+# dev = socioprophet-web-dev.
 name: client-vue deploy
 
 on:
@@ -94,9 +97,9 @@ jobs:
       - name: Report the URL
         run: |
           if [ "${{ steps.env.outputs.alias }}" = "prod" ]; then
-            echo "Cockpit deployed: https://socioprophet-cockpit.web.app" >> "$GITHUB_STEP_SUMMARY"
+            echo "Cockpit deployed: https://socioprophet-web.web.app" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Cockpit deployed (dev): https://socioprophet-cockpit-dev.web.app" >> "$GITHUB_STEP_SUMMARY"
+            echo "Cockpit deployed (dev): https://socioprophet-web-dev.web.app" >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Boards: /delivery · /professional-intelligence/competitive · /knowledge/studio" >> "$GITHUB_STEP_SUMMARY"

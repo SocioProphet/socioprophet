@@ -16,7 +16,7 @@
           "socioprophet-builder-dev"
         ],
         "cockpit": [
-          "socioprophet-cockpit-dev"
+          "socioprophet-web-dev"
         ]
       }
     },
@@ -32,7 +32,7 @@
           "socioprophet-builder"
         ],
         "cockpit": [
-          "socioprophet-cockpit"
+          "socioprophet-web"
         ]
       }
     }
