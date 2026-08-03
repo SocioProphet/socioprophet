@@ -20,7 +20,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
+  pull-requests: write
   issues: read
 
 concurrency:
@@ -38,6 +38,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      # board-spec.yaml is NOT in this repo — its canonical home is
+      # SocioProphet/sociosphere (a public repo). Consume the single source of
+      # truth via a sparse cross-repo checkout rather than forking a copy in here;
+      # pointing --board-spec at a nonexistent path left "Board spec resolved"
+      # permanently unverified.
+      - name: Fetch canonical board spec (sociosphere is the source of truth)
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/sociosphere
+          sparse-checkout: registry/board-spec.yaml
+          sparse-checkout-cone-mode: false
+          path: .sociosphere
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -50,7 +63,7 @@ jobs:
             --orgs "SocioProphet,SourceOS-Linux" \
             --days 14 \
             --history-weeks 10 \
-            --board-spec "${GITHUB_WORKSPACE}/registry/board-spec.yaml"
+            --board-spec "${GITHUB_WORKSPACE}/.sociosphere/registry/board-spec.yaml"
 
       # The gate. A snapshot that could not collect live evidence, or that
       # asserts a value with no evidence ref, must not be published as status.
@@ -71,15 +84,43 @@ jobs:
           npx vue-tsc --noEmit
           npx vitest run src/__tests__/deliveryDashboard.test.ts src/__tests__/deliveryEconomics.test.ts
 
-      - name: Commit the refreshed snapshot
+      # Publish the refreshed snapshot through the SAME gate as everything else.
+      # master is protected (required check "gate / check"), so a direct push is —
+      # correctly — rejected (GH006). Pushing anyway, or making that push
+      # non-fatal, would be fail-open: it silently disables the refresh. Instead
+      # the snapshot arrives as a gated, auto-merging PR from a bot-owned branch.
+      - name: Open or update the snapshot PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SNAPSHOT: socioprophet-web/client-vue/src/data/deliverySnapshot.ts
+          BRANCH: bot/delivery-snapshot
         run: |
           cd "$GITHUB_WORKSPACE"
-          if git diff --quiet -- socioprophet-web/client-vue/src/data/deliverySnapshot.ts; then
-            echo "snapshot unchanged"
+          if git diff --quiet -- "$SNAPSHOT"; then
+            echo "snapshot unchanged — nothing to propose"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add socioprophet-web/client-vue/src/data/deliverySnapshot.ts
-          git commit -m "chore(cockpit): refresh delivery snapshot from merge evidence [skip ci]"
-          git push
+          # Carry exactly the regenerated snapshot onto a dedicated bot branch,
+          # rebuilt from the current master each run so the PR only ever diffs the
+          # snapshot file.
+          git checkout -B "$BRANCH"
+          git add "$SNAPSHOT"
+          git commit -m "chore(cockpit): refresh delivery snapshot from merge evidence"
+          git push --force origin "HEAD:$BRANCH"
+          # Open the PR once; later runs update it via the force-push above.
+          if gh pr view "$BRANCH" --json state --jq '.state' 2>/dev/null | grep -qx OPEN; then
+            echo "existing snapshot PR updated"
+          else
+            gh pr create \
+              --base master \
+              --head "$BRANCH" \
+              --title "chore(cockpit): refresh delivery snapshot from merge evidence" \
+              --body $'Automated refresh of the cockpit delivery snapshot from real merge evidence.\n\nThe workflow never pushes to master directly — branch protection correctly rejects that. This PR flows through the same `gate / check` as every other change, and auto-merge is enabled so it merges the moment the gate passes.'
+          fi
+          # Let it merge itself once the required gate passes — no standing write
+          # access to master, no fail-open. Enabling auto-merge is best-effort:
+          # the load-bearing outcome (an open, gated PR) is already achieved.
+          gh pr merge "$BRANCH" --squash --auto \
+            || echo "auto-merge not set; PR remains open and gated for review/merge"
