@@ -58,10 +58,16 @@ function appLink(name: string): string {
 
     <p class="ci-thesis"><span class="ci-thesis-mark">Thesis</span>{{ state.thesis }}</p>
 
-    <RouterLink class="ci-galaxy" to="/professional-intelligence/competitive/features">
-      <span class="ci-galaxy-k">Feature Library — the galaxy</span>
-      <span class="ci-galaxy-t">Every feature across all specimens, normalized and aligned to real tritfabric modules + foundation models, through six typed lenses →</span>
-    </RouterLink>
+    <div class="ci-links">
+      <RouterLink class="ci-galaxy" to="/professional-intelligence/competitive/features">
+        <span class="ci-galaxy-k">Feature Library — the galaxy</span>
+        <span class="ci-galaxy-t">Every feature across all specimens, normalized and aligned to real tritfabric modules + foundation models, through six typed lenses →</span>
+      </RouterLink>
+      <RouterLink class="ci-galaxy ci-galaxy--mk" to="/professional-intelligence/competitive/markets">
+        <span class="ci-galaxy-k">Market Portfolio — coverage</span>
+        <span class="ci-galaxy-t">Every market the estate competes in, and how much intelligence each actually has. This market is 1 of 8 →</span>
+      </RouterLink>
+    </div>
 
     <!-- THE MACHINE -->
     <section class="ci-block" aria-label="The machine">
@@ -309,6 +315,7 @@ function appLink(name: string): string {
   padding-left: 0.85rem;
 }
 
+.ci-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 0.7rem; }
 .ci-galaxy {
   display: flex;
   flex-direction: column;
@@ -319,9 +326,11 @@ function appLink(name: string): string {
   background: var(--surface);
   padding: 0.7rem 0.9rem;
   text-decoration: none;
-  max-width: 96ch;
 }
 .ci-galaxy:hover { border-color: var(--teal); background: var(--surface-2); }
+.ci-galaxy--mk { border-left-color: var(--info); }
+.ci-galaxy--mk .ci-galaxy-k { color: var(--info); }
+.ci-galaxy--mk:hover { border-color: var(--info); }
 .ci-galaxy-k { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700; color: var(--teal); }
 .ci-galaxy-t { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.45; }
 

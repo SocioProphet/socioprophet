@@ -251,6 +251,29 @@ export const routeRegistry: RouteRegistryEntry[] = [
     breadcrumbs: ['Maps & Analytics', 'Custom Analytics'],
   },
   {
+    path: '/professional-intelligence/competitive/markets',
+    label: 'Market Portfolio',
+    domain: 'Professional Intelligence',
+    maturity: 'L1',
+    stateMode: 'fixture',
+    navTier: 'tab-only',
+    userJob: 'See every market the estate competes in and how much competitive intelligence coverage each actually has — including the ones with none.',
+    ownerPlane: 'client-vue competitive-intelligence fixture; coverage is a declared register',
+    boundary: 'Declared coverage register, not a measurement. Uncovered markets have no teardown data behind them and carry no assessment.',
+    primaryObject: 'market coverage register',
+    breadcrumbs: ['Professional Intelligence OS', 'Competitive Intelligence', 'Market Portfolio'],
+    tabs: [
+      { label: 'Operating Dashboard', to: '/professional-intelligence' },
+      { label: 'Competitive Intelligence', to: '/professional-intelligence/competitive' },
+      { label: 'Market Portfolio', to: '/professional-intelligence/competitive/markets' },
+      { label: 'Feature Library', to: '/professional-intelligence/competitive/features' },
+      { label: 'Gates', to: '/gates' },
+      { label: 'Policies', to: '/policies' },
+      { label: 'Runs', to: '/runs' },
+      { label: 'Attestations', to: '/attestations' },
+    ],
+  },
+  {
     path: '/professional-intelligence/competitive/features',
     label: 'Feature Library',
     domain: 'Professional Intelligence',
@@ -265,6 +288,7 @@ export const routeRegistry: RouteRegistryEntry[] = [
     tabs: [
       { label: 'Operating Dashboard', to: '/professional-intelligence' },
       { label: 'Competitive Intelligence', to: '/professional-intelligence/competitive' },
+      { label: 'Market Portfolio', to: '/professional-intelligence/competitive/markets' },
       { label: 'Feature Library', to: '/professional-intelligence/competitive/features' },
       { label: 'Gates', to: '/gates' },
       { label: 'Policies', to: '/policies' },
@@ -287,6 +311,7 @@ export const routeRegistry: RouteRegistryEntry[] = [
     tabs: [
       { label: 'Operating Dashboard', to: '/professional-intelligence' },
       { label: 'Competitive Intelligence', to: '/professional-intelligence/competitive' },
+      { label: 'Market Portfolio', to: '/professional-intelligence/competitive/markets' },
       { label: 'Feature Library', to: '/professional-intelligence/competitive/features' },
       { label: 'Gates', to: '/gates' },
       { label: 'Policies', to: '/policies' },
@@ -310,6 +335,7 @@ export const routeRegistry: RouteRegistryEntry[] = [
     tabs: [
       { label: 'Operating Dashboard', to: '/professional-intelligence' },
       { label: 'Competitive Intelligence', to: '/professional-intelligence/competitive' },
+      { label: 'Market Portfolio', to: '/professional-intelligence/competitive/markets' },
       { label: 'Feature Library', to: '/professional-intelligence/competitive/features' },
       { label: 'Gates', to: '/gates' },
       { label: 'Policies', to: '/policies' },
