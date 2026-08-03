@@ -3,12 +3,14 @@
 // Annealed to the epistemic-Carbon language: SurfaceHeader, shared dark tokens,
 // hairline dense rows, 0.56rem uppercase labels, mono numerics, data-ink over chrome.
 import { computed, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 import SurfaceHeader from '../components/SurfaceHeader.vue';
 import BoundaryNotice from '../components/BoundaryNotice.vue';
 import {
   competitiveIntelligenceState as state,
   type IntelCategory,
 } from '../features/competitive-intelligence/state';
+import { slugify } from '../features/competitive-intelligence/dossiers';
 
 type CategoryFilter = IntelCategory | 'all';
 
@@ -32,6 +34,10 @@ function scoreTone(score: number): string {
   if (score >= 80) return 'is-high';
   if (score >= 60) return 'is-mid';
   return 'is-low';
+}
+
+function appLink(name: string): string {
+  return `/professional-intelligence/competitive/${slugify(name)}`;
 }
 </script>
 
@@ -107,7 +113,7 @@ function scoreTone(score: number): string {
           <tbody>
             <tr v-for="app in filteredApps" :key="app.name" :class="{ 'is-counter': app.counterExample }">
               <td class="ci-num ci-rank">{{ app.rank }}</td>
-              <td class="ci-app">{{ app.name }}</td>
+              <td class="ci-app"><RouterLink class="ci-applink" :to="appLink(app.name)">{{ app.name }}</RouterLink></td>
               <td><span :class="`ci-cat ci-cat--${app.category}`">{{ app.categoryLabel }}</span></td>
               <td class="ci-num ci-scoreval">{{ app.score }}</td>
               <td class="ci-scorecell">
@@ -137,7 +143,10 @@ function scoreTone(score: number): string {
           :class="{ 'is-counter': app.counterExample }"
         >
           <div class="ci-cardtop">
-            <h3><span class="ci-cardrank">{{ app.rank }}</span>{{ app.name }}</h3>
+            <h3>
+              <span class="ci-cardrank">{{ app.rank }}</span>
+              <RouterLink class="ci-applink" :to="appLink(app.name)">{{ app.name }}</RouterLink>
+            </h3>
             <span :class="`ci-cat ci-cat--${app.category}`">{{ app.categoryLabel }}</span>
           </div>
           <p class="ci-trick">{{ app.trick }}</p>
@@ -149,6 +158,7 @@ function scoreTone(score: number): string {
           <p class="ci-steal">
             <span class="ci-steal-k">{{ app.counterExample ? 'Why it is here' : 'Steal this' }}</span>{{ app.steal }}
           </p>
+          <RouterLink class="ci-dossier" :to="appLink(app.name)">Dossier — features &amp; how we beat them →</RouterLink>
         </article>
       </div>
     </section>
@@ -460,6 +470,9 @@ h3 {
 .ci-rank-table th.ci-num, .ci-rank-table td.ci-num { width: 1%; white-space: nowrap; }
 .ci-rank { color: var(--text-3); font-family: var(--mono, ui-monospace), monospace; }
 .ci-app { font-weight: 640; white-space: nowrap; color: var(--text); }
+.ci-applink { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.ci-applink:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.ci-applink:focus-visible { outline: none; color: var(--accent); }
 .ci-scoreval { font-weight: 700; color: var(--text); }
 
 .ci-scorecell { min-width: 130px; width: 130px; }
@@ -541,6 +554,10 @@ tr.is-counter:hover td { background: var(--amber-soft); }
 .ci-cardpane.is-counter .ci-steal { background: rgba(227, 179, 65, 0.12); }
 .ci-steal-k { display: block; font-size: 0.54rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; color: var(--accent); margin-bottom: 0.22rem; }
 .ci-cardpane.is-counter .ci-steal-k { color: var(--amber); }
+
+.ci-dossier { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: var(--accent); text-decoration: none; }
+.ci-dossier:hover { color: var(--accent-2); }
+.ci-dossier:focus-visible { outline: none; text-decoration: underline; }
 
 /* stats */
 .ci-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.8rem; }
