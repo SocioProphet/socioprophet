@@ -1,0 +1,72 @@
+# Delivery snapshot — regenerate the cockpit's delivery dashboard from real merge
+# evidence on every merge to master, and FAIL CLOSED if the rendered snapshot
+# would misreport delivery.
+#
+# Governance intent (registry/board-spec.yaml): GitHub Projects is a render
+# target, not the truth. The truth is merged PRs and issue events. This job
+# recomputes from that evidence so the dashboard cannot drift from what shipped.
+name: delivery-snapshot
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'socioprophet-web/client-vue/**'
+      - '.github/workflows/delivery-snapshot.yml'
+  schedule:
+    # Refresh daily so the board reflects reality even in a quiet week.
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: delivery-snapshot
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: socioprophet-web/client-vue
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Regenerate snapshot from merge evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/generate-delivery-snapshot.mjs --repo "${GITHUB_REPOSITORY}" --days 14
+
+      # The gate. A snapshot that could not collect live evidence, or that
+      # asserts a value with no evidence ref, must not be published as status.
+      - name: Verify the snapshot is honest (fail closed)
+        run: node scripts/verify-delivery-snapshot.mjs
+
+      - name: Typecheck and test the surface
+        run: |
+          npm ci --no-audit --no-fund
+          npx vue-tsc --noEmit
+          npx vitest run src/__tests__/deliveryDashboard.test.ts
+
+      - name: Commit the refreshed snapshot
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          if git diff --quiet -- socioprophet-web/client-vue/src/data/deliverySnapshot.ts; then
+            echo "snapshot unchanged"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add socioprophet-web/client-vue/src/data/deliverySnapshot.ts
+          git commit -m "chore(cockpit): refresh delivery snapshot from merge evidence [skip ci]"
+          git push

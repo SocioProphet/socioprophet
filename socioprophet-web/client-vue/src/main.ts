@@ -67,6 +67,7 @@ import HolographMe from './pages/HolographMe.vue';
 import SituationsSurface from './pages/SituationsSurface.vue';
 import NlpExtractionBench from './pages/NlpExtractionBench.vue';
 import KnowledgeStudio from './pages/KnowledgeStudio.vue';
+import DeliveryDashboard from './pages/DeliveryDashboard.vue';
 import ExperimentsBoard from './pages/ExperimentsBoard.vue';
 import BehavioralAnalytics from './pages/BehavioralAnalytics.vue';
 import AppBuildBoard from './pages/AppBuildBoard.vue';
@@ -106,6 +107,7 @@ const explicitRoutes = [
   { path: '/capability/algorithmic-trading', component: AlgoTradingBoard },
   { path: '/capability/nlp-information-extraction', component: NlpExtractionBench },
   { path: '/knowledge/studio', component: KnowledgeStudio },
+  { path: '/delivery', component: DeliveryDashboard },
   { path: '/capability/experiments-simulations', component: ExperimentsBoard },
   { path: '/capability/behavioral-analytics', component: BehavioralAnalytics },
   { path: '/capability/mobile-app-development', component: AppBuildBoard },
