@@ -68,6 +68,7 @@ import SituationsSurface from './pages/SituationsSurface.vue';
 import NlpExtractionBench from './pages/NlpExtractionBench.vue';
 import KnowledgeStudio from './pages/KnowledgeStudio.vue';
 import DeliveryDashboard from './pages/DeliveryDashboard.vue';
+import EstateGraph from './pages/EstateGraph.vue';
 import ExperimentsBoard from './pages/ExperimentsBoard.vue';
 import BehavioralAnalytics from './pages/BehavioralAnalytics.vue';
 import AppBuildBoard from './pages/AppBuildBoard.vue';
@@ -112,6 +113,7 @@ const explicitRoutes = [
   { path: '/capability/nlp-information-extraction', component: NlpExtractionBench },
   { path: '/knowledge/studio', component: KnowledgeStudio },
   { path: '/delivery', component: DeliveryDashboard },
+  { path: '/delivery/estate', component: EstateGraph },
   { path: '/capability/experiments-simulations', component: ExperimentsBoard },
   { path: '/capability/behavioral-analytics', component: BehavioralAnalytics },
   { path: '/capability/mobile-app-development', component: AppBuildBoard },
