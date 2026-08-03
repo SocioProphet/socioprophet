@@ -33,6 +33,8 @@ export const useProjects = defineStore('projects', () => {
   }, { deep: true });
 
   const active = computed<Project | null>(() => projects.value.find((p) => p.id === activeId.value) ?? null);
+  // The active project's id — the string project-scoped surfaces (Studio compute/notebooks/…) bind to.
+  const currentProjectId = computed<string | null>(() => active.value?.id ?? null);
 
   function create(title: string): Project {
     const p: Project = {
@@ -53,5 +55,5 @@ export const useProjects = defineStore('projects', () => {
   }
   function setActive(id: string | null) { activeId.value = id; }
 
-  return { projects, activeId, active, create, rename, remove, setActive };
+  return { projects, activeId, active, currentProjectId, create, rename, remove, setActive };
 });

@@ -6,6 +6,7 @@
 // canonical hellgraph-service / owl-reasoner / entity-resolution backends via /svc/*.
 import { ref, computed, watch, markRaw } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useProjects } from '../stores/projects';
 import './studio/studio-tokens.css';
 import StudioNotebooks from './studio/StudioNotebooks.vue';
 import StudioCompute from './studio/StudioCompute.vue';
@@ -53,7 +54,10 @@ const flat = GROUPS.flatMap((g) => g.items);
 
 const route = useRoute();
 const router = useRouter();
-const project = ref('Untitled project');
+const projects = useProjects();
+// Project-scoped tabs bind to the real active project from the store; fall back to the
+// stub 'demo' project when none is selected so the surface stays populated (fail-closed).
+const project = computed(() => projects.currentProjectId ?? 'demo');
 const current = ref(sectionFromQuery());
 function sectionFromQuery(): string {
   const s = (route.query.section as string) || (route.query.tab === 'compute' ? 'compute' : 'notebooks');
