@@ -25,6 +25,9 @@
 
 import { computed, ref, type ComputedRef, type Ref } from 'vue';
 import type { Dictionary, EntityType, RelationType } from './fixture';
+// Durable backend selected at the single bind point (`useKeWorkbench`, below).
+// Function-declaration exports on both sides keep this import cycle safe (hoisted).
+import { resolveDurableKeWorkbench } from './keWorkbenchStore.durable';
 
 /** A learned label vs a human-authored override. Human overrides supersede. */
 export type ProvenanceClass = 'learned' | 'human_authored';
@@ -150,11 +153,13 @@ export function createKeWorkbench(): KeWorkbench {
   };
 }
 
-// Shared, session-durable singleton — the bind point between the Reasoning Chain
-// Inspector (writes) and the Knowledge Studio loop (reads). A real durable store
-// replaces this behind the KeWorkbench interface with no caller change.
-let singleton: KeWorkbench | null = null;
+// Shared bind point between the Reasoning Chain Inspector (writes) and the
+// Knowledge Studio loop (reads). The durable store now backs this seam: it is
+// project-scoped, persisted client-side (localStorage), and hydrates into the
+// same reactive refs — swapped in behind this SAME interface with no caller
+// change. `createKeWorkbench()` above stays the pure in-memory reference impl
+// (the locked contract test drives it directly); the durable wiring lives in
+// ./keWorkbenchStore.durable.ts and is selected here — the single wiring point.
 export function useKeWorkbench(): KeWorkbench {
-  if (!singleton) singleton = createKeWorkbench();
-  return singleton;
+  return resolveDurableKeWorkbench();
 }
