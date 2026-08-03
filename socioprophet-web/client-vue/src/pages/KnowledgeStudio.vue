@@ -169,7 +169,7 @@ const allDictionaries = computed(() => [...ke.dictionaries.value, ...dictionarie
             <table class="ks-table">
               <thead><tr><th>Type</th><th>Roles</th><th class="n">Mentions</th><th class="n">F1</th><th>Value kind</th></tr></thead>
               <tbody>
-                <tr v-for="e in allEntityTypes" :key="e.name" :class="{ 'is-authored': e.authored }">
+                <tr v-for="e in allEntityTypes" :key="(e.authored ? 'a:' : 's:') + e.name" :class="{ 'is-authored': e.authored }">
                   <td>
                     <span class="ks-swatch" :style="{ background: e.color }" aria-hidden="true" /><b class="ks-strong">{{ e.name }}</b>
                     <span v-if="e.authored" class="ks-pill authored" :title="e.receipt">authored</span>
@@ -191,7 +191,7 @@ const allDictionaries = computed(() => [...ke.dictionaries.value, ...dictionarie
             <table class="ks-table">
               <thead><tr><th>Relation</th><th>Subject</th><th>Object</th><th class="n">Instances</th><th class="n">F1</th></tr></thead>
               <tbody>
-                <tr v-for="r in allRelationTypes" :key="r.name" :class="{ 'is-authored': r.authored }">
+                <tr v-for="r in allRelationTypes" :key="(r.authored ? 'a:' : 's:') + r.name" :class="{ 'is-authored': r.authored }">
                   <td class="ks-strong">
                     {{ r.name }}
                     <span v-if="r.authored" class="ks-pill authored" :title="r.receipt">authored</span>
@@ -216,7 +216,7 @@ const allDictionaries = computed(() => [...ke.dictionaries.value, ...dictionarie
             <table class="ks-table">
               <thead><tr><th>Dictionary</th><th class="n">Terms</th><th>Maps to</th><th>Source</th><th>Licence</th></tr></thead>
               <tbody>
-                <tr v-for="d in allDictionaries" :key="d.name" :class="{ 'is-bad': d.licence.startsWith('UNKNOWN'), 'is-authored': d.authored }">
+                <tr v-for="d in allDictionaries" :key="(d.authored ? 'a:' : 's:') + d.name" :class="{ 'is-bad': d.licence.startsWith('UNKNOWN'), 'is-authored': d.authored }">
                   <td class="ks-strong">
                     {{ d.name }}
                     <span v-if="d.authored" class="ks-pill authored" :title="d.receipt">authored</span>
@@ -276,14 +276,14 @@ const allDictionaries = computed(() => [...ke.dictionaries.value, ...dictionarie
               </div>
 
               <ul v-else class="ks-list">
-                <li v-for="d in allDictionaries" :key="d.name">{{ d.name }} — <span class="ks-mono">{{ d.mappedType }}</span></li>
+                <li v-for="d in allDictionaries" :key="(d.authored ? 'a:' : 's:') + d.name">{{ d.name }} — <span class="ks-mono">{{ d.mappedType }}</span></li>
               </ul>
             </div>
 
             <aside class="ks-rules-class" aria-label="Class">
               <h3>Class</h3>
               <p class="ks-dim">Check a class to display its occurrences in the document.</p>
-              <label v-for="e in allEntityTypes" :key="e.name" class="ks-check">
+              <label v-for="e in allEntityTypes" :key="(e.authored ? 'a:' : 's:') + e.name" class="ks-check">
                 <input type="checkbox" checked disabled />
                 <span class="ks-swatch" :style="{ background: e.color }" aria-hidden="true" />
                 <span class="ks-mono">{{ e.name }}</span>
