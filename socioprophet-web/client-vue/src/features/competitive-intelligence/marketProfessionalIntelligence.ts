@@ -6,6 +6,8 @@
 // price sheet is public. Most others publish no rate card, so seat prices are
 // third-party estimates and are flagged per row.
 
+import type { MarketTeardownData } from './marketTeardown';
+
 export type Confidence = 'confirmed' | 'estimate' | 'none';
 
 export type MoatArchetype = 'semantic-lock-in' | 'permissions-graph' | 'licensed-data' | 'deployability' | 'workflow-shape';
@@ -51,9 +53,12 @@ export const moatArchetypeLabel: Record<MoatArchetype, string> = {
   'workflow-shape': 'workflow shape',
 };
 
-export const professionalIntelligenceMarket = {
+export const professionalIntelligenceMarket: MarketTeardownData = {
   generatedAt: '2026-08-03T00:00:00-04:00',
-  headline: 'Professional & market intelligence',
+  headline: 'Professional & Market Intelligence',
+  marketLabel: 'market 2',
+  machineTitle: "This market's machine — eight steps",
+  machineNote: 'Not the consumer loop. No virality, no watermark, no streak. TRUST → EMBED → GOVERN → ACCRETE → EXPAND → ESCALATE — and step 8 is eating step 1.',
   lede:
     'The market our flagship actually competes in. Twenty-three platforms torn down, from Bloomberg at ~$32K/seat to Feedly at ~$19K for a whole team. This market does NOT run the consumer machine — there is no viral loop, no watermark, no streak. It runs on substrate ownership, governed deployability, and who is trusted to act unattended.',
   thesis:
