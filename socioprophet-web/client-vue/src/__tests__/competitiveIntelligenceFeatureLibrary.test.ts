@@ -32,8 +32,23 @@ describe('competitive-intelligence feature library', () => {
     for (const f of featureLibrary) {
       expect(f.demand, f.id).toBeGreaterThanOrEqual(0);
       expect(f.demand, f.id).toBeLessThanOrEqual(100);
-      expect(['evidence', 'hypothesis'], f.id).toContain(f.demandBasis);
+      expect(['evidence', 'hypothesis', 'commercial'], f.id).toContain(f.demandBasis);
       expect(f.demandNote.length, f.id).toBeGreaterThan(0);
+    }
+  });
+
+  it('grades every evidence-backed claim so thin evidence cannot hide behind the label', () => {
+    for (const f of featureLibrary.filter((x) => x.demandBasis === 'evidence')) {
+      expect(f.evidenceGrade, f.id).toBeTruthy();
+    }
+  });
+
+  it('never lets an operator-demand feature outrank the evidenced field', () => {
+    const topEvidenced = Math.max(
+      ...featureLibrary.filter((f) => f.demandBasis === 'evidence').map((f) => f.demand),
+    );
+    for (const f of featureLibrary.filter((x) => x.demandBasis === 'commercial')) {
+      expect(f.demand, f.id).toBeLessThan(topEvidenced);
     }
   });
 

@@ -95,6 +95,7 @@ const totals = computed(() => ({
   partial: featureLibrary.filter((f) => f.readiness === 'partial').length,
   gap: featureLibrary.filter((f) => f.readiness === 'gap').length,
   evidence: featureLibrary.filter((f) => f.demandBasis === 'evidence').length,
+  commercial: featureLibrary.filter((f) => f.demandBasis === 'commercial').length,
 }));
 
 function demandTone(v: number): string {
@@ -142,6 +143,7 @@ function demandTone(v: number): string {
         <span class="fx-pill is-partial">{{ totals.partial }} partial</span>
         <span class="fx-pill is-gap">{{ totals.gap }} gap</span>
         <span class="fx-pill is-ev">{{ totals.evidence }}/{{ totals.features }} demand evidence-backed</span>
+        <span class="fx-pill is-com">{{ totals.commercial }} operator-demand only</span>
       </div>
     </div>
 
@@ -188,11 +190,14 @@ function demandTone(v: number): string {
                   <span class="fx-tag" :class="`st-${f.stance}`">{{ stanceLabel[f.stance] }}</span>
                   <span class="fx-tag fx-tag--mod">{{ f.modality }}</span>
                 </span>
+                <span v-if="f.demandSegment" class="fx-segment">⚠ {{ f.demandSegment }}</span>
               </td>
               <td class="fx-num fx-demand">
                 <b>{{ f.demand }}</b>
                 <span class="fx-bar" aria-hidden="true"><span :class="demandTone(f.demand)" :style="{ width: `${f.demand}%` }" /></span>
-                <span class="fx-basis" :class="f.demandBasis === 'evidence' ? 'is-ev' : 'is-hyp'">{{ f.demandBasis }}</span>
+                <span class="fx-basis" :class="`bs-${f.demandBasis}`">
+                  {{ f.demandBasis }}<template v-if="f.evidenceGrade">&nbsp;{{ f.evidenceGrade }}</template>
+                </span>
               </td>
               <td v-if="activeLens === 'opportunity'" class="fx-num fx-opp">{{ opportunityScore(f) }}</td>
               <td class="fx-ships">
@@ -257,6 +262,7 @@ function demandTone(v: number): string {
 .fx-pill.is-partial { color: var(--amber); background: var(--amber-soft); }
 .fx-pill.is-gap { color: var(--down); background: rgba(240,101,106,0.14); }
 .fx-pill.is-ev { color: var(--info); background: var(--info-soft); }
+.fx-pill.is-com { color: var(--amber); background: var(--amber-soft); }
 
 .fx-lenses { display: flex; flex-wrap: wrap; gap: 0.4rem; border-top: 1px solid var(--line); padding-top: 0.9rem; }
 .fx-lens {
@@ -312,8 +318,10 @@ function demandTone(v: number): string {
 .fx-bar .is-mid { background: var(--amber); }
 .fx-bar .is-low { background: var(--neutral); }
 .fx-basis { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
-.fx-basis.is-ev { color: var(--info); }
-.fx-basis.is-hyp { color: var(--text-3); }
+.fx-basis.bs-evidence { color: var(--info); }
+.fx-basis.bs-hypothesis { color: var(--text-3); }
+.fx-basis.bs-commercial { color: var(--amber); }
+.fx-segment { display: block; margin-top: 0.3rem; font-size: 0.58rem; color: var(--amber); line-height: 1.35; }
 .fx-opp { font-weight: 700; color: var(--accent); }
 
 .fx-ships { min-width: 150px; }

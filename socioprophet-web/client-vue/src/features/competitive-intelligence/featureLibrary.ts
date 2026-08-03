@@ -15,7 +15,16 @@
 // genuinely beatable today; the media specimens (Remini, PhotoRoom, CapCut, Lensa)
 // are NOT — not on their core trick — without acquiring new model capability.
 
-export type DemandBasis = 'evidence' | 'hypothesis';
+/**
+ * evidence   — users demonstrably want it (verbatim reviews, behavioral data, migrations).
+ * hypothesis — our product judgment; no user-side signal found.
+ * commercial — it works for the OPERATOR but users never asked for it. Naming this
+ *              separately stops operator-side conversion data masquerading as demand.
+ */
+export type DemandBasis = 'evidence' | 'hypothesis' | 'commercial';
+
+/** Strength of the demand evidence: A = behavioral/verbatim, B = mixed, C = thin. */
+export type EvidenceGrade = 'A' | 'B' | 'C';
 export type Readiness = 'have' | 'partial' | 'gap';
 export type Modality = 'text' | 'image' | 'audio' | 'video' | 'cross' | 'none';
 export type FeatureStance = 'moat' | 'copyable' | 'commodity' | 'opening';
@@ -38,6 +47,9 @@ export type FeatureType = {
   demand: number;
   demandBasis: DemandBasis;
   demandNote: string;
+  evidenceGrade?: EvidenceGrade;
+  /** Who wants it, when demand splits by audience rather than being uniform. */
+  demandSegment?: string;
   modality: Modality;
   owners: CapabilityOwner[];
   readiness: Readiness;
@@ -122,6 +134,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Shazam', 'Snipd', 'AudioPen', 'Photomath', 'Cal AI'],
     demand: 92,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Shazam verb-ified the behaviour; Snipd users cite headphone-button snip as the reason they stay. Lowest-friction capture consistently wins reviews.',
     modality: 'cross',
     owners: [
@@ -141,6 +154,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Photomath', 'Cal AI', 'PhotoRoom', 'Remini'],
     demand: 88,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Photomath ~85% recurring revenue on a scan-first funnel; Cal AI built a ~$30M business on removing manual logging.',
     modality: 'image',
     owners: [
@@ -160,6 +174,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Speechify', 'Instapaper / Pocket', 'PhotoRoom', 'ElevenLabs Reader'],
     demand: 84,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'The cheapest, stickiest capture surface on mobile; every reader-class app converges on it. Pocket\'s shutdown showed the surface outlives the product.',
     modality: 'cross',
     owners: [{ kind: 'estate', name: 'socioprophet-web (client-vue)', path: 'socioprophet-web/client-vue' }],
@@ -176,6 +191,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Facetune', 'Remini', 'PhotoRoom', 'AudioPen'],
     demand: 86,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Remini\'s slider is its hero UI; Facetune\'s press-and-hold is its signature. The transformation delta is what users post.',
     modality: 'cross',
     owners: [{ kind: 'estate', name: 'client-vue (UI primitive)', path: 'socioprophet-web/client-vue/src/components' }],
@@ -192,6 +208,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Cleanup.pictures', 'Photomath', 'Perplexity', 'Shazam'],
     demand: 90,
     demandBasis: 'evidence',
+    evidenceGrade: 'A',
     demandNote: '82% of trial starts happen on Day 0 (RevenueCat) — you get one session. Cleanup.pictures made no-signup its entire acquisition wedge.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'client-vue (DEV_AUTH_BYPASS pattern)', path: 'socioprophet-web/client-vue/src/main.ts' }],
@@ -210,6 +227,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Speechify', 'ElevenLabs Reader', 'Instapaper / Pocket'],
     demand: 82,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Speechify: ~50M users, 100k+ 5-star reviews, Apple Design Award 2025 — accessibility/education demand is proven and durable.',
     modality: 'audio',
     owners: [{ kind: 'none', name: 'no TTS model in roster' }],
@@ -226,6 +244,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['AudioPen', 'Superwhisper / MacWhisper', 'Otter.ai', 'Granola'],
     demand: 85,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'AudioPen\'s before/after screenshot is its whole growth loop; Granola hit a $1.5B valuation on capture-then-enhance.',
     modality: 'audio',
     owners: [
@@ -245,6 +264,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Perplexity'],
     demand: 89,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Perplexity built a category on it; citations are the single most-cited reason users trust it over a raw chatbot.',
     modality: 'text',
     owners: [
@@ -265,6 +285,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Photomath'],
     demand: 80,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Photomath\'s free steps are its retention core; the paid tier is animated depth. ~$27.4M FY23, ~85% recurring.',
     modality: 'text',
     owners: [
@@ -284,6 +305,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Blinkist', 'Snipd', 'Granola', 'Arc Search'],
     demand: 78,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Blinkist built an SEO empire on it; Arc Search proved the gesture is loved even when the business fails.',
     modality: 'text',
     owners: [
@@ -301,9 +323,10 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'transform',
     whatItIs: 'Corrections and rewrites surfaced in-place, inside whatever text field the user is already in.',
     shippedBy: ['Grammarly'],
-    demand: 87,
-    demandBasis: 'hypothesis',
-    demandNote: 'Grammarly\'s scale implies durable demand; we have no direct review-mined signal for the assist itself vs the distribution.',
+    demand: 80,
+    demandBasis: 'evidence',
+    evidenceGrade: 'B',
+    demandNote: 'Real without Grammarly\'s distribution — LanguageTool has 4M+ users as a free/OSS rival, and Apple shipped system-wide Writing Tools in iOS 18.1 (an OS vendor entering is revealed demand). But expert sentiment is hostile ("full LLM brainrot") and the moat is being taken by the OS for free.',
     modality: 'text',
     owners: [
       { kind: 'model', name: 'llama3.2:1b/3b (local, low-latency)', path: 'sourceos-model-carry/examples/local-model-profile.llama32-1b.json' },
@@ -322,6 +345,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['PhotoRoom'],
     demand: 83,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'PhotoRoom: $150M+ ARR, ~1-month payback, 5B+ photos/yr. Seller demand is proven and recurring.',
     modality: 'image',
     owners: [{ kind: 'none', name: 'no image segmentation model in roster' }],
@@ -336,9 +360,10 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'transform',
     whatItIs: 'Brush over an unwanted object; AI reconstructs the background seamlessly.',
     shippedBy: ['Cleanup.pictures'],
-    demand: 74,
-    demandBasis: 'hypothesis',
-    demandNote: 'Strong SEO intent on "remove object from photo"; acquisition history (Stability → Jasper) implies value, but no direct demand mining.',
+    demand: 78,
+    demandBasis: 'evidence',
+    evidenceGrade: 'A',
+    demandNote: 'Unprompted App Store verbatims ("Need to erase something small but annoying? This is the app for you", "BEST APP TO REMOVE RANDOM WATERMARKS"), and Google made Magic Eraser a Pixel headline then charged for it via Google One. Caveat: 1-star reviews are all quality failures, and it is now table stakes on every flagship — commoditizing fast.',
     modality: 'image',
     owners: [{ kind: 'none', name: 'no inpainting model in roster' }],
     readiness: 'gap',
@@ -354,6 +379,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Remini', 'FaceApp', 'Facetune'],
     demand: 81,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Remini ~$93M run-rate; repeated #1 App Store surges. Demand is real but novelty-cyclical.',
     modality: 'image',
     owners: [{ kind: 'none', name: 'no face/image generative model in roster' }],
@@ -370,6 +396,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Lensa (Magic Avatars)', 'EPIK / AI Yearbook', 'HeadshotPro / Aragon'],
     demand: 70,
     demandBasis: 'evidence',
+    evidenceGrade: 'A',
     demandNote: 'Enormous but spiky: Lensa ~$30.7M in one month then a 92% collapse; EPIK #1 then gone. HeadshotPro\'s B2B slice is the durable part.',
     modality: 'image',
     owners: [{ kind: 'none', name: 'no image generative model in roster' }],
@@ -384,9 +411,10 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'transform',
     whatItIs: 'Pick a trending template, clips auto-fill to the beat, export in under a minute with zero skill.',
     shippedBy: ['CapCut'],
-    demand: 79,
-    demandBasis: 'hypothesis',
-    demandNote: '~490M users implies demand, but it is inseparable from TikTok distribution — we cannot isolate the feature\'s own pull.',
+    demand: 85,
+    demandBasis: 'evidence',
+    evidenceGrade: 'A',
+    demandNote: 'Best-evidenced item in the study: CapCut complaints are about being DENIED templates ("Won\'t let me use templates", "Half the app is locked behind a paywall") — protest at losing access beats praise as demand evidence. Users actively hunt templates via organic TikTok discovery surfaces.',
     modality: 'video',
     owners: [{ kind: 'none', name: 'no video model/pipeline in roster' }],
     readiness: 'gap',
@@ -404,6 +432,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Duolingo', 'Forest'],
     demand: 88,
     demandBasis: 'evidence',
+    evidenceGrade: 'A',
     demandNote: 'Streaks ≈ 2× daily retention; a streak wager alone gives +14% D7. The forgiveness mechanic is why it does not backfire.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'client-vue (state + notifications)', path: 'socioprophet-web/client-vue' }],
@@ -420,6 +449,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Things / Bear', 'Snipd', 'Instapaper / Pocket', 'Granola'],
     demand: 84,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Bear/Things convert on accumulated investment rather than a feature wall; Granola gates note history for exactly this reason.',
     modality: 'none',
     owners: [
@@ -439,6 +469,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Duolingo', 'Remini'],
     demand: 72,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Duolingo scores urgency and picks copy variants per user; it is the reference implementation. Users tolerate it because it is calibrated.',
     modality: 'none',
     owners: [{ kind: 'tritfabric', name: 'atlas/policy (rules) ', path: 'tritfabric/atlas/policy.py' }],
@@ -453,9 +484,10 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'retention',
     whatItIs: 'Attach the streak to something the user tends and can kill — a tree, a garden — then bridge it to a real-world consequence.',
     shippedBy: ['Forest'],
-    demand: 68,
+    demand: 58,
     demandBasis: 'hypothesis',
-    demandNote: '2M+ real trees planted is strong social proof, but we have no direct evidence users demand this over a plain counter.',
+    evidenceGrade: 'B',
+    demandNote: 'The mechanic lands ("brutally merciless if you lose focus. I like it") but NO evidence users prefer a living object to a plain streak — and Duolingo\'s published streak-wager data (+14% D7) cuts the other way at vastly larger scale. Forest 2-star reviews show the punishment often does not even fire, and an uncredible loss kills the mechanic. Nobody ever REQUESTS a dying tree; they report the effect afterward.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'client-vue', path: 'socioprophet-web/client-vue' }],
     readiness: 'have',
@@ -469,9 +501,11 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'retention',
     whatItIs: 'One fresh unit of value per day so a one-job app is never "finished".',
     shippedBy: ['Blinkist', 'Duolingo'],
-    demand: 71,
-    demandBasis: 'hypothesis',
-    demandNote: 'Standard practice across the catalog; no isolated demand signal for the daily-pick itself.',
+    demand: 55,
+    demandBasis: 'commercial',
+    evidenceGrade: 'C',
+    demandSegment: 'Operator-side. Wordle-style scarcity ~70; served daily pick ~40.',
+    demandNote: 'OPERATOR demand, not user demand: the Daily Blink is described as "a top acquisition lever" built as a push campaign, and there is a documented user request to REMOVE it. Zero of ~50 recent Blinkist reviews mention it. The genuine user-side case is Wordle, where scarcity (one puzzle, no more) drives the ritual — a different mechanic from a served recommendation.',
     modality: 'text',
     owners: [{ kind: 'estate', name: 'socioprophet news/feeds', path: 'socioprophet-web/client-vue/src/pages/NewsFeed.vue' }],
     readiness: 'have',
@@ -488,7 +522,8 @@ export const featureLibrary: FeatureType[] = [
     whatItIs: 'A long personalization quiz that builds sunk cost and branches users to different, primed paywalls.',
     shippedBy: ['Cal AI', 'Blinkist'],
     demand: 60,
-    demandBasis: 'evidence',
+    demandBasis: 'commercial',
+    evidenceGrade: 'B',
     demandNote: 'Users do not "want" this — but it works: Cal AI 3×\'d monthly revenue with it. Demand here is commercial, not user-side.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'client-vue', path: 'socioprophet-web/client-vue' }],
@@ -504,7 +539,8 @@ export const featureLibrary: FeatureType[] = [
     whatItIs: 'One mechanic that simultaneously proves value, advertises to everyone who sees the output, and creates the friction that converts.',
     shippedBy: ['PhotoRoom', 'CapCut', 'Prisma', 'FaceApp'],
     demand: 62,
-    demandBasis: 'evidence',
+    demandBasis: 'commercial',
+    evidenceGrade: 'B',
     demandNote: 'Commercially proven (PhotoRoom ~1-month payback). User-side demand is for its REMOVAL — which is the point.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'client-vue', path: 'socioprophet-web/client-vue' }],
@@ -520,7 +556,8 @@ export const featureLibrary: FeatureType[] = [
     whatItIs: 'Show the magic free; gate exactly what a commercial user cannot live without (rights, HD, batch).',
     shippedBy: ['PhotoRoom', 'Photomath', 'Rocket Money'],
     demand: 66,
-    demandBasis: 'evidence',
+    demandBasis: 'commercial',
+    evidenceGrade: 'B',
     demandNote: 'Hobbyists stay free and market you; earners self-select into paying. PhotoRoom\'s payback proves the split works.',
     modality: 'none',
     owners: [{ kind: 'tritfabric', name: 'atlas/policy (entitlements)', path: 'tritfabric/atlas/policy.py' }],
@@ -537,6 +574,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Things / Bear', 'Granola'],
     demand: 73,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Bear\'s sync-only paywall is consistently praised in reviews as fair — rare for a subscription.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'memory-mesh / sync plane', path: '~/dev/memory-mesh' }],
@@ -552,7 +590,8 @@ export const featureLibrary: FeatureType[] = [
     whatItIs: 'Treat the paywall as the #1 product surface — hundreds of variants, geo/device pricing, anchored annual vs decoy weekly.',
     shippedBy: ['Cal AI', 'Remini'],
     demand: 55,
-    demandBasis: 'evidence',
+    demandBasis: 'commercial',
+    evidenceGrade: 'B',
     demandNote: 'Cal AI ran 400+ variants; 87% shown a wall → 57% start a transaction. Pure commercial demand.',
     modality: 'none',
     owners: [{ kind: 'none', name: 'no experimentation plane wired to pricing' }],
@@ -569,9 +608,11 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'distribution',
     whatItIs: 'One install yields keyboard + editor + extension + widget, so the single feature fires in every context.',
     shippedBy: ['Grammarly', 'Speechify'],
-    demand: 76,
-    demandBasis: 'hypothesis',
-    demandNote: 'Inferred from Grammarly/Speechify scale; users demand ubiquity implicitly rather than requesting it.',
+    demand: 62,
+    demandBasis: 'evidence',
+    evidenceGrade: 'B',
+    demandSegment: 'Demand is for COVERAGE (~85), not for installs. Colonization is the vendor\'s means, tolerated not wanted.',
+    demandNote: 'Users want "works everywhere I already write" — but every surface is a permission tax. iOS warns full-access keyboards can "access, collect and transmit the data you type"; security guidance says avoid third-party keyboards; a 2019 iOS bug granted full access even when denied. Grammarly\'s own 1-star reviews carry that distrust ("why do we have to share our location?").',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'BearBrowser', path: '~/dev/BearBrowser' }],
     readiness: 'partial',
@@ -587,6 +628,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Otter.ai'],
     demand: 64,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Self-distributing, but Granola\'s botless growth shows a real counter-demand for NOT having a bot in the room.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'agentplane', path: '~/dev/agentplane' }],
@@ -601,9 +643,10 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'distribution',
     whatItIs: 'The output is a live web object a non-user can open and query, which converts them into a user.',
     shippedBy: ['Granola', 'Perplexity'],
-    demand: 77,
+    demand: 84,
     demandBasis: 'evidence',
-    demandNote: '"Ask Granola" web notes and Perplexity\'s shareable pages are each their strongest documented loop.',
+    evidenceGrade: 'A',
+    demandNote: 'Second-best-evidenced item: users report BEHAVIORAL REFUSAL, not annoyance — "I dont click on twitter links, since there is a login wall". Critically the wall suppresses the SHARER too: "makes me cautious to want to share links with other people" — the second-order effect that kills viral distribution. Loom, Adobe XD and HuggingChat show the same finding across independent domains.',
     modality: 'text',
     owners: [
       { kind: 'estate', name: 'client-vue + Artifact surface', path: 'socioprophet-web/client-vue' },
@@ -620,9 +663,11 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'distribution',
     whatItIs: 'Thousands of generated pages, one per intent, compounding organic acquisition under everything else.',
     shippedBy: ['Blinkist', 'HeadshotPro / Aragon', 'Photomath', 'Perplexity'],
-    demand: 69,
-    demandBasis: 'evidence',
-    demandNote: 'HeadshotPro ranks #1 for its category on this alone; ~$300K/mo at ~90% margin with no paid engine.',
+    demand: 40,
+    demandBasis: 'commercial',
+    evidenceGrade: 'C',
+    demandSegment: 'User demand ~15 (nobody asks for these pages). Commercial viability now conditional ~50 and ERODING.',
+    demandNote: 'Not a user-demand feature at all — and the channel is now adversarial. Google\'s March 2024 scaled-content-abuse policy explicitly names "generating many pages where the content is only slightly different… to manipulate rankings"; the Helpful Content update deindexed large template operations (one case: 50k city pages, 98% deindexed in 3 months). HeadshotPro\'s ~$300K/mo is real but the floor is shrinking.',
     modality: 'text',
     owners: [
       { kind: 'estate', name: 'socioprophet-web / domain portfolio', path: '~/dev/socioprophet-web' },
@@ -631,7 +676,7 @@ export const featureLibrary: FeatureType[] = [
     readiness: 'partial',
     gapNote: 'We hold ~30 domains largely unwired (per the domain portfolio audit) — the substrate is idle.',
     stance: 'opening',
-    ourAngle: 'We already own the domains and can generate governed pages locally. This is dormant capital.',
+    ourAngle: 'REVISED DOWN: we own ~30 domains and can generate pages locally, but Google now actively penalizes exactly this. Do not treat it as dormant capital. The only defensible version is genuinely useful pages carrying provenance — which is a content strategy, not an SEO trick.',
   },
   {
     id: 'deep-link-template-loop',
@@ -639,9 +684,11 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'distribution',
     whatItIs: 'Every exported artifact carries a link that re-opens the tool with that recipe loaded.',
     shippedBy: ['CapCut'],
-    demand: 63,
-    demandBasis: 'hypothesis',
-    demandNote: 'Powerful for CapCut, but inseparable from TikTok ownership; the isolated demand is unproven.',
+    demand: 60,
+    demandBasis: 'evidence',
+    evidenceGrade: 'B',
+    demandSegment: 'Conditional: ~80 only if you own or are favoured by the source surface; ~60 generic.',
+    demandNote: 'Genuine user pull exists — people SEARCH for template links, which is pull not push. But ByteDance owns both ends and the TikTok algorithm reportedly favours template videos. Strip out common ownership and the evidence for a generic "try this X" loop is thin. Do not generalize this mechanic.',
     modality: 'none',
     owners: [{ kind: 'estate', name: 'client-vue routing', path: 'socioprophet-web/client-vue/src/main.ts' }],
     readiness: 'have',
@@ -659,6 +706,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Perplexity'],
     demand: 86,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'The most-cited reason users trust Perplexity over a bare chatbot; trust is the scarce good in AI products right now.',
     modality: 'text',
     owners: [
@@ -679,6 +727,7 @@ export const featureLibrary: FeatureType[] = [
     shippedBy: ['Superwhisper / MacWhisper', 'PhotoRoom', 'Granola'],
     demand: 80,
     demandBasis: 'evidence',
+    evidenceGrade: 'B',
     demandNote: 'Superwhisper sells on it; Granola grew on botless local capture; FaceApp and Lensa were punished for the opposite.',
     modality: 'cross',
     owners: [
@@ -697,9 +746,11 @@ export const featureLibrary: FeatureType[] = [
     cluster: 'trust',
     whatItIs: 'Training data and user inputs carry consent and license provenance end to end.',
     shippedBy: [],
-    demand: 75,
+    demand: 88,
     demandBasis: 'evidence',
-    demandNote: 'Nobody in the catalog ships this — and several were punished for its absence (Lensa BIPA suit + artist backlash, FaceApp, Cleo FTC).',
+    evidenceGrade: 'A',
+    demandSegment: 'CREATOR + ENTERPRISE ~88 (grade A). Mass CONSUMER only ~45 (grade C) — do not blend them.',
+    demandNote: 'Creator demand is behavioral and strong: Cara grew 40k→650k users in ONE WEEK rejecting Meta AI training; Spawning\'s opt-out registry passed 1B works; Adobe\'s ToS wording forced two rewrites in a month. Consumer demand is the privacy paradox — high stated concern (Pew: ~half more concerned than excited) but Lensa re-spiked to 12.6M downloads in 11 days in Dec 2025, so consumers did NOT durably punish it.',
     modality: 'cross',
     owners: [
       { kind: 'tritfabric', name: 'atlas/autonomy_gate + autopilot/promotion_controller', path: 'tritfabric/atlas/autopilot/promotion_controller.py' },
