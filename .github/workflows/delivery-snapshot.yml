@@ -34,15 +34,42 @@ jobs:
       run:
         working-directory: socioprophet-web/client-vue
     steps:
+      # Prefer a minted, short-lived GitHub App installation token so the snapshot
+      # PR is AUTHORED BY THE APP. GitHub deliberately does not start workflow runs
+      # for events triggered by the default GITHUB_TOKEN (recursion guard), so a PR
+      # opened with github.token never triggers the required `gate / check` and can
+      # therefore never auto-merge. An App-authored PR triggers the gate normally.
+      # No long-lived PAT is stored — the token is minted at runtime and expires.
+      #
+      # Until the App is configured this falls back to github.token: the PR still
+      # opens and is fully gated (never a direct push, never fail-open), it just
+      # needs its gate triggered once (e.g. a maintainer close/reopen) to merge.
+      # One-time setup: create a GitHub App with contents:write + pull-requests:write
+      # on SocioProphet/socioprophet, install it, then set repo var
+      # DELIVERY_SNAPSHOT_APP_ID and repo secret DELIVERY_SNAPSHOT_APP_KEY.
+      - name: Mint scoped GitHub App token (optional)
+        id: apptoken
+        if: ${{ vars.DELIVERY_SNAPSHOT_APP_ID != '' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.DELIVERY_SNAPSHOT_APP_ID }}
+          private-key: ${{ secrets.DELIVERY_SNAPSHOT_APP_KEY }}
+          owner: SocioProphet
+          repositories: socioprophet
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Persist whichever token authors the snapshot PR, so the push + PR are
+          # attributed to the App when configured (falls back to github.token).
+          token: ${{ steps.apptoken.outputs.token || github.token }}
 
       # board-spec.yaml is NOT in this repo — its canonical home is
       # SocioProphet/sociosphere (a public repo). Consume the single source of
       # truth via a sparse cross-repo checkout rather than forking a copy in here;
       # pointing --board-spec at a nonexistent path left "Board spec resolved"
-      # permanently unverified.
+      # permanently unverified. Uses github.token: sociosphere is public, and the
+      # App token is scoped to socioprophet only.
       - name: Fetch canonical board spec (sociosphere is the source of truth)
         uses: actions/checkout@v4
         with:
@@ -50,6 +77,7 @@ jobs:
           sparse-checkout: registry/board-spec.yaml
           sparse-checkout-cone-mode: false
           path: .sociosphere
+          token: ${{ github.token }}
 
       - uses: actions/setup-node@v4
         with:
@@ -91,7 +119,9 @@ jobs:
       # the snapshot arrives as a gated, auto-merging PR from a bot-owned branch.
       - name: Open or update the snapshot PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          # App token when configured (so the PR triggers the gate and auto-merges);
+          # github.token otherwise (PR opens and is gated, needs its gate triggered).
+          GH_TOKEN: ${{ steps.apptoken.outputs.token || github.token }}
           SNAPSHOT: socioprophet-web/client-vue/src/data/deliverySnapshot.ts
           BRANCH: bot/delivery-snapshot
         run: |
