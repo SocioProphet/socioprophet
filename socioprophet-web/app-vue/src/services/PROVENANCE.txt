@@ -1,0 +1,16 @@
+source-repo: SourceOS-Linux/sourceos-spec
+source-path: estate-safety-kit/js/urlSafe.ts
+source-commit: 78f5cf69d231ef5d2c9bd6df45bdf500e7a97ced
+vendored-path: socioprophet-web/app-vue/src/services/url-safe.ts
+vendored-at: 2026-08-03
+
+# PROVISIONAL PIN: source-commit above is the head of sourceos-spec PR
+# https://github.com/SourceOS-Linux/sourceos-spec/pull/276 (feat/estate-safety-kit),
+# not yet merged to main. GitHub serves raw content for any pushed commit, so
+# tools/check_vendored_safety_kit.py resolves this pin correctly today, but the
+# branch could be deleted after merge — re-pin source-commit to the actual merge
+# commit on sourceos-spec's main once #276 lands, then re-run the checker.
+#
+# Run: python3 check_vendored_safety_kit.py url-safe.ts
+# (fetch tools/check_vendored_safety_kit.py from sourceos-spec at source-commit above,
+# or point --source-root at a local sourceos-spec checkout)
