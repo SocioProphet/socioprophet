@@ -207,6 +207,44 @@
         </svg>
       </div>
     </section>
+
+    <!-- ── 4 · Value reading · qualified attention ── -->
+    <section class="twm-card twm-val" aria-label="Value reading">
+      <div class="twm-card-head">
+        <h2>Value reading · qualified attention</h2>
+        <span class="twm-sub"><code>Kknow = coverage · (1−drift) · integrity</code> · read live off <code>x</code></span>
+      </div>
+      <p class="twm-val-note">
+        The value axiom, made functional: value roots in <b>qualified attention</b>, measured as
+        <code>Kknow</code>. Knowledge raises only the <b>controllable surplus</b> — it can never buy
+        down the <b>exogenous hurdle</b> — and value banks only under human governance (close the
+        <em>human action</em> gate above to hold it fail-closed). A model, not a measurement.
+      </p>
+      <div class="twm-val-grid">
+        <div class="twm-val-metric">
+          <span class="twm-val-label">Kknow · qualified attention</span>
+          <span class="twm-val-bar"><i :style="{ width: (value.kknow * 100) + '%' }" /></span>
+          <b>{{ value.kknow.toFixed(2) }}</b>
+        </div>
+        <div class="twm-val-metric">
+          <span class="twm-val-label">controllable surplus</span>
+          <span class="twm-val-bar"><i :style="{ width: (value.controllableSurplus * 100) + '%' }" /></span>
+          <b>{{ value.controllableSurplus.toFixed(2) }}</b>
+        </div>
+        <div class="twm-val-metric">
+          <span class="twm-val-label">− hurdle · exogenous</span>
+          <span class="twm-val-bar twm-val-bar--hurdle"><i :style="{ width: (value.hurdle * 100) + '%' }" /></span>
+          <b>{{ value.hurdle.toFixed(2) }}</b>
+        </div>
+        <div class="twm-val-signal" :class="value.valueSignal >= 0 ? 'pos' : 'neg'">
+          <span class="twm-val-label">value signal · ΔEP-like</span>
+          <b>{{ value.valueSignal >= 0 ? '+' : '' }}{{ value.valueSignal.toFixed(2) }}</b>
+        </div>
+      </div>
+      <p class="twm-val-verdict" :class="value.bankable ? 'ok' : 'held'">
+        {{ value.bankable ? 'BANKABLE' : 'HELD' }} — {{ value.reason }}
+      </p>
+    </section>
   </section>
 </template>
 
@@ -239,6 +277,7 @@ import {
   type StepResult,
   type TwinStateModel,
 } from '../features/twinStateSpace';
+import { valueReading } from '../features/valueModel';
 
 // ── Lifecycle colors (per the world-model spec) ──
 const LIFECYCLE: Array<{ state: TwinState; color: string }> = [
@@ -367,6 +406,12 @@ watch(selectedId, rebuildModel);
 function toggleGate(cls: ImpulseClass): void {
   model.gates[cls] = cycleGate(model.gates[cls]);
 }
+
+// ── Value reading: the value axiom (Kknow + EP-like signal) read live off x.
+// Banking is gated on human governance (the human_action gate): with no operator
+// governance in the loop the value is held fail-closed. See features/valueModel.ts
+// and docs/value-axiom-human-attention.md.
+const value = computed(() => valueReading(model.state, { governanceGate: model.gates.human_action }));
 
 function inject(): void {
   lastStep.value = stepModel(model, selectedImpulse.value, magnitude.value);
@@ -544,4 +589,24 @@ function trajPoints(dim: StateDim): string {
 
 .twm-traj { margin-top: 1rem; }
 .twm-traj-svg { width: 100%; height: auto; background: rgba(20, 30, 48, 0.35); border-radius: 10px; }
+
+/* Section 4 · value reading */
+.twm-val-note { margin: 0 0 0.9rem; font-size: 0.76rem; opacity: 0.82; line-height: 1.5; max-width: 76ch; }
+.twm-val-note code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+.twm-val-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; }
+.twm-val-metric { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.35rem 0.6rem;
+  padding: 0.6rem 0.7rem; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.22); }
+.twm-val-label { grid-column: 1 / -1; font-size: 0.72rem; opacity: 0.75; }
+.twm-val-bar { height: 0.5rem; border-radius: 999px; background: rgba(148, 163, 184, 0.18); overflow: hidden; }
+.twm-val-bar i { display: block; height: 100%; background: #7c8cff; }
+.twm-val-bar--hurdle i { background: #f0656a; }
+.twm-val-metric b { font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.twm-val-signal { display: grid; align-content: center; gap: 0.25rem; padding: 0.6rem 0.7rem; border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.28); }
+.twm-val-signal b { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.twm-val-signal.pos { border-color: rgba(63, 185, 80, 0.5); background: rgba(63, 185, 80, 0.08); }
+.twm-val-signal.neg { border-color: rgba(240, 101, 106, 0.5); background: rgba(240, 101, 106, 0.08); }
+.twm-val-verdict { margin: 0.9rem 0 0; font-size: 0.78rem; padding: 0.45rem 0.65rem; border-radius: 8px; font-weight: 600; }
+.twm-val-verdict.ok { background: rgba(63, 185, 80, 0.12); border: 1px solid rgba(63, 185, 80, 0.4); }
+.twm-val-verdict.held { background: rgba(240, 180, 41, 0.12); border: 1px solid rgba(240, 180, 41, 0.45); }
 </style>
