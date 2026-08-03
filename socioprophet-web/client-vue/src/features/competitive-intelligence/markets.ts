@@ -69,7 +69,7 @@ export const markets: Market[] = [
     ourSurfaces: ['SocioProphet cockpit', 'sherlock-search', 'prophet-truth', 'economic-prophet'],
     rivals: ['Bloomberg Terminal', 'AlphaSense', 'Hebbia', 'Palantir Foundry', 'Glean', 'Perplexity Enterprise'],
     coverage: 'covered',
-    specimens: 18,
+    specimens: 23,
     route: '/professional-intelligence/competitive/enterprise',
     machine: [
       { name: 'Land via a modelling engagement', detail: 'Give away implementation to encode their business logic in your model before price is agreed.' },
@@ -80,7 +80,7 @@ export const markets: Market[] = [
       { name: 'Monetize governance separately', detail: 'Audit logs, SCIM and retention are what the CISO actually buys.' },
       { name: 'Draw the retrieved / generated boundary', detail: 'Never let the model produce a number it could have looked up.' },
     ],
-    note: 'THE market our flagship competes in. 18 specimens from Bloomberg (~$32K/seat) to Feedly (~$19K whole-team). Verdict: our defensible axis is Palantir/Primer (sovereign, governed, provenance-first), NOT Glean/Perplexity horizontal retrieval.',
+    note: 'THE market our flagship competes in. 23 specimens from Bloomberg (~$32K/seat) to Feedly (~$19K whole-team). Verdict: our defensible axis is Palantir/Primer (sovereign, governed, provenance-first), NOT Glean/Perplexity horizontal retrieval.',
   },
   {
     id: 'browser',
