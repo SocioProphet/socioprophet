@@ -11,6 +11,10 @@
 // store swaps in behind this same interface. The reactive singleton below is the
 // session-durable stand-in until that store lands (tracked follow-up @mdheller).
 //
+// INTERFACE HANDOFF: the seam, invariants, and the decisions the durable store
+// must converge on are pinned in ./KE_WORKBENCH_CONTRACT.md. Change the shapes
+// here and there together — this file is the source of truth for the types.
+//
 // Estate rules honored (see also features/reasoning-chain/keAuthorship.ts):
 //   - "learn, don't match dictionaries": every appended asset is LEARNED +
 //     VERSIONED, never a static match rule (`matchRule: false`, `learned: true`).
