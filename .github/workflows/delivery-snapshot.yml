@@ -62,7 +62,12 @@ jobs:
 
       - name: Typecheck and test the surface
         run: |
-          npm ci --no-audit --no-fund
+          # client-vue commits a pnpm-lock.yaml, not a package-lock.json, so
+          # `npm ci` (which requires package-lock/npm-shrinkwrap) fails EUSAGE and
+          # the whole snapshot job dies before it can commit the refreshed data.
+          # Match the working convention of client-vue-product-build.yml, which
+          # installs with `npm install`.
+          npm install --no-audit --no-fund
           npx vue-tsc --noEmit
           npx vitest run src/__tests__/deliveryDashboard.test.ts src/__tests__/deliveryEconomics.test.ts
 
