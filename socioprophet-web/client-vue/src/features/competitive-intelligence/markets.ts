@@ -133,6 +133,16 @@ export const markets: Market[] = [
     note: 'Fast-moving, well-funded market we build in daily but have never assessed.',
   },
   {
+    id: 'platform-data',
+    name: 'Platform & data infrastructure',
+    arena: 'The governed build/deploy/data platform a product estate runs on',
+    ourSurfaces: ['prophet-platform', 'git-ops-standards', 'ArgoCD/GKE estate', 'socbase'],
+    rivals: ['Palantir Foundry', 'Databricks', 'Snowflake', 'Vercel', 'Supabase', 'Render'],
+    coverage: 'none',
+    specimens: 0,
+    note: 'The platform our whole estate runs on, and it had no market entry at all until now — the most-used thing we own was the least assessed. socbase sits here as the sovereign Firebase/Supabase replacement.',
+  },
+  {
     id: 'knowledge-graph',
     name: 'Knowledge graph & ontology',
     arena: 'Entity, relationship and provenance substrates',
