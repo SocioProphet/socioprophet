@@ -1,22 +1,26 @@
 // Competitive-intelligence comparison-boards API client.
 //
 // Consumes the BOARD DATA MODEL produced by the intelligence-superiority benchmark
-// contract (competitive-intel / strategy plane): per-category comparison boards whose
-// rows are litmus features, whose columns are the estate + each competitor, and whose
-// cells carry a BEAT / MEET / PARTIAL / GAP rank. The estate's own cells additionally
-// carry an evidence link (repo/path/PR), a maturity badge (live vs spec), and an
-// assessment basis (self-assessed vs externally-certified).
+// contract (competitive-intel / strategy plane, dashboard-bff GET /v1/competitive-boards):
+// per-category comparison boards whose rows are litmus features, whose columns are
+// competitors, and whose cells carry a BEAT / MEET / PARTIAL / GAP rank.
+//
+// RELATIVE-ONLY SCORING MODEL — no separate "estate column". A cell is the estate's
+// claim about its standing against ONE competitor on ONE feature; the same feature
+// legitimately carries a different verdict against a different competitor (e.g. BEAT vs
+// Vectara, MEET vs Cohere, on the same row) because nobody independently rated either
+// side's absolute capability — only the estate's comparative claim exists. Every cell
+// therefore carries evidence/maturity/basis, not just a subset of them.
 //
 // Live-first, fail-open-to-fixture — mirrors intelligenceSuperiorityApi.ts /
 // isotaApi.ts: an env-configured base, a getJson wrapper, and a *WithFallback variant
 // that returns a bundled, deterministic fixture when the producer is absent so the
 // surface ALWAYS renders. Scores are NOT hardcoded in the component — the board renders
-// only from this dataset (single source of truth = the benchmark contract). When the
-// producer lands, wire the live seam and the same renderer serves live data unchanged.
+// only from this dataset (single source of truth = the benchmark contract).
 //
-// HONESTY: every board dataset carries an `assessment_basis` on estate cells so the UI
-// badges self-assessed vs externally-certified ranks — a BEAT the estate asserts about
-// itself is never laundered into an independently-certified result.
+// HONESTY: every cell carries an `assessment_basis` so the UI badges self-assessed vs
+// externally-certified ranks — a BEAT the estate asserts about itself is never
+// laundered into an independently-certified result.
 
 import { COMPETITIVE_BOARDS_FIXTURE } from '../features/competitive-intelligence/boards/fixture';
 
@@ -49,26 +53,26 @@ export interface LitmusFeature {
   definition: string;
 }
 
-/** A board column: the estate or one competitor. */
-export interface BoardColumn {
+/** A board column: one named competitor. There is no estate column — see BoardCell. */
+export interface BoardCompetitor {
   id: string;
   name: string;
-  /** True for the estate's own column. */
-  is_estate: boolean;
   /** Optional short descriptor (e.g. the competitor's category posture). */
   note?: string;
 }
 
-/** A single (feature × column) cell. */
+/** One (feature × competitor) cell: the estate's claim about its standing against THAT
+ * competitor on THAT feature. Every cell is an estate claim, so evidence/maturity/basis
+ * live on every cell, not on a subset of them. */
 export interface BoardCell {
   feature_id: string;
-  column_id: string;
+  competitor_id: string;
   rank: BoardRank;
-  /** Estate-only: evidence link (repo/path/PR) grounding the rank. */
+  /** Evidence link (repo/path/PR) grounding the rank. */
   evidence?: { label: string; href: string };
-  /** Estate-only: live (shipped) vs spec (declared). */
+  /** live (shipped) vs spec (declared). */
   maturity?: BoardMaturity;
-  /** Estate-only: self-assessed vs externally-certified. */
+  /** self-assessed vs externally-certified. */
   basis?: AssessmentBasis;
   /** Short rationale shown on expand. */
   note?: string;
@@ -79,9 +83,7 @@ export interface CategoryBoard {
   id: string;
   name: string;
   description: string;
-  /** The column id that is the estate (its cells carry evidence/maturity/basis). */
-  estate_column_id: string;
-  columns: BoardColumn[];
+  competitors: BoardCompetitor[];
   features: LitmusFeature[];
   cells: BoardCell[];
 }
@@ -92,7 +94,7 @@ export interface CompetitiveBoardsDataset {
   version: string;
   /** ISO timestamp the producer stamped. */
   generated_at: string;
-  /** Human label for the estate column across all boards. */
+  /** Human label for the estate across the page (not a column — see BoardCell). */
   estate_label: string;
   categories: CategoryBoard[];
   disclaimer: string;

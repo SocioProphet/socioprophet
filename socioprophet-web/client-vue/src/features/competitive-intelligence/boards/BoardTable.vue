@@ -1,7 +1,9 @@
 <!-- BOARD TABLE — one category comparison board.
-     Rows = litmus features (definition on hover + expand), columns = estate + each
-     competitor, cells = BEAT/MEET/PARTIAL/GAP rank. Estate cells carry an evidence
-     link, a maturity badge (live/spec) and an assessment-basis badge (self/certified).
+     Rows = litmus features (definition on hover + expand), columns = named competitors.
+     RELATIVE-ONLY: each cell is the estate's own claim about its standing against THAT
+     competitor on THAT feature (BEAT/MEET/PARTIAL/GAP) — there is no separate "estate
+     column", so every cell carries an evidence link, a maturity badge (live/spec) and
+     an assessment-basis badge (self/certified), not just a subset of them.
      Ranks are text-labelled + glyph-prefixed so they are never color-only (a11y). -->
 <template>
   <PCard :title="board.name">
@@ -17,20 +19,18 @@
 
     <div class="bt-scroll" role="region" :aria-label="`${board.name} comparison board`" tabindex="0">
       <table class="bt-table">
-        <caption class="sr-only">{{ board.name }}: litmus features (rows) by estate and competitors (columns)</caption>
+        <caption class="sr-only">{{ board.name }}: litmus features (rows) vs competitors (columns), each cell the estate's own verdict against that competitor</caption>
         <thead>
           <tr>
             <th scope="col" class="bt-featcol">Litmus feature</th>
             <th
-              v-for="col in board.columns"
-              :key="col.id"
+              v-for="comp in board.competitors"
+              :key="comp.id"
               scope="col"
               class="bt-colhead"
-              :class="{ 'bt-colhead--estate': col.is_estate }"
             >
-              <span class="bt-colname">{{ col.name }}</span>
-              <span v-if="col.is_estate" class="bt-estate-flag">estate</span>
-              <span v-if="col.note" class="bt-colnote">{{ col.note }}</span>
+              <span class="bt-colname">{{ comp.name }}</span>
+              <span v-if="comp.note" class="bt-colnote">{{ comp.note }}</span>
             </th>
           </tr>
         </thead>
@@ -51,45 +51,42 @@
             </th>
             <td
               v-for="rc in row.cells"
-              :key="rc.col.id"
+              :key="rc.competitor.id"
               class="bt-cell"
-              :class="{ 'bt-cell--estate': rc.col.is_estate }"
             >
               <template v-if="rc.cell">
                 <span
                   class="rank-chip"
                   :class="`rank-${rc.cell.rank.toLowerCase()}`"
-                  :aria-label="`${row.feat.name} · ${rc.col.name}: ${rc.cell.rank}`"
+                  :aria-label="`${row.feat.name} vs ${rc.competitor.name}: ${rc.cell.rank}`"
                 >
                   <span class="rank-glyph" aria-hidden="true">{{ glyph(rc.cell.rank) }}</span>
                   {{ rc.cell.rank }}
                 </span>
-                <template v-if="rc.col.is_estate">
-                  <span class="bt-badges">
-                    <span
-                      v-if="rc.cell.maturity"
-                      class="bt-badge"
-                      :class="`bt-badge--${rc.cell.maturity}`"
-                      :title="rc.cell.maturity === 'live' ? 'Live — shipped capability' : 'Spec — declared / planned'"
-                    >{{ rc.cell.maturity }}</span>
-                    <span
-                      v-if="rc.cell.basis"
-                      class="bt-badge bt-badge--basis"
-                      :title="rc.cell.basis === 'externally-certified' ? 'Rank verified by an external party' : 'Rank asserted by the estate'"
-                    >{{ rc.cell.basis === 'externally-certified' ? 'certified' : 'self' }}</span>
-                  </span>
-                  <a
-                    v-if="rc.cell.evidence && isSafeHttp(rc.cell.evidence.href)"
-                    class="bt-evidence"
-                    :href="rc.cell.evidence.href"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >{{ rc.cell.evidence.label }} ↗</a>
+                <span class="bt-badges">
                   <span
-                    v-else-if="rc.cell.evidence"
-                    class="bt-evidence bt-evidence--unsafe"
-                  >{{ rc.cell.evidence.label }}</span>
-                </template>
+                    v-if="rc.cell.maturity"
+                    class="bt-badge"
+                    :class="`bt-badge--${rc.cell.maturity}`"
+                    :title="rc.cell.maturity === 'live' ? 'Live — shipped capability' : 'Spec — declared / planned'"
+                  >{{ rc.cell.maturity }}</span>
+                  <span
+                    v-if="rc.cell.basis"
+                    class="bt-badge bt-badge--basis"
+                    :title="rc.cell.basis === 'externally-certified' ? 'Rank verified by an external party' : 'Rank asserted by the estate'"
+                  >{{ rc.cell.basis === 'externally-certified' ? 'certified' : 'self' }}</span>
+                </span>
+                <a
+                  v-if="rc.cell.evidence && isSafeHttp(rc.cell.evidence.href)"
+                  class="bt-evidence"
+                  :href="rc.cell.evidence.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >{{ rc.cell.evidence.label }} ↗</a>
+                <span
+                  v-else-if="rc.cell.evidence"
+                  class="bt-evidence bt-evidence--unsafe"
+                >{{ rc.cell.evidence.label }}</span>
                 <span
                   v-if="rc.cell.note && expanded.has(row.feat.id)"
                   class="bt-cellnote"
@@ -117,7 +114,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import PCard from '../../../components/workbench/PCard.vue';
-import type { BoardCell, BoardColumn, BoardRank, CategoryBoard, LitmusFeature } from '../../../api/competitiveBoardsApi';
+import type { BoardCell, BoardCompetitor, BoardRank, CategoryBoard, LitmusFeature } from '../../../api/competitiveBoardsApi';
 import { RANK_ORDER, cellFor, tallyBoard } from './tally';
 import { isSafeHttp } from '../../../utils/urlSafe';
 
@@ -134,7 +131,7 @@ function toggle(id: string) {
 }
 
 interface ResolvedCell {
-  col: BoardColumn;
+  competitor: BoardCompetitor;
   cell: BoardCell | undefined;
 }
 interface FeatureRow {
@@ -142,14 +139,14 @@ interface FeatureRow {
   cells: ResolvedCell[];
 }
 
-// Resolve every (feature × column) cell once per render instead of re-scanning
+// Resolve every (feature × competitor) cell once per render instead of re-scanning
 // board.cells for the same lookup at every template usage site.
 const rows = computed<FeatureRow[]>(() =>
   props.board.features.map((feat) => ({
     feat,
-    cells: props.board.columns.map((col) => ({
-      col,
-      cell: cellFor(props.board, feat.id, col.id),
+    cells: props.board.competitors.map((competitor) => ({
+      competitor,
+      cell: cellFor(props.board, feat.id, competitor.id),
     })),
   })),
 );
@@ -172,9 +169,7 @@ function glyph(rank: BoardRank): string {
 
 .bt-featcol { width: 15rem; font-size: var(--fs-eyebrow); text-transform: uppercase; letter-spacing: var(--ls-eyebrow); color: var(--text-3); font-weight: 600; }
 .bt-colhead { min-width: 8rem; }
-.bt-colhead--estate { background: var(--accent-soft); }
 .bt-colname { display: block; font-weight: 700; color: var(--text); }
-.bt-estate-flag { display: inline-block; margin-top: 0.15rem; font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 800; }
 .bt-colnote { display: block; margin-top: 0.15rem; font-size: var(--fs-xs); color: var(--text-3); }
 
 .bt-featcell { width: 15rem; }
@@ -183,7 +178,6 @@ function glyph(rank: BoardRank): string {
 .bt-feat-i { display: inline-grid; place-items: center; width: 1.05rem; height: 1.05rem; border: 1px solid var(--line-2); border-radius: 999px; font-size: 0.62rem; font-style: italic; color: var(--text-2); }
 .bt-feat-def { margin: 0.35rem 0 0; font-size: var(--fs-xs); color: var(--text-2); line-height: 1.5; font-style: normal; }
 
-.bt-cell--estate { background: color-mix(in srgb, var(--accent-soft) 60%, transparent); }
 .bt-cell-empty { color: var(--text-3); }
 
 .rank-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.14rem 0.45rem; border-radius: 6px; font-size: var(--fs-xs); font-weight: 800; letter-spacing: 0.05em; border: 1px solid transparent; }

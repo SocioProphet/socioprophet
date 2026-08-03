@@ -17,34 +17,24 @@ function emptyTally(): RankTally {
   return { BEAT: 0, MEET: 0, PARTIAL: 0, GAP: 0 };
 }
 
-/** The estate's cells for a board, in feature order. */
-export function estateCells(board: CategoryBoard): BoardCell[] {
-  const byFeature = new Map<string, BoardCell>();
-  for (const cell of board.cells) {
-    if (cell.column_id === board.estate_column_id) byFeature.set(cell.feature_id, cell);
-  }
-  return board.features
-    .map((f) => byFeature.get(f.id))
-    .filter((c): c is BoardCell => Boolean(c));
-}
-
-/** Look up a single cell (feature × column). */
+/** Look up a single cell (feature × competitor). */
 export function cellFor(
   board: CategoryBoard,
   featureId: string,
-  columnId: string,
+  competitorId: string,
 ): BoardCell | undefined {
-  return board.cells.find((c) => c.feature_id === featureId && c.column_id === columnId);
+  return board.cells.find((c) => c.feature_id === featureId && c.competitor_id === competitorId);
 }
 
-/** Per-category tally of the ESTATE column's ranks. */
+/** Per-category tally over EVERY cell — there is no separate estate column to single out;
+ * every cell already is an estate-vs-one-competitor verdict. */
 export function tallyBoard(board: CategoryBoard): RankTally {
   const tally = emptyTally();
-  for (const cell of estateCells(board)) tally[cell.rank] += 1;
+  for (const cell of board.cells) tally[cell.rank] += 1;
   return tally;
 }
 
-/** Overall scorecard = the estate's ranks summed across every category. */
+/** Overall scorecard = every cell's rank summed across every category. */
 export function tallyDataset(dataset: CompetitiveBoardsDataset): RankTally {
   const tally = emptyTally();
   for (const board of dataset.categories) {
@@ -54,7 +44,7 @@ export function tallyDataset(dataset: CompetitiveBoardsDataset): RankTally {
   return tally;
 }
 
-/** Total number of ranked estate cells in a tally (denominator for shares). */
+/** Total number of ranked cells in a tally (denominator for shares). */
 export function tallyTotal(tally: RankTally): number {
   return RANK_ORDER.reduce((sum, rank) => sum + tally[rank], 0);
 }

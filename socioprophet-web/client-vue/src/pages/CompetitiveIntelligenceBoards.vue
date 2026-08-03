@@ -1,10 +1,13 @@
 <!-- COMPETITIVE INTELLIGENCE · SUPERIORITY BOARDS
      A first-class cockpit surface for the intelligence-superiority comparison boards.
-     Per category: rows = litmus features, columns = estate + competitors, cells =
-     BEAT/MEET/PARTIAL/GAP with the estate's evidence link, maturity (live/spec) and
-     assessment basis (self/certified). Renders ONLY from the benchmark board dataset
-     (single source of truth) — live-first, with a bundled fixture fallback so it
-     always renders. Scores are never hardcoded in this component. -->
+     Per category: rows = litmus features, columns = named competitors, cells =
+     BEAT/MEET/PARTIAL/GAP — the estate's own relative claim against THAT competitor on
+     THAT feature (no separate estate column: nobody independently rated either side's
+     absolute capability, only the estate's comparative claim exists). Every cell carries
+     the estate's evidence link, maturity (live/spec) and assessment basis
+     (self/certified). Renders ONLY from the benchmark board dataset (single source of
+     truth) — live-first, with a bundled fixture fallback so it always renders. Scores
+     are never hardcoded in this component. -->
 <template>
   <section class="cib-page" aria-labelledby="cib-title">
     <SurfaceHeader

@@ -1,9 +1,12 @@
 // Bundled representative board dataset — the fallback the surface renders when the
-// live producer (intelligence-superiority benchmark contract, competitive-intel plane)
-// is unavailable. It is a faithful REPRESENTATIVE of the contract shape, not a measured
-// certification: estate ranks are self-assessed unless a cell says otherwise, and the
-// disclaimer travels with the data. When the live producer is wired, this file is only
-// the offline fallback; the renderer consumes whichever dataset the API client returns.
+// live producer (intelligence-superiority benchmark contract, competitive-intel plane,
+// dashboard-bff GET /v1/competitive-boards) is unavailable. It is a faithful
+// REPRESENTATIVE of the contract shape, not a measured certification.
+//
+// RELATIVE-ONLY SCORING MODEL — no separate estate column. Every cell states the
+// estate's own claim about its standing against ONE competitor on ONE feature; the
+// same feature legitimately carries a different verdict against a different
+// competitor. Evidence/maturity/basis therefore live on every cell.
 //
 // Positioning grounded in the estate's competitive-intelligence register (local-RAG /
 // GraphRAG peers, agent frameworks, eval labs, governance vendors, KG engines,
@@ -16,27 +19,25 @@ const REPO = 'https://github.com/SocioProphet';
 
 export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
   service: 'competitive-boards (bundled fixture)',
-  version: '0.1.0-fixture',
+  version: '0.2.0-fixture',
   generated_at: '2026-08-03T00:00:00Z',
   estate_label: 'SocioProphet estate',
   disclaimer:
-    'Representative fixture, not a measured certification. Estate ranks are self-assessed ' +
-    'unless a cell is marked externally-certified; maturity distinguishes live (shipped) ' +
-    'from spec (declared). Competitor ranks are the estate\'s assessment of open positioning, ' +
-    'not the vendors\' own claims. Wire VITE_COMPETITIVE_BOARDS_BASE to the benchmark producer ' +
-    'for the live board dataset.',
+    'Representative fixture, not a measured certification. Every cell is the estate\'s ' +
+    'own relative claim against that one competitor on that one feature — self-assessed ' +
+    'unless marked externally-certified; maturity distinguishes live (shipped) from spec ' +
+    '(declared). Wire VITE_COMPETITIVE_BOARDS_BASE to the benchmark producer for the live ' +
+    'board dataset.',
   categories: [
     {
       id: 'rag',
       name: 'RAG / Retrieval',
       description:
         'Retrieval-augmented generation over structured knowledge — the local-RAG / GraphRAG field.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'ms-graphrag', name: 'MS GraphRAG', is_estate: false, note: 'GPT-4-class, expensive indexing' },
-        { id: 'lightrag', name: 'LightRAG', is_estate: false, note: 'HKUDS, ~30B dual-layer KG+vector' },
-        { id: 'onyx', name: 'Onyx (Danswer)', is_estate: false, note: 'air-gapped, 40+ connectors' },
+      competitors: [
+        { id: 'ms-graphrag', name: 'MS GraphRAG', note: 'GPT-4-class, expensive indexing' },
+        { id: 'lightrag', name: 'LightRAG', note: 'HKUDS, ~30B dual-layer KG+vector' },
+        { id: 'onyx', name: 'Onyx (Danswer)', note: 'air-gapped, 40+ connectors' },
       ],
       features: [
         { id: 'verified-compute', name: 'Verified compute', definition: 'Executes and verifies computations (modular arithmetic, ODEs) rather than only retrieving text — a capability class retrieval-only systems lack.' },
@@ -46,38 +47,32 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'air-gapped-local', name: 'Air-gapped local operation', definition: 'Runs fully offline on local LLMs with no cloud dependency.' },
       ],
       cells: [
-        { feature_id: 'verified-compute', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'noetica operator library', href: `${REPO}/Noetica/tree/main/reason` }, note: 'Operator + reason lane; retrieval-only peers structurally lack it.' },
-        { feature_id: 'verified-compute', column_id: 'ms-graphrag', rank: 'GAP' },
-        { feature_id: 'verified-compute', column_id: 'lightrag', rank: 'GAP' },
-        { feature_id: 'verified-compute', column_id: 'onyx', rank: 'GAP' },
-        { feature_id: 'selective-retrieval', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'CRAG gate measurement', href: `${REPO}/Noetica` }, note: 'Measured retrieval hurts reasoning; routes around it.' },
-        { feature_id: 'selective-retrieval', column_id: 'ms-graphrag', rank: 'GAP' },
-        { feature_id: 'selective-retrieval', column_id: 'lightrag', rank: 'PARTIAL' },
-        { feature_id: 'selective-retrieval', column_id: 'onyx', rank: 'PARTIAL' },
-        { feature_id: 'frontier-authored-structure', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'glossary canon', href: `${REPO}/socioprophet` }, note: 'Author canon offline; 7B looks it up.' },
-        { feature_id: 'frontier-authored-structure', column_id: 'ms-graphrag', rank: 'GAP', note: 'Pays expensive GPT-4 extraction.' },
-        { feature_id: 'frontier-authored-structure', column_id: 'lightrag', rank: 'GAP' },
-        { feature_id: 'frontier-authored-structure', column_id: 'onyx', rank: 'PARTIAL' },
-        { feature_id: 'grounded-citations', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sourceos-spec Receipt', href: `${REPO}/SourceOS` }, note: 'Receipt fabric > MENTIONS citations, but parity on surfacing.' },
-        { feature_id: 'grounded-citations', column_id: 'ms-graphrag', rank: 'MEET' },
-        { feature_id: 'grounded-citations', column_id: 'lightrag', rank: 'MEET' },
-        { feature_id: 'grounded-citations', column_id: 'onyx', rank: 'MEET' },
-        { feature_id: 'air-gapped-local', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'prophet-mesh local', href: `${REPO}/Noetica` } },
-        { feature_id: 'air-gapped-local', column_id: 'ms-graphrag', rank: 'GAP' },
-        { feature_id: 'air-gapped-local', column_id: 'lightrag', rank: 'PARTIAL' },
-        { feature_id: 'air-gapped-local', column_id: 'onyx', rank: 'BEAT', note: 'Fully air-gapped @37k users — more productized here.' },
+        { feature_id: 'verified-compute', competitor_id: 'ms-graphrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'noetica operator library', href: `${REPO}/Noetica/tree/main/reason` }, note: 'Operator + reason lane; retrieval-only peers structurally lack it.' },
+        { feature_id: 'verified-compute', competitor_id: 'lightrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'noetica operator library', href: `${REPO}/Noetica/tree/main/reason` }, note: 'Operator + reason lane; retrieval-only peers structurally lack it.' },
+        { feature_id: 'verified-compute', competitor_id: 'onyx', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'noetica operator library', href: `${REPO}/Noetica/tree/main/reason` }, note: 'Operator + reason lane; retrieval-only peers structurally lack it.' },
+        { feature_id: 'selective-retrieval', competitor_id: 'ms-graphrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'CRAG gate measurement', href: `${REPO}/Noetica` }, note: 'Measured retrieval hurts reasoning; routes around it.' },
+        { feature_id: 'selective-retrieval', competitor_id: 'lightrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'CRAG gate measurement', href: `${REPO}/Noetica` }, note: 'Measured retrieval hurts reasoning; routes around it.' },
+        { feature_id: 'selective-retrieval', competitor_id: 'onyx', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'CRAG gate measurement', href: `${REPO}/Noetica` }, note: 'Measured retrieval hurts reasoning; routes around it.' },
+        { feature_id: 'frontier-authored-structure', competitor_id: 'ms-graphrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'glossary canon', href: `${REPO}/socioprophet` }, note: 'Pays expensive GPT-4 extraction.' },
+        { feature_id: 'frontier-authored-structure', competitor_id: 'lightrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'glossary canon', href: `${REPO}/socioprophet` }, note: 'Author canon offline; 7B looks it up.' },
+        { feature_id: 'frontier-authored-structure', competitor_id: 'onyx', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'glossary canon', href: `${REPO}/socioprophet` }, note: 'Author canon offline; 7B looks it up.' },
+        { feature_id: 'grounded-citations', competitor_id: 'ms-graphrag', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sourceos-spec Receipt', href: `${REPO}/SourceOS` }, note: 'Receipt fabric > MENTIONS citations, but parity on surfacing.' },
+        { feature_id: 'grounded-citations', competitor_id: 'lightrag', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sourceos-spec Receipt', href: `${REPO}/SourceOS` }, note: 'Receipt fabric > MENTIONS citations, but parity on surfacing.' },
+        { feature_id: 'grounded-citations', competitor_id: 'onyx', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sourceos-spec Receipt', href: `${REPO}/SourceOS` }, note: 'Receipt fabric > MENTIONS citations, but parity on surfacing.' },
+        { feature_id: 'air-gapped-local', competitor_id: 'ms-graphrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'prophet-mesh local', href: `${REPO}/Noetica` } },
+        { feature_id: 'air-gapped-local', competitor_id: 'lightrag', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'prophet-mesh local', href: `${REPO}/Noetica` } },
+        { feature_id: 'air-gapped-local', competitor_id: 'onyx', rank: 'PARTIAL', maturity: 'live', basis: 'self-assessed', evidence: { label: 'prophet-mesh local', href: `${REPO}/Noetica` }, note: 'Fully air-gapped @37k users — more productized here.' },
       ],
     },
     {
       id: 'agent-framework',
       name: 'Agent framework',
-      description: 'Governed multi-step agent execution with tool consent and receipts.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'langgraph', name: 'LangGraph', is_estate: false },
-        { id: 'autogen', name: 'AutoGen', is_estate: false },
-        { id: 'crewai', name: 'CrewAI', is_estate: false },
+      description:
+        'Governed multi-step agent execution with tool consent and receipts.',
+      competitors: [
+        { id: 'langgraph', name: 'LangGraph' },
+        { id: 'autogen', name: 'AutoGen' },
+        { id: 'crewai', name: 'CrewAI' },
       ],
       features: [
         { id: 'governed-tool-consent', name: 'Purpose-bound tool consent', definition: 'Tool calls are gated by purpose-bound consent, not standing broad grants.' },
@@ -86,34 +81,29 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'loop-governance', name: 'Governed loops vs DAGs', definition: 'Loops are explicitly governed (bounded, receipted) rather than free-running graphs.' },
       ],
       cells: [
-        { feature_id: 'governed-tool-consent', column_id: 'estate', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` }, note: 'Purpose-bound consent membrane; frameworks grant broadly.' },
-        { feature_id: 'governed-tool-consent', column_id: 'langgraph', rank: 'GAP' },
-        { feature_id: 'governed-tool-consent', column_id: 'autogen', rank: 'GAP' },
-        { feature_id: 'governed-tool-consent', column_id: 'crewai', rank: 'GAP' },
-        { feature_id: 'fail-closed-gates', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
-        { feature_id: 'fail-closed-gates', column_id: 'langgraph', rank: 'PARTIAL' },
-        { feature_id: 'fail-closed-gates', column_id: 'autogen', rank: 'GAP' },
-        { feature_id: 'fail-closed-gates', column_id: 'crewai', rank: 'GAP' },
-        { feature_id: 'execution-receipts', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'executions-ledger', href: `${REPO}/socioprophet` } },
-        { feature_id: 'execution-receipts', column_id: 'langgraph', rank: 'PARTIAL' },
-        { feature_id: 'execution-receipts', column_id: 'autogen', rank: 'PARTIAL' },
-        { feature_id: 'execution-receipts', column_id: 'crewai', rank: 'GAP' },
-        { feature_id: 'loop-governance', column_id: 'estate', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'loops-vs-DAGs note', href: `${REPO}/socioprophet` } },
-        { feature_id: 'loop-governance', column_id: 'langgraph', rank: 'MEET' },
-        { feature_id: 'loop-governance', column_id: 'autogen', rank: 'PARTIAL' },
-        { feature_id: 'loop-governance', column_id: 'crewai', rank: 'PARTIAL' },
+        { feature_id: 'governed-tool-consent', competitor_id: 'langgraph', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` }, note: 'Purpose-bound consent membrane; frameworks grant broadly.' },
+        { feature_id: 'governed-tool-consent', competitor_id: 'autogen', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` }, note: 'Purpose-bound consent membrane; frameworks grant broadly.' },
+        { feature_id: 'governed-tool-consent', competitor_id: 'crewai', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` }, note: 'Purpose-bound consent membrane; frameworks grant broadly.' },
+        { feature_id: 'fail-closed-gates', competitor_id: 'langgraph', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
+        { feature_id: 'fail-closed-gates', competitor_id: 'autogen', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
+        { feature_id: 'fail-closed-gates', competitor_id: 'crewai', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
+        { feature_id: 'execution-receipts', competitor_id: 'langgraph', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'executions-ledger', href: `${REPO}/socioprophet` } },
+        { feature_id: 'execution-receipts', competitor_id: 'autogen', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'executions-ledger', href: `${REPO}/socioprophet` } },
+        { feature_id: 'execution-receipts', competitor_id: 'crewai', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'executions-ledger', href: `${REPO}/socioprophet` } },
+        { feature_id: 'loop-governance', competitor_id: 'langgraph', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'loops-vs-DAGs note', href: `${REPO}/socioprophet` } },
+        { feature_id: 'loop-governance', competitor_id: 'autogen', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'loops-vs-DAGs note', href: `${REPO}/socioprophet` } },
+        { feature_id: 'loop-governance', competitor_id: 'crewai', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'loops-vs-DAGs note', href: `${REPO}/socioprophet` } },
       ],
     },
     {
       id: 'model-lab-eval',
       name: 'Model lab / eval',
-      description: 'Provider-neutral evaluation with reproduced (not merely cited) metric facts.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'openai-evals', name: 'OpenAI Evals', is_estate: false },
-        { id: 'langsmith', name: 'LangSmith', is_estate: false },
-        { id: 'helm', name: 'HELM', is_estate: false },
+      description:
+        'Provider-neutral evaluation with reproduced (not merely cited) metric facts.',
+      competitors: [
+        { id: 'openai-evals', name: 'OpenAI Evals' },
+        { id: 'langsmith', name: 'LangSmith' },
+        { id: 'helm', name: 'HELM' },
       ],
       features: [
         { id: 'reproduced-not-cited', name: 'Reproduced not cited', definition: 'Metric facts are measured by us (internal_reproduced), not just cited vendor numbers.' },
@@ -122,34 +112,29 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'schema-validated', name: 'Schema-validated facts', definition: 'Every metric fact validates against the canonical eval-metric schema before it is served.' },
       ],
       cells: [
-        { feature_id: 'reproduced-not-cited', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'emit_intelligence_superiority_metrics.py', href: `${REPO}/prophet-platform` }, note: 'internal_reproduced facts vs cited-only leaderboards.' },
-        { feature_id: 'reproduced-not-cited', column_id: 'openai-evals', rank: 'PARTIAL' },
-        { feature_id: 'reproduced-not-cited', column_id: 'langsmith', rank: 'PARTIAL' },
-        { feature_id: 'reproduced-not-cited', column_id: 'helm', rank: 'MEET' },
-        { feature_id: 'provider-neutral', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'Model Tournament · iSOTA', href: `${REPO}/socioprophet` } },
-        { feature_id: 'provider-neutral', column_id: 'openai-evals', rank: 'GAP' },
-        { feature_id: 'provider-neutral', column_id: 'langsmith', rank: 'PARTIAL' },
-        { feature_id: 'provider-neutral', column_id: 'helm', rank: 'MEET' },
-        { feature_id: 'disjoint-honesty', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'dashboard-bff comparison_valid', href: `${REPO}/prophet-platform` } },
-        { feature_id: 'disjoint-honesty', column_id: 'openai-evals', rank: 'GAP' },
-        { feature_id: 'disjoint-honesty', column_id: 'langsmith', rank: 'GAP' },
-        { feature_id: 'disjoint-honesty', column_id: 'helm', rank: 'PARTIAL' },
-        { feature_id: 'schema-validated', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval', href: `${REPO}/prophet-platform` } },
-        { feature_id: 'schema-validated', column_id: 'openai-evals', rank: 'MEET' },
-        { feature_id: 'schema-validated', column_id: 'langsmith', rank: 'MEET' },
-        { feature_id: 'schema-validated', column_id: 'helm', rank: 'MEET' },
+        { feature_id: 'reproduced-not-cited', competitor_id: 'openai-evals', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'emit_intelligence_superiority_metrics.py', href: `${REPO}/prophet-platform` }, note: 'internal_reproduced facts vs cited-only leaderboards.' },
+        { feature_id: 'reproduced-not-cited', competitor_id: 'langsmith', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'emit_intelligence_superiority_metrics.py', href: `${REPO}/prophet-platform` }, note: 'internal_reproduced facts vs cited-only leaderboards.' },
+        { feature_id: 'reproduced-not-cited', competitor_id: 'helm', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'emit_intelligence_superiority_metrics.py', href: `${REPO}/prophet-platform` }, note: 'internal_reproduced facts vs cited-only leaderboards.' },
+        { feature_id: 'provider-neutral', competitor_id: 'openai-evals', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'Model Tournament · iSOTA', href: `${REPO}/socioprophet` } },
+        { feature_id: 'provider-neutral', competitor_id: 'langsmith', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'Model Tournament · iSOTA', href: `${REPO}/socioprophet` } },
+        { feature_id: 'provider-neutral', competitor_id: 'helm', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'Model Tournament · iSOTA', href: `${REPO}/socioprophet` } },
+        { feature_id: 'disjoint-honesty', competitor_id: 'openai-evals', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'dashboard-bff comparison_valid', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'disjoint-honesty', competitor_id: 'langsmith', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'dashboard-bff comparison_valid', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'disjoint-honesty', competitor_id: 'helm', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'dashboard-bff comparison_valid', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'schema-validated', competitor_id: 'openai-evals', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'schema-validated', competitor_id: 'langsmith', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'schema-validated', competitor_id: 'helm', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval', href: `${REPO}/prophet-platform` } },
       ],
     },
     {
       id: 'ai-governance',
       name: 'AI governance / trust',
-      description: 'Evidence-fabric governance: receipts, lawful learning, consent, controls that cannot fail.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'credo', name: 'Credo AI', is_estate: false },
-        { id: 'watsonx-gov', name: 'watsonx.governance', is_estate: false },
-        { id: 'guardrails-ai', name: 'Guardrails AI', is_estate: false },
+      description:
+        'Evidence-fabric governance: receipts, lawful learning, consent, controls that cannot fail.',
+      competitors: [
+        { id: 'credo', name: 'Credo AI' },
+        { id: 'watsonx-gov', name: 'watsonx.governance' },
+        { id: 'guardrails-ai', name: 'Guardrails AI' },
       ],
       features: [
         { id: 'evidence-receipts', name: 'Evidence-fabric receipts', definition: 'Governance decisions are backed by cryptographic, replayable receipts rather than reports.' },
@@ -158,34 +143,29 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'control-cannot-fail', name: 'Control that cannot fail', definition: 'Controls are enforced by construction (fail-closed), verified by artifact not by command.' },
       ],
       cells: [
-        { feature_id: 'evidence-receipts', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'evidence-intake-kernel', href: `${REPO}/evidence-intake-kernel` } },
-        { feature_id: 'evidence-receipts', column_id: 'credo', rank: 'PARTIAL' },
-        { feature_id: 'evidence-receipts', column_id: 'watsonx-gov', rank: 'PARTIAL' },
-        { feature_id: 'evidence-receipts', column_id: 'guardrails-ai', rank: 'GAP' },
-        { feature_id: 'lawful-learning', column_id: 'estate', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'lawful-learning conformance audit', href: `${REPO}/socioprophet` } },
-        { feature_id: 'lawful-learning', column_id: 'credo', rank: 'MEET' },
-        { feature_id: 'lawful-learning', column_id: 'watsonx-gov', rank: 'BEAT', note: 'Externally-audited governance is their moat.' },
-        { feature_id: 'lawful-learning', column_id: 'guardrails-ai', rank: 'GAP' },
-        { feature_id: 'purpose-bound-consent', column_id: 'estate', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'purpose-bound tool consent', href: `${REPO}/socioprophet` } },
-        { feature_id: 'purpose-bound-consent', column_id: 'credo', rank: 'PARTIAL' },
-        { feature_id: 'purpose-bound-consent', column_id: 'watsonx-gov', rank: 'PARTIAL' },
-        { feature_id: 'purpose-bound-consent', column_id: 'guardrails-ai', rank: 'GAP' },
-        { feature_id: 'control-cannot-fail', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
-        { feature_id: 'control-cannot-fail', column_id: 'credo', rank: 'PARTIAL' },
-        { feature_id: 'control-cannot-fail', column_id: 'watsonx-gov', rank: 'MEET' },
-        { feature_id: 'control-cannot-fail', column_id: 'guardrails-ai', rank: 'PARTIAL' },
+        { feature_id: 'evidence-receipts', competitor_id: 'credo', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'evidence-intake-kernel', href: `${REPO}/evidence-intake-kernel` } },
+        { feature_id: 'evidence-receipts', competitor_id: 'watsonx-gov', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'evidence-intake-kernel', href: `${REPO}/evidence-intake-kernel` } },
+        { feature_id: 'evidence-receipts', competitor_id: 'guardrails-ai', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'evidence-intake-kernel', href: `${REPO}/evidence-intake-kernel` } },
+        { feature_id: 'lawful-learning', competitor_id: 'credo', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'lawful-learning conformance audit', href: `${REPO}/socioprophet` } },
+        { feature_id: 'lawful-learning', competitor_id: 'watsonx-gov', rank: 'PARTIAL', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'lawful-learning conformance audit', href: `${REPO}/socioprophet` }, note: 'Externally-audited governance is their moat.' },
+        { feature_id: 'lawful-learning', competitor_id: 'guardrails-ai', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'lawful-learning conformance audit', href: `${REPO}/socioprophet` } },
+        { feature_id: 'purpose-bound-consent', competitor_id: 'credo', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'purpose-bound tool consent', href: `${REPO}/socioprophet` } },
+        { feature_id: 'purpose-bound-consent', competitor_id: 'watsonx-gov', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'purpose-bound tool consent', href: `${REPO}/socioprophet` } },
+        { feature_id: 'purpose-bound-consent', competitor_id: 'guardrails-ai', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'purpose-bound tool consent', href: `${REPO}/socioprophet` } },
+        { feature_id: 'control-cannot-fail', competitor_id: 'credo', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
+        { feature_id: 'control-cannot-fail', competitor_id: 'watsonx-gov', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
+        { feature_id: 'control-cannot-fail', competitor_id: 'guardrails-ai', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'guardrail-fabric', href: `${REPO}/guardrail-fabric` } },
       ],
     },
     {
       id: 'knowledge-graph',
       name: 'Knowledge graph',
-      description: 'Frontier-authored ontology with triple-plausibility grounding and shaping.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'neo4j', name: 'Neo4j', is_estate: false },
-        { id: 'tigergraph', name: 'TigerGraph', is_estate: false },
-        { id: 'foundry', name: 'Palantir Foundry', is_estate: false },
+      description:
+        'Frontier-authored ontology with triple-plausibility grounding and shaping.',
+      competitors: [
+        { id: 'neo4j', name: 'Neo4j' },
+        { id: 'tigergraph', name: 'TigerGraph' },
+        { id: 'foundry', name: 'Palantir Foundry' },
       ],
       features: [
         { id: 'triple-plausibility', name: 'Triple-plausibility grounding', definition: 'KG-BERT held-out triple-plausibility scoring gates what enters the graph.' },
@@ -194,33 +174,28 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'semantic-coords', name: 'Semantic coordinate algebra', definition: 'Concepts carry semantic coordinates enabling algebraic reasoning over meaning.' },
       ],
       cells: [
-        { feature_id: 'triple-plausibility', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'KG-BERT 0.985 n=16990', href: `${REPO}/prophet-platform` } },
-        { feature_id: 'triple-plausibility', column_id: 'neo4j', rank: 'GAP' },
-        { feature_id: 'triple-plausibility', column_id: 'tigergraph', rank: 'GAP' },
-        { feature_id: 'triple-plausibility', column_id: 'foundry', rank: 'PARTIAL' },
-        { feature_id: 'ontogenesis-shaping', column_id: 'estate', rank: 'PARTIAL', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'ontogenesis GI classes', href: `${REPO}/socioprophet` }, note: 'Unshaped GI classes remain — declared, partially shipped.' },
-        { feature_id: 'ontogenesis-shaping', column_id: 'neo4j', rank: 'GAP' },
-        { feature_id: 'ontogenesis-shaping', column_id: 'tigergraph', rank: 'GAP' },
-        { feature_id: 'ontogenesis-shaping', column_id: 'foundry', rank: 'GAP' },
-        { feature_id: 'frontier-canon', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'frontier-authored glossary', href: `${REPO}/socioprophet` } },
-        { feature_id: 'frontier-canon', column_id: 'neo4j', rank: 'PARTIAL' },
-        { feature_id: 'frontier-canon', column_id: 'tigergraph', rank: 'PARTIAL' },
-        { feature_id: 'frontier-canon', column_id: 'foundry', rank: 'MEET' },
-        { feature_id: 'semantic-coords', column_id: 'estate', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'semantic coordinate algebra', href: `${REPO}/socioprophet` } },
-        { feature_id: 'semantic-coords', column_id: 'neo4j', rank: 'GAP' },
-        { feature_id: 'semantic-coords', column_id: 'tigergraph', rank: 'GAP' },
-        { feature_id: 'semantic-coords', column_id: 'foundry', rank: 'PARTIAL' },
+        { feature_id: 'triple-plausibility', competitor_id: 'neo4j', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'KG-BERT 0.985 n=16990', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'triple-plausibility', competitor_id: 'tigergraph', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'KG-BERT 0.985 n=16990', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'triple-plausibility', competitor_id: 'foundry', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'KG-BERT 0.985 n=16990', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'ontogenesis-shaping', competitor_id: 'neo4j', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'ontogenesis GI classes', href: `${REPO}/socioprophet` }, note: 'Unshaped GI classes remain — declared, partially shipped.' },
+        { feature_id: 'ontogenesis-shaping', competitor_id: 'tigergraph', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'ontogenesis GI classes', href: `${REPO}/socioprophet` }, note: 'Unshaped GI classes remain — declared, partially shipped.' },
+        { feature_id: 'ontogenesis-shaping', competitor_id: 'foundry', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'ontogenesis GI classes', href: `${REPO}/socioprophet` }, note: 'Unshaped GI classes remain — declared, partially shipped.' },
+        { feature_id: 'frontier-canon', competitor_id: 'neo4j', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'frontier-authored glossary', href: `${REPO}/socioprophet` } },
+        { feature_id: 'frontier-canon', competitor_id: 'tigergraph', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'frontier-authored glossary', href: `${REPO}/socioprophet` } },
+        { feature_id: 'frontier-canon', competitor_id: 'foundry', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'frontier-authored glossary', href: `${REPO}/socioprophet` } },
+        { feature_id: 'semantic-coords', competitor_id: 'neo4j', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'semantic coordinate algebra', href: `${REPO}/socioprophet` } },
+        { feature_id: 'semantic-coords', competitor_id: 'tigergraph', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'semantic coordinate algebra', href: `${REPO}/socioprophet` } },
+        { feature_id: 'semantic-coords', competitor_id: 'foundry', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'semantic coordinate algebra', href: `${REPO}/socioprophet` } },
       ],
     },
     {
       id: 'ecosystem-marketplace',
       name: 'Ecosystem / marketplace',
-      description: 'Sovereign registry + capability membrane with epistemic-annealing pricing.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'hf-hub', name: 'HuggingFace Hub', is_estate: false },
-        { id: 'langchain-hub', name: 'LangChain Hub', is_estate: false },
+      description:
+        'Sovereign registry + capability membrane with epistemic-annealing pricing.',
+      competitors: [
+        { id: 'hf-hub', name: 'HuggingFace Hub' },
+        { id: 'langchain-hub', name: 'LangChain Hub' },
       ],
       features: [
         { id: 'sovereign-registry', name: 'Sovereign registry', definition: 'Artifacts served from a sovereign, air-gappable registry (zot/gitea) — not a single external hub.' },
@@ -228,26 +203,22 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'annealing-pricing', name: 'Epistemic-annealing pricing', definition: 'Marketplace pricing reflects epistemic value via an annealing model, not flat listing fees.' },
       ],
       cells: [
-        { feature_id: 'sovereign-registry', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sovereign registry', href: `${REPO}/socioprophet` } },
-        { feature_id: 'sovereign-registry', column_id: 'hf-hub', rank: 'GAP' },
-        { feature_id: 'sovereign-registry', column_id: 'langchain-hub', rank: 'GAP' },
-        { feature_id: 'capability-membrane', column_id: 'estate', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` } },
-        { feature_id: 'capability-membrane', column_id: 'hf-hub', rank: 'GAP' },
-        { feature_id: 'capability-membrane', column_id: 'langchain-hub', rank: 'PARTIAL' },
-        { feature_id: 'annealing-pricing', column_id: 'estate', rank: 'PARTIAL', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'epistemic-annealing pricing', href: `${REPO}/socioprophet/blob/master/socioprophet-web/client-vue/docs/marketplace-epistemic-annealing-pricing.md` } },
-        { feature_id: 'annealing-pricing', column_id: 'hf-hub', rank: 'GAP' },
-        { feature_id: 'annealing-pricing', column_id: 'langchain-hub', rank: 'GAP' },
+        { feature_id: 'sovereign-registry', competitor_id: 'hf-hub', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sovereign registry', href: `${REPO}/socioprophet` } },
+        { feature_id: 'sovereign-registry', competitor_id: 'langchain-hub', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'sovereign registry', href: `${REPO}/socioprophet` } },
+        { feature_id: 'capability-membrane', competitor_id: 'hf-hub', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` } },
+        { feature_id: 'capability-membrane', competitor_id: 'langchain-hub', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'capability membrane', href: `${REPO}/socioprophet` } },
+        { feature_id: 'annealing-pricing', competitor_id: 'hf-hub', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'epistemic-annealing pricing', href: `${REPO}/socioprophet/blob/master/socioprophet-web/client-vue/docs/marketplace-epistemic-annealing-pricing.md` } },
+        { feature_id: 'annealing-pricing', competitor_id: 'langchain-hub', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'epistemic-annealing pricing', href: `${REPO}/socioprophet/blob/master/socioprophet-web/client-vue/docs/marketplace-epistemic-annealing-pricing.md` } },
       ],
     },
     {
       id: 'reproducibility',
       name: 'Reproducibility',
-      description: 'Schema-validated, seed-pinned, replayable runs with self-validating checkers.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'wandb', name: 'Weights & Biases', is_estate: false },
-        { id: 'mlflow', name: 'MLflow', is_estate: false },
+      description:
+        'Schema-validated, seed-pinned, replayable runs with self-validating checkers.',
+      competitors: [
+        { id: 'wandb', name: 'Weights & Biases' },
+        { id: 'mlflow', name: 'MLflow' },
       ],
       features: [
         { id: 'schema-facts', name: 'Schema-validated facts', definition: 'Runs emit facts validated against a strict schema (additionalProperties:false) before storage.' },
@@ -256,29 +227,24 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'self-validating-checker', name: 'Self-validating checker', definition: 'The conformance checker validates itself (excluding itself) so it cannot silently pass broken.' },
       ],
       cells: [
-        { feature_id: 'schema-facts', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval strict', href: `${REPO}/prophet-platform` } },
-        { feature_id: 'schema-facts', column_id: 'wandb', rank: 'PARTIAL' },
-        { feature_id: 'schema-facts', column_id: 'mlflow', rank: 'PARTIAL' },
-        { feature_id: 'replayable-envelopes', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'TwinEventEnvelope', href: `${REPO}/socioprophet` } },
-        { feature_id: 'replayable-envelopes', column_id: 'wandb', rank: 'PARTIAL' },
-        { feature_id: 'replayable-envelopes', column_id: 'mlflow', rank: 'MEET' },
-        { feature_id: 'seed-pinned', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'seed1729 / seed2026', href: `${REPO}/prophet-platform` } },
-        { feature_id: 'seed-pinned', column_id: 'wandb', rank: 'MEET' },
-        { feature_id: 'seed-pinned', column_id: 'mlflow', rank: 'MEET' },
-        { feature_id: 'self-validating-checker', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'self-validating checker', href: `${REPO}/socioprophet` } },
-        { feature_id: 'self-validating-checker', column_id: 'wandb', rank: 'GAP' },
-        { feature_id: 'self-validating-checker', column_id: 'mlflow', rank: 'GAP' },
+        { feature_id: 'schema-facts', competitor_id: 'wandb', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval strict', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'schema-facts', competitor_id: 'mlflow', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'schemas/eval strict', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'replayable-envelopes', competitor_id: 'wandb', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'TwinEventEnvelope', href: `${REPO}/socioprophet` } },
+        { feature_id: 'replayable-envelopes', competitor_id: 'mlflow', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'TwinEventEnvelope', href: `${REPO}/socioprophet` } },
+        { feature_id: 'seed-pinned', competitor_id: 'wandb', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'seed1729 / seed2026', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'seed-pinned', competitor_id: 'mlflow', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'seed1729 / seed2026', href: `${REPO}/prophet-platform` } },
+        { feature_id: 'self-validating-checker', competitor_id: 'wandb', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'self-validating checker', href: `${REPO}/socioprophet` } },
+        { feature_id: 'self-validating-checker', competitor_id: 'mlflow', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'self-validating checker', href: `${REPO}/socioprophet` } },
       ],
     },
     {
       id: 'world-model-twin',
       name: 'World model / twin',
-      description: 'Geospatially-grounded state-space twins with a governed impulse core.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'omniverse', name: 'NVIDIA Omniverse', is_estate: false },
-        { id: 'foundry-twin', name: 'Palantir Foundry', is_estate: false },
+      description:
+        'Geospatially-grounded state-space twins with a governed impulse core.',
+      competitors: [
+        { id: 'omniverse', name: 'NVIDIA Omniverse' },
+        { id: 'foundry-twin', name: 'Palantir Foundry' },
       ],
       features: [
         { id: 'governed-impulse', name: 'Governed impulse core', definition: 'Twin dynamics x⁺ = A·x + B·(G·u) route inputs through a gate G that holds the twin fail-closed.' },
@@ -287,29 +253,24 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'geospatial-cop', name: 'Geospatial common operating picture', definition: 'Twins located on a shared geospatial picture over a risk field.' },
       ],
       cells: [
-        { feature_id: 'governed-impulse', column_id: 'estate', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'Twin World Model impulse core', href: `${REPO}/socioprophet` } },
-        { feature_id: 'governed-impulse', column_id: 'omniverse', rank: 'GAP' },
-        { feature_id: 'governed-impulse', column_id: 'foundry-twin', rank: 'PARTIAL' },
-        { feature_id: 'twin-lifecycle-receipts', column_id: 'estate', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'cloud-twin lifecycle', href: `${REPO}/socioprophet` } },
-        { feature_id: 'twin-lifecycle-receipts', column_id: 'omniverse', rank: 'GAP' },
-        { feature_id: 'twin-lifecycle-receipts', column_id: 'foundry-twin', rank: 'PARTIAL' },
-        { feature_id: 'ontology-bound-twin', column_id: 'estate', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'twin ontology', href: `${REPO}/gaia-world-model` } },
-        { feature_id: 'ontology-bound-twin', column_id: 'omniverse', rank: 'MEET' },
-        { feature_id: 'ontology-bound-twin', column_id: 'foundry-twin', rank: 'MEET' },
-        { feature_id: 'geospatial-cop', column_id: 'estate', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'equirectangular COP', href: `${REPO}/socioprophet` } },
-        { feature_id: 'geospatial-cop', column_id: 'omniverse', rank: 'BEAT', note: 'Photoreal simulation is their moat.' },
-        { feature_id: 'geospatial-cop', column_id: 'foundry-twin', rank: 'MEET' },
+        { feature_id: 'governed-impulse', competitor_id: 'omniverse', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'Twin World Model impulse core', href: `${REPO}/socioprophet` } },
+        { feature_id: 'governed-impulse', competitor_id: 'foundry-twin', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'Twin World Model impulse core', href: `${REPO}/socioprophet` } },
+        { feature_id: 'twin-lifecycle-receipts', competitor_id: 'omniverse', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'cloud-twin lifecycle', href: `${REPO}/socioprophet` } },
+        { feature_id: 'twin-lifecycle-receipts', competitor_id: 'foundry-twin', rank: 'BEAT', maturity: 'live', basis: 'self-assessed', evidence: { label: 'cloud-twin lifecycle', href: `${REPO}/socioprophet` } },
+        { feature_id: 'ontology-bound-twin', competitor_id: 'omniverse', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'twin ontology', href: `${REPO}/gaia-world-model` } },
+        { feature_id: 'ontology-bound-twin', competitor_id: 'foundry-twin', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'twin ontology', href: `${REPO}/gaia-world-model` } },
+        { feature_id: 'geospatial-cop', competitor_id: 'omniverse', rank: 'PARTIAL', maturity: 'live', basis: 'self-assessed', evidence: { label: 'equirectangular COP', href: `${REPO}/socioprophet` }, note: 'Photoreal simulation is their moat.' },
+        { feature_id: 'geospatial-cop', competitor_id: 'foundry-twin', rank: 'MEET', maturity: 'live', basis: 'self-assessed', evidence: { label: 'equirectangular COP', href: `${REPO}/socioprophet` } },
       ],
     },
     {
       id: 'risk-value',
       name: 'Risk / value',
-      description: 'Regime-aware calculus over value × time — an EP financial spine.',
-      estate_column_id: 'estate',
-      columns: [
-        { id: 'estate', name: 'SocioProphet', is_estate: true },
-        { id: 'aladdin', name: 'BlackRock Aladdin', is_estate: false },
-        { id: 'bloomberg', name: 'Bloomberg', is_estate: false },
+      description:
+        'Regime-aware calculus over value × time — an EP financial spine.',
+      competitors: [
+        { id: 'aladdin', name: 'BlackRock Aladdin' },
+        { id: 'bloomberg', name: 'Bloomberg' },
       ],
       features: [
         { id: 'regime-aware', name: 'Regime-aware calculus', definition: 'Value/risk computed with an explicit regime-aware calculus (regime + microstructure + vol-surface).' },
@@ -317,16 +278,14 @@ export const COMPETITIVE_BOARDS_FIXTURE: CompetitiveBoardsDataset = {
         { id: 'value-energy', name: 'Value-energy conservation', definition: 'A welfare-annealing framework conserving value-energy while annealing toward global QoL.' },
       ],
       cells: [
-        { feature_id: 'regime-aware', column_id: 'estate', rank: 'PARTIAL', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'omnirisk/EP financial spine', href: `${REPO}/economic-prophet` }, note: 'EP kernel + regime lens declared; not fully shipped.' },
-        { feature_id: 'regime-aware', column_id: 'aladdin', rank: 'BEAT', note: 'Mature risk analytics is their moat.' },
-        { feature_id: 'regime-aware', column_id: 'bloomberg', rank: 'MEET' },
-        { feature_id: 'ep-spine', column_id: 'estate', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'economic-prophet canonical', href: `${REPO}/economic-prophet` } },
-        { feature_id: 'ep-spine', column_id: 'aladdin', rank: 'MEET' },
-        { feature_id: 'ep-spine', column_id: 'bloomberg', rank: 'MEET' },
-        { feature_id: 'value-energy', column_id: 'estate', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'welfare-annealing framework', href: `${REPO}/socioprophet` }, note: 'Constructive inverse of the SILENT failure mode; unique framing.' },
-        { feature_id: 'value-energy', column_id: 'aladdin', rank: 'GAP' },
-        { feature_id: 'value-energy', column_id: 'bloomberg', rank: 'GAP' },
+        { feature_id: 'regime-aware', competitor_id: 'aladdin', rank: 'GAP', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'omnirisk/EP financial spine', href: `${REPO}/economic-prophet` }, note: 'Mature risk analytics is their moat.' },
+        { feature_id: 'regime-aware', competitor_id: 'bloomberg', rank: 'PARTIAL', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'omnirisk/EP financial spine', href: `${REPO}/economic-prophet` }, note: 'EP kernel + regime lens declared; not fully shipped.' },
+        { feature_id: 'ep-spine', competitor_id: 'aladdin', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'economic-prophet canonical', href: `${REPO}/economic-prophet` } },
+        { feature_id: 'ep-spine', competitor_id: 'bloomberg', rank: 'MEET', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'economic-prophet canonical', href: `${REPO}/economic-prophet` } },
+        { feature_id: 'value-energy', competitor_id: 'aladdin', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'welfare-annealing framework', href: `${REPO}/socioprophet` }, note: 'Constructive inverse of the SILENT failure mode; unique framing.' },
+        { feature_id: 'value-energy', competitor_id: 'bloomberg', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', evidence: { label: 'welfare-annealing framework', href: `${REPO}/socioprophet` }, note: 'Constructive inverse of the SILENT failure mode; unique framing.' },
       ],
     },
   ],
 };
+
