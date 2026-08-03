@@ -15,6 +15,10 @@
         </label>
         <button v-if="mode === 'solar' && centerId !== 'sun'" class="st-reset" @click="recenterSun"
                 title="Recenter the universe on the Sun">⌖ Sun</button>
+        <span v-if="mode === 'solar' && lensOn" class="st-lens" title="Observer place (latitude °, longitude °)">@
+          <input class="st-obs" type="number" v-model.number="obsLat" step="0.5" aria-label="Observer latitude degrees" />
+          <input class="st-obs" type="number" v-model.number="obsLon" step="0.5" aria-label="Observer longitude degrees" />
+        </span>
       </template>
     </SurfaceHeader>
 
@@ -26,6 +30,7 @@
         <div class="st-date">{{ dateLabel }}</div>
         <div class="st-epi">epistemic <b>{{ epistemic }}</b><span v-if="lensOn" class="st-lens-tag"> · lens speculative</span></div>
         <div class="st-center">⌖ center <b>{{ centerName }}</b> <span class="st-hint">— click a body to recenter</span></div>
+        <div v-if="lensOn" class="st-epi">{{ horoLabel }} <span class="st-hint">@ {{ obsLat }}°, {{ obsLon }}°</span></div>
         <ul class="st-planets">
           <li v-for="p in planetReadout" :key="p.id">
             <span class="st-dot" :style="{ background: p.css }" />{{ p.name }}
@@ -86,6 +91,7 @@ import SurfaceHeader from '../components/SurfaceHeader.vue';
 import ProvenanceBadge from '../components/ProvenanceBadge.vue';
 import { prov } from '../features/provenance/types';
 import { PLANETS, heliocentric, orbitPath } from '../space/ephemeris';
+import { ascendantLon, midheavenLon, lstHours, signOf } from '../space/horoscope';
 import { generateGalaxy } from '../space/galaxy';
 import { loadQuadrant, cubeEdges, sectorGrid, mappedSectors, CUBE_LY, QUAD_SCALE, SECTORS, type StarSystem } from '../space/quadrant';
 
@@ -187,23 +193,58 @@ const epistemic = computed<'empirical' | 'speculative' | 'synthetic'>(() =>
 const centerId = ref<string>('sun');
 const centerName = ref<string>('Sun');
 
+// Horoscope / observer orientation — the EMPIRICAL geocentric skeleton (LST → Ascendant/MC) for a
+// place + the current sim time. The angles are computed; the sign NAMES are the interpretive lens.
+const obsLat = ref(40.1);
+const obsLon = ref(-75.1);
+const horo = computed(() => {
+  const dt = simDate.value;
+  const ascLon = ascendantLon(dt, obsLat.value, obsLon.value);
+  const mcLon = midheavenLon(dt, obsLon.value);
+  return { ascLon, mcLon, lst: lstHours(dt, obsLon.value), asc: signOf(ascLon), mc: signOf(mcLon) };
+});
+const lstLabel = computed(() => {
+  const h = Math.floor(horo.value.lst);
+  const m = Math.floor((horo.value.lst - h) * 60);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+});
+const horoLabel = computed(() =>
+  `ASC ${horo.value.asc.glyph} ${Math.round(horo.value.asc.deg)}° · MC ${horo.value.mc.glyph} ${Math.round(horo.value.mc.deg)}° · LST ${lstLabel.value}`);
+
 const ECLIPTIC_AU = 34; // a reference ring just beyond the outer planets
 function eclipticLensLayers() {
   // The zodiac IS the ecliptic divided into twelve — an interpretive division of the plane, not a
-  // physical feature. Drawn in the z=0 ecliptic plane as a ring plus 12 sector spokes.
+  // physical feature. Drawn in the z=0 ecliptic plane, ORIENTED by the (empirical) Ascendant so the
+  // rising point sits on the +X horizon; the ASC (gold) and MC (teal) markers are computed geometry.
   const R = ECLIPTIC_AU * AU;
+  const rot = -horo.value.ascLon * (Math.PI / 180);
+  const pt = (ang: number, rad: number): [number, number, number] => [Math.cos(ang + rot) * rad, Math.sin(ang + rot) * rad, 0];
   const ring: [number, number, number][] = [];
-  for (let i = 0; i <= 96; i++) { const a = (i / 96) * Math.PI * 2; ring.push([Math.cos(a) * R, Math.sin(a) * R, 0]); }
+  for (let i = 0; i <= 96; i++) ring.push(pt((i / 96) * Math.PI * 2, R));
   const data: { path: [number, number, number][] }[] = [{ path: ring }];
   for (let k = 0; k < 12; k++) {
     const a = (k / 12) * Math.PI * 2;
-    data.push({ path: [[Math.cos(a) * R * 0.94, Math.sin(a) * R * 0.94, 0], [Math.cos(a) * R, Math.sin(a) * R, 0]] });
+    data.push({ path: [pt(a, R * 0.94), pt(a, R)] });
   }
+  const ascLine = { path: [pt(0, 0), pt(0, R)] as [number, number, number][] };                 // Ascendant → +X
+  const mcAng = (horo.value.mcLon - horo.value.ascLon) * (Math.PI / 180);
+  const mcLine = { path: [pt(mcAng, 0), pt(mcAng, R)] as [number, number, number][] };           // Midheaven
   return [
     new PathLayer({
       id: 'ecliptic-lens', data, coordinateSystem: cart,
       getPath: (d: any) => d.path, getColor: [154, 127, 208, 120],
       getWidth: 1, widthUnits: 'pixels', widthMinPixels: 1,
+      updateTriggers: { getPath: [horo.value.ascLon] },
+    }),
+    new PathLayer({
+      id: 'ecliptic-asc', data: [ascLine], coordinateSystem: cart,
+      getPath: (d: any) => d.path, getColor: [232, 184, 75, 220],
+      getWidth: 2, widthUnits: 'pixels', widthMinPixels: 1, updateTriggers: { getPath: [horo.value.ascLon] },
+    }),
+    new PathLayer({
+      id: 'ecliptic-mc', data: [mcLine], coordinateSystem: cart,
+      getPath: (d: any) => d.path, getColor: [63, 192, 182, 200],
+      getWidth: 1.5, widthUnits: 'pixels', widthMinPixels: 1, updateTriggers: { getPath: [horo.value.ascLon, horo.value.mcLon] },
     }),
   ];
 }
@@ -382,7 +423,7 @@ function tick(ts: number) {
   raf = requestAnimationFrame(tick);
 }
 
-watch([dayOffset, mode, lensOn, quadrant, horizonOn, lookbackLy, centerId], render);
+watch([dayOffset, mode, lensOn, quadrant, horizonOn, lookbackLy, centerId, obsLat, obsLon], render);
 
 onMounted(() => {
   if (!canvasEl.value) return;
@@ -441,6 +482,8 @@ onUnmounted(() => {
 .st-readout--quad { border-color: rgba(0, 210, 255, 0.35); box-shadow: 0 0 24px rgba(0, 200, 255, 0.08) inset; }
 .st-readout--quad .st-date { color: #aef2ff; }
 .st-src { color: #4fd0e6; }
+.st-obs { width: 58px; background: var(--surface-2, #11151c); border: 1px solid rgba(120, 140, 180, 0.3);
+  color: var(--text-1, #cfd8e6); border-radius: 5px; padding: 3px 5px; font: inherit; font-size: 0.78rem; }
 .st-time { display: flex; align-items: center; gap: 12px; padding: 12px 4px 2px; }
 .st-time--galaxy { color: #8b97a8; font-size: 0.8rem; }
 .st-play, .st-now { border: 1px solid rgba(120, 140, 180, 0.3); background: var(--surface-2, #11151c);
