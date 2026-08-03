@@ -35,61 +35,61 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="feat in board.features" :key="feat.id">
+          <tr v-for="row in rows" :key="row.feat.id">
             <th scope="row" class="bt-featcell">
               <button
                 type="button"
                 class="bt-feat-toggle"
-                :aria-expanded="expanded.has(feat.id)"
-                :title="feat.definition"
-                @click="toggle(feat.id)"
+                :aria-expanded="expanded.has(row.feat.id)"
+                :title="row.feat.definition"
+                @click="toggle(row.feat.id)"
               >
-                <span class="bt-feat-name">{{ feat.name }}</span>
-                <span class="bt-feat-i" aria-hidden="true">{{ expanded.has(feat.id) ? '−' : 'i' }}</span>
+                <span class="bt-feat-name">{{ row.feat.name }}</span>
+                <span class="bt-feat-i" aria-hidden="true">{{ expanded.has(row.feat.id) ? '−' : 'i' }}</span>
               </button>
-              <p v-if="expanded.has(feat.id)" class="bt-feat-def">{{ feat.definition }}</p>
+              <p v-if="expanded.has(row.feat.id)" class="bt-feat-def">{{ row.feat.definition }}</p>
             </th>
             <td
-              v-for="col in board.columns"
-              :key="col.id"
+              v-for="rc in row.cells"
+              :key="rc.col.id"
               class="bt-cell"
-              :class="{ 'bt-cell--estate': col.is_estate }"
+              :class="{ 'bt-cell--estate': rc.col.is_estate }"
             >
-              <template v-if="cell(feat.id, col.id)">
+              <template v-if="rc.cell">
                 <span
                   class="rank-chip"
-                  :class="`rank-${cell(feat.id, col.id)!.rank.toLowerCase()}`"
-                  :aria-label="`${feat.name} · ${col.name}: ${cell(feat.id, col.id)!.rank}`"
+                  :class="`rank-${rc.cell.rank.toLowerCase()}`"
+                  :aria-label="`${row.feat.name} · ${rc.col.name}: ${rc.cell.rank}`"
                 >
-                  <span class="rank-glyph" aria-hidden="true">{{ glyph(cell(feat.id, col.id)!.rank) }}</span>
-                  {{ cell(feat.id, col.id)!.rank }}
+                  <span class="rank-glyph" aria-hidden="true">{{ glyph(rc.cell.rank) }}</span>
+                  {{ rc.cell.rank }}
                 </span>
-                <template v-if="col.is_estate">
+                <template v-if="rc.col.is_estate">
                   <span class="bt-badges">
                     <span
-                      v-if="cell(feat.id, col.id)!.maturity"
+                      v-if="rc.cell.maturity"
                       class="bt-badge"
-                      :class="`bt-badge--${cell(feat.id, col.id)!.maturity}`"
-                      :title="cell(feat.id, col.id)!.maturity === 'live' ? 'Live — shipped capability' : 'Spec — declared / planned'"
-                    >{{ cell(feat.id, col.id)!.maturity }}</span>
+                      :class="`bt-badge--${rc.cell.maturity}`"
+                      :title="rc.cell.maturity === 'live' ? 'Live — shipped capability' : 'Spec — declared / planned'"
+                    >{{ rc.cell.maturity }}</span>
                     <span
-                      v-if="cell(feat.id, col.id)!.basis"
+                      v-if="rc.cell.basis"
                       class="bt-badge bt-badge--basis"
-                      :title="cell(feat.id, col.id)!.basis === 'externally-certified' ? 'Rank verified by an external party' : 'Rank asserted by the estate'"
-                    >{{ cell(feat.id, col.id)!.basis === 'externally-certified' ? 'certified' : 'self' }}</span>
+                      :title="rc.cell.basis === 'externally-certified' ? 'Rank verified by an external party' : 'Rank asserted by the estate'"
+                    >{{ rc.cell.basis === 'externally-certified' ? 'certified' : 'self' }}</span>
                   </span>
                   <a
-                    v-if="cell(feat.id, col.id)!.evidence"
+                    v-if="rc.cell.evidence"
                     class="bt-evidence"
-                    :href="cell(feat.id, col.id)!.evidence!.href"
+                    :href="rc.cell.evidence.href"
                     target="_blank"
                     rel="noopener noreferrer"
-                  >{{ cell(feat.id, col.id)!.evidence!.label }} ↗</a>
+                  >{{ rc.cell.evidence.label }} ↗</a>
                 </template>
                 <span
-                  v-if="cell(feat.id, col.id)!.note && expanded.has(feat.id)"
+                  v-if="rc.cell.note && expanded.has(row.feat.id)"
                   class="bt-cellnote"
-                >{{ cell(feat.id, col.id)!.note }}</span>
+                >{{ rc.cell.note }}</span>
               </template>
               <span v-else class="bt-cell-empty" aria-label="no data">—</span>
             </td>
@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import PCard from '../../../components/workbench/PCard.vue';
-import type { BoardRank, CategoryBoard } from '../../../api/competitiveBoardsApi';
+import type { BoardCell, BoardColumn, BoardRank, CategoryBoard, LitmusFeature } from '../../../api/competitiveBoardsApi';
 import { RANK_ORDER, cellFor, tallyBoard } from './tally';
 
 const props = defineProps<{ board: CategoryBoard }>();
@@ -128,9 +128,26 @@ function toggle(id: string) {
   expanded.value = next;
 }
 
-function cell(featureId: string, columnId: string) {
-  return cellFor(props.board, featureId, columnId);
+interface ResolvedCell {
+  col: BoardColumn;
+  cell: BoardCell | undefined;
 }
+interface FeatureRow {
+  feat: LitmusFeature;
+  cells: ResolvedCell[];
+}
+
+// Resolve every (feature × column) cell once per render instead of re-scanning
+// board.cells for the same lookup at every template usage site.
+const rows = computed<FeatureRow[]>(() =>
+  props.board.features.map((feat) => ({
+    feat,
+    cells: props.board.columns.map((col) => ({
+      col,
+      cell: cellFor(props.board, feat.id, col.id),
+    })),
+  })),
+);
 
 function glyph(rank: BoardRank): string {
   return { BEAT: '▲', MEET: '●', PARTIAL: '◐', GAP: '▽' }[rank];
