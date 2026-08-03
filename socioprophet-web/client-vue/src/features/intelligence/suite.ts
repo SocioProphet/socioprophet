@@ -79,7 +79,12 @@ const nodeByName = new Map(estateGraph.nodes.map((n) => [n.name, n]));
 
 export function resolveRef(ref: SurfaceRef): RefResolution {
   const node = ref.repo ? (nodeByName.get(ref.repo) ?? null) : null;
-  const repoMeasured = ref.repo ? node !== null : true;
+  // A repo is only "measured" when it is both IN the graph and its metrics
+  // were actually collected — a node present with collected:false (scan
+  // attempted, failed) is exactly as unmeasured as a repo never scanned at
+  // all. This has to agree with marketRows()'s own `n.collected` filter, or
+  // the two would silently disagree about which repos are unknown.
+  const repoMeasured = ref.repo ? node !== null && node.collected : true;
   const streamFound = ref.stream ? streamNames.has(ref.stream) : true;
   // Only a bad STREAM is "broken" — board-spec is a closed vocabulary. A repo
   // outside the scan window is unknown, and unknown is not broken.
@@ -93,7 +98,9 @@ export function resolveRef(ref: SurfaceRef): RefResolution {
     detail: broken
       ? `Stream '${ref.stream}' is not in board-spec — a broken link, not a description.`
       : !repoMeasured && ref.repo
-        ? `Repo '${ref.repo}' is outside the estate graph's scan window; health is unknown, not zero.`
+        ? node
+          ? `Repo '${ref.repo}' is in the estate graph but its metrics were not collected${node.reason ? ` (${node.reason})` : ''}; health is unknown, not zero.`
+          : `Repo '${ref.repo}' is outside the estate graph's scan window; health is unknown, not zero.`
         : 'Resolved.',
   };
 }
@@ -115,7 +122,9 @@ export function marketRows(): MarketRow[] {
     const nodes = refs
       .map((r) => r.node)
       .filter((n): n is Node => n !== null && n.collected);
-    const withCi = nodes.filter((n) => n.ciSuccessRate !== null);
+    const withCi = nodes.filter(
+      (n): n is Node & { ciSuccessRate: number } => n.ciSuccessRate !== null,
+    );
     const agent = nodes.reduce((s, n) => s + n.agentAuthored, 0);
     const human = nodes.reduce((s, n) => s + n.humanAuthored, 0);
     return {
@@ -125,7 +134,7 @@ export function marketRows(): MarketRow[] {
       brokenRefs: refs.filter((r) => r.broken).length,
       measuredNodes: nodes.length,
       ciRate: withCi.length
-        ? Math.round(withCi.reduce((s, n) => s + (n.ciSuccessRate as number), 0) / withCi.length)
+        ? Math.round(withCi.reduce((s, n) => s + n.ciSuccessRate, 0) / withCi.length)
         : null,
       costProxyUsd: Math.round(nodes.reduce((s, n) => s + (n.costProxyUsd ?? 0), 0) * 100) / 100,
       agentSharePct: agent + human ? Math.round((agent / (agent + human)) * 100) : null,
