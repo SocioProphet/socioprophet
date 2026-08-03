@@ -13,6 +13,7 @@ import {
   dictionaries, regexes, rules, annotationTasks, performance, perfGateThreshold,
   versions, beyondParity,
 } from '../features/knowledge-studio/fixture';
+import { useKeWorkbench } from '../features/knowledge-studio/keWorkbench';
 
 const active = ref('documents');
 const docTab = ref<'sets' | 'annotation' | 'all'>('sets');
@@ -30,6 +31,16 @@ const failing = computed(() => performance.filter((p) => p.gate === 'fail'));
 const macroF1 = computed(
   () => performance.reduce((s, p) => s + p.f1, 0) / performance.length,
 );
+
+// ---- authored inputs from the Reasoning Chain Inspector (durable KE-workbench) ----
+// Assets authored in the inspector write through the shared workbench contract and
+// enter the loop here as develop-stage inputs — authored ahead of the seeded
+// registries so they read first. Learned + versioned, never match rules.
+const ke = useKeWorkbench();
+const authoredCount = computed(() => ke.ledger.value.length);
+const allEntityTypes = computed(() => [...ke.entityTypes.value, ...entityTypes]);
+const allRelationTypes = computed(() => [...ke.relationTypes.value, ...relationTypes]);
+const allDictionaries = computed(() => [...ke.dictionaries.value, ...dictionaries]);
 </script>
 
 <template>
@@ -68,6 +79,17 @@ const macroF1 = computed(
           <span class="ks-stage-owner">{{ s.owner }}</span>
         </li>
       </ol>
+    </section>
+
+    <!-- AUTHORED INPUTS (from the Reasoning Chain Inspector, via the durable KE-workbench) -->
+    <section v-if="authoredCount" class="ks-authored" aria-label="Authored inputs from the Reasoning Chain Inspector">
+      <span class="ks-authored-dot" aria-hidden="true" />
+      <p class="ks-authored-text">
+        <b>{{ authoredCount }}</b> annotation{{ authoredCount === 1 ? '' : 's' }} authored from the
+        <b>Reasoning Chain Inspector</b> {{ authoredCount === 1 ? 'is' : 'are' }} queued as <b>develop-stage</b> inputs
+        via the durable KE-workbench contract — learned + versioned (never match rules); human overrides supersede the
+        learned value with the prior retained; receipts sealed by the promotion gate, honestly <b>unsigned</b>.
+      </p>
     </section>
 
     <!-- WORKSPACE -->
@@ -147,8 +169,11 @@ const macroF1 = computed(
             <table class="ks-table">
               <thead><tr><th>Type</th><th>Roles</th><th class="n">Mentions</th><th class="n">F1</th><th>Value kind</th></tr></thead>
               <tbody>
-                <tr v-for="e in entityTypes" :key="e.name">
-                  <td><span class="ks-swatch" :style="{ background: e.color }" aria-hidden="true" /><b class="ks-strong">{{ e.name }}</b></td>
+                <tr v-for="e in allEntityTypes" :key="e.name" :class="{ 'is-authored': e.authored }">
+                  <td>
+                    <span class="ks-swatch" :style="{ background: e.color }" aria-hidden="true" /><b class="ks-strong">{{ e.name }}</b>
+                    <span v-if="e.authored" class="ks-pill authored" :title="e.receipt">authored</span>
+                  </td>
                   <td class="ks-dim">{{ e.roles }}</td>
                   <td class="n">{{ e.mentions.toLocaleString() }}</td>
                   <td class="n" :class="e.f1 !== null && e.f1 < perfGateThreshold ? 'is-lowv' : ''">{{ e.f1 ?? '—' }}</td>
@@ -166,8 +191,11 @@ const macroF1 = computed(
             <table class="ks-table">
               <thead><tr><th>Relation</th><th>Subject</th><th>Object</th><th class="n">Instances</th><th class="n">F1</th></tr></thead>
               <tbody>
-                <tr v-for="r in relationTypes" :key="r.name">
-                  <td class="ks-strong">{{ r.name }}</td>
+                <tr v-for="r in allRelationTypes" :key="r.name" :class="{ 'is-authored': r.authored }">
+                  <td class="ks-strong">
+                    {{ r.name }}
+                    <span v-if="r.authored" class="ks-pill authored" :title="r.receipt">authored</span>
+                  </td>
                   <td class="ks-mono">{{ r.subject }}</td>
                   <td class="ks-mono">{{ r.object }}</td>
                   <td class="n">{{ r.instances.toLocaleString() }}</td>
@@ -188,8 +216,11 @@ const macroF1 = computed(
             <table class="ks-table">
               <thead><tr><th>Dictionary</th><th class="n">Terms</th><th>Maps to</th><th>Source</th><th>Licence</th></tr></thead>
               <tbody>
-                <tr v-for="d in dictionaries" :key="d.name" :class="{ 'is-bad': d.licence.startsWith('UNKNOWN') }">
-                  <td class="ks-strong">{{ d.name }}</td>
+                <tr v-for="d in allDictionaries" :key="d.name" :class="{ 'is-bad': d.licence.startsWith('UNKNOWN'), 'is-authored': d.authored }">
+                  <td class="ks-strong">
+                    {{ d.name }}
+                    <span v-if="d.authored" class="ks-pill authored" :title="d.receipt">authored</span>
+                  </td>
                   <td class="n">{{ d.terms.toLocaleString() }}</td>
                   <td class="ks-mono">{{ d.mappedType }}</td>
                   <td class="ks-dim">{{ d.source }}</td>
@@ -245,14 +276,14 @@ const macroF1 = computed(
               </div>
 
               <ul v-else class="ks-list">
-                <li v-for="d in dictionaries" :key="d.name">{{ d.name }} — <span class="ks-mono">{{ d.mappedType }}</span></li>
+                <li v-for="d in allDictionaries" :key="d.name">{{ d.name }} — <span class="ks-mono">{{ d.mappedType }}</span></li>
               </ul>
             </div>
 
             <aside class="ks-rules-class" aria-label="Class">
               <h3>Class</h3>
               <p class="ks-dim">Check a class to display its occurrences in the document.</p>
-              <label v-for="e in entityTypes" :key="e.name" class="ks-check">
+              <label v-for="e in allEntityTypes" :key="e.name" class="ks-check">
                 <input type="checkbox" checked disabled />
                 <span class="ks-swatch" :style="{ background: e.color }" aria-hidden="true" />
                 <span class="ks-mono">{{ e.name }}</span>
@@ -420,6 +451,16 @@ const macroF1 = computed(
 .ks-stage.st-active { border-top-color: var(--accent); } .ks-stage.st-active .ks-stage-dot { background: var(--accent); } .ks-stage.st-active .ks-stage-label { color: var(--accent); }
 .ks-stage.st-blocked { border-top-color: var(--down); } .ks-stage.st-blocked .ks-stage-dot { background: var(--down); } .ks-stage.st-blocked .ks-stage-label { color: var(--down); }
 
+/* authored inputs strip */
+.ks-authored {
+  display: flex; align-items: flex-start; gap: 0.55rem;
+  border: 1px solid var(--accent-soft); border-left: 2px solid var(--teal);
+  border-radius: var(--radius-sm); background: rgba(45, 212, 191, 0.06); padding: 0.6rem 0.85rem;
+}
+.ks-authored-dot { flex: none; width: 0.45rem; height: 0.45rem; margin-top: 0.35rem; border-radius: 999px; background: var(--teal); }
+.ks-authored-text { margin: 0; font-size: 0.62rem; color: var(--text-2); line-height: 1.5; }
+.ks-authored-text b { color: var(--text); }
+
 /* workspace */
 .ks-workspace { display: grid; grid-template-columns: 190px 1fr; gap: 0.9rem; align-items: start; }
 @media (max-width: 820px) { .ks-workspace { grid-template-columns: 1fr; } }
@@ -479,6 +520,8 @@ tr.is-off td { opacity: 0.55; }
 .ks-pill.warn { color: var(--amber); background: var(--amber-soft); }
 .ks-pill.bad { color: var(--down); background: rgba(240, 101, 106, 0.14); }
 .ks-pill.off { color: var(--neutral); background: rgba(139, 148, 158, 0.14); }
+.ks-pill.authored { color: var(--teal); background: rgba(45, 212, 191, 0.14); margin-left: 0.4rem; cursor: help; }
+tr.is-authored td { background: rgba(45, 212, 191, 0.06); }
 
 .ks-swatch { display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 2px; margin-right: 0.35rem; vertical-align: middle; }
 .ks-bar { display: block; height: 0.2rem; margin-top: 0.2rem; border-radius: 999px; background: var(--line-2); overflow: hidden; }

@@ -9,6 +9,7 @@ import {
   defineRelationType,
   useAuthorshipLedger,
 } from '../features/reasoning-chain/keAuthorship';
+import { createKeWorkbench } from '../features/knowledge-studio/keWorkbench';
 
 const author = { author: 'charles.peterson@socioprophet.ai', ts: '2026-08-03T00:00:00.000Z' };
 
@@ -47,5 +48,17 @@ describe('KE authorship', () => {
     ledger.record(b);
     expect(ledger.events.value[0].term).toBe(':B');
     expect(ledger.events.value.length).toBe(2);
+  });
+
+  it('handing the workbench in appends durably into the KE loop (consume-not-fork)', () => {
+    const ke = createKeWorkbench();
+    const { event } = promoteConceptToDictionaryTerm(':OrgUnit', 'ENTITY_TYPE', 'ORGANIZATION', author, ke);
+    // the same record is now a durable, versioned entry AND a KE-contract dictionary asset.
+    expect(ke.ledger.value[0].id).toBe(event.id);
+    expect(ke.dictionaries.value[0].authored).toBe(true);
+    expect(ke.dictionaries.value[0].mappedType).toBe('ORGANIZATION');
+    // receipt is sealed by the promotion gate — honest, unsigned, no fabricated crypto.
+    expect(event.receipt).toContain('unsigned');
+    expect(event.receipt).not.toContain('sha256:');
   });
 });

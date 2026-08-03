@@ -26,12 +26,13 @@ import {
 } from '../features/reasoning-chain/kindVocabulary';
 import { scoreVariants, type ScoredVariant } from '../features/reasoning-chain/scoreVariants';
 import {
-  useAuthorshipLedger, promoteConceptToDictionaryTerm, defineEntityType,
-  defineRelationType, overrideConcept, type AuthorshipEvent,
+  promoteConceptToDictionaryTerm, defineEntityType,
+  defineRelationType, overrideConcept,
 } from '../features/reasoning-chain/keAuthorship';
 import { useNoeticaChat } from '../composables/useNoeticaChat';
 import { useConceptResolver } from '../features/reasoning-chain/conceptResolver';
 import { chatTurnToExample, liveChainsFromTurns, type LiveChain } from '../features/reasoning-chain/chatTurnAdapter';
+import { useKeWorkbench } from '../features/knowledge-studio/keWorkbench';
 
 const cockpit = useCockpit();
 const auth = useAuth();
@@ -73,8 +74,10 @@ watch(activeExamples, (list) => {
   if (!list.some((e) => e.id === exampleId.value)) exampleId.value = list[0]?.id ?? 'A';
 }, { immediate: true });
 
-// ---- authorship (human overrides supersede learned; prior retained) ----
-const ledger = useAuthorshipLedger();
+// ---- authorship → durable KE-workbench contract (shared with Knowledge Studio) ----
+// Writing through the shared workbench means authored assets become inputs to the
+// Knowledge Studio loop; the in-memory unsigned ledger is gone.
+const ke = useKeWorkbench();
 // Human overrides recorded this session, keyed by concept label.
 const overrides = ref<Record<string, string>>({});
 const selectedConcept = ref<{ label: string; kind: AnnotationKind } | null>(null);
@@ -89,25 +92,20 @@ function kindOf(concept: TokenConcept): AnnotationKind {
 function selectConcept(concept: TokenConcept) {
   selectedConcept.value = { label: concept.l, kind: kindOf(concept) };
 }
-function record(e: AuthorshipEvent) {
-  ledger.record(e);
-  if (e.action === 'overwrite') overrides.value = { ...overrides.value, [e.term]: e.version };
-}
 function onPromote() {
   const s = selectedConcept.value; if (!s) return;
-  record(promoteConceptToDictionaryTerm(s.label, s.kind, KIND_META[s.kind].label, { author: author.value }).event);
+  promoteConceptToDictionaryTerm(s.label, s.kind, KIND_META[s.kind].label, { author: author.value }, ke);
 }
 function onDefineType() {
   const s = selectedConcept.value; if (!s) return;
   const rel = s.kind === 'RELATION' || s.kind === 'POSSESSION';
-  const built = rel
-    ? defineRelationType(s.label, s.kind, 'SUBJECT', 'OBJECT', { author: author.value })
-    : defineEntityType(s.label, s.kind, { author: author.value });
-  record(built.event);
+  if (rel) defineRelationType(s.label, s.kind, 'SUBJECT', 'OBJECT', { author: author.value }, ke);
+  else defineEntityType(s.label, s.kind, { author: author.value }, ke);
 }
 function onOverride() {
   const s = selectedConcept.value; if (!s) return;
-  record(overrideConcept(s.label, s.kind, s.label, { author: author.value, note: 'human override of learned label' }));
+  const ev = overrideConcept(s.label, s.kind, s.label, { author: author.value, note: 'human override of learned label' }, ke);
+  overrides.value = { ...overrides.value, [ev.term]: ev.version };
 }
 
 // ---- governed scoring ----
@@ -198,14 +196,14 @@ watch([example, mode, source], setCockpitContext);
       v-if="source === 'live'"
       label="live · active conversation chain"
       tone="muted"
-      message="Bound to the live Noetica conversation chain (useNoeticaChat): the selected turn's plan / retrieval / grounding populate the four stages. Concept LABELS resolve against the live learned resolver / KE registries; KINDs stay bound to regis-entity-graph#22. Where a label has no live resolution the KIND is shown (provisional). The governed variant scorer is unchanged; authorship events are held in an in-memory ledger (unsigned) until the KE workbench seals them."
+      message="Bound to the live Noetica conversation chain (useNoeticaChat): the selected turn's plan / retrieval / grounding populate the four stages. Concept LABELS resolve against the live learned resolver / KE registries; KINDs stay bound to regis-entity-graph#22. Where a label has no live resolution the KIND is shown (provisional). The governed variant scorer is unchanged; authorship writes through the durable KE-workbench contract (versioned, receipted) and surfaces as an input to the Knowledge Studio loop — receipts honestly unsigned, sealed by the promotion gate, never fabricated."
       aria-label="Reasoning Chain Inspector boundary"
     />
     <BoundaryNotice
       v-else
       label="demo · seed conversation chains"
       tone="muted"
-      message="Demo/offline mode over three seed conversation chains — shown when no live turn is selected. KINDs are bound to regis-entity-graph#22; authorship events are held in an in-memory ledger (unsigned) — the durable KE-workbench contract seals them."
+      message="Demo/offline mode over three seed conversation chains — shown when no live turn is selected. KINDs are bound to regis-entity-graph#22; authorship writes through the durable KE-workbench contract (versioned, receipted) and surfaces as an input to the Knowledge Studio loop. Receipts are honestly unsigned — sealed by the promotion gate, never fabricated."
       aria-label="Reasoning Chain Inspector boundary"
     />
 
@@ -290,9 +288,9 @@ watch([example, mode, source], setCockpitContext);
         <aside class="rci-author" aria-label="Knowledge-engineering authoring">
           <div class="rci-author-h">Author into the KE loop</div>
           <p class="rci-author-hint">
-            Select a concept tag, then author it. Terms are learned + <b>versioned</b> (never a match rule); a human
-            override supersedes the learned value and keeps the prior as a version. Events are receipted (unsigned
-            until the KE workbench seals them).
+            Select a concept tag, then author it into the durable KE-workbench. Terms are learned + <b>versioned</b>
+            (never a match rule); a human override supersedes the learned value and keeps the prior as a version.
+            Receipts are sealed by the promotion gate — honestly <b>unsigned</b>, never fabricated.
           </p>
           <div v-if="selectedConcept" class="rci-author-sel">
             selected <b class="mono">{{ selectedConcept.label }}</b>
@@ -305,10 +303,10 @@ watch([example, mode, source], setCockpitContext);
             <button type="button" :disabled="!selectedConcept" @click="onOverride">✎ Overwrite (human)</button>
           </div>
 
-          <div v-if="ledger.events.value.length" class="rci-ledger">
-            <div class="rci-ledger-h">Authorship ledger · governed &amp; versioned</div>
+          <div v-if="ke.ledger.value.length" class="rci-ledger">
+            <div class="rci-ledger-h">Authorship ledger · governed &amp; versioned · durable KE-workbench</div>
             <ul>
-              <li v-for="ev in ledger.events.value" :key="ev.id">
+              <li v-for="ev in ke.ledger.value" :key="ev.id">
                 <span class="rci-led-act">{{ ev.action }}</span>
                 <span class="mono">{{ ev.term }}</span>
                 <span class="rci-tag-kind">{{ ev.kind }}</span>

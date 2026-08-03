@@ -111,6 +111,10 @@ export type EntityType = {
   /** Whether values of this type are observed or modelled — WKS cannot express this. */
   valueKind: 'observed' | 'derived';
   roles: string;
+  /** Authored into the KE loop (e.g. from the Reasoning Chain Inspector), not seeded. */
+  authored?: boolean;
+  /** Honest receipt from the promotion gate — unsigned until a real signer seals it. */
+  receipt?: string;
 };
 
 export const entityTypes: EntityType[] = [
@@ -130,6 +134,10 @@ export type RelationType = {
   object: string;
   instances: number;
   f1: number | null;
+  /** Authored into the KE loop (e.g. from the Reasoning Chain Inspector), not seeded. */
+  authored?: boolean;
+  /** Honest receipt from the promotion gate — unsigned until a real signer seals it. */
+  receipt?: string;
 };
 
 export const relationTypes: RelationType[] = [
@@ -147,6 +155,10 @@ export type Dictionary = {
   source: string;
   /** Licence provenance on the term list — a lawful-learning requirement. */
   licence: string;
+  /** Authored into the KE loop (e.g. from the Reasoning Chain Inspector), not seeded. */
+  authored?: boolean;
+  /** Honest receipt from the promotion gate — unsigned until a real signer seals it. */
+  receipt?: string;
 };
 
 export const dictionaries: Dictionary[] = [

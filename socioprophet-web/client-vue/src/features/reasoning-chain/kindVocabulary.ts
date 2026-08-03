@@ -112,8 +112,11 @@ export function paletteForConcept(cat: SourceCat, label: string): KindPalette {
 
 // Provenance class shown on every concept tag: a learned label vs a
 // human-authored override. Human overrides supersede the learned value; the
-// prior is retained as a version (see keAuthorship.ts).
-export type ProvenanceClass = 'learned' | 'human_authored';
+// prior is retained as a version (see keAuthorship.ts). The type is owned by the
+// KE-workbench contract (single source of truth) and re-exported here for the
+// annotation layer — CONSUME-NOT-FORK.
+export type { ProvenanceClass } from '../knowledge-studio/keWorkbench';
+import type { ProvenanceClass } from '../knowledge-studio/keWorkbench';
 export const PROVENANCE_META: Record<ProvenanceClass, { glyph: string; label: string }> = {
   learned: { glyph: '◐', label: 'learned' },
   human_authored: { glyph: '✎', label: 'human-authored' },
