@@ -328,6 +328,7 @@ export const routeRegistry: RouteRegistryEntry[] = [
       { label: 'Market Portfolio', to: '/professional-intelligence/competitive/markets' },
       { label: 'Enterprise Intelligence', to: '/professional-intelligence/competitive/enterprise' },
       { label: 'Feature Library', to: '/professional-intelligence/competitive/features' },
+      { label: 'Model Platforms', to: '/professional-intelligence/competitive/model-platforms' },
       { label: 'Gates', to: '/gates' },
       { label: 'Policies', to: '/policies' },
     ],

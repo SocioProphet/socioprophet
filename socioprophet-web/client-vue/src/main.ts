@@ -78,6 +78,7 @@ import DigitalTwin from './pages/DigitalTwin.vue';
 import TwinOperatingPicture from './pages/TwinOperatingPicture.vue';
 import ModelTournament from './pages/ModelTournament.vue';
 import ModelBoard from './pages/ModelBoard.vue';
+import ModelPlatformIntelligence from './pages/ModelPlatformIntelligence.vue';
 import TwinWorldModel from './pages/TwinWorldModel.vue';
 import LandResources from './pages/LandResources.vue';
 import AgenticOS from './pages/AgenticOS.vue';
@@ -125,6 +126,7 @@ const explicitRoutes = [
   { path: '/analytics/twin-workshop', component: TwinOperatingPicture },
   { path: '/analytics/model-tournament', component: ModelTournament },
   { path: '/analytics/model-board', component: ModelBoard },
+  { path: '/professional-intelligence/competitive/model-platforms', component: ModelPlatformIntelligence },
   { path: '/analytics/twin-world-model', component: TwinWorldModel },
   // Layer 0 — Land & Natural Resources (the base of the economic model). Also
   // gives the Weather domain's "Natural Resources" sub-domain a real surface.
