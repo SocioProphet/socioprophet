@@ -80,6 +80,7 @@ import LandResources from './pages/LandResources.vue';
 import AgenticOS from './pages/AgenticOS.vue';
 import Marketplace from './pages/Marketplace.vue';
 import LaborMarket from './pages/LaborMarket.vue';
+import DeliveryExcellence from './pages/DeliveryExcellence.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
 import './styles.css';
@@ -92,6 +93,7 @@ const explicitRoutes = [
   { path: '/agentic-os', component: AgenticOS },
   { path: '/marketplace', component: Marketplace },
   { path: '/people/labor-market', component: LaborMarket },
+  { path: '/delivery/wbs', component: DeliveryExcellence },
   // Capability-rail cells that are realized through an existing surface — the
   // capability keeps its own /capability/* URL + rail highlight, and the host
   // screen shows the capability as its header lens (via navScopeForPath).

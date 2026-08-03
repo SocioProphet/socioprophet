@@ -20,6 +20,19 @@ export type RouteRegistryEntry = {
 
 export const routeRegistry: RouteRegistryEntry[] = [
   {
+    path: '/delivery/wbs',
+    label: 'Delivery Excellence',
+    domain: 'Delivery Excellence',
+    maturity: 'L2',
+    stateMode: 'live-fallback',
+    navTier: 'tab-only',
+    userJob: 'Read the sovereign Work Breakdown Structure — projects → WBS elements → deliverables → tasks — with contributor reputation, execution receipts, and removable GitHub/Taskwarrior/cowork mirrors.',
+    ownerPlane: 'client-vue DeliveryExcellence (sovereign fixture, XSEDE 2.0 reference program); live via the sovereign /api/delivery endpoint (opt-in, fails closed)',
+    boundary: 'Sovereign-canonical WBS; GitHub/Taskwarrior/cowork are removable sync mirrors (GitHub transitional). No writeback, issue-creation, or execution authority is active; live pull fails closed to the fixture.',
+    primaryObject: 'work breakdown structure',
+    breadcrumbs: ['Delivery Excellence', 'WBS'],
+  },
+  {
     path: '/news',
     label: 'News',
     domain: 'News & Events',
