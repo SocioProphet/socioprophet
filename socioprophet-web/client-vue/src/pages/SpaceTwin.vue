@@ -9,6 +9,9 @@
           <button role="tab" :aria-selected="mode === 'solar'" :class="{ on: mode === 'solar' }" @click="setMode('solar')">☉ Solar System</button>
           <button role="tab" :aria-selected="mode === 'galaxy'" :class="{ on: mode === 'galaxy' }" @click="setMode('galaxy')">✦ Galaxy</button>
         </div>
+        <label v-if="mode === 'solar'" class="st-lens" title="Interpretive overlay — annotates, never alters the ephemeris">
+          <input type="checkbox" v-model="lensOn" /> ✴ Ecliptic lens
+        </label>
       </template>
     </SurfaceHeader>
 
@@ -18,6 +21,7 @@
       <!-- readout overlay -->
       <div class="st-readout" v-if="mode === 'solar'">
         <div class="st-date">{{ dateLabel }}</div>
+        <div class="st-epi">epistemic <b>{{ epistemic }}</b><span v-if="lensOn" class="st-lens-tag"> · lens speculative</span></div>
         <ul class="st-planets">
           <li v-for="p in planetReadout" :key="p.id">
             <span class="st-dot" :style="{ background: p.css }" />{{ p.name }}
@@ -27,6 +31,7 @@
       </div>
       <div class="st-readout" v-else>
         <div class="st-date">Procedural galaxy</div>
+        <div class="st-epi">epistemic <b>{{ epistemic }}</b></div>
         <p class="st-note">{{ galaxyStars.length.toLocaleString() }} generated stars · {{ arms }} spiral arms</p>
       </div>
     </div>
@@ -114,6 +119,34 @@ const planetReadout = computed(() =>
 const AU = 20;            // scene units per AU (keeps numbers comfortable for the GPU)
 const cart = COORDINATE_SYSTEM.CARTESIAN;
 
+// ── typed interpretive lens (governed, capped speculative — annotates, never alters the ephemeris) ──
+// Binds this surface's honesty to the estate epistemic lattice: computed solar data is `empirical`,
+// the generated galaxy is `speculative`, and a lens overlay is capped at `speculative` — never read as
+// ground truth. This is the usolspace projection discipline (typed, capped, graduatable) in the UI.
+const lensOn = ref(false);
+const epistemic = computed<'empirical' | 'speculative'>(() => (mode.value === 'solar' ? 'empirical' : 'speculative'));
+
+const ECLIPTIC_AU = 34; // a reference ring just beyond the outer planets
+function eclipticLensLayers() {
+  // The zodiac IS the ecliptic divided into twelve — an interpretive division of the plane, not a
+  // physical feature. Drawn in the z=0 ecliptic plane as a ring plus 12 sector spokes.
+  const R = ECLIPTIC_AU * AU;
+  const ring: [number, number, number][] = [];
+  for (let i = 0; i <= 96; i++) { const a = (i / 96) * Math.PI * 2; ring.push([Math.cos(a) * R, Math.sin(a) * R, 0]); }
+  const data: { path: [number, number, number][] }[] = [{ path: ring }];
+  for (let k = 0; k < 12; k++) {
+    const a = (k / 12) * Math.PI * 2;
+    data.push({ path: [[Math.cos(a) * R * 0.94, Math.sin(a) * R * 0.94, 0], [Math.cos(a) * R, Math.sin(a) * R, 0]] });
+  }
+  return [
+    new PathLayer({
+      id: 'ecliptic-lens', data, coordinateSystem: cart,
+      getPath: (d: any) => d.path, getColor: [154, 127, 208, 120],
+      getWidth: 1, widthUnits: 'pixels', widthMinPixels: 1,
+    }),
+  ];
+}
+
 function solarLayers() {
   const date = simDate.value;
   const orbits = PLANETS.map((p) => ({
@@ -144,6 +177,7 @@ function solarLayers() {
       radiusMinPixels: 2, radiusMaxPixels: 40, stroked: false, pickable: true,
       updateTriggers: { getPosition: dayOffset.value },
     }),
+    ...(lensOn.value ? eclipticLensLayers() : []),
   ];
 }
 
@@ -204,7 +238,7 @@ function tick(ts: number) {
   raf = requestAnimationFrame(tick);
 }
 
-watch([dayOffset, mode], render);
+watch([dayOffset, mode, lensOn], render);
 
 onMounted(() => {
   if (!canvasEl.value) return;
@@ -248,6 +282,11 @@ onUnmounted(() => {
 .st-au { margin-left: auto; color: #8b97a8; font-variant-numeric: tabular-nums; }
 .st-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .st-note { margin: 4px 0 0; color: #8b97a8; }
+.st-lens { display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; color: var(--text-2, #9aa4b2);
+  font-size: 0.8rem; cursor: pointer; }
+.st-epi { margin-bottom: 6px; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: #8b97a8; }
+.st-epi b { color: #e8b84b; font-weight: 600; text-transform: none; }
+.st-lens-tag { color: #9a7fd0; }
 .st-time { display: flex; align-items: center; gap: 12px; padding: 12px 4px 2px; }
 .st-time--galaxy { color: #8b97a8; font-size: 0.8rem; }
 .st-play, .st-now { border: 1px solid rgba(120, 140, 180, 0.3); background: var(--surface-2, #11151c);
