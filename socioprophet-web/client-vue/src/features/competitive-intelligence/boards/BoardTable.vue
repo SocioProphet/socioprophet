@@ -79,12 +79,16 @@
                     >{{ rc.cell.basis === 'externally-certified' ? 'certified' : 'self' }}</span>
                   </span>
                   <a
-                    v-if="rc.cell.evidence"
+                    v-if="rc.cell.evidence && isSafeHttp(rc.cell.evidence.href)"
                     class="bt-evidence"
                     :href="rc.cell.evidence.href"
                     target="_blank"
                     rel="noopener noreferrer"
                   >{{ rc.cell.evidence.label }} ↗</a>
+                  <span
+                    v-else-if="rc.cell.evidence"
+                    class="bt-evidence bt-evidence--unsafe"
+                  >{{ rc.cell.evidence.label }}</span>
                 </template>
                 <span
                   v-if="rc.cell.note && expanded.has(row.feat.id)"
@@ -115,6 +119,7 @@ import { computed, ref } from 'vue';
 import PCard from '../../../components/workbench/PCard.vue';
 import type { BoardCell, BoardColumn, BoardRank, CategoryBoard, LitmusFeature } from '../../../api/competitiveBoardsApi';
 import { RANK_ORDER, cellFor, tallyBoard } from './tally';
+import { isSafeHttp } from '../../../utils/urlSafe';
 
 const props = defineProps<{ board: CategoryBoard }>();
 
@@ -196,6 +201,7 @@ function glyph(rank: BoardRank): string {
 .bt-badge--basis { color: var(--teal); border-color: rgba(45, 212, 191, 0.4); }
 .bt-evidence { display: inline-block; margin-top: 0.3rem; font-size: var(--fs-xs); color: var(--info); text-decoration: none; }
 .bt-evidence:hover { text-decoration: underline; }
+.bt-evidence--unsafe { color: var(--text-3); cursor: default; }
 .bt-cellnote { display: block; margin-top: 0.3rem; font-size: var(--fs-xs); color: var(--text-3); line-height: 1.45; }
 
 .bt-defs { margin-top: 0.75rem; font-size: var(--fs-sm); }
