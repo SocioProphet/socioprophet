@@ -63,9 +63,17 @@
         </select>
       </label>
     </div>
-    <div class="st-time st-time--galaxy" v-else>
+    <div class="st-time st-time--galaxy" v-else-if="mode === 'galaxy'">
       <button class="st-play" :aria-label="playing ? 'Pause' : 'Play'" @click="playing = !playing">{{ playing ? '❚❚' : '▶' }}</button>
       <span class="st-galaxy-hint">rotation is illustrative, not an angular-velocity model</span>
+    </div>
+    <div class="st-time st-time--galaxy" v-else>
+      <button class="st-play" :aria-label="playing ? 'Pause' : 'Play'" @click="playing = !playing">{{ playing ? '❚❚' : '▶' }}</button>
+      <label class="st-lens"><input type="checkbox" v-model="horizonOn" /> ◯ Light horizon</label>
+      <template v-if="horizonOn">
+        <input class="st-scrub" type="range" min="1" :max="CUBE_LY * 2" step="1" v-model.number="lookbackLy" aria-label="Light horizon (light-years)" />
+        <span class="st-galaxy-hint">{{ lookbackLy }} ly · {{ withinHorizonCount }} systems within {{ centerName }}'s past light cone</span>
+      </template>
     </div>
   </section>
 </template>
@@ -102,6 +110,19 @@ const deck = shallowRef<Deck<OrbitView[]> | null>(null);
 const quadrant = ref<StarSystem[]>([]);
 const quadrantSource = ref<'loading' | 'usol-live' | 'initial-load' | 'seed'>('loading');
 const REGIONS = SECTORS ** 3;
+// Light cone: the observer's past light-horizon — a bubble of radius (lookback light-years) around the
+// current center. Systems inside are observable now; beyond it, their light has not yet reached here.
+const horizonOn = ref(false);
+const lookbackLy = ref(CUBE_LY);
+const horizonCenterLy = computed<[number, number, number]>(() => {
+  const s = quadrant.value.find((x) => x.id === centerId.value);
+  return s ? s.position : [0, 0, 0];
+});
+const withinHorizonCount = computed(() => {
+  if (!horizonOn.value) return quadrant.value.length;
+  const c = horizonCenterLy.value;
+  return quadrant.value.filter((s) => Math.hypot(s.position[0] - c[0], s.position[1] - c[1], s.position[2] - c[2]) <= lookbackLy.value).length;
+});
 const mappedRegions = computed(() => mappedSectors(quadrant.value));
 const quadrantSourceLabel = computed(() =>
   quadrantSource.value === 'usol-live' ? 'live USOL'
@@ -232,11 +253,30 @@ function galaxyLayers() {
   ];
 }
 
+function horizonRings(centerLy: [number, number, number], radiusLy: number): { path: [number, number, number][] }[] {
+  const cx = centerLy[0] * QUAD_SCALE, cy = centerLy[1] * QUAD_SCALE, cz = centerLy[2] * QUAD_SCALE;
+  const R = radiusLy * QUAD_SCALE;
+  const circle = (fn: (a: number) => [number, number, number]) => {
+    const path: [number, number, number][] = [];
+    for (let i = 0; i <= 64; i++) { const a = (i / 64) * Math.PI * 2; path.push(fn(a)); }
+    return { path };
+  };
+  return [
+    circle((a) => [cx + Math.cos(a) * R, cy + Math.sin(a) * R, cz]),
+    circle((a) => [cx + Math.cos(a) * R, cy, cz + Math.sin(a) * R]),
+    circle((a) => [cx, cy + Math.cos(a) * R, cz + Math.sin(a) * R]),
+  ];
+}
+
 function quadrantLayers() {
+  const c = horizonCenterLy.value;
+  const R = lookbackLy.value;
+  const trig = [horizonOn.value, R, c[0], c[1], c[2]];
   const nodes = quadrant.value.map((s) => ({
     id: s.id, name: s.name,
     position: [s.position[0] * QUAD_SCALE, s.position[1] * QUAD_SCALE, s.position[2] * QUAD_SCALE] as [number, number, number],
     color: s.color,
+    within: !horizonOn.value || Math.hypot(s.position[0] - c[0], s.position[1] - c[1], s.position[2] - c[2]) <= R,
   }));
   return [
     new PathLayer({
@@ -249,17 +289,25 @@ function quadrantLayers() {
       getPath: (d: any) => d.path, getColor: [0, 224, 255, 170],
       getWidth: 1.5, widthUnits: 'pixels', widthMinPixels: 1,
     }),
-    new ScatterplotLayer({ // holographic glow halo
+    ...(horizonOn.value ? [new PathLayer({ // observer's past light-horizon (a bubble = 3 great circles)
+      id: 'quad-horizon', data: horizonRings(c, R), coordinateSystem: cart,
+      getPath: (d: any) => d.path, getColor: [130, 235, 255, 120],
+      getWidth: 1, widthUnits: 'pixels', widthMinPixels: 1,
+    })] : []),
+    new ScatterplotLayer({ // holographic glow halo (dimmed beyond the light horizon)
       id: 'quad-halo', data: nodes, coordinateSystem: cart,
       getPosition: (d: any) => d.position,
-      getFillColor: (d: any): [number, number, number, number] => [d.color[0], d.color[1], d.color[2], 38],
+      getFillColor: (d: any): [number, number, number, number] => [d.color[0], d.color[1], d.color[2], d.within ? 38 : 10],
       getRadius: 7, radiusUnits: 'pixels', radiusMinPixels: 6, radiusMaxPixels: 26, stroked: false,
+      updateTriggers: { getFillColor: trig },
     }),
     new ScatterplotLayer({ // bright core — pickable → recenter the cube on any system
       id: 'quad-stars', data: nodes, coordinateSystem: cart,
-      getPosition: (d: any) => d.position, getFillColor: (d: any) => d.color,
+      getPosition: (d: any) => d.position,
+      getFillColor: (d: any): [number, number, number, number] => [d.color[0], d.color[1], d.color[2], d.within ? 255 : 55],
       getRadius: 2.5, radiusUnits: 'pixels', radiusMinPixels: 2, radiusMaxPixels: 6, stroked: false,
       pickable: true, onClick: (info: any) => recenterOn(info.object),
+      updateTriggers: { getFillColor: trig },
     }),
   ];
 }
@@ -334,7 +382,7 @@ function tick(ts: number) {
   raf = requestAnimationFrame(tick);
 }
 
-watch([dayOffset, mode, lensOn, quadrant], render);
+watch([dayOffset, mode, lensOn, quadrant, horizonOn, lookbackLy, centerId], render);
 
 onMounted(() => {
   if (!canvasEl.value) return;
