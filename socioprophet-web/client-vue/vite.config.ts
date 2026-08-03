@@ -90,7 +90,13 @@ export default defineConfig(({ mode }) => {
       environment: 'happy-dom',
       globals: true,
       setupFiles: ['src/__tests__/setup.ts'],
-      include: ['src/__tests__/**/*.test.ts'],
+      // src/utils/urlSafe.test.ts (#550) landed outside src/__tests__/ and was
+      // therefore never actually run by `npm test` — added explicitly rather than
+      // widening to `src/**/*.test.ts`, which would also newly pick up several other
+      // pre-existing out-of-glob test files (src/config/mesh.test.ts,
+      // src/features/contract-surfaces/, src/runtime-adapters/*) whose current
+      // pass/fail state hasn't been verified here; that's a separate cleanup.
+      include: ['src/__tests__/**/*.test.ts', 'src/utils/**/*.test.ts'],
     },
   };
 });
