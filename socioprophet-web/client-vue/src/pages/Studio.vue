@@ -12,6 +12,7 @@ import StudioNotebooks from './studio/StudioNotebooks.vue';
 import StudioCompute from './studio/StudioCompute.vue';
 import StudioComputeSettings from './studio/StudioComputeSettings.vue';
 import GraphExplorer from './studio/GraphExplorer.vue';
+import GraphExplorerPanel from './studio/GraphExplorerPanel.vue';
 import QueryConsole from './studio/QueryConsole.vue';
 import Analytics from './studio/Analytics.vue';
 import GraphRAG from './studio/GraphRAG.vue';
@@ -33,6 +34,7 @@ const GROUPS: { group: string; items: Sec[] }[] = [
   ]},
   { group: 'Knowledge engineering', items: [
     { id: 'graph', label: 'Graph Explorer', ic: '⟡', comp: markRaw(GraphExplorer), sub: 'Force-directed graph + provenance inspector' },
+    { id: 'explorer', label: 'Platform Explorer', ic: '⊕', comp: markRaw(GraphExplorerPanel), sub: 'Ontology topology/vector/hybrid + Kiali-style runtime overlay' },
     { id: 'query', label: 'Query Console', ic: '⌘', comp: markRaw(QueryConsole), sub: 'SPARQL · Cypher · Gremlin over the live kernel' },
     { id: 'analytics', label: 'Analytics', ic: '📈', comp: markRaw(Analytics), sub: 'PageRank / components on the Rust kernel' },
     { id: 'graphrag', label: 'GraphRAG', ic: '✦', comp: markRaw(GraphRAG), sub: 'Ask the graph, cited answers' },
