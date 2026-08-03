@@ -12,6 +12,8 @@
         <label v-if="mode === 'solar'" class="st-lens" title="Interpretive overlay — annotates, never alters the ephemeris">
           <input type="checkbox" v-model="lensOn" /> ✴ Ecliptic lens
         </label>
+        <button v-if="mode === 'solar' && centerId !== 'sun'" class="st-reset" @click="recenterSun"
+                title="Recenter the universe on the Sun">⌖ Sun</button>
       </template>
     </SurfaceHeader>
 
@@ -22,6 +24,7 @@
       <div class="st-readout" v-if="mode === 'solar'">
         <div class="st-date">{{ dateLabel }}</div>
         <div class="st-epi">epistemic <b>{{ epistemic }}</b><span v-if="lensOn" class="st-lens-tag"> · lens speculative</span></div>
+        <div class="st-center">⌖ center <b>{{ centerName }}</b> <span class="st-hint">— click a body to recenter</span></div>
         <ul class="st-planets">
           <li v-for="p in planetReadout" :key="p.id">
             <span class="st-dot" :style="{ background: p.css }" />{{ p.name }}
@@ -125,6 +128,9 @@ const cart = COORDINATE_SYSTEM.CARTESIAN;
 // ground truth. This is the usolspace projection discipline (typed, capped, graduatable) in the UI.
 const lensOn = ref(false);
 const epistemic = computed<'empirical' | 'speculative'>(() => (mode.value === 'solar' ? 'empirical' : 'speculative'));
+// "Center the universe on any point" — the observer origin. Default is heliocentric (the Sun).
+const centerId = ref<string>('sun');
+const centerName = ref<string>('Sun');
 
 const ECLIPTIC_AU = 34; // a reference ring just beyond the outer planets
 function eclipticLensLayers() {
@@ -154,12 +160,12 @@ function solarLayers() {
     color: [...p.color, 90] as [number, number, number, number],
   }));
   const bodies = [
-    { position: [0, 0, 0], color: [255, 214, 92], radius: 9, name: 'Sun' },
+    { position: [0, 0, 0] as [number, number, number], color: [255, 214, 92], radius: 9, name: 'Sun', id: 'sun' },
     ...PLANETS.map((p) => {
       const [x, y, z] = heliocentric(p, date);
       return {
         position: [x * AU, y * AU, z * AU] as [number, number, number],
-        color: p.color, name: p.name,
+        color: p.color, name: p.name, id: p.id,
         radius: 2.5 + Math.log10(p.radiusKm) - 3, // log-scaled marker, never physical scale
       };
     }),
@@ -175,6 +181,7 @@ function solarLayers() {
       getPosition: (d: any) => d.position, getFillColor: (d: any) => d.color,
       getRadius: (d: any) => d.radius, radiusUnits: 'pixels',
       radiusMinPixels: 2, radiusMaxPixels: 40, stroked: false, pickable: true,
+      onClick: (info: any) => recenterOn(info.object),   // center the universe on any body
       updateTriggers: { getPosition: dayOffset.value },
     }),
     ...(lensOn.value ? eclipticLensLayers() : []),
@@ -207,6 +214,23 @@ function pushView() {
   deck.value?.setProps({ viewState: { orbit: viewState } });
 }
 
+// ── recenter: center the universe on any point (a clicked body, or the Sun) ──
+// A snapshot at click time — the origin does NOT chase the body as time plays (re-click to recenter),
+// which keeps the controlled view honest and never fights the user's own pan/zoom.
+function recenterOn(body: { id?: string; name?: string; position?: [number, number, number] } | null | undefined) {
+  if (!body || !body.position) return;
+  centerId.value = body.id ?? 'sun';
+  centerName.value = body.name ?? 'Sun';
+  viewState = { ...viewState, target: body.position };
+  pushView();
+}
+function recenterSun() {
+  centerId.value = 'sun';
+  centerName.value = 'Sun';
+  viewState = { ...viewState, target: [0, 0, 0] };
+  pushView();
+}
+
 function render() {
   if (!deck.value) return;
   deck.value.setProps({ layers: mode.value === 'solar' ? solarLayers() : galaxyLayers() });
@@ -217,6 +241,7 @@ function setMode(m: 'solar' | 'galaxy') {
   mode.value = m;
   playing.value = false;
   galaxyAngle = 0;                    // so re-entering galaxy mode does not resume mid-spin
+  recenterSun();                      // a mode switch resets the observer origin to heliocentric
   viewState = initialViewState();     // a mode switch DELIBERATELY reframes to the new mode's default
   deck.value?.setProps({ viewState: { orbit: viewState }, layers: m === 'solar' ? solarLayers() : galaxyLayers() });
 }
@@ -287,6 +312,12 @@ onUnmounted(() => {
 .st-epi { margin-bottom: 6px; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: #8b97a8; }
 .st-epi b { color: #e8b84b; font-weight: 600; text-transform: none; }
 .st-lens-tag { color: #9a7fd0; }
+.st-center { font-size: 0.72rem; color: #cfd8e6; margin-bottom: 6px; }
+.st-center b { color: #eef3fa; }
+.st-hint { color: #6b788c; }
+.st-reset { border: 1px solid rgba(120, 140, 180, 0.3); background: var(--surface-2, #11151c); color: var(--text-2, #9aa4b2);
+  font: inherit; font-size: 0.8rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; margin-left: 6px; }
+.st-reset:hover { color: #fff; border-color: var(--accent, #3a6df0); }
 .st-time { display: flex; align-items: center; gap: 12px; padding: 12px 4px 2px; }
 .st-time--galaxy { color: #8b97a8; font-size: 0.8rem; }
 .st-play, .st-now { border: 1px solid rgba(120, 140, 180, 0.3); background: var(--surface-2, #11151c);
