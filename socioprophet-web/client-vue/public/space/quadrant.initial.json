@@ -1,0 +1,358 @@
+{
+  "source": "usol.nearby_stars",
+  "cube_ly": 40,
+  "systems": [
+    {
+      "id": "sol",
+      "name": "Sol",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "color": [
+        255,
+        236,
+        170
+      ],
+      "distLy": 0.0,
+      "spectral": "G"
+    },
+    {
+      "id": "alpha-centauri",
+      "name": "Alpha Centauri",
+      "position": [
+        -1.634,
+        -1.3663,
+        -3.8158
+      ],
+      "color": [
+        255,
+        236,
+        170
+      ],
+      "distLy": 4.37,
+      "spectral": "G"
+    },
+    {
+      "id": "barnard-s-star",
+      "name": "Barnard's Star",
+      "position": [
+        -0.0622,
+        -5.9397,
+        0.4873
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 5.96,
+      "spectral": "M"
+    },
+    {
+      "id": "wolf-359",
+      "name": "Wolf 359",
+      "position": [
+        -7.5028,
+        2.1372,
+        0.9593
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 7.86,
+      "spectral": "M"
+    },
+    {
+      "id": "lalande-21185",
+      "name": "Lalande 21185",
+      "position": [
+        -6.5229,
+        1.6384,
+        4.881
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 8.31,
+      "spectral": "M"
+    },
+    {
+      "id": "sirius",
+      "name": "Sirius",
+      "position": [
+        -1.6181,
+        8.1345,
+        -2.4914
+      ],
+      "color": [
+        202,
+        215,
+        255
+      ],
+      "distLy": 8.66,
+      "spectral": "A"
+    },
+    {
+      "id": "luyten-726-8",
+      "name": "Luyten 726-8",
+      "position": [
+        7.5513,
+        3.4572,
+        -2.6905
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 8.73,
+      "spectral": "M"
+    },
+    {
+      "id": "ross-154",
+      "name": "Ross 154",
+      "position": [
+        1.9088,
+        -8.6459,
+        -3.9125
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 9.68,
+      "spectral": "M"
+    },
+    {
+      "id": "ross-248",
+      "name": "Ross 248",
+      "position": [
+        7.3767,
+        -0.6,
+        7.1922
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 10.32,
+      "spectral": "M"
+    },
+    {
+      "id": "epsilon-eridani",
+      "name": "Epsilon Eridani",
+      "position": [
+        6.1852,
+        8.2829,
+        -1.7225
+      ],
+      "color": [
+        255,
+        210,
+        161
+      ],
+      "distLy": 10.48,
+      "spectral": "K"
+    },
+    {
+      "id": "lacaille-9352",
+      "name": "Lacaille 9352",
+      "position": [
+        8.4595,
+        -2.0544,
+        -6.29
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 10.74,
+      "spectral": "M"
+    },
+    {
+      "id": "ross-128",
+      "name": "Ross 128",
+      "position": [
+        -10.9923,
+        0.6049,
+        0.1537
+      ],
+      "color": [
+        255,
+        163,
+        120
+      ],
+      "distLy": 11.01,
+      "spectral": "M"
+    },
+    {
+      "id": "procyon",
+      "name": "Procyon",
+      "position": [
+        -4.8051,
+        10.3516,
+        1.0426
+      ],
+      "color": [
+        248,
+        247,
+        255
+      ],
+      "distLy": 11.46,
+      "spectral": "F"
+    },
+    {
+      "id": "61-cygni",
+      "name": "61 Cygni",
+      "position": [
+        6.4651,
+        -6.103,
+        7.1355
+      ],
+      "color": [
+        255,
+        210,
+        161
+      ],
+      "distLy": 11.4,
+      "spectral": "K"
+    },
+    {
+      "id": "tau-ceti",
+      "name": "Tau Ceti",
+      "position": [
+        10.2888,
+        5.0071,
+        -3.2681
+      ],
+      "color": [
+        255,
+        236,
+        170
+      ],
+      "distLy": 11.9,
+      "spectral": "G"
+    },
+    {
+      "id": "altair",
+      "name": "Altair",
+      "position": [
+        7.6966,
+        -14.6288,
+        2.5797
+      ],
+      "color": [
+        202,
+        215,
+        255
+      ],
+      "distLy": 16.73,
+      "spectral": "A"
+    },
+    {
+      "id": "eta-cassiopeiae",
+      "name": "Eta Cassiopeiae",
+      "position": [
+        10.1053,
+        2.2033,
+        16.4367
+      ],
+      "color": [
+        255,
+        236,
+        170
+      ],
+      "distLy": 19.42,
+      "spectral": "G"
+    },
+    {
+      "id": "vega",
+      "name": "Vega",
+      "position": [
+        3.1545,
+        -19.2635,
+        15.6833
+      ],
+      "color": [
+        202,
+        215,
+        255
+      ],
+      "distLy": 25.04,
+      "spectral": "A"
+    },
+    {
+      "id": "fomalhaut",
+      "name": "Fomalhaut",
+      "position": [
+        21.0413,
+        -5.8748,
+        -12.4204
+      ],
+      "color": [
+        202,
+        215,
+        255
+      ],
+      "distLy": 25.13,
+      "spectral": "A"
+    },
+    {
+      "id": "pollux",
+      "name": "Pollux",
+      "position": [
+        -13.258,
+        26.708,
+        15.8744
+      ],
+      "color": [
+        255,
+        210,
+        161
+      ],
+      "distLy": 33.78,
+      "spectral": "K"
+    },
+    {
+      "id": "denebola",
+      "name": "Denebola",
+      "position": [
+        -34.7069,
+        1.6367,
+        9.0311
+      ],
+      "color": [
+        202,
+        215,
+        255
+      ],
+      "distLy": 35.9,
+      "spectral": "A"
+    },
+    {
+      "id": "arcturus",
+      "name": "Arcturus",
+      "position": [
+        -28.7706,
+        -19.333,
+        12.0573
+      ],
+      "color": [
+        255,
+        210,
+        161
+      ],
+      "distLy": 36.7,
+      "spectral": "K"
+    }
+  ]
+}

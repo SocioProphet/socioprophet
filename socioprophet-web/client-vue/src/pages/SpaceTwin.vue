@@ -2,12 +2,13 @@
   <section class="st" aria-label="Space digital twin">
     <SurfaceHeader title="Space Twin" eyebrow="Digital twinning · solar system &amp; galaxy">
       <template #badge>
-        <ProvenanceBadge :p="mode === 'solar' ? solarProv : galaxyProv" compact />
+        <ProvenanceBadge :p="mode === 'solar' ? solarProv : mode === 'galaxy' ? galaxyProv : quadrantProv" compact />
       </template>
       <template #actions>
         <div class="st-modes" role="tablist" aria-label="Twin scale">
           <button role="tab" :aria-selected="mode === 'solar'" :class="{ on: mode === 'solar' }" @click="setMode('solar')">☉ Solar System</button>
           <button role="tab" :aria-selected="mode === 'galaxy'" :class="{ on: mode === 'galaxy' }" @click="setMode('galaxy')">✦ Galaxy</button>
+          <button role="tab" :aria-selected="mode === 'quadrant'" :class="{ on: mode === 'quadrant' }" @click="setMode('quadrant')">⬢ Quadrant</button>
         </div>
         <label v-if="mode === 'solar'" class="st-lens" title="Interpretive overlay — annotates, never alters the ephemeris">
           <input type="checkbox" v-model="lensOn" /> ✴ Ecliptic lens
@@ -32,10 +33,16 @@
           </li>
         </ul>
       </div>
-      <div class="st-readout" v-else>
+      <div class="st-readout" v-else-if="mode === 'galaxy'">
         <div class="st-date">Procedural galaxy</div>
         <div class="st-epi">epistemic <b>{{ epistemic }}</b></div>
         <p class="st-note">{{ galaxyStars.length.toLocaleString() }} generated stars · {{ arms }} spiral arms</p>
+      </div>
+      <div class="st-readout st-readout--quad" v-else>
+        <div class="st-date">Cube of space · Sol sector</div>
+        <div class="st-epi">epistemic <b>{{ epistemic }}</b> · <span class="st-src">{{ quadrantSourceLabel }}</span></div>
+        <div class="st-center">⌖ center <b>{{ centerName }}</b> <span class="st-hint">— click a system to recenter</span></div>
+        <p class="st-note">{{ quadrant.length }} systems · {{ mappedRegions }} / {{ REGIONS }} regions mapped · ±{{ CUBE_LY }} ly</p>
       </div>
     </div>
 
@@ -72,6 +79,7 @@ import ProvenanceBadge from '../components/ProvenanceBadge.vue';
 import { prov } from '../features/provenance/types';
 import { PLANETS, heliocentric, orbitPath } from '../space/ephemeris';
 import { generateGalaxy } from '../space/galaxy';
+import { loadQuadrant, cubeEdges, sectorGrid, mappedSectors, CUBE_LY, QUAD_SCALE, SECTORS, type StarSystem } from '../space/quadrant';
 
 // Honest provenance — the whole point of an epistemic surface is that it declares HOW it
 // was produced. The solar system is computed & replayable (Kepler); the galaxy is admitted
@@ -86,9 +94,32 @@ const galaxyProv = prov('generated', {
   note: 'Procedural logarithmic-spiral disk (seeded, reproducible). A structural stand-in — NOT a star catalogue.',
 });
 
-const mode = ref<'solar' | 'galaxy'>('solar');
+const mode = ref<'solar' | 'galaxy' | 'quadrant'>('solar');
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const deck = shallowRef<Deck<OrbitView[]> | null>(null);
+
+// ── quadrant "cube of space" — fed by live USOL plus an initial data load ──
+const quadrant = ref<StarSystem[]>([]);
+const quadrantSource = ref<'loading' | 'usol-live' | 'initial-load' | 'seed'>('loading');
+const REGIONS = SECTORS ** 3;
+const mappedRegions = computed(() => mappedSectors(quadrant.value));
+const quadrantSourceLabel = computed(() =>
+  quadrantSource.value === 'usol-live' ? 'live USOL'
+  : quadrantSource.value === 'initial-load' ? 'initial data load'
+  : quadrantSource.value === 'seed' ? 'seed (offline)'
+  : 'loading…');
+const quadrantProv = computed(() =>
+  quadrantSource.value === 'usol-live'
+    ? prov('computed', { verifier: 'live USOL service (/api/space/quadrant)', sources: ['USOL nearby-star astrometry'], note: 'Hydrated from the live USOL data plane.' })
+    : prov('fixture', { sources: ['nearby-star astrometry, public catalogs (factual)'], note: 'Initial data load (shipped bundle). Live USOL hydration via /api/space/quadrant when the service is up.' }));
+let quadrantLoaded = false;
+async function ensureQuadrant() {
+  if (quadrantLoaded) return;
+  quadrantLoaded = true;
+  const d = await loadQuadrant();
+  quadrant.value = d.systems;
+  quadrantSource.value = d.source;
+}
 
 // ── time (the 4th dimension) ──────────────────────────────────────────────
 const SPAN_DAYS = 55152;                 // ~1950 → 2100
@@ -127,7 +158,10 @@ const cart = COORDINATE_SYSTEM.CARTESIAN;
 // the generated galaxy is `speculative`, and a lens overlay is capped at `speculative` — never read as
 // ground truth. This is the usolspace projection discipline (typed, capped, graduatable) in the UI.
 const lensOn = ref(false);
-const epistemic = computed<'empirical' | 'speculative'>(() => (mode.value === 'solar' ? 'empirical' : 'speculative'));
+const epistemic = computed<'empirical' | 'speculative' | 'synthetic'>(() =>
+  mode.value === 'solar' ? 'empirical'
+  : mode.value === 'quadrant' ? (quadrantSource.value === 'usol-live' ? 'empirical' : 'synthetic')
+  : 'speculative');
 // "Center the universe on any point" — the observer origin. Default is heliocentric (the Sun).
 const centerId = ref<string>('sun');
 const centerName = ref<string>('Sun');
@@ -198,10 +232,46 @@ function galaxyLayers() {
   ];
 }
 
+function quadrantLayers() {
+  const nodes = quadrant.value.map((s) => ({
+    id: s.id, name: s.name,
+    position: [s.position[0] * QUAD_SCALE, s.position[1] * QUAD_SCALE, s.position[2] * QUAD_SCALE] as [number, number, number],
+    color: s.color,
+  }));
+  return [
+    new PathLayer({
+      id: 'quad-grid', data: sectorGrid(), coordinateSystem: cart,
+      getPath: (d: any) => d.path, getColor: [0, 180, 220, 40],
+      getWidth: 1, widthUnits: 'pixels', widthMinPixels: 1,
+    }),
+    new PathLayer({
+      id: 'quad-cube', data: cubeEdges(), coordinateSystem: cart,
+      getPath: (d: any) => d.path, getColor: [0, 224, 255, 170],
+      getWidth: 1.5, widthUnits: 'pixels', widthMinPixels: 1,
+    }),
+    new ScatterplotLayer({ // holographic glow halo
+      id: 'quad-halo', data: nodes, coordinateSystem: cart,
+      getPosition: (d: any) => d.position,
+      getFillColor: (d: any): [number, number, number, number] => [d.color[0], d.color[1], d.color[2], 38],
+      getRadius: 7, radiusUnits: 'pixels', radiusMinPixels: 6, radiusMaxPixels: 26, stroked: false,
+    }),
+    new ScatterplotLayer({ // bright core — pickable → recenter the cube on any system
+      id: 'quad-stars', data: nodes, coordinateSystem: cart,
+      getPosition: (d: any) => d.position, getFillColor: (d: any) => d.color,
+      getRadius: 2.5, radiusUnits: 'pixels', radiusMinPixels: 2, radiusMaxPixels: 6, stroked: false,
+      pickable: true, onClick: (info: any) => recenterOn(info.object),
+    }),
+  ];
+}
+
+function layersForMode(m: 'solar' | 'galaxy' | 'quadrant') {
+  return m === 'solar' ? solarLayers() : m === 'galaxy' ? galaxyLayers() : quadrantLayers();
+}
+
 function initialViewState(): OrbitViewState {
-  return mode.value === 'solar'
-    ? { target: [0, 0, 0], rotationX: 42, rotationOrbit: 30, zoom: -3.2, minZoom: -6, maxZoom: 4 }
-    : { target: [0, 0, 0], rotationX: 62, rotationOrbit: 0, zoom: -3.4, minZoom: -6, maxZoom: 4 };
+  if (mode.value === 'solar') return { target: [0, 0, 0], rotationX: 42, rotationOrbit: 30, zoom: -3.2, minZoom: -6, maxZoom: 4 };
+  if (mode.value === 'quadrant') return { target: [0, 0, 0], rotationX: 38, rotationOrbit: 24, zoom: -5.2, minZoom: -8, maxZoom: 4 };
+  return { target: [0, 0, 0], rotationX: 62, rotationOrbit: 0, zoom: -3.4, minZoom: -6, maxZoom: 4 };
 }
 
 // The camera is CONTROLLED — we own the view state. `initialViewState()` is only the per-mode DEFAULT;
@@ -233,17 +303,18 @@ function recenterSun() {
 
 function render() {
   if (!deck.value) return;
-  deck.value.setProps({ layers: mode.value === 'solar' ? solarLayers() : galaxyLayers() });
+  deck.value.setProps({ layers: layersForMode(mode.value) });
 }
 
-function setMode(m: 'solar' | 'galaxy') {
+function setMode(m: 'solar' | 'galaxy' | 'quadrant') {
   if (m === mode.value) return;
   mode.value = m;
   playing.value = false;
-  galaxyAngle = 0;                    // so re-entering galaxy mode does not resume mid-spin
+  galaxyAngle = 0;                    // so re-entering a spinning mode does not resume mid-spin
   recenterSun();                      // a mode switch resets the observer origin to heliocentric
+  if (m === 'quadrant') void ensureQuadrant();   // live USOL + initial data load, on first entry
   viewState = initialViewState();     // a mode switch DELIBERATELY reframes to the new mode's default
-  deck.value?.setProps({ viewState: { orbit: viewState }, layers: m === 'solar' ? solarLayers() : galaxyLayers() });
+  deck.value?.setProps({ viewState: { orbit: viewState }, layers: layersForMode(m) });
 }
 
 // ── animation loop (time or galaxy spin) ─────────────────────────────────
@@ -263,7 +334,7 @@ function tick(ts: number) {
   raf = requestAnimationFrame(tick);
 }
 
-watch([dayOffset, mode, lensOn], render);
+watch([dayOffset, mode, lensOn, quadrant], render);
 
 onMounted(() => {
   if (!canvasEl.value) return;
@@ -318,6 +389,10 @@ onUnmounted(() => {
 .st-reset { border: 1px solid rgba(120, 140, 180, 0.3); background: var(--surface-2, #11151c); color: var(--text-2, #9aa4b2);
   font: inherit; font-size: 0.8rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; margin-left: 6px; }
 .st-reset:hover { color: #fff; border-color: var(--accent, #3a6df0); }
+/* quadrant hologram: cyan holo-cube styling */
+.st-readout--quad { border-color: rgba(0, 210, 255, 0.35); box-shadow: 0 0 24px rgba(0, 200, 255, 0.08) inset; }
+.st-readout--quad .st-date { color: #aef2ff; }
+.st-src { color: #4fd0e6; }
 .st-time { display: flex; align-items: center; gap: 12px; padding: 12px 4px 2px; }
 .st-time--galaxy { color: #8b97a8; font-size: 0.8rem; }
 .st-play, .st-now { border: 1px solid rgba(120, 140, 180, 0.3); background: var(--surface-2, #11151c);
