@@ -52,6 +52,7 @@ import CompetitiveIntelligence from './pages/CompetitiveIntelligence.vue';
 import CompetitiveIntelligenceApp from './pages/CompetitiveIntelligenceApp.vue';
 import CompetitiveIntelligenceFeatures from './pages/CompetitiveIntelligenceFeatures.vue';
 import CompetitiveIntelligenceMarkets from './pages/CompetitiveIntelligenceMarkets.vue';
+import CompetitiveIntelligenceEnterprise from './pages/CompetitiveIntelligenceEnterprise.vue';
 import Reader from './pages/Reader.vue';
 import OperatorDashboard from './pages/OperatorDashboard.vue';
 import AlgoTradingBoard from './pages/AlgoTradingBoard.vue';
@@ -127,6 +128,7 @@ const explicitRoutes = [
   // static before the :id param so /features is not swallowed as a specimen slug
   { path: '/professional-intelligence/competitive/features', component: CompetitiveIntelligenceFeatures },
   { path: '/professional-intelligence/competitive/markets', component: CompetitiveIntelligenceMarkets },
+  { path: '/professional-intelligence/competitive/enterprise', component: CompetitiveIntelligenceEnterprise },
   { path: '/professional-intelligence/competitive/:id', component: CompetitiveIntelligenceApp },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
   { path: '/control-plane', component: ControlPlaneLifecycle },
