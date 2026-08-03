@@ -229,6 +229,7 @@ export const AGENT_COCKPIT: NavGroup[] = [
       { label: 'Control Plane', to: '/control-plane/org' },
       { label: 'Executions Ledger', to: '/control-plane/executions' },
       { label: 'Delivery Excellence (WBS)', to: '/delivery/wbs' },
+      { label: 'Cowork (collaboration)', to: '/delivery/cowork' },
       { label: 'Containment (blast-radius)', to: '/control-plane/containment' },
       { label: 'Provenance (why a decision)', to: '/control-plane/provenance' },
       { label: 'Universe Viewer', to: '/universe' },
