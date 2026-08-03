@@ -29,10 +29,27 @@ import {
   useAuthorshipLedger, promoteConceptToDictionaryTerm, defineEntityType,
   defineRelationType, overrideConcept, type AuthorshipEvent,
 } from '../features/reasoning-chain/keAuthorship';
+import { useNoeticaChat } from '../composables/useNoeticaChat';
+import { useConceptResolver } from '../features/reasoning-chain/conceptResolver';
+import { chatTurnToExample, liveChainsFromTurns, type LiveChain } from '../features/reasoning-chain/chatTurnAdapter';
 
 const cockpit = useCockpit();
 const auth = useAuth();
 const author = computed(() => auth.user?.email ?? 'operator');
+
+// ---- data source: LIVE Noetica conversation chains vs demo seed fixtures ----
+// The live learned resolver sources concept LABELS (conceptResolver.ts); KINDs
+// stay bound to regis-entity-graph#22 (kindVocabulary.ts). The three fixtures
+// remain available as a demo/offline mode so the route renders with no live data.
+const chat = useNoeticaChat();
+const resolver = useConceptResolver();
+type SourceMode = 'live' | 'demo';
+const liveChains = computed<LiveChain[]>(() => liveChainsFromTurns(chat.turns.value));
+const liveExamples = computed<Example[]>(() => liveChains.value.map((c) => chatTurnToExample(c, resolver)));
+// Default to live when there is a live chain to inspect; otherwise demo fixtures.
+const source = ref<SourceMode>(liveChains.value.length ? 'live' : 'demo');
+const activeExamples = computed<Example[]>(() => (source.value === 'live' ? liveExamples.value : EXAMPLES));
+const hasLive = computed(() => liveExamples.value.length > 0);
 
 type StageKey = 'annotation' | 'concepts' | 'variants' | 'execution';
 const STAGES: { key: StageKey; label: string }[] = [
@@ -44,9 +61,17 @@ const STAGES: { key: StageKey; label: string }[] = [
 
 const exampleId = ref('A');
 const stage = ref<StageKey>('annotation');
-const example = computed<Example>(() => EXAMPLES.find((e) => e.id === exampleId.value) ?? EXAMPLES[0]);
+const example = computed<Example>(
+  () => activeExamples.value.find((e) => e.id === exampleId.value) ?? activeExamples.value[0] ?? EXAMPLES[0],
+);
 const mode = ref(example.value.modes[0].key);
 watch(example, (e) => { mode.value = e.modes[0].key; });
+
+// When the active example set changes (source toggle, a new live turn arrives),
+// keep the selection valid — snap to the first available example.
+watch(activeExamples, (list) => {
+  if (!list.some((e) => e.id === exampleId.value)) exampleId.value = list[0]?.id ?? 'A';
+}, { immediate: true });
 
 // ---- authorship (human overrides supersede learned; prior retained) ----
 const ledger = useAuthorshipLedger();
@@ -141,13 +166,15 @@ const legendKinds = computed<AnnotationKind[]>(() => {
 function setCockpitContext() {
   cockpit.setContext({
     surface: 'Reasoning Chain Inspector',
-    entityLabel: `Example ${example.value.id} · ${example.value.label}`,
+    entityLabel: source.value === 'live'
+      ? `Live · ${example.value.label}`
+      : `Example ${example.value.id} · ${example.value.label}`,
     detail: example.value.question,
     route: '/noetica/reasoning-chain',
   });
 }
 onMounted(setCockpitContext);
-watch([example, mode], setCockpitContext);
+watch([example, mode, source], setCockpitContext);
 </script>
 
 <template>
@@ -155,7 +182,8 @@ watch([example, mode], setCockpitContext);
     <SurfaceHeader title="Reasoning Chain Inspector" eyebrow="Noetica · reasoning trace · governed vocabulary">
       <template #badge>
         <span class="rci-badge">L2</span>
-        <span class="rci-badge rci-badge--fixture">seed fixtures</span>
+        <span v-if="source === 'live'" class="rci-badge rci-badge--live">live chain</span>
+        <span v-else class="rci-badge rci-badge--fixture">seed fixtures</span>
       </template>
     </SurfaceHeader>
 
@@ -167,16 +195,46 @@ watch([example, mode], setCockpitContext);
     </p>
 
     <BoundaryNotice
-      label="fixture · seed conversation chains"
+      v-if="source === 'live'"
+      label="live · active conversation chain"
       tone="muted"
-      message="Fixture-backed over three seed conversation chains; live conversation-chain binding is a tracked follow-up. KINDs are bound to regis-entity-graph#22; authorship events are held in an in-memory ledger (unsigned) — the durable KE-workbench contract seals them."
+      message="Bound to the live Noetica conversation chain (useNoeticaChat): the selected turn's plan / retrieval / grounding populate the four stages. Concept LABELS resolve against the live learned resolver / KE registries; KINDs stay bound to regis-entity-graph#22. Where a label has no live resolution the KIND is shown (provisional). The governed variant scorer is unchanged; authorship events are held in an in-memory ledger (unsigned) until the KE workbench seals them."
+      aria-label="Reasoning Chain Inspector boundary"
+    />
+    <BoundaryNotice
+      v-else
+      label="demo · seed conversation chains"
+      tone="muted"
+      message="Demo/offline mode over three seed conversation chains — shown when no live turn is selected. KINDs are bound to regis-entity-graph#22; authorship events are held in an in-memory ledger (unsigned) — the durable KE-workbench contract seals them."
       aria-label="Reasoning Chain Inspector boundary"
     />
 
-    <!-- example selector + question card -->
+    <!-- data source: live conversation chain vs demo fixtures -->
+    <div class="rci-source" role="group" aria-label="Data source">
+      <button
+        type="button" class="rci-src" :class="{ on: source === 'live' }"
+        :disabled="!hasLive" @click="source = 'live'"
+        :title="hasLive ? 'Inspect the live Noetica conversation chain' : 'No live turn yet — send a message in the Noetica chat'"
+      >Live chain<span v-if="hasLive" class="rci-src-n">{{ liveExamples.length }}</span></button>
+      <button
+        type="button" class="rci-src" :class="{ on: source === 'demo' }"
+        @click="source = 'demo'"
+      >Demo · seed fixtures</button>
+      <span v-if="source === 'live' && !hasLive" class="rci-dim rci-src-hint">no live conversation turn to inspect yet</span>
+    </div>
+
+    <!-- live-empty state: keep the route renderable with no live data -->
+    <div v-if="source === 'live' && !hasLive" class="rci-empty">
+      No live conversation turn is available to inspect. Ask Noetica something in the chat dock, then return here —
+      the active chain per turn will populate the four stages. Meanwhile, switch to
+      <button type="button" class="rci-link" @click="source = 'demo'">demo seed fixtures</button>.
+    </div>
+
+    <template v-else>
+    <!-- example / turn selector + question card -->
     <div class="rci-picker" role="tablist" aria-label="Example">
       <button
-        v-for="e in EXAMPLES" :key="e.id" type="button" class="rci-pill"
+        v-for="e in activeExamples" :key="e.id" type="button" class="rci-pill"
         :class="{ on: exampleId === e.id }" role="tab" :aria-selected="exampleId === e.id"
         @click="exampleId = e.id"
       >{{ e.id }} · {{ e.label }}</button>
@@ -222,6 +280,7 @@ watch([example, mode], setCockpitContext);
               <span class="rci-tag-prov" aria-hidden="true">{{ PROVENANCE_META[provenanceOf(c)].glyph }}</span>
               {{ c.l }}
               <span class="rci-tag-kind">{{ kindOf(c) }}</span>
+              <span v-if="c.provisional" class="rci-tag-prov-mark" title="Provisional — no live label resolution; showing the governed KIND">prov</span>
             </span>
             <span v-if="!t.concepts.length" class="rci-tag rci-tag--untyped" title="Untyped — no resolved concept">untyped</span>
           </li>
@@ -337,6 +396,7 @@ watch([example, mode], setCockpitContext);
         </blockquote>
       </div>
     </div>
+    </template>
   </section>
 </template>
 
@@ -344,6 +404,18 @@ watch([example, mode], setCockpitContext);
 .rci { padding: 1.25rem 1.75rem 2.5rem; color: var(--text); max-width: 1080px; }
 .rci-badge { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid var(--line-2); border-radius: 999px; padding: 0.08rem 0.5rem; color: var(--text-2); }
 .rci-badge--fixture { color: var(--text-3); }
+.rci-badge--live { color: #22c55e; border-color: #22c55e; }
+
+/* data-source toggle + live-empty state */
+.rci-source { display: flex; align-items: center; gap: 0.5rem; margin: 0.8rem 0 0.2rem; flex-wrap: wrap; }
+.rci-src { background: var(--surface); border: 1px solid var(--line); color: var(--text-2); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; }
+.rci-src.on { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+.rci-src:disabled { opacity: 0.45; cursor: not-allowed; }
+.rci-src-n { font-size: 0.62rem; background: var(--surface-2); border-radius: 999px; padding: 0.02rem 0.4rem; color: var(--text-2); }
+.rci-src-hint { font-size: 0.74rem; }
+.rci-empty { background: var(--surface); border: 1px dashed var(--line-2); border-radius: 10px; padding: 1rem 1.1rem; color: var(--text-2); font-size: 0.86rem; line-height: 1.5; margin-top: 0.8rem; }
+.rci-link { background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; font: inherit; text-decoration: underline; }
+.rci-tag-prov-mark { font-size: 0.54rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--amber, #d9a63a); border: 1px solid currentColor; border-radius: 4px; padding: 0 0.25rem; }
 .rci-lede { color: var(--text-2); font-size: 0.9rem; line-height: 1.5; max-width: 72ch; margin: 0.6rem 0 0.9rem; }
 .rci-lede b { color: var(--text); font-weight: 600; }
 .mono { font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }

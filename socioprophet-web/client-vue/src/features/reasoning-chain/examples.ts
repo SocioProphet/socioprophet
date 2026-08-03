@@ -15,6 +15,12 @@ export interface TokenConcept {
   c: SourceCat;
   /** Provenance class — labels are learned unless a human override supersedes. */
   provenance?: ProvenanceClass;
+  /**
+   * True when the label is a graceful KIND fallback (no live label resolution),
+   * not a resolved governed label. Fixtures never set this; live-derived chains
+   * (chatTurnAdapter.ts) mark unresolved concepts so the UI can flag them.
+   */
+  provisional?: boolean;
 }
 export interface Token {
   text: string;
