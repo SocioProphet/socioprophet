@@ -43,7 +43,8 @@
   "scripts": {
     "start": "node src/server.ts",
     "dev": "nodemon src/server.ts",
-    "test:contracts": "node test/contracts.test.mjs"
+    "test:contracts": "node test/contracts.test.mjs",
+    "test:delivery": "node test/delivery.reconcile.test.mjs"
   },
   "author": "Will Jones",
   "dependencies": {

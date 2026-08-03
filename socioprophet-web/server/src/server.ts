@@ -15,6 +15,7 @@ const buildsRouter = require("./routes/api/builds-route");
 const fleetRouter = require("./routes/api/fleet-route");
 const bootRouter = require("./routes/boot-route");
 const proCyberneticaRouter = require("./routes/api/procybernetica-dashboard-route");
+const deliveryRouter = require("./routes/api/delivery-route");
 const { requireAuth } = require("./middleware/auth");
 
 const app = express();
@@ -43,6 +44,9 @@ app.use("/api/feed", rssRouter);
 app.use("/api/builds", apiLimiter, requireAuth, buildsRouter);
 app.use("/api/fleet", apiLimiter, requireAuth, fleetRouter);
 app.use("/api/procybernetica", apiLimiter, proCyberneticaRouter);
+// Sovereign delivery producer (public read): /api/delivery/* + /api/cowork/*.
+// Sovereign store is canonical; the client adapters fail closed when unreachable.
+app.use("/api", apiLimiter, deliveryRouter);
 // Device provisioning is UNAUTHENTICATED (claim-code authorized) — nlboot devices
 // have no Socbase token; rate-limited at the HTTP layer.
 app.use("/boot", bootLimiter, bootRouter);
