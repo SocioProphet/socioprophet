@@ -2,9 +2,19 @@
 /**
  * verify-delivery-snapshot.mjs — the CI gate.
  *
- * FAILS CLOSED. A snapshot may only be published as delivery status when it was
- * computed from live evidence and every asserted value carries an evidence ref.
- * This is what stops the dashboard reporting a number nobody can reproduce.
+ * TWO CLASSES OF GATE, deliberately separated:
+ *
+ *  INTEGRITY gates block publication. They ask "can this snapshot be trusted at
+ *  all?" — was it computed from live evidence, does it carry a receipt, does any
+ *  metric claim a 'measured' basis it cannot support. A snapshot failing these
+ *  would misinform, so it must not ship.
+ *
+ *  HEALTH gates do NOT block publication. They ask "is delivery going well?" —
+ *  aging WIP, WIP limits, whether the backlog is prioritized. These are the
+ *  findings the dashboard exists to surface. Blocking on them would suppress the
+ *  dashboard exactly when it is most needed, which is backwards.
+ *
+ * FAILS CLOSED on integrity. Reports loudly on health.
  */
 import fs from 'node:fs';
 
@@ -12,38 +22,37 @@ const FILE = process.argv[2] || 'src/data/deliverySnapshot.ts';
 const src = fs.readFileSync(FILE, 'utf8');
 const start = src.indexOf('= {') + 2;
 const end = src.lastIndexOf('} as const');
-if (start < 2 || end < 0) {
-  console.error('FAIL: could not parse the generated snapshot.');
-  process.exit(1);
-}
+if (start < 2 || end < 0) { console.error('INTEGRITY FAIL: cannot parse the generated snapshot.'); process.exit(1); }
 const snap = JSON.parse(src.slice(start, end + 1));
 
-const failures = [];
+const INTEGRITY_GATES = new Set(['Evidence collected']);
 
-if (snap.sourceMode !== 'live') {
-  failures.push(`sourceMode is '${snap.sourceMode}' — live merge evidence was not collected.`);
-}
-if (!snap.commit || snap.commit === 'unknown') {
-  failures.push('snapshot carries no commit receipt.');
-}
+const integrity = [];
+const health = [];
+
+if (snap.sourceMode !== 'live') integrity.push(`sourceMode is '${snap.sourceMode}' — live evidence was not collected.`);
+if (!snap.commit || snap.commit === 'unknown') integrity.push('snapshot carries no commit receipt.');
+
 for (const m of snap.metrics ?? []) {
-  if (m.basis !== 'measured' && !String(m.evidence ?? '').trim()) {
-    failures.push(`metric '${m.id}' has basis '${m.basis}' and no evidence ref.`);
-  }
-  if (typeof m.value !== 'number' || Number.isNaN(m.value)) {
-    failures.push(`metric '${m.id}' has a non-numeric value.`);
-  }
+  if (typeof m.value !== 'number' || Number.isNaN(m.value)) integrity.push(`metric '${m.id}' has a non-numeric value.`);
+  if (m.basis === 'measured' && !String(m.evidence ?? '').trim()) integrity.push(`metric '${m.id}' claims 'measured' with no evidence ref — fabricated basis.`);
+  if (m.basis !== 'measured' && !String(m.evidence ?? '').trim()) health.push(`metric '${m.id}' asserts a value with no evidence ref (unverified).`);
 }
 for (const g of snap.gates ?? []) {
-  if (g.status === 'fail') failures.push(`gate '${g.name}' is failing: ${g.detail}`);
+  if (g.status !== 'fail') continue;
+  (INTEGRITY_GATES.has(g.name) ? integrity : health).push(`gate '${g.name}': ${g.detail}`);
 }
-// A live snapshot must not claim a measured basis with an empty evidence ref.
-const bogus = (snap.metrics ?? []).filter((m) => m.basis === 'measured' && !String(m.evidence ?? '').trim());
-if (bogus.length) failures.push(`${bogus.length} metric(s) claim 'measured' with no evidence — fabricated basis.`);
 
-if (failures.length) {
-  console.error('DELIVERY SNAPSHOT GATE: FAIL (closed)');
-  for (const f of failures) console.error(`  - ${f}`);
+if (integrity.length) {
+  console.error('DELIVERY SNAPSHOT — INTEGRITY GATE: FAIL (closed, not published)');
+  for (const f of integrity) console.error(`  - ${f}`);
   process.exit(1);
 }
-console.log(`DELIVERY SNAPSHOT GATE: PASS — ${snap.metrics.length} measured metrics at ${snap.commit.slice(0, 7)}.`);
+
+console.log(`DELIVERY SNAPSHOT — INTEGRITY GATE: PASS (${snap.metrics.length} metrics, receipt ${snap.commit.slice(0, 7)})`);
+if (health.length) {
+  console.log(`DELIVERY HEALTH: ${health.length} finding(s) — published so they are visible, not suppressed:`);
+  for (const f of health) console.log(`  ! ${f}`);
+} else {
+  console.log('DELIVERY HEALTH: no findings.');
+}

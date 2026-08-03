@@ -73,6 +73,26 @@ export type CiGate = {
   detail: string;
 };
 
+export type OrgRollup = {
+  org: string;
+  merged: number;
+  openPrs: number;
+  closedIssues: number;
+  openIssues: number;
+};
+
+/** One weekly throughput bucket — the Monte Carlo sample unit. */
+export type ThroughputWeek = {
+  weekStart: string;
+  weekEnd: string;
+  merged: number;
+};
+
+/** MoSCoW counts read from labels; labelsSeen === 0 means unprioritized. */
+export type MoscowCounts = {
+  must: number; should: number; could: number; wont: number; labelsSeen: number;
+};
+
 export type DeliverySnapshot = {
   /** 'live' only when generated from real merge/issue evidence. */
   sourceMode: SourceMode;
@@ -82,7 +102,14 @@ export type DeliverySnapshot = {
   /** CI run that produced it, when generated in CI. */
   workflowRun: string | null;
   repo: string;
+  windowDays: number;
   boundaryNotice: string;
+  perOrg: OrgRollup[];
+  /** Weekly throughput history — resampled by Monte Carlo, never averaged. */
+  history: ThroughputWeek[];
+  /** Items STARTED in the window. A flow, not the open stock. */
+  arrivals: number;
+  moscow: MoscowCounts;
   sprint: SprintState;
   metrics: FlowMetric[];
   columns: BoardColumn[];

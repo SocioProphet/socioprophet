@@ -11,6 +11,11 @@ import {
   overallGate, isUnverified, completionRate, scopeChurn, breachesWip,
   type FlowMetric,
 } from '../features/delivery/contract';
+import {
+  backward, current, forward, loop, lanePriorities, pricingTiers, costModel,
+  COMMIT_PERCENTILE,
+} from '../features/delivery/horizons';
+import { moscowLabel } from '../features/delivery/economics';
 
 const gate = computed(() => overallGate(snap));
 const isLive = computed(() => snap.sourceMode === 'live');
@@ -34,6 +39,15 @@ function fmt(m: FlowMetric): string {
   return String(m.value);
 }
 const shortCommit = computed(() => snap.commit.slice(0, 7));
+
+// three horizons over one evidence base, plus the loop
+const back = computed(() => backward(snap));
+const now = computed(() => current(snap));
+const fwd = computed(() => forward(snap));
+const learn = computed(() => loop());
+const maxWeek = computed(() => Math.max(1, ...snap.history.map((h) => h.merged)));
+const rankedLanes = computed(() => [...lanePriorities].sort((a, b) => (b.wsjf ?? 0) - (a.wsjf ?? 0)));
+const money = (n: number) => `$${n.toLocaleString()}`;
 </script>
 
 <template>
@@ -132,6 +146,143 @@ const shortCommit = computed(() => snap.commit.slice(0, 7));
           <p v-else class="dd-metric-ev dd-mono">{{ m.evidence }}</p>
         </article>
       </div>
+    </section>
+
+    <!-- ===================== BACKWARD ===================== -->
+    <section class="dd-block" aria-label="Backward — what happened">
+      <div class="dd-h">
+        <h2><span class="dd-hz">Backward</span> What actually happened</h2>
+        <p>{{ back.weeks }} weeks of measured history. {{ back.detail }}</p>
+      </div>
+      <div class="dd-hist">
+        <div v-for="h in snap.history" :key="h.weekStart" class="dd-hist-col" :title="`${h.weekStart} → ${h.weekEnd}: ${h.merged} merged`">
+          <span class="dd-hist-bar" :style="{ height: `${(h.merged / maxWeek) * 100}%` }" />
+          <span class="dd-hist-n">{{ h.merged }}</span>
+        </div>
+      </div>
+      <div class="dd-facts">
+        <span><b>{{ back.totalMerged.toLocaleString() }}</b> merged</span>
+        <span><b>{{ back.medianWeekly }}</b> median/wk</span>
+        <span><b>{{ back.worstWeek }}–{{ back.bestWeek }}</b> range</span>
+        <span v-if="back.variabilityRatio" class="dd-warn"><b>{{ back.variabilityRatio }}×</b> variability</span>
+        <span v-if="back.costPerItem">
+          <b>${{ back.costPerItem }}</b> cost/item
+          <span class="dd-basis b-declared">{{ back.costBasis }}</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- ===================== CURRENT ===================== -->
+    <section class="dd-block" aria-label="Current — what is true now">
+      <div class="dd-h">
+        <h2><span class="dd-hz">Current</span> What is true right now</h2>
+        <p>Flow state, prioritization discipline, and whether the system is stable enough to reason about.</p>
+      </div>
+      <div class="dd-two">
+        <article class="dd-panel" :class="now.littlesLaw.valid ? 'ok' : 'warn'">
+          <h3>Little's Law</h3>
+          <p class="dd-panel-v" v-if="now.littlesLaw.valid">
+            implied cycle time <b>{{ now.littlesLaw.impliedCycleTimeDays }}d</b>
+          </p>
+          <p class="dd-panel-v" v-else><b>not applied</b></p>
+          <p class="dd-panel-d">{{ now.littlesLaw.detail }}</p>
+        </article>
+        <article class="dd-panel" :class="now.moscowUnprioritized ? 'warn' : now.moscow?.ok ? 'ok' : 'bad'">
+          <h3>MoSCoW discipline</h3>
+          <p class="dd-panel-v" v-if="now.moscow">
+            Must is <b>{{ Math.round(now.moscow.mustShare * 100) }}%</b> of committed
+          </p>
+          <p class="dd-panel-v" v-else><b>unprioritized</b></p>
+          <p class="dd-panel-d">{{ now.moscow ? now.moscow.detail : now.detail }}</p>
+          <div v-if="!now.moscowUnprioritized" class="dd-moscow">
+            <span v-for="k in (['must','should','could','wont'] as const)" :key="k" class="dd-mos" :class="`m-${k}`">
+              {{ moscowLabel[k] }} {{ snap.moscow[k] }}
+            </span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== FORWARD ===================== -->
+    <section class="dd-block" aria-label="Forward — what is likely">
+      <div class="dd-h">
+        <h2><span class="dd-hz">Forward</span> What is likely</h2>
+        <p>
+          Monte Carlo over {{ fwd.forecast.samples }} observed weekly throughputs —
+          <b>never a velocity average</b>. {{ fwd.detail }}
+        </p>
+      </div>
+      <div v-if="fwd.forecast.sufficient" class="dd-fc">
+        <div class="dd-fc-h">
+          <span>{{ fwd.backlog.toLocaleString() }} open items · {{ fwd.forecast.trials.toLocaleString() }} trials</span>
+          <b class="dd-mono">commit @p{{ COMMIT_PERCENTILE }}: {{ fwd.commitWeeks }} weeks</b>
+        </div>
+        <div class="dd-fc-rows">
+          <div v-for="p in fwd.forecast.percentiles" :key="p.p" class="dd-fc-row" :class="{ 'is-commit': p.p === COMMIT_PERCENTILE }">
+            <span class="dd-fc-p">p{{ p.p }}</span>
+            <span class="dd-fc-bar"><span :style="{ width: `${(p.periods / Math.max(1, fwd.forecast.percentiles[fwd.forecast.percentiles.length-1].periods)) * 100}%` }" /></span>
+            <b class="dd-fc-n">{{ p.periods }}w</b>
+          </div>
+        </div>
+      </div>
+      <p v-else class="dd-warn">{{ fwd.forecast.detail }}</p>
+
+      <div class="dd-h dd-h--sub">
+        <h3>Pricing &amp; break-even</h3>
+        <p>
+          Tiers priced into the <b>$1K–$20K canyon</b> the incumbents leave empty, metered on governed artifacts
+          rather than seats. All money inputs are <b>declared</b>, not measured — a scenario, not a projection.
+        </p>
+      </div>
+      <div class="dd-tablewrap">
+        <table class="dd-table">
+          <thead><tr><th>Tier</th><th class="n">Annual</th><th>Meter</th><th class="n">Break-even accts</th><th class="n">Margin @25</th><th>Basis</th></tr></thead>
+          <tbody>
+            <tr v-for="(t, i) in pricingTiers" :key="t.id">
+              <td class="dd-strong">{{ t.name }}</td>
+              <td class="n">{{ money(t.annual) }}</td>
+              <td class="dd-dim">{{ t.meter }}</td>
+              <td class="n"><b>{{ fwd.breakEven[t.id] ?? '—' }}</b></td>
+              <td class="n">{{ fwd.margins[i].marginPct !== null ? fwd.margins[i].marginPct + '%' : '—' }}</td>
+              <td><span class="dd-basis" :class="`b-${t.basis}`">{{ t.basis }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="dd-note">Cost base: <b>{{ money(costModel.costPerPeriod) }}</b>/week — {{ costModel.note }}</p>
+
+      <div class="dd-h dd-h--sub">
+        <h3>WSJF — what to build next</h3>
+        <p>Cost of Delay ÷ Job Size. Ranks value-per-unit-time, which is the actual bridge from a board to a P&amp;L. Cost-of-delay weights are <b>declared</b> strategic inputs from the market studies.</p>
+      </div>
+      <div class="dd-wsjf">
+        <article v-for="(l, i) in rankedLanes" :key="l.lane" class="dd-lane" :class="{ 'is-top': i === 0 }">
+          <div class="dd-lane-h">
+            <span class="dd-lane-rank">{{ i + 1 }}</span>
+            <b>{{ l.lane }}</b>
+            <span class="dd-lane-w">WSJF {{ l.wsjf ?? '—' }}<span class="dd-dim"> · size {{ l.size }}</span></span>
+          </div>
+          <p>{{ l.rationale }}</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== LEARNING LOOP ===================== -->
+    <section class="dd-block" aria-label="Learning loop">
+      <div class="dd-h">
+        <h2><span class="dd-hz">Loop</span> Was the last forecast right?</h2>
+        <p>A forecasting system that is never scored is a horoscope. This compares what was forecast against what happened and names the systematic bias.</p>
+      </div>
+      <article class="dd-panel" :class="learn.calibration.bias === 'calibrated' ? 'ok' : learn.calibration.bias === 'unknown' ? 'warn' : 'bad'">
+        <h3>Calibration — {{ learn.calibration.bias }}</h3>
+        <p class="dd-panel-v" v-if="learn.calibration.hitRate !== null">
+          hit rate <b>{{ Math.round(learn.calibration.hitRate * 100) }}%</b>
+          vs expected <b>{{ Math.round((learn.calibration.expectedRate ?? 0) * 100) }}%</b>
+          <span class="dd-dim"> over {{ learn.calibration.resolved }} resolved</span>
+        </p>
+        <p class="dd-panel-d">{{ learn.detail }}</p>
+        <p class="dd-panel-rec"><span>Correction</span>{{ learn.calibration.recommendation }}</p>
+      </article>
     </section>
 
     <!-- BOARD -->
@@ -302,6 +453,65 @@ tr.is-blocked td { background: rgba(240,101,106,0.06); }
 .r-medium { color: var(--amber); background: var(--amber-soft); }
 .r-high { color: var(--down); background: rgba(240,101,106,0.14); }
 .dd-empty { margin: 0; font-size: var(--fs-sm); color: var(--text-3); line-height: 1.5; max-width: 90ch; }
+
+.dd-hz {
+  display: inline-block; font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 700; color: var(--accent); background: var(--accent-soft);
+  border-radius: 3px; padding: 0.08rem 0.36rem; margin-right: 0.5rem; vertical-align: middle;
+}
+.dd-h--sub { border-top: 0; padding-top: 0.6rem; }
+.dd-h--sub h3 { margin: 0; font-size: var(--fs-base); font-weight: 640; }
+
+.dd-hist { display: flex; align-items: flex-end; gap: 0.3rem; height: 110px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); padding: 0.6rem; }
+.dd-hist-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 0.2rem; height: 100%; }
+.dd-hist-bar { display: block; width: 100%; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 2px; }
+.dd-hist-n { font-size: 0.5rem; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+.dd-facts { display: flex; flex-wrap: wrap; gap: 1rem; font-size: var(--fs-xs); color: var(--text-3); }
+.dd-facts b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+.dd-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem; }
+.dd-panel { border: 1px solid var(--line); border-left: 2px solid var(--line-2); border-radius: var(--radius-sm); background: var(--surface); padding: 0.8rem 0.9rem; }
+.dd-panel.ok { border-left-color: var(--up); }
+.dd-panel.warn { border-left-color: var(--amber); }
+.dd-panel.bad { border-left-color: var(--down); }
+.dd-panel h3 { margin: 0 0 0.3rem; font-size: var(--fs-base); font-weight: 640; }
+.dd-panel-v { margin: 0 0 0.35rem; font-size: var(--fs-sm); color: var(--text-2); }
+.dd-panel-v b { color: var(--text); font-size: var(--fs-md); }
+.dd-panel-d { margin: 0; font-size: 0.62rem; color: var(--text-3); line-height: 1.5; }
+.dd-panel-rec { margin: 0.5rem 0 0; padding-top: 0.5rem; border-top: 1px solid var(--line); font-size: 0.62rem; color: var(--text-2); }
+.dd-panel-rec span { display: block; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; color: var(--accent); margin-bottom: 0.15rem; }
+
+.dd-moscow { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+.dd-mos { font-size: 0.52rem; border-radius: 3px; padding: 0.04rem 0.32rem; font-weight: 700; }
+.m-must { color: var(--down); background: rgba(240,101,106,0.14); }
+.m-should { color: var(--amber); background: var(--amber-soft); }
+.m-could { color: var(--info); background: var(--info-soft); }
+.m-wont { color: var(--neutral); background: rgba(139,148,158,0.14); }
+
+.dd-fc { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); padding: 0.8rem 0.9rem; }
+.dd-fc-h { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--fs-xs); color: var(--text-3); margin-bottom: 0.5rem; }
+.dd-fc-h b { color: var(--accent); }
+.dd-fc-rows { display: flex; flex-direction: column; gap: 0.3rem; }
+.dd-fc-row { display: grid; grid-template-columns: 2.2rem 1fr 2.6rem; align-items: center; gap: 0.5rem; }
+.dd-fc-p { font-size: 0.6rem; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.dd-fc-bar { height: 0.45rem; border-radius: 999px; background: var(--line-2); overflow: hidden; }
+.dd-fc-bar span { display: block; height: 100%; background: var(--info); }
+.dd-fc-row.is-commit .dd-fc-bar span { background: var(--accent); }
+.dd-fc-row.is-commit .dd-fc-n { color: var(--accent); }
+.dd-fc-n { font-size: var(--fs-xs); font-variant-numeric: tabular-nums; text-align: right; }
+
+.dd-wsjf { display: flex; flex-direction: column; gap: 0.5rem; }
+.dd-lane { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); padding: 0.6rem 0.8rem; }
+.dd-lane.is-top { border-color: var(--accent); background: var(--accent-soft); }
+.dd-lane-h { display: flex; align-items: baseline; gap: 0.5rem; }
+.dd-lane-rank { font-family: var(--mono, ui-monospace), monospace; font-size: 0.6rem; color: var(--accent); font-weight: 700; }
+.dd-lane-h b { flex: 1; font-size: var(--fs-sm); }
+.dd-lane-w { font-size: 0.6rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.dd-lane p { margin: 0.25rem 0 0; font-size: 0.62rem; color: var(--text-3); line-height: 1.45; }
+
+.dd-note { margin: 0.4rem 0 0; font-size: 0.6rem; color: var(--text-3); line-height: 1.45; }
+.dd-strong { font-weight: 640; color: var(--text); }
 
 .dd-boards { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .dd-board {

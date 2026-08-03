@@ -45,18 +45,26 @@ jobs:
       - name: Regenerate snapshot from merge evidence
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/generate-delivery-snapshot.mjs --repo "${GITHUB_REPOSITORY}" --days 14
+        run: |
+          node scripts/generate-delivery-snapshot.mjs \
+            --orgs "SocioProphet,SourceOS-Linux" \
+            --days 14 \
+            --history-weeks 10 \
+            --board-spec "${GITHUB_WORKSPACE}/registry/board-spec.yaml"
 
       # The gate. A snapshot that could not collect live evidence, or that
       # asserts a value with no evidence ref, must not be published as status.
-      - name: Verify the snapshot is honest (fail closed)
+      # Integrity fails the build (the snapshot would misinform).
+      # Health findings are printed and PUBLISHED — suppressing the dashboard when
+      # flow degrades is exactly backwards.
+      - name: Verify snapshot integrity (fail closed)
         run: node scripts/verify-delivery-snapshot.mjs
 
       - name: Typecheck and test the surface
         run: |
           npm ci --no-audit --no-fund
           npx vue-tsc --noEmit
-          npx vitest run src/__tests__/deliveryDashboard.test.ts
+          npx vitest run src/__tests__/deliveryDashboard.test.ts src/__tests__/deliveryEconomics.test.ts
 
       - name: Commit the refreshed snapshot
         run: |

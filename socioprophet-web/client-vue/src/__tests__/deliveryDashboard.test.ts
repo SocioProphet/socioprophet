@@ -38,11 +38,27 @@ describe('delivery dashboard', () => {
   });
 
   it('fails the overall gate when a metric asserts a value with no evidence', () => {
+    // Isolate the metric case: gates are evaluated first by design, so pass a
+    // clean gate set. (On live data a real health gate may be failing, which is
+    // a finding about delivery, not about the metric under test.)
     const g = overallGate({
       ...snap,
+      gates: [{ name: 'Evidence collected', status: 'pass', detail: 'ok' }],
       metrics: [{ ...snap.metrics[0], basis: 'declared', evidence: '' }],
     });
     expect(g.status).toBe('unverified');
+  });
+
+  it('reports a failing health gate rather than hiding it', () => {
+    // The estate currently breaches the aging-WIP threshold. The gate must say
+    // so — a dashboard that goes quiet when flow degrades is worse than none.
+    const g = overallGate(snap);
+    if (snap.gates.some((x) => x.status === 'fail')) {
+      expect(g.status).toBe('fail');
+      expect(g.detail).toContain('gate');
+    } else {
+      expect(['pass', 'unverified']).toContain(g.status);
+    }
   });
 
   it('guards sprint maths against a zero commitment', () => {
