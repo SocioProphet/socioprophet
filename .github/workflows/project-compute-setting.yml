@@ -1,0 +1,32 @@
+name: project-compute-setting
+
+on:
+  pull_request:
+    paths:
+      - "schemas/control-plane/project-compute-setting.schema.json"
+      - "examples/control-plane/project-compute-setting*.json"
+      - "scripts/validate_project_compute_setting.py"
+      - ".github/workflows/project-compute-setting.yml"
+  push:
+    branches: [ main, master ]
+    paths:
+      - "schemas/control-plane/project-compute-setting.schema.json"
+      - "examples/control-plane/project-compute-setting*.json"
+      - "scripts/validate_project_compute_setting.py"
+      - ".github/workflows/project-compute-setting.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install jsonschema
+      - name: Validate ProjectComputeSetting contract
+        run: python3 scripts/validate_project_compute_setting.py

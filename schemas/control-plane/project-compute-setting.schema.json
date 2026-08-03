@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/control-plane/project-compute-setting.v1alpha1.schema.json",
+  "title": "ProjectComputeSetting",
+  "description": "A project's compute configuration in the cockpit: two planes (governed cluster + federated volunteer-mesh over the agent-machine inception-twin), the Work-Unit defaults, the FIPS crypto profiles, and the governed-deployment view (region/enclave, data-class, TPM attestation, policy-drift, legal-basis). Governance is fail-closed: no ungoverned compute, and a mesh plane must ride the inception-twin and be revocable. Rendered by the Studio 'Compute' tab.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": { "const": "control.socioprophet.org/v1alpha1" },
+    "kind": { "const": "ProjectComputeSetting" },
+    "metadata": {
+      "type": "object", "additionalProperties": false, "required": ["id", "projectRef"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "projectRef": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "spec": {
+      "type": "object", "additionalProperties": false,
+      "required": ["planes", "workUnitDefaults", "cryptoProfileRef", "federationCryptoProfileRef", "deployments"],
+      "properties": {
+        "planes": {
+          "type": "object", "additionalProperties": false, "required": ["governed", "mesh"],
+          "properties": {
+            "governed": {
+              "type": "object", "additionalProperties": false, "required": ["enabled"],
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "clusterRef": { "type": "string" }, "region": { "type": "string" },
+                "defaultEnclave": { "type": "string" }
+              }
+            },
+            "mesh": {
+              "type": "object", "additionalProperties": false, "required": ["enabled"],
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "twinRef": { "type": "string", "description": "the agent-machine inception-twin A2AStateMachine this mesh rides" },
+                "trustedNodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object", "additionalProperties": false, "required": ["nodeRef", "hostRef", "attestationRef"],
+                    "properties": {
+                      "nodeRef": { "type": "string" }, "hostRef": { "type": "string" },
+                      "attestationRef": { "type": "string" }
+                    }
+                  }
+                },
+                "minTrust": { "type": "integer", "minimum": 0 },
+                "revocation": {
+                  "type": "object", "additionalProperties": false, "required": ["required", "propagationSeconds"],
+                  "properties": {
+                    "required": { "type": "boolean" },
+                    "propagationSeconds": { "type": "integer", "minimum": 1 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "workUnitDefaults": {
+          "type": "object", "additionalProperties": false, "required": ["schemaId", "proofMode", "sandbox", "policyRef"],
+          "properties": {
+            "schemaId": { "type": "string", "pattern": "^sha3:" },
+            "proofMode": { "type": "string", "enum": ["redundant", "spot_check", "tee", "zk"] },
+            "sandbox": { "type": "string", "enum": ["docker", "lightning", "wasm", "kata"] },
+            "policyRef": { "type": "string", "minLength": 1 }
+          }
+        },
+        "cryptoProfileRef": { "type": "string", "minLength": 1, "description": "transport CryptoProfile (TriTRPC)" },
+        "federationCryptoProfileRef": { "type": "string", "minLength": 1, "description": "FederationCryptoProfile (Merkle-log)" },
+        "deployments": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["name", "type", "status", "regionEnclave", "dataClass", "ownerRef", "iamRoles", "attestation", "policyDrift", "legalBasis"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "type": { "type": "string", "enum": ["cluster", "mesh"] },
+              "status": { "type": "string", "enum": ["running", "stopped", "pending", "failed"] },
+              "regionEnclave": { "type": "string", "minLength": 1 },
+              "dataClass": { "type": "string", "minLength": 1 },
+              "ownerRef": { "type": "string", "minLength": 1 },
+              "iamRoles": { "type": "array", "items": { "type": "string" } },
+              "attestation": {
+                "type": "object", "additionalProperties": false, "required": ["tpmVerified", "firmwareHash"],
+                "properties": { "tpmVerified": { "type": "boolean" }, "firmwareHash": { "type": "string", "minLength": 1 } }
+              },
+              "policyDrift": {
+                "type": "object", "additionalProperties": false, "required": ["compliant", "residencyPolicyRef"],
+                "properties": { "compliant": { "type": "boolean" }, "residencyPolicyRef": { "type": "string", "minLength": 1 } }
+              },
+              "legalBasis": {
+                "type": "object", "additionalProperties": false, "required": ["kind", "ref"],
+                "properties": { "kind": { "type": "string" }, "ref": { "type": "string", "minLength": 1 } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

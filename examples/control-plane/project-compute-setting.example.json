@@ -1,0 +1,96 @@
+{
+  "apiVersion": "control.socioprophet.org/v1alpha1",
+  "kind": "ProjectComputeSetting",
+  "metadata": {
+    "id": "project-compute-setting:heller-personal-research",
+    "projectRef": "project:heller-personal-research",
+    "createdAt": "2026-08-03T00:00:00Z"
+  },
+  "spec": {
+    "planes": {
+      "governed": {
+        "enabled": true,
+        "clusterRef": "cluster:us-east-gov-1",
+        "region": "us-east",
+        "defaultEnclave": "US-East-Gov-1"
+      },
+      "mesh": {
+        "enabled": true,
+        "twinRef": "urn:srcos:agent-machine:a2a-state-machine:inception-twin-default",
+        "trustedNodes": [
+          {
+            "nodeRef": "node:edge-a-01",
+            "hostRef": "urn:srcos:agent-machine:m2-asahi-local",
+            "attestationRef": "attest:edge-a-01"
+          },
+          {
+            "nodeRef": "node:twin-k8s",
+            "hostRef": "urn:srcos:agent-machine:twin-k8s",
+            "attestationRef": "attest:twin-k8s"
+          }
+        ],
+        "minTrust": 3,
+        "revocation": {
+          "required": true,
+          "propagationSeconds": 5
+        }
+      }
+    },
+    "workUnitDefaults": {
+      "schemaId": "sha3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "proofMode": "tee",
+      "sandbox": "wasm",
+      "policyRef": "policy://compute/residency-pii"
+    },
+    "cryptoProfileRef": "crypto://tritrpc/fips",
+    "federationCryptoProfileRef": "fedcrypto://fips/ecdsa",
+    "deployments": [
+      {
+        "name": "FraudDetector-v2",
+        "type": "cluster",
+        "status": "running",
+        "regionEnclave": "US-East-Gov-1",
+        "dataClass": "PII-restricted",
+        "ownerRef": "user:j-rivera",
+        "iamRoles": [
+          "Users"
+        ],
+        "attestation": {
+          "tpmVerified": true,
+          "firmwareHash": "sha256:1c8437..."
+        },
+        "policyDrift": {
+          "compliant": true,
+          "residencyPolicyRef": "policy://residency/us-gov"
+        },
+        "legalBasis": {
+          "kind": "DPA",
+          "ref": "DPA-001324578"
+        }
+      },
+      {
+        "name": "BatchRiskScore",
+        "type": "mesh",
+        "status": "stopped",
+        "regionEnclave": "EU-Sovereign-2",
+        "dataClass": "Trusted-TPM",
+        "ownerRef": "user:s-lee",
+        "iamRoles": [
+          "Trusted"
+        ],
+        "attestation": {
+          "tpmVerified": true,
+          "firmwareHash": "sha256:aa0011..."
+        },
+        "policyDrift": {
+          "compliant": true,
+          "residencyPolicyRef": "policy://residency/eu-sovereign"
+        },
+        "legalBasis": {
+          "kind": "DPA",
+          "ref": "DPA-001324579"
+        }
+      }
+    ]
+  }
+}

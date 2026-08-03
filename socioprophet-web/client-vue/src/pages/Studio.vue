@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router';
 import './studio/studio-tokens.css';
 import StudioNotebooks from './studio/StudioNotebooks.vue';
 import StudioCompute from './studio/StudioCompute.vue';
+import StudioComputeSettings from './studio/StudioComputeSettings.vue';
 import GraphExplorer from './studio/GraphExplorer.vue';
 import QueryConsole from './studio/QueryConsole.vue';
 import Analytics from './studio/Analytics.vue';
@@ -27,6 +28,7 @@ const GROUPS: { group: string; items: Sec[] }[] = [
   { group: 'Workbench', items: [
     { id: 'notebooks', label: 'Notebooks', ic: '⬢', comp: markRaw(StudioNotebooks), project: true, sub: 'Ray-backed governed notebooks — receipt per cell' },
     { id: 'compute', label: 'Compute Plane', ic: '⛩', comp: markRaw(StudioCompute), project: true, sub: 'Universal Compute Plane — one governed, proof-carrying door' },
+    { id: 'compute-settings', label: 'Compute', ic: '⚙', comp: markRaw(StudioComputeSettings), project: true, sub: 'Project compute setting — governed cluster + federated mesh, per-deployment governance' },
   ]},
   { group: 'Knowledge engineering', items: [
     { id: 'graph', label: 'Graph Explorer', ic: '⟡', comp: markRaw(GraphExplorer), sub: 'Force-directed graph + provenance inspector' },

@@ -946,3 +946,71 @@ export async function loadStudio(projectId?: string): Promise<StudioBundle> {
   if (!res.ok) throw new Error(`studio load failed: ${res.status}`);
   return (await res.json()) as StudioBundle;
 }
+
+// ── Project compute settings (governed cluster + federated volunteer-mesh) ──
+// Renders the Studio "Compute" tab. Governed-compute view (region/enclave, data-class, TPM
+// attestation, policy-drift, legal-basis) + the two planes; mesh rides the agent-machine
+// inception-twin. Contract: schemas/control-plane/project-compute-setting.schema.json.
+export interface ComputeDeployment {
+  name: string;
+  type: "cluster" | "mesh";
+  status: string;
+  regionEnclave: string;
+  dataClass: string;
+  ownerRef: string;
+  iamRoles: string[];
+  attestation: { tpmVerified: boolean; firmwareHash: string };
+  policyDrift: { compliant: boolean; residencyPolicyRef: string };
+  legalBasis: { kind: string; ref: string };
+}
+export interface ComputeTrustedNode { nodeRef: string; hostRef: string; attestationRef: string }
+export interface ComputeSettings {
+  projectRef: string;
+  planes: {
+    governed: { enabled: boolean; clusterRef?: string; region?: string; defaultEnclave?: string };
+    mesh: {
+      enabled: boolean;
+      twinRef?: string;
+      trustedNodes?: ComputeTrustedNode[];
+      minTrust?: number;
+      revocation?: { required: boolean; propagationSeconds: number };
+    };
+  };
+  cryptoProfileRef: string;
+  federationCryptoProfileRef: string;
+  deployments: ComputeDeployment[];
+  degraded?: boolean;
+}
+
+const STUB_COMPUTE_SETTINGS = (project: string): ComputeSettings => ({
+  projectRef: project,
+  planes: {
+    governed: { enabled: true, clusterRef: "cluster:us-east-gov-1", region: "us-east", defaultEnclave: "US-East-Gov-1" },
+    mesh: {
+      enabled: true,
+      twinRef: "urn:srcos:agent-machine:a2a-state-machine:inception-twin-default",
+      trustedNodes: [
+        { nodeRef: "node:edge-a-01", hostRef: "urn:srcos:agent-machine:m2-asahi-local", attestationRef: "attest:edge-a-01" },
+        { nodeRef: "node:twin-k8s", hostRef: "urn:srcos:agent-machine:twin-k8s", attestationRef: "attest:twin-k8s" },
+      ],
+      minTrust: 3,
+      revocation: { required: true, propagationSeconds: 5 },
+    },
+  },
+  cryptoProfileRef: "crypto://tritrpc/fips",
+  federationCryptoProfileRef: "fedcrypto://fips/ecdsa",
+  deployments: [
+    { name: "FraudDetector-v2", type: "cluster", status: "running", regionEnclave: "US-East-Gov-1", dataClass: "PII-restricted", ownerRef: "user:j-rivera", iamRoles: ["Users"], attestation: { tpmVerified: true, firmwareHash: "sha256:1c8437…" }, policyDrift: { compliant: true, residencyPolicyRef: "policy://residency/us-gov" }, legalBasis: { kind: "DPA", ref: "DPA-001324578" } },
+    { name: "BatchRiskScore", type: "mesh", status: "stopped", regionEnclave: "EU-Sovereign-2", dataClass: "Trusted-TPM", ownerRef: "user:s-lee", iamRoles: ["Trusted"], attestation: { tpmVerified: true, firmwareHash: "sha256:aa0011…" }, policyDrift: { compliant: true, residencyPolicyRef: "policy://residency/eu-sovereign" }, legalBasis: { kind: "DPA", ref: "DPA-001324579" } },
+  ],
+  degraded: true,
+});
+
+export async function loadComputeSettings(project: string): Promise<ComputeSettings> {
+  const b = nbBase();
+  if (!b) return STUB_COMPUTE_SETTINGS(project);
+  const r = await fetch(`${b}/api/studio/compute/settings?project=${encodeURIComponent(project)}`, { headers: { accept: "application/json" } }).catch(() => null);
+  if (!r || !r.ok) return STUB_COMPUTE_SETTINGS(project);
+  const d = await r.json();
+  return Array.isArray(d?.deployments) ? (d as ComputeSettings) : STUB_COMPUTE_SETTINGS(project);
+}
