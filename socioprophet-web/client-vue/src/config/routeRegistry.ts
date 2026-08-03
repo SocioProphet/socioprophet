@@ -116,6 +116,27 @@ export const routeRegistry: RouteRegistryEntry[] = [
     primaryObject: 'chat surface',
     breadcrumbs: ['Noetica', 'Chat'],
     railLabel: '◇',
+    tabs: [
+      { label: 'Chat', to: '/noetica' },
+      { label: 'Reasoning Chain', to: '/noetica/reasoning-chain' },
+    ],
+  },
+  {
+    path: '/noetica/reasoning-chain',
+    label: 'Reasoning Chain Inspector',
+    domain: 'Noetica',
+    maturity: 'L2',
+    stateMode: 'fixture',
+    navTier: 'tab-only',
+    userJob: 'Inspect a conversation chain in four stages — Annotation → Concepts → Variants → Execution — with annotations bound to the governed semantic-role KIND vocabulary and candidate plans ranked by the governed variant scorer.',
+    ownerPlane: 'client-vue ReasoningChainInspector (seed fixtures); KINDs from regis-entity-graph#22; authorship into the KE/dictionary workbench contract',
+    boundary: 'Fixture-backed over three seed conversation chains; no live conversation-chain binding and no durable KE writeback yet — authorship events are held in an unsigned in-memory ledger.',
+    primaryObject: 'reasoning chain',
+    breadcrumbs: ['Noetica', 'Reasoning Chain Inspector'],
+    tabs: [
+      { label: 'Chat', to: '/noetica' },
+      { label: 'Reasoning Chain', to: '/noetica/reasoning-chain' },
+    ],
   },
   {
     path: '/weather/forecast',

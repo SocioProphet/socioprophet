@@ -36,6 +36,7 @@ import PeopleDirectory from './pages/PeopleDirectory.vue';
 import SocialSignals from './pages/SocialSignals.vue';
 import LawDocket from './pages/LawDocket.vue';
 import NoeticaChat from './pages/NoeticaChat.vue';
+import ReasoningChainInspector from './pages/ReasoningChainInspector.vue';
 import WeatherMonitor from './pages/WeatherMonitor.vue';
 import ControlPlaneLifecycle from './pages/ControlPlaneLifecycle.vue';
 import NoeticaControlPlane from './pages/NoeticaControlPlane.vue';
@@ -172,6 +173,7 @@ const explicitRoutes = [
   { path: '/people/social-networks', component: SocialSignals },
   { path: '/law/international-law', component: LawDocket },
   { path: '/noetica', component: NoeticaChat },
+  { path: '/noetica/reasoning-chain', component: ReasoningChainInspector },
   { path: '/weather/forecast', component: WeatherMonitor },
 ];
 
