@@ -3,7 +3,7 @@
     "@tailwindcss/cli": "^4.1.18",
     "autoprefixer": "^10.4.24",
     "markdown-it-mathjax3": "^4.3.2",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.25",
     "tailwindcss": "^4.1.18",
     "vitepress": "^1.6.4"
   }
