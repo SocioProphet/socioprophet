@@ -14,6 +14,9 @@
         ],
         "app": [
           "socioprophet-builder-dev"
+        ],
+        "cockpit": [
+          "socioprophet-cockpit-dev"
         ]
       }
     },
@@ -27,6 +30,9 @@
         ],
         "app": [
           "socioprophet-builder"
+        ],
+        "cockpit": [
+          "socioprophet-cockpit"
         ]
       }
     }

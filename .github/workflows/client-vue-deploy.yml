@@ -1,0 +1,102 @@
+# client-vue (cockpit) deploy — builds the canonical cockpit SPA and deploys it to
+# Firebase Hosting, DEV-FIRST.
+#
+# Closes a real gap: client-vue is the canonical product shell (the Delivery
+# Dashboard, Competitive Intelligence and Knowledge Studio all live here) and it
+# had NO deploy path at all — firebase.json served docs, marketing and app-vue
+# only, and client-vue-product-build.yml builds without deploying. So nothing a
+# reviewer could open ever reflected client-vue.
+#
+#   push to master (client-vue changes) → auto-deploy to DEV
+#   manual run (workflow_dispatch, environment=prod) → deploy to PROD, gated by the
+#     `production` GitHub Environment (required reviewers = "prod on my say-so").
+#
+# Requires: repo secret FIREBASE_TOKEN, and the Hosting sites to exist:
+#   firebase hosting:sites:create socioprophet-cockpit-dev --project socioprophet-web-dev-env
+#   firebase hosting:sites:create socioprophet-cockpit     --project socioprophet-web
+# Nothing deploys without them; the job fails loudly rather than silently no-oping.
+name: client-vue deploy
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'socioprophet-web/client-vue/**'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/client-vue-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Firebase project alias to deploy'
+        required: true
+        default: dev
+        type: choice
+        options: [dev, prod]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: client-vue-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04  # pinned to match the SHA-pinned actions below; `ubuntu-latest` moves as GitHub retires images.
+    steps:
+      # SHA-pinned per repo convention — the deploy job holds FIREBASE_TOKEN with full
+      # Hosting authority, so a moving-tag compromise would let an attacker publish
+      # arbitrary content. Version comments name the tag for renovate/dependabot.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: '20', cache: 'npm', cache-dependency-path: socioprophet-web/client-vue/package-lock.json }
+
+      - name: Build client-vue
+        working-directory: socioprophet-web/client-vue
+        run: |
+          npm ci
+          npx vue-tsc --noEmit
+          npm run build
+
+      # The cockpit renders governed surfaces, so a broken gate must not ship.
+      - name: Verify delivery snapshot integrity
+        working-directory: socioprophet-web/client-vue
+        run: node scripts/verify-delivery-snapshot.mjs
+
+      - name: Upload build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: { name: client-vue-dist, path: socioprophet-web/client-vue/dist, retention-days: 3 }
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    # A push to master deploys dev; a manual run deploys the chosen alias. `prod`
+    # runs under the `production` Environment so it inherits its protection rules.
+    environment: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod') && 'production' || 'development' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: { name: client-vue-dist, path: socioprophet-web/client-vue/dist }
+
+      - name: Resolve alias
+        id: env
+        run: echo "alias=${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'dev' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Firebase Hosting (cockpit target)
+        # SHA-pinned. THIS action receives FIREBASE_TOKEN.
+        uses: w9jds/firebase-action@af97ff3f81136bba7d9048915ba5f05ba42a551d # v15.24.0
+        with:
+          args: deploy --only hosting:cockpit --project ${{ steps.env.outputs.alias }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Report the URL
+        run: |
+          if [ "${{ steps.env.outputs.alias }}" = "prod" ]; then
+            echo "Cockpit deployed: https://socioprophet-cockpit.web.app" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Cockpit deployed (dev): https://socioprophet-cockpit-dev.web.app" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Boards: /delivery · /professional-intelligence/competitive · /knowledge/studio" >> "$GITHUB_STEP_SUMMARY"
