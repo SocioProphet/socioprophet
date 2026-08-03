@@ -4,7 +4,7 @@
 // chain never out-scores a shorter correct one. Maps to the counter-test gate.
 
 import { describe, expect, it } from 'vitest';
-import { scoreVariants, scoreChain, rawMargin, precisionAt1 } from '../features/reasoning-chain/scoreVariants';
+import { scoreVariants, scoreChain, rawMargin, precisionAt1, baselinePrecisionAt1, auditCorpus, MIN_N } from '../features/reasoning-chain/scoreVariants';
 import { EXAMPLES, LOGGED_QUESTIONS } from '../features/reasoning-chain/examples';
 
 const exA = EXAMPLES[0];
@@ -71,15 +71,41 @@ describe('scoreVariants — tie-break is by DECLARED path, never scorer noise', 
   });
 });
 
-describe('precisionAt1 — counter-test gate (seed set)', () => {
-  it('selects the gold plan for every seeded logged question', () => {
+describe('precisionAt1 — counter-test gate', () => {
+  it('selects the declared gold plan for every logged question', () => {
     const p = precisionAt1(LOGGED_QUESTIONS);
     expect(p.precisionAt1).toBe(1);
     expect(p.misses).toEqual([]);
   });
 
-  it('honestly reports the corpus is below the estate min-n bar (GKN#9)', () => {
+  it('clears the estate min-n bar so the gate is a live regression guard (GKN#9)', () => {
     const p = precisionAt1(LOGGED_QUESTIONS);
-    expect(p.meetsMinN).toBe(false); // seed set only; corpus must grow to n>=30
+    expect(p.n).toBeGreaterThanOrEqual(MIN_N);
+    expect(p.meetsMinN).toBe(true); // corpus grown to n>=30 (was seed-only)
+  });
+
+  it('HONEST: withholds a published precision@1 CLAIM until real logs back it', () => {
+    // The corpus is authored/reference fixtures — good enough to gate regressions,
+    // NOT to publish an external precision@1 claim. The gate says so structurally.
+    const p = precisionAt1(LOGGED_QUESTIONS);
+    expect(p.loggedN).toBe(0); // no production_log fixtures in-repo yet
+    expect(p.publishable).toBe(false); // min-n met, but not with real logs
+    expect(p.claimBlockedReason).toMatch(/production-logged/);
+  });
+
+  it('TEETH: the governed scorer STRICTLY beats the naive coverage-only baseline', () => {
+    // If governance added no signal, a naive ranker would tie it. It must not.
+    const governed = precisionAt1(LOGGED_QUESTIONS).precisionAt1;
+    const naive = baselinePrecisionAt1(LOGGED_QUESTIONS);
+    expect(governed).toBe(1);
+    expect(naive.precisionAt1).toBeLessThan(governed);
+    // the adversarial fixtures (and seeds A, V) are exactly where the baseline fails
+    expect(naive.misses).toEqual(
+      expect.arrayContaining(['A-org-scoping', 'V-own-lists', 'AH-contacts-ambient-first', 'AM-databases-ambient-first']),
+    );
+  });
+
+  it('the corpus is structurally well-formed — no authoring drift', () => {
+    expect(auditCorpus(LOGGED_QUESTIONS)).toEqual([]);
   });
 });
