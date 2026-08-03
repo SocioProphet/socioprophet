@@ -16,6 +16,13 @@ import {
   COMMIT_PERCENTILE,
 } from '../features/delivery/horizons';
 import { moscowLabel } from '../features/delivery/economics';
+import Sparkline from '../components/Sparkline.vue';
+import {
+  evaluate, applyAction, ReceiptChain, revokeWarrant, warrantState,
+  actionLabel, DIGEST_DISCLOSURE,
+  type Warrant, type ActionKind, type ActorKind,
+} from '../features/delivery/actions';
+import { ref, reactive } from 'vue';
 
 const gate = computed(() => overallGate(snap));
 const isLive = computed(() => snap.sourceMode === 'live');
@@ -48,6 +55,83 @@ const learn = computed(() => loop());
 const maxWeek = computed(() => Math.max(1, ...snap.history.map((h) => h.merged)));
 const rankedLanes = computed(() => [...lanePriorities].sort((a, b) => (b.wsjf ?? 0) - (a.wsjf ?? 0)));
 const money = (n: number) => `$${n.toLocaleString()}`;
+
+// ---- agentic surface: warrants, composer, receipts -------------------------
+// Seeded with a live-looking warrant so the gate can be exercised; every action
+// is evaluated BEFORE it is applied and the verdict is shown first.
+const warrants = reactive<Warrant[]>([
+  {
+    id: 'w-triage-01',
+    grantee: 'agent.triage',
+    purpose: 'triage aging pull requests',
+    scope: ['SocioProphet/socioprophet', 'SourceOS-Linux/BearBrowser'],
+    permits: ['edit', 'add'],
+    issuedAt: '2026-08-01T09:00:00Z',
+    expiresAt: '2026-08-10T09:00:00Z',
+    budget: 25,
+    used: 4,
+    revokedAt: null,
+    grantedBy: 'mdheller',
+  },
+  {
+    id: 'w-farm-02',
+    grantee: 'fleet.reviewers',
+    purpose: 'review and label open issues',
+    scope: ['SocioProphet/socioprophet'],
+    permits: ['edit'],
+    issuedAt: '2026-07-20T09:00:00Z',
+    expiresAt: '2026-07-30T09:00:00Z',
+    budget: 100,
+    used: 12,
+    revokedAt: null,
+    grantedBy: 'mdheller',
+  },
+]);
+
+const chain = new ReceiptChain();
+const receipts = ref(chain.all());
+const chainState = ref(chain.verify());
+
+const draft = reactive({
+  kind: 'edit' as ActionKind,
+  actorKind: 'agent' as ActorKind,
+  actorId: 'agent.triage',
+  warrantId: 'w-triage-01',
+  target: 'SocioProphet/socioprophet',
+  purpose: 'triage aging pull requests older than seven days',
+});
+
+const preview = computed(() => evaluate({
+  kind: draft.kind,
+  actor: draft.actorKind === 'agent'
+    ? { kind: 'agent', id: draft.actorId, warrantId: draft.warrantId }
+    : { kind: 'human', id: draft.actorId },
+  target: draft.target,
+  purpose: draft.purpose,
+  at: new Date().toISOString(),
+}, warrants));
+
+function submit() {
+  applyAction({
+    kind: draft.kind,
+    actor: draft.actorKind === 'agent'
+      ? { kind: 'agent', id: draft.actorId, warrantId: draft.warrantId }
+      : { kind: 'human', id: draft.actorId },
+    target: draft.target,
+    purpose: draft.purpose,
+    at: new Date().toISOString(),
+  }, warrants, chain);
+  receipts.value = [...chain.all()];
+  chainState.value = chain.verify();
+}
+
+function revoke(w: Warrant) {
+  const i = warrants.findIndex((x) => x.id === w.id);
+  if (i >= 0) warrants[i] = revokeWarrant(warrants[i], new Date().toISOString());
+}
+
+const ACTION_KINDS: ActionKind[] = ['add', 'edit', 'remove', 'delegate', 'farm-out'];
+const orgSeries = computed(() => snap.perOrg.map((o) => ({ org: o.org, values: [o.openIssues, o.openPrs, o.merged, o.closedIssues] })));
 </script>
 
 <template>
@@ -154,12 +238,26 @@ const money = (n: number) => `$${n.toLocaleString()}`;
         <h2><span class="dd-hz">Backward</span> What actually happened</h2>
         <p>{{ back.weeks }} weeks of measured history. {{ back.detail }}</p>
       </div>
-      <div class="dd-hist">
-        <div v-for="h in snap.history" :key="h.weekStart" class="dd-hist-col" :title="`${h.weekStart} → ${h.weekEnd}: ${h.merged} merged`">
-          <span class="dd-hist-bar" :style="{ height: `${(h.merged / maxWeek) * 100}%` }" />
-          <span class="dd-hist-n">{{ h.merged }}</span>
-        </div>
-      </div>
+      <!-- Tufte: the series as a dataword, not a boxed chart. Band = interquartile
+           range, so a week reads as normal or not without a gridline. -->
+      <p class="dd-sentence">
+        Weekly throughput
+        <Sparkline :values="snap.history.map((h) => h.merged)" :width="220" :height="26" />
+        across {{ back.weeks }} weeks — median <b>{{ back.medianWeekly }}</b>, and the
+        <b>{{ back.variabilityRatio }}×</b> spread is why the forecast resamples rather than averages.
+      </p>
+      <table class="dd-sm">
+        <tbody>
+          <tr v-for="o in snap.perOrg" :key="o.org">
+            <th scope="row">{{ o.org }}</th>
+            <td><Sparkline :values="[o.openIssues, o.openPrs, o.merged, o.closedIssues]" :width="80" :height="18" :labels="false" :band="false" /></td>
+            <td class="n">{{ o.merged.toLocaleString() }}<span class="u">merged</span></td>
+            <td class="n">{{ o.openPrs.toLocaleString() }}<span class="u">open PR</span></td>
+            <td class="n">{{ o.openIssues.toLocaleString() }}<span class="u">open issue</span></td>
+            <td class="n">{{ o.closedIssues.toLocaleString() }}<span class="u">closed</span></td>
+          </tr>
+        </tbody>
+      </table>
       <div class="dd-facts">
         <span><b>{{ back.totalMerged.toLocaleString() }}</b> merged</span>
         <span><b>{{ back.medianWeekly }}</b> median/wk</span>
@@ -283,6 +381,101 @@ const money = (n: number) => `$${n.toLocaleString()}`;
         <p class="dd-panel-d">{{ learn.detail }}</p>
         <p class="dd-panel-rec"><span>Correction</span>{{ learn.calibration.recommendation }}</p>
       </article>
+    </section>
+
+    <!-- ===================== AGENTIC SURFACE ===================== -->
+    <section class="dd-block" aria-label="Agentic surface">
+      <div class="dd-h">
+        <h2><span class="dd-hz">Act</span> Add · edit · remove · delegate · farm out</h2>
+        <p>
+          The board is not read-only. Every action — by a human or an agent — is evaluated
+          <b>before</b> it is applied, and the verdict is shown first. This implements the gap the market study
+          found unclaimed: <b>purpose-bound, scope-limited, time-limited, revocable</b> delegation with a record
+          of what the agent did.
+        </p>
+      </div>
+
+      <!-- warrants: small multiples, one row each, no cards -->
+      <table class="dd-warrants">
+        <thead><tr><th>Warrant</th><th>Grantee</th><th>Purpose</th><th>Scope</th><th>Permits</th><th class="n">Budget</th><th>Expires</th><th>State</th><th></th></tr></thead>
+        <tbody>
+          <tr v-for="w in warrants" :key="w.id" :class="`ws-${warrantState(w, new Date())}`">
+            <td class="dd-mono">{{ w.id }}</td>
+            <td class="dd-mono">{{ w.grantee }}</td>
+            <td>{{ w.purpose }}</td>
+            <td class="dd-dim">{{ w.scope.join(', ') }}</td>
+            <td class="dd-mono dd-dim">{{ w.permits.join(' ') }}</td>
+            <td class="n">
+              {{ w.used }}/{{ w.budget }}
+              <span class="dd-microbar"><span :style="{ width: `${Math.min(100, (w.used / w.budget) * 100)}%` }" /></span>
+            </td>
+            <td class="dd-dim">{{ w.expiresAt.slice(0, 10) }}</td>
+            <td><span class="dd-ws" :class="`ws-${warrantState(w, new Date())}`">{{ warrantState(w, new Date()) }}</span></td>
+            <td>
+              <button v-if="!w.revokedAt" type="button" class="dd-revoke" @click="revoke(w)">revoke</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- composer: verdict BEFORE action -->
+      <div class="dd-compose">
+        <div class="dd-compose-row">
+          <label>Actor
+            <select v-model="draft.actorKind">
+              <option value="agent">agent</option>
+              <option value="human">human</option>
+            </select>
+          </label>
+          <label>Id <input v-model="draft.actorId" /></label>
+          <label v-if="draft.actorKind === 'agent'">Warrant
+            <select v-model="draft.warrantId">
+              <option v-for="w in warrants" :key="w.id" :value="w.id">{{ w.id }}</option>
+            </select>
+          </label>
+          <label>Action
+            <select v-model="draft.kind">
+              <option v-for="k in ACTION_KINDS" :key="k" :value="k">{{ actionLabel[k] }}</option>
+            </select>
+          </label>
+        </div>
+        <div class="dd-compose-row">
+          <label class="grow">Target <input v-model="draft.target" /></label>
+          <label class="grow">Purpose <input v-model="draft.purpose" /></label>
+        </div>
+        <div class="dd-verdict" :class="`v-${preview.decision}`">
+          <span class="dd-verdict-k">{{ preview.decision }}</span>
+          <span>{{ preview.detail }}</span>
+          <button type="button" class="dd-apply" :disabled="preview.decision === 'deny'" @click="submit">
+            {{ preview.decision === 'needs-approval' ? 'Confirm & apply' : 'Apply' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- receipts -->
+      <div class="dd-h dd-h--sub">
+        <h3>Receipt chain</h3>
+        <p>
+          Denied actions are recorded too — a gate with no record of refusals is unauditable.
+          <span :class="chainState.ok ? 'dd-ok' : 'dd-warn'">{{ chainState.detail }}</span>
+        </p>
+      </div>
+      <table v-if="receipts.length" class="dd-receipts">
+        <thead><tr><th class="n">#</th><th>Actor</th><th>Action</th><th>Target</th><th>Decision</th><th>Why</th><th>prev→digest</th></tr></thead>
+        <tbody>
+          <tr v-for="r in receipts" :key="r.seq" :class="`v-${r.decision}`">
+            <td class="n dd-mono">{{ r.seq }}</td>
+            <td><span class="dd-actor" :class="`a-${r.actor.kind}`">{{ r.actor.kind }}</span> <span class="dd-mono">{{ r.actor.id }}</span></td>
+            <td>{{ actionLabel[r.kind] }}</td>
+            <td class="dd-mono dd-dim">{{ r.target }}</td>
+            <td><span class="dd-ws" :class="`v-${r.decision}`">{{ r.decision }}</span></td>
+            <td class="dd-dim">{{ r.reasons.join('; ') || '—' }}</td>
+            <td class="dd-mono dd-dim">{{ r.prev }}→{{ r.digest }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p v-else class="dd-dim dd-note">No actions yet. Submit one above to see the gate decide and the chain extend.</p>
+      <p class="dd-note dd-warn">{{ DIGEST_DISCLOSURE }}</p>
     </section>
 
     <!-- BOARD -->
@@ -512,6 +705,69 @@ tr.is-blocked td { background: rgba(240,101,106,0.06); }
 
 .dd-note { margin: 0.4rem 0 0; font-size: 0.6rem; color: var(--text-3); line-height: 1.45; }
 .dd-strong { font-weight: 640; color: var(--text); }
+
+/* --- Tufte pass: hairline rules instead of boxes; every mark carries data --- */
+.dd-sentence { margin: 0; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.9; }
+.dd-sentence b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* small multiples: same row shape repeated, so comparison needs no legend */
+.dd-sm, .dd-warrants, .dd-receipts { width: 100%; border-collapse: collapse; font-size: var(--fs-xs); }
+.dd-sm th[scope='row'] { text-align: left; font-weight: 640; color: var(--text-2); white-space: nowrap; padding-right: 0.7rem; }
+.dd-sm td, .dd-warrants td, .dd-warrants th, .dd-receipts td, .dd-receipts th {
+  padding: 0.32rem 0.5rem; border-bottom: 1px solid var(--line); vertical-align: middle;
+}
+.dd-sm tr:last-child td, .dd-warrants tbody tr:last-child td, .dd-receipts tbody tr:last-child td { border-bottom: 0; }
+.dd-warrants th, .dd-receipts th {
+  font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700;
+  color: var(--text-3); text-align: left; border-bottom-color: var(--line-2);
+}
+.dd-sm td.n, .dd-warrants td.n, .dd-receipts td.n { text-align: right; font-variant-numeric: tabular-nums; }
+.dd-sm .u { display: block; font-size: 0.48rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* a bar that is 1px tall carries the same information as one that is 12px tall */
+.dd-microbar { display: block; height: 2px; margin-top: 2px; background: var(--line-2); }
+.dd-microbar span { display: block; height: 100%; background: var(--accent); }
+
+.dd-ws { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+.dd-ws.ws-active, .dd-ws.v-allow { color: var(--up); }
+.dd-ws.ws-expired, .dd-ws.ws-exhausted, .dd-ws.v-needs-approval { color: var(--amber); }
+.dd-ws.ws-revoked, .dd-ws.v-deny { color: var(--down); }
+tr.ws-expired td, tr.ws-revoked td { opacity: 0.5; }
+
+.dd-actor { font-size: 0.48rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+.dd-actor.a-agent { color: var(--info); }
+.dd-actor.a-human { color: var(--teal); }
+
+.dd-revoke {
+  background: none; border: 0; border-bottom: 1px solid var(--line-2); padding: 0 0 1px;
+  font-size: 0.55rem; color: var(--text-3); cursor: pointer;
+}
+.dd-revoke:hover { color: var(--down); border-bottom-color: var(--down); }
+
+.dd-compose { display: flex; flex-direction: column; gap: 0.45rem; padding: 0.6rem 0; border-top: 1px solid var(--line); }
+.dd-compose-row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: flex-end; }
+.dd-compose label { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); font-weight: 700; }
+.dd-compose label.grow { flex: 1; min-width: 220px; }
+.dd-compose input, .dd-compose select {
+  background: transparent; border: 0; border-bottom: 1px solid var(--line-2);
+  color: var(--text); font-size: var(--fs-xs); padding: 0.15rem 0; font-family: inherit;
+  text-transform: none; letter-spacing: 0; font-weight: 400;
+}
+.dd-compose input:focus, .dd-compose select:focus { outline: none; border-bottom-color: var(--accent); }
+.dd-compose select { color: var(--text-2); }
+
+.dd-verdict { display: flex; align-items: center; gap: 0.6rem; font-size: var(--fs-xs); color: var(--text-3); padding-top: 0.2rem; }
+.dd-verdict-k { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; }
+.dd-verdict.v-allow .dd-verdict-k { color: var(--up); }
+.dd-verdict.v-deny .dd-verdict-k { color: var(--down); }
+.dd-verdict.v-needs-approval .dd-verdict-k { color: var(--amber); }
+.dd-apply {
+  margin-left: auto; background: none; border: 1px solid var(--line-2); border-radius: 4px;
+  padding: 0.2rem 0.6rem; font-size: 0.55rem; color: var(--text-2); cursor: pointer; white-space: nowrap;
+}
+.dd-apply:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.dd-apply:disabled { opacity: 0.35; cursor: not-allowed; }
+.dd-ok { color: var(--up); }
 
 .dd-boards { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .dd-board {
