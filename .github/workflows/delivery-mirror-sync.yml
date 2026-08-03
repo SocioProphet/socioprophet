@@ -1,0 +1,64 @@
+# Sovereign → GitHub delivery mirror sync.
+#
+# The sovereign delivery store is canonical; this converges the delivery-excellence
+# issue mirror toward it (create/update; orphans labelled, never closed). The write
+# credential is MINTED IN CI — a short-lived GitHub App installation token scoped to
+# a single repo — so no long-lived PAT is ever stored.
+#
+# One-time setup: create a GitHub App with `issues:read+write` on SocioProphet/
+# delivery-excellence, install it, then set repo var DELIVERY_SYNC_APP_ID and repo
+# secret DELIVERY_SYNC_APP_KEY (the App private key). Until then this workflow is a
+# no-op (the token step is skipped) — nothing writes without those being present.
+name: delivery-mirror-sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Apply writes to the mirror (false = dry-run drift report)'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '17 6 * * *' # daily dry-run drift check (never writes)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delivery-mirror-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Mint a scoped, short-lived App installation token at runtime (no stored PAT).
+      - name: Mint scoped GitHub App token
+        id: apptoken
+        if: ${{ vars.DELIVERY_SYNC_APP_ID != '' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.DELIVERY_SYNC_APP_ID }}
+          private-key: ${{ secrets.DELIVERY_SYNC_APP_KEY }}
+          owner: SocioProphet
+          repositories: delivery-excellence
+
+      - name: Reconcile sovereign store → delivery-excellence mirror
+        if: ${{ steps.apptoken.outputs.token != '' }}
+        working-directory: socioprophet-web/server
+        env:
+          GH_TOKEN: ${{ steps.apptoken.outputs.token }}
+          MIRROR_REPO: SocioProphet/delivery-excellence
+          # Apply ONLY on a manual dispatch that explicitly opts in; schedule is always dry-run.
+          APPLY: ${{ github.event_name == 'workflow_dispatch' && inputs.apply }}
+        run: node scripts/mirror-sync.mjs
+
+      - name: No app configured — skipped
+        if: ${{ vars.DELIVERY_SYNC_APP_ID == '' }}
+        run: echo "DELIVERY_SYNC_APP_ID not set — sync is dormant until the GitHub App is configured. No writes attempted."

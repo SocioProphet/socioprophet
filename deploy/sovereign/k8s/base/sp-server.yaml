@@ -1,0 +1,38 @@
+# sp-server — the sovereign API / delivery producer (Express server serving
+# /api/delivery/* + /api/cowork/* over the canonical store). SCAFFOLD: portable to
+# ANY k8s cluster (no cloud-provider objects); image is built from
+# socioprophet-web/server/Dockerfile by CI and pinned per the no-moving-tag rule.
+# In-cluster the nginx front-end proxies /api/ here (see deploy/sovereign/nginx.conf).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sp-server
+  labels: { app: sp-server }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: sp-server } }
+  template:
+    metadata: { labels: { app: sp-server } }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 1000, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: sp-server
+          image: registry.socioprophet.ai/sp-server:REPLACE_WITH_SHA_AT_CUTOVER
+          ports: [{ name: http, containerPort: 8080 }]
+          env:
+            - { name: PORT, value: "8080" }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: false, capabilities: { drop: ["ALL"] } }
+          # TCP probes so no health endpoint is required by the manifest.
+          readinessProbe: { tcpSocket: { port: http }, initialDelaySeconds: 3, periodSeconds: 10 }
+          livenessProbe:  { tcpSocket: { port: http }, initialDelaySeconds: 5, periodSeconds: 15 }
+          resources: { requests: { cpu: 50m, memory: 96Mi }, limits: { cpu: 500m, memory: 256Mi } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sp-server
+  labels: { app: sp-server }
+spec:
+  type: ClusterIP
+  selector: { app: sp-server }
+  ports: [{ name: http, port: 8080, targetPort: http }]
