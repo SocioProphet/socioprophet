@@ -38,6 +38,13 @@ const gh = (ep, jq) => {
   return execFileSync('gh', a, { encoding:'utf8', maxBuffer:64*1024*1024, stdio:['ignore','pipe','pipe'] });
 };
 const ghJson = (ep, jq) => JSON.parse(gh(ep, jq));
+/** Paginated list fetch. Without this a 100+ repo org truncates and every
+ *  declared edge is misclassified as drift — which is exactly what happened. */
+const ghAll = (ep, jq) => {
+  const raw = execFileSync('gh', ['api','-X','GET',ep,'--paginate','--jq',jq],
+    { encoding:'utf8', maxBuffer:64*1024*1024, stdio:['ignore','pipe','pipe'] });
+  return raw.trim().split('\n').filter(Boolean).map(l=>JSON.parse(l)).flat();
+};
 const since = new Date(Date.now() - DAYS*86400000).toISOString();
 const sinceDay = since.slice(0,10);
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -51,7 +58,19 @@ try {
     .map(m => ({ name:m[1], org:m[2] }));
 } catch { /* reported honestly below */ }
 
-// ---- nodes: most-active repos per org -------------------------------------
+// ---- topology first: the node set must be seeded BY the graph -------------
+// Choosing nodes purely by activity produced 0 connected edges and 60 dangling
+// ones — the topology names repos that are not the most active. The node set is
+// therefore the UNION of (most active) and (named in the declared topology).
+const REGISTRY_DIR_EARLY = path.join(process.env.HOME ?? '', 'dev/sociosphere/registry');
+let topoNames = new Set();
+try {
+  const y = fs.readFileSync(path.join(REGISTRY_DIR_EARLY, 'dependency-graph.yaml'), 'utf8');
+  for (const m of y.matchAll(/-\s+from:\s*(\S+)\s*\n\s*to:\s*(\S+)/g)) {
+    topoNames.add(m[1]); topoNames.add(m[2]);
+  }
+} catch {}
+
 const nodes = [];
 let orgTotals = [];
 
@@ -72,7 +91,11 @@ for (const org of ORGS) {
   } catch {}
   orgTotals.push({ org, collected:true, reason:null, repos:repos.length, merged, openPrs });
 
-  for (const r of repos.slice(0, Math.ceil(TOP_N/ORGS.length))) {
+  // Union: the most active, plus anything the topology names (so edges connect).
+  const perOrg = Math.ceil(TOP_N/ORGS.length);
+  const active = repos.slice(0, perOrg);
+  const named = repos.filter(r => topoNames.has(r.name) && !active.some(a=>a.full===r.full));
+  for (const r of [...active, ...named]) {
     const node = {
       id: r.full, name: r.name, org,
       collected: false, reason: null,
@@ -149,3 +172,102 @@ export const estateGraph: EstateGraph = ${JSON.stringify(snapshot,null,2)} as co
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT, banner);
 process.stdout.write(`[estate-graph] ${snapshot.sourceMode} · ${ORGS.length} orgs · ${streams.length} streams · ${collected.length}/${nodes.length} nodes · ${totalMinutes} CI min · ~$${totalCost} proxy · agent ${snapshot.totals.agentSharePct}% → ${OUT}\n`);
+
+// ---------------------------------------------------------------------------
+// EDGES — the declared sociosphere topology.
+//
+// Three registries, three different edge KINDS, kept distinct because they mean
+// different things: a submodule pin is not an authority relationship, and
+// collapsing them would produce a graph that looks connected and says nothing.
+// ---------------------------------------------------------------------------
+function parseEdges(registryDir) {
+  const out = { dependency: [], authority: [], lanes: [], sources: [] };
+
+  // dependency-graph.yaml: `- from: X` / `to: Y` / `type: Z`
+  try {
+    const p = path.join(registryDir, 'dependency-graph.yaml');
+    const y = fs.readFileSync(p, 'utf8');
+    for (const m of y.matchAll(/-\s+from:\s*(\S+)\s*\n\s*to:\s*(\S+)\s*\n\s*type:\s*(\S+)/g)) {
+      out.dependency.push({ from: m[1], to: m[2], type: m[3] });
+    }
+    out.sources.push(p);
+  } catch {}
+
+  // authority-dependencies.yaml is JSON despite the extension.
+  try {
+    const p = path.join(registryDir, 'authority-dependencies.yaml');
+    const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+    for (const a of j.authority_dependencies ?? []) {
+      out.authority.push({
+        id: a.id,
+        from: (a.source?.repo ?? '').split('/').pop(),
+        to: (a.target?.repo ?? '').split('/').pop(),
+        fromKind: a.source?.kind ?? null,
+        toKind: a.target?.kind ?? null,
+        status: a.status ?? 'unknown',
+      });
+    }
+    out.sources.push(p);
+  } catch {}
+
+  // estate-control-graph.yaml: governance lanes with an owning repo.
+  try {
+    const p = path.join(registryDir, 'estate-control-graph.yaml');
+    const y = fs.readFileSync(p, 'utf8');
+    for (const m of y.matchAll(/-\s+id:\s*(\S+)\s*\n\s*owner_repo:\s*(\S+)/g)) {
+      out.lanes.push({ id: m[1], ownerRepo: m[2], owner: m[2].split('/').pop() });
+    }
+    out.sources.push(p);
+  } catch {}
+
+  return out;
+}
+
+const REGISTRY_DIR = path.join(process.env.HOME ?? '', 'dev/sociosphere/registry');
+const edges = parseEdges(REGISTRY_DIR);
+
+// Validate every declared endpoint against the REAL repo set. A declared graph
+// that names repos which do not exist is drift, and drift must be reported —
+// not quietly filtered until the picture looks connected.
+let realRepos = new Set();
+try {
+  for (const org of ORGS) {
+    for (const n of ghAll(`orgs/${org}/repos?per_page=100`, '[.[].name]')) realRepos.add(n);
+    sleep(400);
+  }
+} catch {}
+const exists = (n) => realRepos.size === 0 || realRepos.has(n);
+const declared = edges.dependency;
+const realEdges = declared.filter((e) => exists(e.from) && exists(e.to));
+const driftEdges = declared.filter((e) => !exists(e.from) || !exists(e.to));
+const driftRepos = [...new Set(declared.flatMap((e) => [e.from, e.to]).filter((n) => !exists(n)))];
+
+const known = new Set(nodes.map((n) => n.name));
+const placed = realEdges.filter((e) => known.has(e.from) && known.has(e.to));
+const dangling = realEdges.filter((e) => !known.has(e.from) || !known.has(e.to));
+
+const graphPatch = {
+  edges: {
+    dependency: placed,
+    dependencyDangling: dangling.length,
+    authority: edges.authority,
+    lanes: edges.lanes,
+    sources: edges.sources,
+    declared: declared.length,
+    real: realEdges.length,
+    driftEdges: driftEdges.length,
+    driftRepos,
+    note: `${placed.length} dependency edge(s) connect measured nodes; ${dangling.length} more are real but outside the measured set. REGISTRY DRIFT: ${driftEdges.length} of ${declared.length} declared edges reference ${driftRepos.length} repo(s) that do not exist in any of the three orgs — that is reported, not filtered away. Authority edges (${edges.authority.length}) and control lanes (${edges.lanes.length}) are kept SEPARATE: a submodule pin is not an authority relationship.`,
+  },
+};
+
+// re-emit with edges folded in
+const merged = { ...snapshot, ...graphPatch };
+fs.writeFileSync(OUT, `// GENERATED by scripts/generate-estate-graph.mjs — do not edit by hand.
+// Three orgs, project streams from registry/board-spec.yaml, per-node AgentOps,
+// and declared topology edges from the sociosphere registries.
+import type { EstateGraph } from '../features/delivery/estate';
+
+export const estateGraph: EstateGraph = ${JSON.stringify(merged, null, 2)} as const;
+`);
+process.stdout.write(`[estate-graph] edges: ${placed.length} dependency (+${dangling.length} dangling) · ${edges.authority.length} authority · ${edges.lanes.length} lanes\n`);

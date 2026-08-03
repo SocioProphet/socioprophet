@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { estateGraph as g } from '../data/estateGraph';
-import { nodeHealth, nodesByOrg, streamsByOrg, orgHealth } from '../features/delivery/estate';
+import { nodeHealth, nodesByOrg, streamsByOrg, orgHealth, driftRatio } from '../features/delivery/estate';
 
 describe('estate graph', () => {
   it('separates all three orgs structurally', () => {
@@ -51,5 +51,31 @@ describe('estate graph', () => {
     for (const n of g.nodes.filter((x) => x.collected)) {
       expect(n.agentAuthored + n.humanAuthored).toBe(n.merged);
     }
+  });
+});
+
+describe('declared topology and registry drift', () => {
+  it('reports drift rather than filtering it away', () => {
+    expect(g.edges.declared).toBeGreaterThan(0);
+    expect(g.edges.real + g.edges.driftEdges).toBe(g.edges.declared);
+    expect(g.edges.note).toContain('reported, not filtered');
+  });
+
+  it('keeps the three edge kinds separate', () => {
+    expect(g.edges.note).toContain('submodule pin is not an authority relationship');
+    expect(Array.isArray(g.edges.lanes)).toBe(true);
+    expect(Array.isArray(g.edges.authority)).toBe(true);
+  });
+
+  it('never draws an edge to a repo that does not exist', () => {
+    const names = new Set(g.nodes.map((n) => n.name));
+    for (const e of g.edges.dependency) {
+      expect(names.has(e.from) && names.has(e.to), `${e.from}->${e.to}`).toBe(true);
+    }
+  });
+
+  it('computes a drift ratio, or refuses when nothing is declared', () => {
+    expect(driftRatio(g.edges)).toBeGreaterThanOrEqual(0);
+    expect(driftRatio({ ...g.edges, declared: 0 })).toBeNull();
   });
 });

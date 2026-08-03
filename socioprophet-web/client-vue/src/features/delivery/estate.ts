@@ -39,6 +39,24 @@ export type EstateNode = {
   lastPush: string;
 };
 
+export type DependencyEdge = { from: string; to: string; type: string };
+export type AuthorityEdge = { id: string; from: string; to: string; fromKind: string | null; toKind: string | null; status: string };
+export type ControlLane = { id: string; ownerRepo: string; owner: string };
+
+export type EstateEdges = {
+  dependency: DependencyEdge[];
+  dependencyDangling: number;
+  authority: AuthorityEdge[];
+  lanes: ControlLane[];
+  sources: string[];
+  /** Declared vs real — registry drift is surfaced, never filtered away. */
+  declared: number;
+  real: number;
+  driftEdges: number;
+  driftRepos: string[];
+  note: string;
+};
+
 export type EstateGraph = {
   sourceMode: 'live' | 'fixture';
   generatedAt: string;
@@ -61,7 +79,14 @@ export type EstateGraph = {
   costBasis: 'declared';
   costNote: string;
   boundaryNotice: string;
+  edges: EstateEdges;
 };
+
+/** Registry drift as a ratio — how much of the declared graph is real. */
+export function driftRatio(e: EstateEdges): number | null {
+  if (!e.declared) return null;
+  return Math.round((e.real / e.declared) * 100);
+}
 
 /** Node health, derived — never asserted. */
 export type NodeHealth = 'healthy' | 'degraded' | 'failing' | 'unknown';

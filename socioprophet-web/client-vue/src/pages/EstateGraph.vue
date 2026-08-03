@@ -14,7 +14,7 @@ import BoundaryNotice from '../components/BoundaryNotice.vue';
 import Sparkline from '../components/Sparkline.vue';
 import { estateGraph as g } from '../data/estateGraph';
 import {
-  nodeHealth, healthLabel, nodesByOrg, streamsByOrg, orgHealth,
+  nodeHealth, healthLabel, nodesByOrg, streamsByOrg, orgHealth, driftRatio,
   type EstateNode,
 } from '../features/delivery/estate';
 
@@ -149,6 +149,59 @@ function orgMinutes(org: string): number {
       </p>
     </section>
 
+    <!-- ===================== DECLARED TOPOLOGY ===================== -->
+    <section class="eg-topo" aria-label="Declared topology">
+      <div class="eg-topo-h">
+        <h2>Declared topology</h2>
+        <span class="eg-k">sociosphere registries</span>
+      </div>
+
+      <!-- drift is the headline, not a footnote -->
+      <p class="eg-drift" :class="{ 'is-bad': (driftRatio(g.edges) ?? 100) < 50 }">
+        <b>{{ g.edges.real }}</b> of <b>{{ g.edges.declared }}</b> declared dependency edges have both endpoints
+        in a real repo<template v-if="g.edges.driftRepos.length">, and
+        <b>{{ g.edges.driftRepos.length }}</b> named repos do not exist in any of the three orgs</template>.
+        <span class="eg-dim">
+          dependency-graph.yaml is stale; it is reported rather than filtered until the picture looks connected.
+        </span>
+      </p>
+      <p v-if="g.edges.driftRepos.length" class="eg-ghosts">
+        <span class="eg-k">not found</span>
+        <span v-for="r in g.edges.driftRepos.slice(0, 16)" :key="r" class="eg-ghost">{{ r }}</span>
+        <span v-if="g.edges.driftRepos.length > 16" class="eg-dim">+{{ g.edges.driftRepos.length - 16 }} more</span>
+      </p>
+
+      <!-- the edges that ARE real, kept separate by kind -->
+      <div class="eg-edges">
+        <div>
+          <span class="eg-k">control lanes <b>{{ g.edges.lanes.length }}</b></span>
+          <ul class="eg-list">
+            <li v-for="l in g.edges.lanes" :key="l.id">
+              <span class="eg-mono">{{ l.owner }}</span>
+              <span class="eg-arrow">governs</span>
+              <span>{{ l.id }}</span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <span class="eg-k">authority edges <b>{{ g.edges.authority.length }}</b></span>
+          <ul class="eg-list">
+            <li v-for="a in g.edges.authority" :key="a.id">
+              <span class="eg-mono">{{ a.from }}</span>
+              <span class="eg-arrow">→</span>
+              <span class="eg-mono">{{ a.to }}</span>
+              <span class="eg-dim">{{ a.fromKind }} → {{ a.toKind }} ({{ a.status }})</span>
+            </li>
+            <li v-if="!g.edges.authority.length" class="eg-dim">none declared</li>
+          </ul>
+        </div>
+      </div>
+      <p class="eg-note">
+        Kinds are kept <b>separate on purpose</b>: a submodule pin is not an authority relationship, and merging
+        them would draw a graph that looks connected and says nothing.
+      </p>
+    </section>
+
     <!-- legend, stated once, in words -->
     <p class="eg-note">
       <span class="eg-swatch a" aria-hidden="true" /> agent-authored ·
@@ -224,6 +277,19 @@ tr.h-unknown td { opacity: 0.55; }
 .eg-micro span { display: block; height: 100%; background: var(--accent); }
 .eg-micro span.cost { background: var(--amber); }
 
+.eg-topo { border-top: 1px solid var(--line-2); padding-top: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.eg-topo-h { display: flex; align-items: baseline; gap: 0.6rem; }
+.eg-topo-h h2 { margin: 0; font-size: var(--fs-md); font-weight: 640; }
+.eg-drift { margin: 0; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.6; }
+.eg-drift b { color: var(--text); font-variant-numeric: tabular-nums; }
+.eg-drift.is-bad b { color: var(--down); }
+.eg-ghosts { margin: 0; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: baseline; }
+.eg-ghost { font-size: 0.55rem; color: var(--down); background: rgba(240,101,106,0.1); border-radius: 3px; padding: 0.02rem 0.3rem; text-decoration: line-through; }
+.eg-edges { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.9rem; }
+.eg-list { list-style: none; margin: 0.25rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.6rem; color: var(--text-2); }
+.eg-list li { display: flex; gap: 0.35rem; align-items: baseline; flex-wrap: wrap; }
+.eg-mono { font-family: var(--mono, ui-monospace), monospace; color: var(--text); }
+.eg-arrow { color: var(--accent); }
 .eg-note { margin: 0; font-size: 0.6rem; color: var(--text-3); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 0.6rem; }
 .eg-note b { color: var(--text-2); }
 .eg-swatch { display: inline-block; width: 0.5rem; height: 0.5rem; vertical-align: middle; margin-right: 0.15rem; }
