@@ -21,6 +21,11 @@ function makeSink(spec: string | undefined): Sink {
 
 const port = Number(process.env.PORT ?? 8790);
 createServer(async (req, res) => {
+  // Liveness/readiness for k8s — answers "is the worker process up", independent of any upstream.
+  if (req.method === 'GET' && (req.url === '/healthz' || req.url === '/readyz')) {
+    res.writeHead(200, { 'content-type': 'text/plain' }).end('ok\n');
+    return;
+  }
   if (req.method !== 'POST' || !req.url?.startsWith('/acquire')) {
     res.writeHead(404).end('POST /acquire');
     return;
