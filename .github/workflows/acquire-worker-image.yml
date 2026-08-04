@@ -1,0 +1,80 @@
+# Builds + signs the governed acquisition worker image in its CANONICAL repo → ghcr, the robust way
+# (same pattern as the Noetica agent-machine image, and how sherlock-search is built in-repo rather
+# than vendored). The Dockerfile esbuild-bundles the worker + the sibling client-vue acquisition core
+# into one self-contained CJS, so the build context is socioprophet-web/. prophet-platform's
+# infra/k8s/acquire-worker just references the published image.
+#
+# ⚠️ HUMAN REVIEW REQUIRED: holds `packages: write` (ghcr push) + `id-token: write` (keyless cosign).
+name: acquire-worker-image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - "socioprophet-web/acquire-worker/**"
+      - "socioprophet-web/client-vue/src/features/acquisition/**"
+      - "socioprophet-web/client-vue/src/data/dataSources.ts"
+      - "socioprophet-web/client-vue/src/data/countries.ts"
+      - ".github/workflows/acquire-worker-image.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: acquire-worker-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/socioprophet/acquire-worker
+
+jobs:
+  build-sign-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write      # push to ghcr
+      id-token: write      # keyless cosign (sigstore OIDC) — no stored key
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
+
+      # Context = socioprophet-web/ so the Dockerfile reaches the sibling client-vue core at bundle time.
+      - name: Build + push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: socioprophet-web
+          file: socioprophet-web/acquire-worker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: true
+          sbom: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign the image (keyless)
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: cosign sign --yes "${IMAGE}@${DIGEST}"
