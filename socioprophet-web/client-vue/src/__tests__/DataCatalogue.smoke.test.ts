@@ -35,6 +35,14 @@ describe('Data Catalogue', () => {
     expect(wrapper.findAll('.dc-grade').length).toBeGreaterThan(0);
   });
 
+  it('surfaces the acquisition tier + compliance grade per source (governed plane)', async () => {
+    const wrapper = await mountCatalogue();
+    expect(wrapper.findAll('.dc-tier').length).toBeGreaterThan(0);
+    const text = wrapper.text();
+    expect(text).toContain('Compliance');
+    expect(text).toContain('Tier');
+  });
+
   it('surfaces the honest world grade distribution (not uniformly A)', async () => {
     const wrapper = await mountCatalogue();
     const segs = wrapper.findAll('.dc-dist-seg');

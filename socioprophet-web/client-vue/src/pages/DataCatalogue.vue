@@ -41,7 +41,7 @@
       <div class="dc-table-wrap">
         <table class="dc-table">
           <thead>
-            <tr><th>Source</th><th>Domain</th><th>Real upstream</th><th>Status</th><th>Grade</th><th>Scope</th><th>Key</th><th>License</th></tr>
+            <tr><th>Source</th><th>Domain</th><th>Real upstream</th><th>Status</th><th title="Data-quality grade">Quality</th><th title="How we acquire it (T0 API … T4 unblocker)">Tier</th><th title="Right-to-acquire / compliance grade">Compliance</th><th>Scope</th><th>Key</th></tr>
           </thead>
           <tbody>
             <tr v-for="s in filteredSources" :key="s.id">
@@ -54,11 +54,12 @@
               <td class="dc-td-up">{{ s.upstream }}<span class="dc-feeds">{{ s.feeds.join(' · ') }}</span></td>
               <td><span class="dc-status" :class="s.status">{{ s.status }}</span></td>
               <td><span class="dc-grade" :class="'g-' + s.grade" :title="s.gradeNote">{{ s.grade }}</span></td>
+              <td><span class="dc-tier" :class="'t-' + acq(s.id).profile.tier" :title="tierLabel[acq(s.id).profile.tier]">{{ acq(s.id).profile.tier }}</span></td>
+              <td><span class="dc-grade" :class="'g-' + acq(s.id).grade" :title="complianceNote(s.id)">{{ acq(s.id).grade }}</span></td>
               <td class="dc-td-scope">{{ scopeLabel[s.scope] }}</td>
               <td><span class="dc-key" :class="s.keyReq">{{ keyLabel[s.keyReq] }}</span></td>
-              <td class="dc-td-lic">{{ s.license }}</td>
             </tr>
-            <tr v-if="!filteredSources.length"><td colspan="8" class="dc-empty">No sources match those filters.</td></tr>
+            <tr v-if="!filteredSources.length"><td colspan="9" class="dc-empty">No sources match those filters.</td></tr>
           </tbody>
         </table>
       </div>
@@ -124,6 +125,8 @@ import { ref, computed } from 'vue';
 import { DATA_SOURCES, GRADE_ORDER, type Grade, type CoverageModel, type KeyReq, type SourceDomain } from '../data/dataSources';
 import type { Income } from '../data/countries';
 import { allCoverage, regionSummaries, worldGradeDistribution, GRADE_LABEL } from '../features/catalogue/coverage';
+import { acquisitionFor } from '../data/acquisitionProfiles';
+import type { AcquisitionTier } from '../features/acquisition/policy';
 
 const tab = ref<'sources' | 'world'>('sources');
 const sources = DATA_SOURCES;
@@ -175,6 +178,16 @@ const scopeLabel: Record<CoverageModel, string> = {
 const keyLabel: Record<KeyReq, string> = { 'none': 'no-key', 'free-tier': 'free key', 'commercial': 'paid', 'sovereign': 'sovereign' };
 const incomeLabel: Record<Income, string> = { H: 'high income', UM: 'upper-middle income', LM: 'lower-middle income', L: 'low income' };
 function epHost(url: string): string { try { return new URL(url).host; } catch { return url; } }
+const acq = (id: string) => acquisitionFor(id);
+const tierLabel: Record<AcquisitionTier, string> = {
+  T0: 'T0 — official API / open dump', T1: 'T1 — polite static HTTP', T2: 'T2 — rotating egress / proxy',
+  T3: 'T3 — headless browser', T4: 'T4 — managed unblocker (anti-bot wall)',
+};
+function complianceNote(id: string): string {
+  const { profile: p, grade } = acquisitionFor(id);
+  const bits = [`right-to-acquire ${grade}`, `robots ${p.policy.robots}`, `ToS ${p.policy.tos}`, p.policy.pii ? 'PII' : 'no PII', p.policy.legalBasis];
+  return bits.join(' · ');
+}
 const asOf = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 </script>
 
@@ -222,6 +235,8 @@ const asOf = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric'
 .dc-status.live { color: #7ee2a8; background: rgba(75, 191, 115, 0.15); } .dc-status.fixture { color: #f0c987; background: rgba(227, 179, 65, 0.15); } .dc-status.planned { color: #93b4ff; background: rgba(120, 160, 255, 0.15); }
 .dc-key { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.03em; font-weight: 700; border-radius: 4px; padding: 0.05rem 0.35rem; white-space: nowrap; }
 .dc-key.none { color: #7ee2a8; background: rgba(75, 191, 115, 0.12); } .dc-key.free-tier { color: #93b4ff; background: rgba(120, 160, 255, 0.12); } .dc-key.commercial { color: #f0883e; background: rgba(240, 136, 62, 0.14); } .dc-key.sovereign { color: var(--accent); background: var(--accent-soft); }
+.dc-tier { display: inline-grid; place-items: center; min-width: 1.7rem; height: 1.25rem; border-radius: 4px; font-size: 0.62rem; font-weight: 800; font-variant-numeric: tabular-nums; color: #0c0f14; }
+.dc-tier.t-T0 { background: #4bbf73; } .dc-tier.t-T1 { background: #7fca8f; } .dc-tier.t-T2 { background: #6ea8fe; } .dc-tier.t-T3 { background: #d8a250; } .dc-tier.t-T4 { background: #e5646a; }
 
 /* Grade chips — the single visual grammar shared by sources + countries */
 .dc-grade { display: inline-grid; place-items: center; min-width: 1.35rem; height: 1.35rem; border-radius: 5px; font-size: 0.74rem; font-weight: 800; color: #0c0f14; }
