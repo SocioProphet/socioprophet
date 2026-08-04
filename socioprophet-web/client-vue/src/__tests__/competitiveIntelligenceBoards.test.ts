@@ -1,6 +1,9 @@
+import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { COMPETITIVE_BOARDS_FIXTURE } from '../features/competitive-intelligence/boards/fixture';
 import { RANK_ORDER, cellFor, tallyBoard, tallyDataset, tallyTotal } from '../features/competitive-intelligence/boards/tally';
+import BoardTable from '../features/competitive-intelligence/boards/BoardTable.vue';
+import type { CategoryBoard } from '../api/competitiveBoardsApi';
 
 describe('competitive-intelligence boards fixture', () => {
   it('has unique category ids', () => {
@@ -79,5 +82,37 @@ describe('board tally helpers', () => {
 
   it('cellFor returns undefined for a non-existent (feature × competitor) pair', () => {
     expect(cellFor(board, 'does-not-exist', board.competitors[0].id)).toBeUndefined();
+  });
+});
+
+describe('BoardTable provisional badge', () => {
+  // The live producer (prophet-platform dashboard-bff GET /v1/competitive-boards) flags a thin
+  // BEAT/MEET lead (spec maturity, or fewer than 2 evidence pointers) as provisional=true rather
+  // than serving it indistinguishable from a solidly-evidenced claim — this must be visible, not
+  // silently dropped by the renderer.
+  const provisionalBoard: CategoryBoard = {
+    id: 'test-cat',
+    name: 'Test category',
+    description: 'test',
+    competitors: [{ id: 'rival', name: 'Rival Co' }],
+    features: [{ id: 'feat-a', name: 'Feature A', definition: 'A test feature.' }],
+    cells: [
+      { feature_id: 'feat-a', competitor_id: 'rival', rank: 'BEAT', maturity: 'spec', basis: 'self-assessed', provisional: true },
+    ],
+  };
+
+  it('renders a provisional badge when the cell is flagged provisional', () => {
+    const wrapper = mount(BoardTable, { props: { board: provisionalBoard } });
+    expect(wrapper.find('.bt-badge--provisional').exists()).toBe(true);
+    expect(wrapper.text()).toContain('provisional');
+  });
+
+  it('does not render a provisional badge when the cell is not flagged', () => {
+    const solidBoard: CategoryBoard = {
+      ...provisionalBoard,
+      cells: [{ ...provisionalBoard.cells[0], provisional: false }],
+    };
+    const wrapper = mount(BoardTable, { props: { board: solidBoard } });
+    expect(wrapper.find('.bt-badge--provisional').exists()).toBe(false);
   });
 });

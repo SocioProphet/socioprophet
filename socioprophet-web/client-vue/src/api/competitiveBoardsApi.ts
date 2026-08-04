@@ -76,6 +76,11 @@ export interface BoardCell {
   basis?: AssessmentBasis;
   /** Short rationale shown on expand. */
   note?: string;
+  /** A thin lead (spec maturity, or fewer than 2 evidence pointers) the producer's own honesty
+   * gate requires to be flagged rather than presented as a solid claim. Absent/false on the
+   * bundled fixture (hand-curated, always evidenced); the live producer sets it per its own
+   * MIN_EVIDENCE_REFS rule — see emit_intelligence_superiority_board.py::_expand_score. */
+  provisional?: boolean;
 }
 
 /** One category comparison board. */

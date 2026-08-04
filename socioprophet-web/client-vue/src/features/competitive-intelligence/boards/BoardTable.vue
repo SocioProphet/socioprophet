@@ -75,6 +75,11 @@
                     class="bt-badge bt-badge--basis"
                     :title="rc.cell.basis === 'externally-certified' ? 'Rank verified by an external party' : 'Rank asserted by the estate'"
                   >{{ rc.cell.basis === 'externally-certified' ? 'certified' : 'self' }}</span>
+                  <span
+                    v-if="rc.cell.provisional"
+                    class="bt-badge bt-badge--provisional"
+                    title="Thin lead — spec maturity or fewer than 2 evidence pointers; the producer's own honesty gate requires this flag rather than presenting it as a solid claim"
+                  >provisional</span>
                 </span>
                 <a
                   v-if="rc.cell.evidence && isSafeHttp(rc.cell.evidence.href)"
@@ -193,6 +198,7 @@ function glyph(rank: BoardRank): string {
 .bt-badge--live { color: var(--live); border-color: rgba(75, 191, 115, 0.4); }
 .bt-badge--spec { color: var(--amber); border-color: rgba(227, 179, 65, 0.4); }
 .bt-badge--basis { color: var(--teal); border-color: rgba(45, 212, 191, 0.4); }
+.bt-badge--provisional { color: var(--amber); border-color: rgba(227, 179, 65, 0.4); }
 .bt-evidence { display: inline-block; margin-top: 0.3rem; font-size: var(--fs-xs); color: var(--info); text-decoration: none; }
 .bt-evidence:hover { text-decoration: underline; }
 .bt-evidence--unsafe { color: var(--text-3); cursor: default; }
