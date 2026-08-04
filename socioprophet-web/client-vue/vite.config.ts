@@ -83,6 +83,13 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/svc\/assay/, ''),
         },
+        // Consent service — self-sovereign consent surface registry + grant/revoke.
+        // Opt-in; the board fails closed to a default-off fixture when absent.
+        '/svc/consent': {
+          target: env.VITE_CONSENT_BASE || 'http://localhost:8790',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/svc\/consent/, ''),
+        },
         // Same-origin proxy to the live Prophet Mesh (mesh.socioprophet.ai has no CORS).
         '/mesh': {
           target: env.VITE_MESH_BASE || 'https://mesh.socioprophet.ai',

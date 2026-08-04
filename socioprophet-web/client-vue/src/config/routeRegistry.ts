@@ -20,6 +20,19 @@ export type RouteRegistryEntry = {
 
 export const routeRegistry: RouteRegistryEntry[] = [
   {
+    path: '/capability/consent',
+    label: 'Consent',
+    domain: 'Capability',
+    maturity: 'L2',
+    stateMode: 'live-fallback',
+    navTier: 'tab-only',
+    userJob: 'See exactly what telemetry could be recorded about your own usage, and turn each one on or off — every item default-off, explained, and revocable.',
+    ownerPlane: 'client-vue ConsentBoard over the sourceos-spec ConsentSurfaceRegistry + CapabilityConsentPolicy; live via /svc/consent (opt-in, fails closed to a default-off fixture)',
+    boundary: 'Self-sovereign: observed party and record-holder are the same principal. Default-deny; nothing collected until granted; every grant revocable. No capture mechanism lives here — this surface only shows and toggles consent state.',
+    primaryObject: 'consent surface',
+    breadcrumbs: ['Capability', 'Consent'],
+  },
+  {
     path: '/capability/assay-fleet',
     label: 'Assay Fleet',
     domain: 'Capability',

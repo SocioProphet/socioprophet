@@ -91,6 +91,7 @@ import DeliveryExcellence from './pages/DeliveryExcellence.vue';
 import Cowork from './pages/Cowork.vue';
 import WorkbenchPage from './pages/WorkbenchPage.vue';
 import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
+import ConsentBoard from './pages/ConsentBoard.vue';
 import './styles.css';
 import './components/workbench/primitives.css';
 
@@ -99,6 +100,7 @@ const explicitRoutes = [
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/capability/dashboard', component: OperatorDashboard },
   { path: '/capability/assay-fleet', component: AssayFleetDashboard },
+  { path: '/capability/consent', component: ConsentBoard },
   { path: '/agentic-os', component: AgenticOS },
   { path: '/marketplace', component: Marketplace },
   { path: '/people/labor-market', component: LaborMarket },
