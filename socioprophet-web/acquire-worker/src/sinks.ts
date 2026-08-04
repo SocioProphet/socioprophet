@@ -5,8 +5,11 @@
 import { mkdir, writeFile, appendFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ProvenanceRecord } from '../../client-vue/src/features/acquisition/policy';
+import type { EnrichmentResult } from './enricher';
 
-export interface LandedRecord { provenance: ProvenanceRecord; body: string | null }
+// Everything lands WITH its provenance; when an Enricher (e.g. SynapseIQ) ran, the enrichment
+// (entities / extractions / embeddings) lands alongside it.
+export interface LandedRecord { provenance: ProvenanceRecord; body: string | null; enrichment?: EnrichmentResult }
 export interface Sink { readonly name: string; write(rec: LandedRecord): Promise<void> }
 
 // Local filesystem: content-addressed body + sidecar provenance JSON under a directory.
@@ -20,6 +23,7 @@ export class LocalFileSink implements Sink {
     const key = rec.provenance.contentHash.replace(/^sha256:/, '').slice(0, 16) || String(Date.now());
     await writeFile(join(this.dir, `${key}.json`), JSON.stringify(rec.provenance, null, 2));
     if (rec.body != null) await writeFile(join(this.dir, `${key}.body`), rec.body);
+    if (rec.enrichment) await writeFile(join(this.dir, `${key}.enrichment.json`), JSON.stringify(rec.enrichment, null, 2));
   }
 }
 

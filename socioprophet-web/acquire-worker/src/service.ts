@@ -12,6 +12,7 @@ import type { AccountClass, AcquisitionTier, SourcePolicy, Override } from '../.
 import type { RobotsRules } from '../../client-vue/src/features/acquisition/robots';
 import { makeNodeDirectFetch, fetchRobots, sha256 } from './nodeTransport';
 import type { Sink } from './sinks';
+import type { Enricher, EnrichmentResult } from './enricher';
 
 const DEFAULT_UA = 'SocioProphetBot/1.0 (+https://socioprophet.ai/bot; governed-acquisition)';
 const PUBLIC: SourcePolicy = { robots: 'allowed', tos: 'public', pii: false, legalBasis: 'public-data' };
@@ -38,9 +39,10 @@ export interface AcquireOptions {
   sourceId?: string;
   geo?: string;
   maxRateWaits?: number;      // how many times to honor a rate-limit deferral before giving up
+  enricher?: Enricher;        // SynapseIQ (or any Enricher) — runs after fetch, before the sink
 }
 
-export type AcquireResult = FetchResult & { landed: boolean; sink?: string };
+export type AcquireResult = FetchResult & { landed: boolean; sink?: string; enriched: boolean };
 
 export class AcquisitionService {
   private fetcher: GovernedFetcher;
@@ -86,11 +88,22 @@ export class AcquisitionService {
       res = await this.fetcher.fetch(req);
     }
 
+    // Enrich (SynapseIQ) between fetch and sink — only on a real body, and never let an enrichment
+    // failure lose the governed fetch: the document still lands, just without enrichment.
+    let enrichment: EnrichmentResult | undefined;
+    if (res.status === 'ok' && res.body && opts.enricher) {
+      try {
+        enrichment = await opts.enricher.enrich({ url, body: res.body, contentHash: res.provenance?.contentHash ?? '' });
+      } catch {
+        enrichment = undefined;
+      }
+    }
+
     let landed = false;
     if (res.provenance && opts.sink) {
-      await opts.sink.write({ provenance: res.provenance, body: res.body ?? null });
+      await opts.sink.write({ provenance: res.provenance, body: res.body ?? null, enrichment });
       landed = true;
     }
-    return { ...res, landed, sink: opts.sink?.name };
+    return { ...res, landed, sink: opts.sink?.name, enriched: !!enrichment };
   }
 }
