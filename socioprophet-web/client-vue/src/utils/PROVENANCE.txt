@@ -1,16 +1,13 @@
 source-repo: SourceOS-Linux/sourceos-spec
 source-path: estate-safety-kit/js/urlSafe.ts
-source-commit: 78f5cf69d231ef5d2c9bd6df45bdf500e7a97ced
+source-commit: 297c4e38befc4a04935cd8cd80bd66874888deb0
 vendored-path: socioprophet-web/client-vue/src/utils/urlSafe.ts
-vendored-at: 2026-08-03
+vendored-at: 2026-08-04
 
-# PROVISIONAL PIN: source-commit above is the head of sourceos-spec PR
-# https://github.com/SourceOS-Linux/sourceos-spec/pull/276 (feat/estate-safety-kit),
-# not yet merged to main. GitHub serves raw content for any pushed commit, so
-# tools/check_vendored_safety_kit.py resolves this pin correctly today, but the
-# branch could be deleted after merge — re-pin source-commit to the actual merge
-# commit on sourceos-spec's main once #276 lands, then re-run the checker.
+# Re-pinned to the actual squash-merge commit on sourceos-spec's main (PR #276 merged).
+# Verified byte-identical against this commit's copy before re-pinning:
+# sha256 9493df8ba2d957798233181f262c30a2fefc718c184200222e119709168703a1 both sides.
 #
 # Same source as socioprophet-web/app-vue/src/services/PROVENANCE.txt — app-vue
 # and client-vue each vendor an independent copy of the same canonical file
-# (SocioProphet/socioprophet#550 / #276's reason for existing in the first place).
+# (SocioProphet/socioprophet#550 / #551, #276's reason for existing in the first place).
