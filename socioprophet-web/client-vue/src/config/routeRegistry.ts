@@ -20,6 +20,19 @@ export type RouteRegistryEntry = {
 
 export const routeRegistry: RouteRegistryEntry[] = [
   {
+    path: '/capability/assay-fleet',
+    label: 'Assay Fleet',
+    domain: 'Capability',
+    maturity: 'L2',
+    stateMode: 'live-fallback',
+    navTier: 'tab-only',
+    userJob: 'See verdict health across the cloud-mesh fleet — the ok/sad/bad distribution, which verifier standards are actually calibrated and live (calibration drift), and any AssayStandard rollout in flight.',
+    ownerPlane: 'client-vue AssayFleetDashboard over prophet-mesh AssayRollup; live via the /svc/assay endpoint (:8780, opt-in, fails closed to a fixture carrying the real calibrated standards)',
+    boundary: 'Cloud-mesh only. A single-user local deployment never instantiates the fleet aggregation path, so this surface is structurally absent on-device. No writeback or rollout-control authority is active; live pull fails closed to the fixture.',
+    primaryObject: 'assay rollup',
+    breadcrumbs: ['Capability', 'Assay Fleet'],
+  },
+  {
     path: '/delivery/wbs',
     label: 'Delivery Excellence',
     domain: 'Delivery Excellence',

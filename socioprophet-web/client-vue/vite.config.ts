@@ -77,6 +77,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/svc\/sherlock/, ''),
         },
+        // prophet-mesh cloud-mesh Assay rollup endpoint. Strip the /svc/assay prefix.
+        '/svc/assay': {
+          target: env.VITE_ASSAY_BASE || 'http://localhost:8780',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/svc\/assay/, ''),
+        },
         // Same-origin proxy to the live Prophet Mesh (mesh.socioprophet.ai has no CORS).
         '/mesh': {
           target: env.VITE_MESH_BASE || 'https://mesh.socioprophet.ai',

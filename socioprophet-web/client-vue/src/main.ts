@@ -57,6 +57,7 @@ import CompetitiveIntelligenceEnterprise from './pages/CompetitiveIntelligenceEn
 import CompetitiveIntelligenceBoards from './pages/CompetitiveIntelligenceBoards.vue';
 import Reader from './pages/Reader.vue';
 import OperatorDashboard from './pages/OperatorDashboard.vue';
+import AssayFleetDashboard from './pages/AssayFleetDashboard.vue';
 import AlgoTradingBoard from './pages/AlgoTradingBoard.vue';
 import PortfolioBoard from './pages/PortfolioBoard.vue';
 import OperatorSurface from './pages/OperatorSurface.vue';
@@ -96,6 +97,7 @@ const explicitRoutes = [
   { path: '/', redirect: '/capability/dashboard' },
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/capability/dashboard', component: OperatorDashboard },
+  { path: '/capability/assay-fleet', component: AssayFleetDashboard },
   { path: '/agentic-os', component: AgenticOS },
   { path: '/marketplace', component: Marketplace },
   { path: '/people/labor-market', component: LaborMarket },
