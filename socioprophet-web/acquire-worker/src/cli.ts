@@ -8,6 +8,7 @@ import { AcquisitionService } from './service';
 import { crawl } from './crawl';
 import { SynapseIQEnricher, NullEnricher, type Enricher } from './enricher';
 import { LocalFileSink, JsonlLedgerSink, HttpSink, MemorySink, MultiSink, type Sink } from './sinks';
+import { WorkspaceNoteSink } from './workspaceNote';
 import type { AccountClass, AcquisitionTier } from '../../client-vue/src/features/acquisition/policy';
 
 function arg(flag: string, def?: string): string | undefined {
@@ -24,7 +25,8 @@ function makeSink(spec: string | undefined): Sink {
     if (kind === 'local') return new LocalFileSink(target || './landed');
     if (kind === 'ledger') return new JsonlLedgerSink(target || './acquire-ledger.jsonl');
     if (kind === 'http') return new HttpSink(target);
-    throw new Error(`unknown sink '${s}' (use local:<dir> | ledger:<file> | http:<url>)`);
+    if (kind === 'note') return new WorkspaceNoteSink(target || './workspace-inbox'); // GooseNotes / Office Plane capture
+    throw new Error(`unknown sink '${s}' (use local:<dir> | ledger:<file> | http:<url> | note:<dir>)`);
   }));
 }
 // --enrich synapseiq:<endpoint>  → SynapseIQ language enrichment (entities/extraction/embeddings).
