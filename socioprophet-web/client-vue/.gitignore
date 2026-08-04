@@ -3,3 +3,9 @@ node_modules/
 dist/
 package-lock.json
 bun.lock
+
+# Playwright (e2e route smoke test) local run artifacts.
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
