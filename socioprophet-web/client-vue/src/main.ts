@@ -83,6 +83,55 @@ import ModelTournament from './pages/ModelTournament.vue';
 import ModelBoard from './pages/ModelBoard.vue';
 import ModelPlatformIntelligence from './pages/ModelPlatformIntelligence.vue';
 import TwinWorldModel from './pages/TwinWorldModel.vue';
+import LandResources from './pages/LandResources.vue';
+import AgenticOS from './pages/AgenticOS.vue';
+import Marketplace from './pages/Marketplace.vue';
+import LaborMarket from './pages/LaborMarket.vue';
+import DeliveryExcellence from './pages/DeliveryExcellence.vue';
+import Cowork from './pages/Cowork.vue';
+import WorkbenchPage from './pages/WorkbenchPage.vue';
+import ScopeDFabric from './pages/workbench/ScopeDFabric.vue';
+import './styles.css';
+import './components/workbench/primitives.css';
+
+const explicitRoutes = [
+  { path: '/', redirect: '/capability/dashboard' },
+  { path: '/login', component: Login, meta: { public: true } },
+  { path: '/capability/dashboard', component: OperatorDashboard },
+  { path: '/capability/assay-fleet', component: AssayFleetDashboard },
+  { path: '/agentic-os', component: AgenticOS },
+  { path: '/marketplace', component: Marketplace },
+  { path: '/people/labor-market', component: LaborMarket },
+  { path: '/delivery/wbs', component: DeliveryExcellence },
+  { path: '/delivery/cowork', component: Cowork },
+  // Capability-rail cells that are realized through an existing surface — the
+  // capability keeps its own /capability/* URL + rail highlight, and the host
+  // screen shows the capability as its header lens (via navScopeForPath).
+  { path: '/capability/portfolios', component: PortfolioBoard },
+  { path: '/operator/holograph-me', component: HolographMe },
+  { path: '/operator/:id', component: OperatorSurface },
+  { path: '/ontology', component: OntologySurface },
+  { path: '/universe', component: UniverseViewer },
+  { path: '/space', component: SpaceTwin },
+  { path: '/situations', component: SituationsSurface },
+  { path: '/marketplace/orchestrate', component: SupplyChainOrchestrator },
+  { path: '/capability/algorithmic-trading', component: AlgoTradingBoard },
+  { path: '/capability/nlp-information-extraction', component: NlpExtractionBench },
+  { path: '/knowledge/studio', component: KnowledgeStudio },
+  { path: '/delivery', component: DeliveryDashboard },
+  { path: '/delivery/estate', component: EstateGraph },
+  { path: '/capability/experiments-simulations', component: ExperimentsBoard },
+  { path: '/capability/behavioral-analytics', component: BehavioralAnalytics },
+  { path: '/capability/mobile-app-development', component: AppBuildBoard },
+  // Maps & Analytics — the analytics trio (Maps itself is MapPage) shares one
+  // Analytics Studio that charts the platform's existing fixtures.
+  { path: '/analytics/supply-chain', component: SupplyChainMap },
+  { path: '/analytics/digital-twin', component: DigitalTwin },
+  { path: '/analytics/twin-workshop', component: TwinOperatingPicture },
+  { path: '/analytics/model-tournament', component: ModelTournament },
+  { path: '/analytics/model-board', component: ModelBoard },
+  { path: '/professional-intelligence/competitive/model-platforms', component: ModelPlatformIntelligence },
+  { path: '/analytics/twin-world-model', component: TwinWorldModel },
   // Layer 0 — Land & Natural Resources (the base of the economic model). Also
   // gives the Weather domain's "Natural Resources" sub-domain a real surface.
   { path: '/weather/natural-resources', component: LandResources },
