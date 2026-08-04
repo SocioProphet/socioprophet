@@ -168,6 +168,28 @@
       </section>
     </div>
 
+    <!-- Governed acquisition — web-data actions dispatched via /api/acquire, recorded + streamed here -->
+    <section v-if="amLive" class="cp-card cp-acq-card" aria-label="Governed acquisition activity">
+      <div class="cp-card-h">🕸 Governed Acquisition <span class="cp-sub">web-data actions · /api/acquire → sovereign worker · recorded + streamed</span>
+        <RouterLink class="cp-acq-open" to="/data/acquisition">open console →</RouterLink>
+      </div>
+      <div class="cp-acq-kpis">
+        <span class="cp-kpi"><b>{{ acqRuns.length }}</b> acquisitions</span>
+        <span class="cp-kpi ok"><b>{{ acqAdmitted }}</b> admitted</span>
+        <span class="cp-kpi ok"><b>{{ acqLanded }}</b> landed</span>
+        <span v-if="acqFailed" class="cp-kpi risk"><b>{{ acqFailed }}</b> failed</span>
+      </div>
+      <div v-if="acqRuns.length" class="cp-acq-list">
+        <div v-for="r in acqRuns.slice(0, 8)" :key="r.run_id" class="cp-acq-row">
+          <span class="cp-acq-state" :class="r.policy_admitted ? (r.memory_written ? 'landed' : 'admitted') : 'held'">{{ r.policy_admitted ? (r.memory_written ? 'landed' : 'admitted') : 'held' }}</span>
+          <span class="cp-acq-id">{{ r.run_id }}</span>
+          <span class="cp-acq-meta">{{ r.tokens_egressed ?? 0 }} egressed · {{ r.latency_ms }}ms</span>
+          <span v-if="r.error" class="cp-acq-err" :title="r.error">{{ r.error }}</span>
+        </div>
+      </div>
+      <p v-else class="cp-acq-empty">No acquisitions yet — dispatch one via <code>POST /api/acquire</code> or the <RouterLink to="/data/acquisition">console</RouterLink>. Each lands here as a governed, audited action with its provenance.</p>
+    </section>
+
     <!-- Audit trail — first-class, persistent, filterable, exportable (Okta system-log pattern) -->
     <section class="cp-card cp-audit-card">
       <div class="cp-card-h">▤ Audit <span class="cp-sub">{{ amLive ? (streamOn ? 'live · streaming · agent-machine runs + decisions' : 'live · polling 30s · agent-machine runs') : 'governed decisions · sealed receipts · persists across reloads' }}</span>
@@ -279,6 +301,16 @@ const fixtureAlerts = computed<Alert[]>(() => computeAlerts(seats.value, queue.v
 const amState = ref<'idle' | 'loading' | 'live' | 'error'>('idle');
 const gov = ref<LiveGovernance | null>(null);
 const amLive = computed(() => amState.value === 'live' && !!gov.value);
+
+// Governed acquisition activity — the agent-machine records web-acquisition dispatched via
+// POST /api/acquire as governance runs (task/provider 'acquire', model 'acquire-worker'), so they
+// stream into gov.runs and become first-class, audited Control-Plane actions.
+const acqRuns = computed(() => (amLive.value && gov.value
+  ? gov.value.runs.filter((r) => r.provider === 'acquire' || r.task === 'acquire' || r.model_routed === 'acquire-worker')
+  : []));
+const acqAdmitted = computed(() => acqRuns.value.filter((r) => r.policy_admitted).length);
+const acqLanded = computed(() => acqRuns.value.filter((r) => r.memory_written).length);
+const acqFailed = computed(() => acqRuns.value.filter((r) => !!r.error).length);
 async function goLiveAM() {
   if (amState.value === 'loading') return;
   amState.value = 'loading';
@@ -647,4 +679,19 @@ onUnmounted(() => { if (clock) clearInterval(clock); closeGovStream(); });
 .cp-audit-dec { font-family: var(--mono, ui-monospace); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.05rem 0.35rem; border-radius: 4px; white-space: nowrap; color: var(--amber); background: var(--amber-soft); }
 .cp-audit-dec.admitted, .cp-audit-dec.executed { color: var(--live); background: var(--live-soft); } .cp-audit-dec.rejected { color: var(--down); background: rgba(240,101,106,0.13); }
 .cp-audit-subj { color: var(--text); } .cp-audit-reason { font-size: 0.58rem; color: var(--text-3); border: 1px solid var(--line-2); border-radius: 4px; padding: 0.02rem 0.3rem; } .cp-audit-meta { color: var(--text-3); } .cp-audit-meta code { font-size: 0.62rem; }
+
+/* Governed acquisition activity card */
+.cp-acq-open { margin-left: auto; font-size: 0.68rem; color: var(--accent); text-decoration: none; }
+.cp-acq-open:hover { text-decoration: underline; }
+.cp-acq-kpis { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.7rem 0.9rem 0; }
+.cp-acq-list { display: flex; flex-direction: column; padding: 0.5rem 0.9rem 0.8rem; }
+.cp-acq-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0; border-bottom: 1px solid var(--line); font-size: 0.74rem; }
+.cp-acq-row:last-child { border-bottom: none; }
+.cp-acq-state { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; border-radius: 4px; padding: 0.05rem 0.4rem; white-space: nowrap; }
+.cp-acq-state.landed { color: var(--live); background: var(--live-soft); } .cp-acq-state.admitted { color: #93b4ff; background: rgba(120,160,255,0.14); } .cp-acq-state.held { color: var(--accent); background: var(--accent-soft); }
+.cp-acq-id { font-family: ui-monospace, monospace; color: var(--text-2); }
+.cp-acq-meta { color: var(--text-3); font-variant-numeric: tabular-nums; margin-left: auto; white-space: nowrap; }
+.cp-acq-err { color: var(--down); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14rem; }
+.cp-acq-empty { padding: 0.8rem 0.9rem 1rem; margin: 0; font-size: 0.78rem; color: var(--text-3); line-height: 1.5; }
+.cp-acq-empty code { font-size: 0.72rem; } .cp-acq-empty a { color: var(--accent); }
 </style>
