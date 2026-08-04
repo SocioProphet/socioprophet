@@ -326,6 +326,7 @@ export const DRAWER_SECTIONS: DrawerSection[] = [
     items: [
       { label: 'Knowledge Graph', to: '/knowledge/graph' },
       { label: 'Search', to: '/data/search' },
+      { label: 'Data Catalogue', to: '/data/catalogue' },
       { label: 'Living Ontology', to: '/ontology' },
       { label: 'Noetica Chat', to: '/noetica' },
     ],
