@@ -4,13 +4,13 @@
 // conditional GET → record provenance → learn from the outcome. The actual network client and the
 // content hasher are INJECTED, so the whole pipeline is unit-testable without a socket (and so the
 // real backend worker can plug in a curl-impersonate / Playwright transport for TLS realism).
-import { evaluateJob, type JobEnvelope, type ProvenanceRecord, type PolicyResult } from './policy';
+import { evaluateJob, type JobEnvelope, type ProvenanceRecord, type PolicyResult, type AcquisitionTier } from './policy';
 import { selectIdentity, scoreOutcome, type EgressIdentity, type FetchOutcome } from './reputation';
 import { RateGovernor } from './rateGovernor';
 import { isAllowed, crawlDelayFor, type RobotsRules } from './robots';
 
 export interface NetResponse { status: number; headers: Record<string, string>; body: string }
-export type NetFetch = (url: string, opts: { headers: Record<string, string>; identity: EgressIdentity }) => Promise<NetResponse>;
+export type NetFetch = (url: string, opts: { headers: Record<string, string>; identity: EgressIdentity; tier: AcquisitionTier }) => Promise<NetResponse>;
 
 export interface FetcherDeps {
   net: NetFetch;
@@ -102,7 +102,7 @@ export class GovernedFetcher {
 
     let res: NetResponse;
     try {
-      res = await this.deps.net(req.url, { headers, identity });
+      res = await this.deps.net(req.url, { headers, identity, tier: req.job.tier });
     } catch (e) {
       const updated = scoreOutcome(identity, 'error', this.now());
       return { status: 'error', identity: updated, reason: e instanceof Error ? e.message : 'network error' };
