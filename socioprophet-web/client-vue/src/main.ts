@@ -170,6 +170,7 @@ const explicitRoutes = [
   { path: '/discovery', component: Discovery },
   { path: '/data/search', component: DataSearch },
   { path: '/data/catalogue', component: () => import('./pages/DataCatalogue.vue') },
+  { path: '/data/acquisition', component: () => import('./pages/AcquisitionConsole.vue') },
   { path: '/knowledge/graph', component: KnowledgeGraph },
   { path: '/forge/import', component: ForgeImport },
   { path: '/sourceos/image-builder', component: ImageBuilder },
