@@ -17,7 +17,9 @@ on:
       - "socioprophet-web/server/src/routes/api/builds-route.ts"
       - "socioprophet-web/server/src/routes/boot-route.ts"
       - "socioprophet-web/server/src/services/bootServer.ts"
+      - "socioprophet-web/server/src/services/bootAttestation.ts"
       - "socioprophet-web/server/test/contracts.test.mjs"
+      - "socioprophet-web/server/test/boot-attestation.test.mjs"
       - ".github/workflows/builder-contract-tests.yml"
   pull_request:
     paths:
@@ -25,7 +27,9 @@ on:
       - "socioprophet-web/server/src/routes/api/builds-route.ts"
       - "socioprophet-web/server/src/routes/boot-route.ts"
       - "socioprophet-web/server/src/services/bootServer.ts"
+      - "socioprophet-web/server/src/services/bootAttestation.ts"
       - "socioprophet-web/server/test/contracts.test.mjs"
+      - "socioprophet-web/server/test/boot-attestation.test.mjs"
 
 jobs:
   contracts:
@@ -42,3 +46,5 @@ jobs:
         run: npm ci || npm install
       - name: Validate builder objects against vendored sourceos-spec schemas
         run: npm run test:contracts
+      - name: Verify boot attestation (measured boot ↔ dm-verity, fail-closed)
+        run: npm run test:boot
