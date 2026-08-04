@@ -1,0 +1,5 @@
+QuorumProof.json — vendored verbatim from SourceOS-Linux/mcp-a2a-zero-trust ::
+schemas/canonical/quorum_proof.schema.json (the authoritative QuorumProof shape).
+Hash-pinned; DO NOT edit here — reconcile from mcp-a2a-zero-trust. The prophet-platform
+quorum verifier (PP #1370) and this server's device-enrollment gate both CONFORM to this
+one shape — verify the canonical proof, never invent a second one.

@@ -18,8 +18,11 @@ on:
       - "socioprophet-web/server/src/routes/boot-route.ts"
       - "socioprophet-web/server/src/services/bootServer.ts"
       - "socioprophet-web/server/src/services/bootAttestation.ts"
+      - "socioprophet-web/server/src/services/deviceEnrollment.ts"
+      - "socioprophet-web/server/src/services/quorum.ts"
       - "socioprophet-web/server/test/contracts.test.mjs"
       - "socioprophet-web/server/test/boot-attestation.test.mjs"
+      - "socioprophet-web/server/test/device-enrollment.test.mjs"
       - ".github/workflows/builder-contract-tests.yml"
   pull_request:
     paths:
@@ -28,8 +31,11 @@ on:
       - "socioprophet-web/server/src/routes/boot-route.ts"
       - "socioprophet-web/server/src/services/bootServer.ts"
       - "socioprophet-web/server/src/services/bootAttestation.ts"
+      - "socioprophet-web/server/src/services/deviceEnrollment.ts"
+      - "socioprophet-web/server/src/services/quorum.ts"
       - "socioprophet-web/server/test/contracts.test.mjs"
       - "socioprophet-web/server/test/boot-attestation.test.mjs"
+      - "socioprophet-web/server/test/device-enrollment.test.mjs"
 
 jobs:
   contracts:
@@ -48,3 +54,5 @@ jobs:
         run: npm run test:contracts
       - name: Verify boot attestation (measured boot ↔ dm-verity, fail-closed)
         run: npm run test:boot
+      - name: Verify device enrollment gate (attested boot × validator quorum, fail-closed)
+        run: npm run test:enroll

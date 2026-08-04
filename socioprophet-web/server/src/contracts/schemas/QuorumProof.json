@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sourceos.local/schemas/canonical/quorum_proof.schema.json",
+  "title": "QuorumProof",
+  "type": "object",
+  "required": [
+    "rule",
+    "validators",
+    "signed_payload_hash",
+    "signatures"
+  ],
+  "properties": {
+    "rule": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validators": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "signed_payload_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "spiffe_id",
+          "sig"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "human"
+            ]
+          },
+          "spiffe_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sig": {
+            "type": "string",
+            "minLength": 16
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

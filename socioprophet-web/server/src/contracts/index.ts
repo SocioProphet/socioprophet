@@ -25,6 +25,7 @@ const validatorNames = [
   "NLBootPlan", "DeviceIdentity", "BootProofRecord", "ContentSpec",
   "ControlNodeProfile", "DesktopProfile", "Offer", "WorkOrder",
   "UsageReceipt", "SettlementEvent", "EventEnvelope",
+  "QuorumProof",
 ];
 const validators: Record<string, any> = {};
 for (const n of validatorNames) validators[n] = ajv.getSchema(idByName[n]);
