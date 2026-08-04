@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sourceos.local/schemas/canonical/grant.schema.json",
+  "title": "Grant",
+  "type": "object",
+  "required": [
+    "grant_id",
+    "issued_at",
+    "expires_at",
+    "binding",
+    "capability",
+    "constraints",
+    "policy_hash"
+  ],
+  "properties": {
+    "grant_id": {
+      "type": "string",
+      "minLength": 8
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "spiffe_id",
+        "aum_digest"
+      ],
+      "properties": {
+        "spiffe_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aum_digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 6
+        }
+      },
+      "additionalProperties": false
+    },
+    "capability": {
+      "type": "object",
+      "required": [
+        "kind",
+        "capability_ref",
+        "capability_digest",
+        "effect"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "mcp_tool",
+            "a2a_skill",
+            "deployment",
+            "runner_action"
+          ]
+        },
+        "capability_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capability_digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "server": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "agent_id": {
+          "type": "string"
+        },
+        "skill": {
+          "type": "string"
+        },
+        "deployment_id": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "executor_ref": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "compute",
+            "exec",
+            "egress"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object"
+    },
+    "policy_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "quorum_proof": {
+      "$ref": "quorum_proof.schema.json"
+    },
+    "evidence_refs": {
+      "$ref": "https://socioprophet.dev/schema/governance/runtime_evidence_refs.schema.json"
+    },
+    "sig": {
+      "type": "object",
+      "required": [
+        "issuer",
+        "sig"
+      ],
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sig": {
+          "type": "string",
+          "minLength": 16
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

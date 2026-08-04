@@ -16,6 +16,7 @@ const fleetRouter = require("./routes/api/fleet-route");
 const bootRouter = require("./routes/boot-route");
 const proCyberneticaRouter = require("./routes/api/procybernetica-dashboard-route");
 const deliveryRouter = require("./routes/api/delivery-route");
+const consentRouter = require("./routes/api/consent-route");
 const { requireAuth } = require("./middleware/auth");
 
 const app = express();
@@ -47,6 +48,9 @@ app.use("/api/procybernetica", apiLimiter, proCyberneticaRouter);
 // Sovereign delivery producer (public read): /api/delivery/* + /api/cowork/*.
 // Sovereign store is canonical; the client adapters fail closed when unreachable.
 app.use("/api", apiLimiter, deliveryRouter);
+// Consent plane. AUTHENTICATED: the subject comes from the session, never from the request, so
+// a caller cannot name whose consent they read or change. Backs client-vue's ConsentBoard.
+app.use("/svc/consent", apiLimiter, requireAuth, consentRouter);
 // Device provisioning is UNAUTHENTICATED (claim-code authorized) — nlboot devices
 // have no Socbase token; rate-limited at the HTTP layer.
 app.use("/boot", bootLimiter, bootRouter);

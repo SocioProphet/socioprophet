@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.dev/schema/governance/runtime_evidence_refs.schema.json",
+  "title": "RuntimeEvidenceRefs",
+  "description": "Reference set that lets grants, policy decisions, or ledger events carry semantic-proof and HDT-summary bindings without embedding full artifacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_ir_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_ir_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "semantic_proof_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "semantic_proof_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "hdt_decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hdt_decision_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "attestation_bundle_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attestation_bundle_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}

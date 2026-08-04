@@ -80,12 +80,23 @@ export async function fetchConsentWithFallback(): Promise<ConsentLoadResult> {
   }
 }
 
-/** Grant or revoke a surface/capability. Fail-open-local: with no backend the change is local-only. */
+/**
+ * Grant or revoke a surface/capability. Fail-open-local: with no backend the change is local-only.
+ *
+ * POST, not GET. These calls change what may be observed about a person, and a state-changing GET
+ * is reachable by a link, a browser prefetch or a cross-site <img> — consent could be granted or
+ * revoked without the person acting. Credentials ride along so the server binds the change to the
+ * authenticated subject rather than trusting an id in the URL.
+ */
 export async function setConsent(id: string, grant: boolean): Promise<{ id: string; state: ConsentState; mode: ConsentMode }> {
   try {
-    const r = await getJson<{ id: string; state: ConsentState }>(
-      `/${grant ? 'grant' : 'revoke'}/${encodeURIComponent(id)}`,
-    );
+    const res = await fetch(`${BASE}/${grant ? 'grant' : 'revoke'}/${encodeURIComponent(id)}`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { accept: 'application/json' },
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${id}`);
+    const r = (await res.json()) as { id: string; state: ConsentState };
     return { ...r, mode: 'live' };
   } catch {
     return { id, state: grant ? 'granted' : 'revoked', mode: 'fixture' };

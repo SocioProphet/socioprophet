@@ -49,6 +49,7 @@
     "test:delivery": "node test/delivery.reconcile.test.mjs",
     "test:mirror": "node test/githubMirror.test.mjs",
     "test:enroll": "node test/device-enrollment.test.mjs",
+    "test:consent": "node test/consent.test.mjs",
     "test:sovereign": "node test/delivery.reconcile.test.mjs && node test/githubMirror.test.mjs"
   },
   "author": "Will Jones",

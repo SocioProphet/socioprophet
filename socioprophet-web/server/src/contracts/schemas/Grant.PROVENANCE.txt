@@ -1,0 +1,12 @@
+Grant.json — vendored verbatim from SourceOS-Linux/mcp-a2a-zero-trust ::
+schemas/canonical/grant.schema.json (the authoritative Grant shape), pinned at
+7ec8133fa87ab33b373cf4e4badd17af77f50c22.
+
+DO NOT edit here — reconcile from mcp-a2a-zero-trust. The consent ledger
+(src/services/consentLedger.ts) mints grants against THIS shape rather than a
+consent-specific one, so a consent grant is verifiable by the same verifier as
+any other capability grant in the estate. A second grant shape would mean
+consent could be honoured by one verifier and ignored by another.
+
+Sibling precedent: QuorumProof.json, vendored the same way for the
+device-enrollment gate.

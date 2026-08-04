@@ -1,0 +1,9 @@
+RuntimeEvidenceRefs.json — vendored verbatim from SourceOS-Linux/mcp-a2a-zero-trust ::
+schemas/governance/runtime_evidence_refs.schema.json, pinned at
+7ec8133fa87ab33b373cf4e4badd17af77f50c22.
+
+DO NOT edit here — reconcile from mcp-a2a-zero-trust. Present only because the canonical
+Grant schema $refs it (Grant.evidence_refs); vendored to complete the ref closure so
+Grant.json compiles standalone. Trimming the $ref out of Grant.json instead would have
+made the vendored copy a fork of the authority, which is the thing the PROVENANCE
+convention exists to prevent.
