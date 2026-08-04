@@ -85,6 +85,37 @@ const CAM = "camera";
   ck("grant of an unknown id is refused", L.grant(L.createStore(), SELF, "telemetry:made:up").ok === false);
 }
 
+// ── prototype pollution (CodeQL js/prototype-polluting-assignment, js/remote-property-injection)
+// The id comes straight off the URL path. On an ordinary {} store, revoke("__proto__") read
+// Object.prototype as a grant record and wrote the revocation onto it, polluting every object in
+// the process. Two independent closures now: a registry gate before the id is used as a key, and
+// a null-prototype grants map.
+{
+  const POLLUTERS = ["__proto__", "constructor", "prototype"];
+  for (const p of POLLUTERS) {
+    const s = L.createStore();
+    s.subject = SELF;
+    const r = L.revoke(s, SELF, p);
+    ck(`revoke("${p}") is refused`, r.ok === false && r.reason === "unknown-id");
+    ck(`revoke("${p}") did not pollute Object.prototype`, {}.state === undefined && {}.revokedAt === undefined);
+
+    const g = L.grant(s, SELF, p);
+    ck(`grant("${p}") is refused`, g.ok === false && g.reason === "unknown-id");
+    ck(`check("${p}") is false`, L.check(s, p) === false);
+  }
+  // A polluted Object.prototype must not be able to fake a grant either.
+  Object.prototype.state = "granted";               // eslint-disable-line no-extend-native
+  try {
+    const s = L.createStore();
+    ck("an inherited 'state' cannot fake a grant", L.check(s, SURFACE) === false);
+    ck("snapshot ignores inherited properties", L.snapshot(s, SELF).surfaces.every((x) => x.consent.state === "denied"));
+  } finally {
+    delete Object.prototype.state;
+  }
+  const s2 = L.createStore();
+  ck("grants map has a null prototype", Object.getPrototypeOf(s2.grants) === null);
+}
+
 // ── grant → check → revoke ────────────────────────────────────────────────────
 {
   const s = L.createStore();

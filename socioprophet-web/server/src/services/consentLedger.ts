@@ -91,6 +91,7 @@ const registry = () => {
 };
 
 const _findItem = (id: string): any | null => {
+  if (typeof id !== "string" || !id) return null;
   const r = registry();
   return (
     r.surfaces.find((s: any) => s.surfaceId === id) ??
@@ -99,10 +100,29 @@ const _findItem = (id: string): any | null => {
   );
 };
 
+// Is this id a real surface/capability? Every operation gates on this BEFORE the id is used as
+// an object key, so an id from the URL path can never name something outside the registry —
+// including "__proto__" and friends. Default-deny applied to the id space itself.
+const _isKnownId = (id: string): boolean => _findItem(id) !== null;
+
 // ── store ────────────────────────────────────────────────────────────────────
-// A grant record per consented id. Deliberately a plain object so it can be swapped for durable
+// A grant record per consented id. Deliberately a plain map so it can be swapped for durable
 // storage without changing the logic below.
-const createStore = () => ({ subject: null as string | null, grants: {} as Record<string, any> });
+//
+// grants uses a NULL-PROTOTYPE object. The ids that key it come from the URL path, and on an
+// ordinary `{}` the keys "__proto__", "constructor" and "prototype" do not behave like data:
+// `grants["__proto__"]` resolves to Object.prototype, so reading a "record" for it yields a
+// truthy object and writing to that record mutates every object in the process. A null-prototype
+// map has no such keys to inherit. This is belt-and-braces with `_isKnownId` below — either one
+// alone would close it, and both are cheap.
+const createStore = () => ({ subject: null as string | null, grants: Object.create(null) as Record<string, any> });
+
+// Own-property lookup that cannot walk a prototype chain.
+const _record = (store: any, id: string): any | null => {
+  const g = store?.grants;
+  if (!g || typeof id !== "string") return null;
+  return Object.prototype.hasOwnProperty.call(g, id) ? g[id] : null;
+};
 
 const _spiffeFor = (subject: string): string => SPIFFE_PREFIX + encodeURIComponent(subject);
 
@@ -190,7 +210,8 @@ const grant = (store: any, subject: string, id: string, opts?: { now?: number; s
 const check = (store: any, id: string, opts?: { now?: number; subject?: string }): boolean => {
   try {
     if (!store || typeof store !== "object" || !store.grants) return false;
-    const rec = store.grants[id];
+    if (!_isKnownId(id)) return false; // an id outside the registry is denied, never looked up
+    const rec = _record(store, id);
     if (!rec || rec.state !== "granted") return false;
     if (rec.revokedAt) return false;
 
@@ -222,7 +243,10 @@ const revoke = (store: any, subject: string, id: string, opts?: { now?: number }
   if (store.subject && subject && store.subject !== subject) {
     return { ok: false, reason: "subject-mismatch" };
   }
-  const rec = store.grants?.[id];
+  // Gate on the registry BEFORE the id touches the store. Without this, revoking "__proto__"
+  // read Object.prototype as a grant record and wrote the revocation onto it.
+  if (!_isKnownId(id)) return { ok: false, reason: "unknown-id" };
+  const rec = _record(store, id);
   const now = opts?.now ?? Date.now();
   if (!rec) {
     // Revoking something never granted is not an error — the end state the person asked for
@@ -239,7 +263,7 @@ const snapshot = (store: any, subject: string, opts?: { now?: number }) => {
   const r = registry();
   const self = subject ?? store?.subject ?? "urn:srcos:principal:self";
   const stateOf = (id: string) => {
-    const rec = store?.grants?.[id];
+    const rec = _record(store, id);
     if (!rec) return { state: "denied" as const };
     const live = check(store, id, { now: opts?.now, subject: self });
     if (rec.state === "revoked") {
