@@ -54,6 +54,7 @@ import CompetitiveIntelligenceApp from './pages/CompetitiveIntelligenceApp.vue';
 import CompetitiveIntelligenceFeatures from './pages/CompetitiveIntelligenceFeatures.vue';
 import CompetitiveIntelligenceMarkets from './pages/CompetitiveIntelligenceMarkets.vue';
 import CompetitiveIntelligenceEnterprise from './pages/CompetitiveIntelligenceEnterprise.vue';
+import CompetitiveIntelligenceBrowser from './pages/CompetitiveIntelligenceBrowser.vue';
 import CompetitiveIntelligenceBoards from './pages/CompetitiveIntelligenceBoards.vue';
 import Reader from './pages/Reader.vue';
 import OperatorDashboard from './pages/OperatorDashboard.vue';
@@ -145,6 +146,7 @@ const explicitRoutes = [
   { path: '/professional-intelligence/competitive/features', component: CompetitiveIntelligenceFeatures },
   { path: '/professional-intelligence/competitive/markets', component: CompetitiveIntelligenceMarkets },
   { path: '/professional-intelligence/competitive/enterprise', component: CompetitiveIntelligenceEnterprise },
+  { path: '/professional-intelligence/competitive/browser', component: CompetitiveIntelligenceBrowser },
   { path: '/professional-intelligence/competitive/boards', component: CompetitiveIntelligenceBoards },
   { path: '/professional-intelligence/competitive/:id', component: CompetitiveIntelligenceApp },
   { path: '/professional-intelligence', component: ProfessionalIntelligence },
