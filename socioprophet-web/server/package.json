@@ -45,6 +45,7 @@
     "dev": "nodemon src/server.ts",
     "test:contracts": "node test/contracts.test.mjs",
     "test:boot": "node test/boot-attestation.test.mjs",
+    "test:admission": "node test/admission.test.mjs",
     "test:delivery": "node test/delivery.reconcile.test.mjs",
     "test:mirror": "node test/githubMirror.test.mjs",
     "test:enroll": "node test/device-enrollment.test.mjs",

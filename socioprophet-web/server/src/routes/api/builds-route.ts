@@ -6,6 +6,7 @@ export {};
 const express = require("express");
 const { socbaseAdmin } = require("../../middleware/auth");
 const { dispatchBuild, readBuildStatus } = require("../../services/buildOrchestrator");
+const { admitBuild } = require("../../services/buildAdmission");
 const contracts = require("../../contracts");
 const { emitEvent } = require("../../services/events");
 
@@ -80,6 +81,25 @@ router.post("/", async (req: any, res: any) => {
     const wo = contracts.workOrder(doc.id, uid, spec.edition || "desktop");
     const woErrors = contracts.validate("WorkOrder", wo);
     if (!woErrors.length) await update({ workOrder: wo });
+
+    // Govern: admit the build through the capability membrane and seal an
+    // AutonomyAdmissionReceipt. Advisory by default (records + emits, never blocks);
+    // BUILD_ADMISSION_ENFORCE=true makes a deny fail-closed. Either way no OS image is
+    // built without a governance decision on record.
+    const admission = await admitBuild(uid, doc.id, spec, tier);
+    const admErrors = contracts.validate("AutonomyAdmissionReceipt.v0.2", admission.receipt);
+    if (admErrors.length) {
+      // our OWN receipt must conform; a non-conformant receipt is a bug, fail-closed.
+      await update({ status: "error", error: "AutonomyAdmissionReceipt not conformant: " + admErrors.join("; ") });
+      return res.status(500).json({ error: "internal: non-conformant admission receipt", details: admErrors });
+    }
+    await update({ admissionReceipt: admission.receipt, admissionDecision: admission.decision });
+    await emitEvent("srcos.builder.admission.decided", `urn:srcos:user:${uid}`,
+      buildRequest.id, { decision: admission.decision, enforced: admission.enforce, receiptId: admission.receipt.receipt_id }, "fog");
+    if (admission.blocked) {
+      await update({ status: "denied", error: "admission denied: " + admission.receipt.reason });
+      return res.status(403).json({ error: "build denied by governance membrane", decision: admission.decision, receipt: admission.receipt });
+    }
 
     try {
       const dispatch = await dispatchBuild(uid, doc.id, spec, tier);

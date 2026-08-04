@@ -18,9 +18,11 @@ on:
       - "socioprophet-web/server/src/routes/boot-route.ts"
       - "socioprophet-web/server/src/services/bootServer.ts"
       - "socioprophet-web/server/src/services/bootAttestation.ts"
+      - "socioprophet-web/server/src/services/buildAdmission.ts"
       - "socioprophet-web/server/src/services/deviceEnrollment.ts"
       - "socioprophet-web/server/src/services/quorum.ts"
       - "socioprophet-web/server/test/contracts.test.mjs"
+      - "socioprophet-web/server/test/admission.test.mjs"
       - "socioprophet-web/server/test/boot-attestation.test.mjs"
       - "socioprophet-web/server/test/device-enrollment.test.mjs"
       - ".github/workflows/builder-contract-tests.yml"
@@ -31,9 +33,11 @@ on:
       - "socioprophet-web/server/src/routes/boot-route.ts"
       - "socioprophet-web/server/src/services/bootServer.ts"
       - "socioprophet-web/server/src/services/bootAttestation.ts"
+      - "socioprophet-web/server/src/services/buildAdmission.ts"
       - "socioprophet-web/server/src/services/deviceEnrollment.ts"
       - "socioprophet-web/server/src/services/quorum.ts"
       - "socioprophet-web/server/test/contracts.test.mjs"
+      - "socioprophet-web/server/test/admission.test.mjs"
       - "socioprophet-web/server/test/boot-attestation.test.mjs"
       - "socioprophet-web/server/test/device-enrollment.test.mjs"
 
@@ -56,3 +60,5 @@ jobs:
         run: npm run test:boot
       - name: Verify device enrollment gate (attested boot × validator quorum, fail-closed)
         run: npm run test:enroll
+      - name: Validate build admission (membrane gate + sealed admission receipt)
+        run: npm run test:admission

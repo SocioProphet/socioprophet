@@ -1,0 +1,7 @@
+AutonomyAdmissionReceipt.v0.2.json
+Source of truth: SourceOS-Linux/prophet-platform :: contracts/AutonomyAdmissionReceipt.v0.2.json
+(the authoritative autonomy-admission contract emitted by the capability membrane).
+Vendored verbatim, hash-pinned. DO NOT edit here — reconcile from prophet-platform.
+Rationale: the image-builder admits every OS build through the SAME contract the
+membrane uses, so a build receipt is comparable to any other admission in the estate.
+Conform, don't invent.

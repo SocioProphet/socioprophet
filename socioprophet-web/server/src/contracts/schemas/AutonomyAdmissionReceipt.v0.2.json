@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/contracts/AutonomyAdmissionReceipt.v0.2.json",
+  "title": "AutonomyAdmissionReceipt",
+  "description": "Runtime evidence receipt emitted when prophet-platform admits, demotes, or denies a choir role operating at a requested AI-driven-development autonomy level. v0.2 binds the decision to the capability-membrane kernel (tools/capability_membrane.py): when an operation context is supplied, the canonical role-aware ladder decision is wrapped by the membrane's four fail-closed layers (surface class, capability radius + tension-member presence, membrane policy verdict, autonomy ladder) and collapsed into one sourceos ExecutionDecision. The membrane block records that decision and the sealHash of the sibling sealed AgentMachineReceipt, making the composed admission tamper-evident.",
+  "type": "object",
+  "required": [
+    "version",
+    "receipt_id",
+    "created_at",
+    "service_ref",
+    "role",
+    "requested_level",
+    "granted_level",
+    "decision",
+    "gate",
+    "evidence_required",
+    "trust_kernel_gate_order",
+    "subject_ref",
+    "membrane",
+    "hash",
+    "hash_algo"
+  ],
+  "properties": {
+    "version": { "const": "0.2" },
+    "receipt_id": { "type": "string" },
+    "created_at": { "type": "string" },
+    "service_ref": { "type": "string" },
+    "role": {
+      "type": "string",
+      "description": "Choir role requesting autonomy (e.g. conductor, coding, research)."
+    },
+    "requested_level": { "type": "string", "pattern": "^L[0-5]$" },
+    "granted_level": { "type": "string", "pattern": "^L[0-5]$" },
+    "role_ceiling": { "type": "string", "pattern": "^L[0-5]$" },
+    "decision": { "type": "string", "enum": ["admit", "demote", "deny"] },
+    "gate": {
+      "type": "string",
+      "description": "Name of the gate that governs the granted level."
+    },
+    "evidence_required": { "type": "string" },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "reason": { "type": "string" },
+    "trust_kernel_gate_order": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "prefixItems": [
+        { "const": "identity" },
+        { "const": "policy" },
+        { "const": "evidence" },
+        { "const": "attestation" },
+        { "const": "revocation" },
+        { "const": "audit" }
+      ],
+      "items": false
+    },
+    "subject_ref": { "type": "string" },
+    "envelope_ref": { "type": "string" },
+    "policy_refs": { "type": "array", "items": { "type": "string" } },
+    "membrane": {
+      "type": "object",
+      "description": "The capability-membrane resolution that governs this admission. execution_decision is the collapsed sourceos ExecutionDecision across all four fail-closed layers; a non-allow value forces decision=deny and granted_level=L0.",
+      "required": [
+        "execution_decision",
+        "verdict",
+        "capability_radius",
+        "missing_tension",
+        "membrane_decision",
+        "enforced",
+        "seal_hash"
+      ],
+      "properties": {
+        "execution_decision": {
+          "type": "string",
+          "enum": ["allow", "deny", "ask", "defer", "rewrite"]
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["allowed", "denied", "deferred", "failed", "observed"]
+        },
+        "capability_radius": { "type": "string", "pattern": "^R[0-5]$" },
+        "missing_tension": { "type": "array", "items": { "type": "string" } },
+        "membrane_decision": {
+          "type": "string",
+          "enum": ["ALLOW", "DENY", "QUARANTINE", "REDACT", "REQUIRE_SIGNATURE"]
+        },
+        "enforced": { "type": "boolean" },
+        "seal_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "agent_machine_receipt_ref": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "hash": { "type": "string" },
+    "hash_algo": { "type": "string" }
+  },
+  "additionalProperties": false
+}

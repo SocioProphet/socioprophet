@@ -26,6 +26,7 @@ const validatorNames = [
   "ControlNodeProfile", "DesktopProfile", "Offer", "WorkOrder",
   "UsageReceipt", "SettlementEvent", "EventEnvelope",
   "QuorumProof",
+  "AutonomyAdmissionReceipt.v0.2",
 ];
 const validators: Record<string, any> = {};
 for (const n of validatorNames) validators[n] = ajv.getSchema(idByName[n]);
