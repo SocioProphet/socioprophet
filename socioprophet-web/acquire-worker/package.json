@@ -1,0 +1,22 @@
+{
+  "name": "@socioprophet/acquire-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Real Node worker for the governed acquisition plane — live fetch, robots, rate, provenance, local/cloud sinks.",
+  "license": "MIT",
+  "bin": { "acquire": "src/cli.ts" },
+  "scripts": {
+    "acquire": "tsx src/cli.ts",
+    "serve": "tsx src/server.ts",
+    "test": "tsx --test src/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "undici": "^6.19.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
