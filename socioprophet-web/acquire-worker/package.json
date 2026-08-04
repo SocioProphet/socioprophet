@@ -16,11 +16,11 @@
     "bundle": "esbuild src/server.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/server.cjs"
   },
   "dependencies": {
-    "undici": "^6.19.8"
+    "undici": "^8.10.0"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.28.1"
   }
 }
