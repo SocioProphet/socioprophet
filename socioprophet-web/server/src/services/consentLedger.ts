@@ -100,10 +100,18 @@ const _findItem = (id: string): any | null => {
   );
 };
 
-// Is this id a real surface/capability? Every operation gates on this BEFORE the id is used as
-// an object key, so an id from the URL path can never name something outside the registry —
-// including "__proto__" and friends. Default-deny applied to the id space itself.
-const _isKnownId = (id: string): boolean => _findItem(id) !== null;
+// The REGISTRY's own id string for a request id, or null if the id names nothing real.
+//
+// Every store key goes through this. The string that ends up as an object key is one this module
+// authored, never the caller's, even though the two compare equal — so there is no data flow from
+// the request to a property name at all. Two things follow: default-deny applied to the id space
+// itself ("__proto__" and friends name nothing, so they are refused before any lookup), and the
+// safety is provable to a taint analyser rather than merely true in practice.
+const _canonicalId = (id: string): string | null => {
+  const item = _findItem(id);
+  if (!item) return null;
+  return (item.surfaceId ?? item.capabilityId ?? null) as string | null;
+};
 
 // ── store ────────────────────────────────────────────────────────────────────
 // A grant record per consented id. Deliberately a plain map so it can be swapped for durable
@@ -113,12 +121,13 @@ const _isKnownId = (id: string): boolean => _findItem(id) !== null;
 // ordinary `{}` the keys "__proto__", "constructor" and "prototype" do not behave like data:
 // `grants["__proto__"]` resolves to Object.prototype, so reading a "record" for it yields a
 // truthy object and writing to that record mutates every object in the process. A null-prototype
-// map has no such keys to inherit. This is belt-and-braces with `_isKnownId` below — either one
+// map has no such keys to inherit. This is belt-and-braces with `_canonicalId` below — either one
 // alone would close it, and both are cheap.
 const createStore = () => ({ subject: null as string | null, grants: Object.create(null) as Record<string, any> });
 
-// Own-property lookup that cannot walk a prototype chain.
-const _record = (store: any, id: string): any | null => {
+// Own-property lookup that cannot walk a prototype chain. `id` is expected to already be a
+// canonical registry string (see _canonicalId); the hasOwnProperty guard is the second lock.
+const _record = (store: any, id: string | null): any | null => {
   const g = store?.grants;
   if (!g || typeof id !== "string") return null;
   return Object.prototype.hasOwnProperty.call(g, id) ? g[id] : null;
@@ -189,11 +198,14 @@ const grant = (store: any, subject: string, id: string, opts?: { now?: number; s
   }
   const item = _findItem(id);
   if (!item) return { ok: false, reason: "unknown-id" }; // default-deny: no such surface, no grant
+  const key = _canonicalId(id);
+  if (key === null) return { ok: false, reason: "unknown-id" };
 
   const g = mintGrant(subject, item, opts);
   store.subject = subject;
-  store.grants[id] = {
-    id,
+  // `key` is the registry's own string, not the caller's — no request value reaches a property name.
+  store.grants[key] = {
+    id: key,
     state: "granted",
     grantedAt: g.issued_at,
     revokedAt: null,
@@ -210,8 +222,9 @@ const grant = (store: any, subject: string, id: string, opts?: { now?: number; s
 const check = (store: any, id: string, opts?: { now?: number; subject?: string }): boolean => {
   try {
     if (!store || typeof store !== "object" || !store.grants) return false;
-    if (!_isKnownId(id)) return false; // an id outside the registry is denied, never looked up
-    const rec = _record(store, id);
+    const key = _canonicalId(id); // an id outside the registry is denied, never looked up
+    if (key === null) return false;
+    const rec = _record(store, key);
     if (!rec || rec.state !== "granted") return false;
     if (rec.revokedAt) return false;
 
@@ -245,8 +258,9 @@ const revoke = (store: any, subject: string, id: string, opts?: { now?: number }
   }
   // Gate on the registry BEFORE the id touches the store. Without this, revoking "__proto__"
   // read Object.prototype as a grant record and wrote the revocation onto it.
-  if (!_isKnownId(id)) return { ok: false, reason: "unknown-id" };
-  const rec = _record(store, id);
+  const key = _canonicalId(id);
+  if (key === null) return { ok: false, reason: "unknown-id" };
+  const rec = _record(store, key);
   const now = opts?.now ?? Date.now();
   if (!rec) {
     // Revoking something never granted is not an error — the end state the person asked for
